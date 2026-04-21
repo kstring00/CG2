@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   BookOpen,
   HandHeart,
+  HeartHandshake,
   Users,
   Compass,
   MapPin,
@@ -30,8 +31,9 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/support', label: 'Home', icon: LayoutDashboard },
   { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
-  { href: '/support/providers', label: 'Providers & Resources', icon: MapPin },
+  { href: '/support/caregiver', label: 'Support for You', icon: HeartHandshake },
   { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
+  { href: '/support/providers', label: 'Providers & Services', icon: MapPin },
   { href: '/support/sensory-friendly', label: 'Sensory-Friendly Guide', icon: HandHeart },
   { href: '/support/community', label: 'Community', icon: Users },
   { href: '/support/help', label: 'Help & Hotlines', icon: HandHeart },

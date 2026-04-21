@@ -6,10 +6,11 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   ClipboardList,
-  LineChart,
+  Star,
   GraduationCap,
   MessageSquare,
-  Sparkles,
+  HeartHandshake,
+  HelpCircle,
   Menu,
   X,
   Lock,
@@ -19,20 +20,12 @@ import {
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
 import { cn } from '@/lib/utils';
 
-/**
- * ClientShell — the layout for the PRIVATE, enrolled-client portal.
- *
- * Visual language: accent (burgundy/red) rail, lock iconography, persistent
- * "Client portal" banner, and an explicit link back to Care Navigation.
- *
- * Every page inside this shell is assumed to be personalized / HIPAA-scoped.
- * Anything public should route through /support instead.
- */
 const navItems = [
-  { href: '/client/portal', label: 'Portal Home', icon: LayoutDashboard },
-  { href: '/client/care-plan', label: 'Care Plan', icon: ClipboardList },
-  { href: '/client/progress', label: 'Progress', icon: LineChart },
-  { href: '/client/coaching', label: 'Parent Coaching', icon: GraduationCap },
+  { href: '/client/portal', label: 'Home', icon: LayoutDashboard },
+  { href: '/client/care-plan', label: 'Current care plan', icon: ClipboardList },
+  { href: '/client/progress', label: 'Growth & wins', icon: Star },
+  { href: '/client/coaching', label: 'Practice at home', icon: GraduationCap },
+  { href: '/client/concerns', label: 'Questions & concerns', icon: HelpCircle },
   { href: '/client/messages', label: 'Messages', icon: MessageSquare },
 ];
 
@@ -92,11 +85,20 @@ export function ClientShell({
           })}
         </ul>
 
-        {/* Cross-layer handoff — back to Care Navigation */}
+        {/* Cross-layer links */}
         <div className="mt-6 border-t border-surface-border/60 pt-4">
           <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-            Also available
+            Also here for you
           </p>
+          <Link
+            href="/support/caregiver"
+            className="group mb-1 flex items-center justify-between gap-3 rounded-xl border border-brand-plum-100 bg-brand-plum-50/60 px-3 py-2.5 text-sm font-semibold text-brand-plum-700 transition-all hover:bg-brand-plum-100"
+          >
+            <span className="inline-flex items-center gap-2">
+              <HeartHandshake className="h-4 w-4" /> Support for you
+            </span>
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
           <Link
             href="/support"
             className="group flex items-center justify-between gap-3 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-sm font-semibold text-primary transition-all hover:bg-primary/10"
@@ -108,17 +110,9 @@ export function ClientShell({
       </nav>
 
       <div className="border-t border-surface-border px-4 py-4">
-        <div className="rounded-2xl border border-accent/15 bg-accent/5 px-3 py-3">
-          <p className="flex items-center gap-1.5 text-xs font-semibold text-accent">
-            <Sparkles className="h-3.5 w-3.5" /> Coming soon
-          </p>
-          <p className="mt-1 text-[11px] leading-relaxed text-brand-muted-600">
-            AI companion tied to your child&apos;s real plan, reviewed by your BCBA.
-          </p>
-        </div>
         <Link
           href="/client"
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 text-[11px] font-semibold text-brand-muted-500 hover:text-brand-muted-900"
+          className="inline-flex w-full items-center justify-center gap-2 text-[11px] font-semibold text-brand-muted-500 hover:text-brand-muted-900"
         >
           <LogOut className="h-3.5 w-3.5" /> Sign out
         </Link>
@@ -155,7 +149,6 @@ export function ClientShell({
       </aside>
 
       <div className="flex-1 lg:ml-64">
-        {/* Persistent "Client portal" banner */}
         <div className="border-b border-accent/25 bg-accent/5">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-accent">
@@ -182,9 +175,6 @@ export function ClientShell({
             <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold uppercase tracking-wide text-accent">
                 Client Portal · {clientName}
-              </p>
-              <p className="truncate text-sm text-brand-muted-700">
-                Tied to your child&apos;s BCBA-authored care plan
               </p>
             </div>
           </div>

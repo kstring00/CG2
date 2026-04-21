@@ -63,10 +63,11 @@ export default function ResourcesPage() {
   return (
     <div className="page-shell">
       <header className="page-header">
-        <h1 className="page-title">Resources &amp; Support Library</h1>
+        <h1 className="page-title">Helpful right now</h1>
         <p className="page-description">
-          This page is designed to answer the question in front of you, not flood you with more reading.
-          Choose your stage first, then use the resources that support a real next decision.
+          Choose your stage and we surface the resources that matter for where you are — not a
+          giant list to scroll through. Each one is from a trusted source and chosen because it
+          answers a real question parents in your stage are asking.
         </p>
       </header>
 
@@ -75,7 +76,7 @@ export default function ResourcesPage() {
           <div>
             <h2 className="section-title">For your stage</h2>
             <p className="mt-1 text-sm text-brand-muted-500">
-              Select the family stage you are in so Common Ground can surface the most useful reading first.
+              Pick the stage that fits your family right now. We will show the resources most useful for where you are.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
