@@ -1,8 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Bookmark, BookOpen, Clock, Search, Sparkles } from 'lucide-react';
-import { DemoDataNotice } from '@/components/ui/DemoDataNotice';
+import { ArrowUpRight, Bookmark, BookOpen, Clock, Search, Sparkles } from 'lucide-react';
 import { TrustPanel } from '@/components/ui/TrustPanel';
 import {
   categoryMeta,
@@ -71,12 +70,6 @@ export default function ResourcesPage() {
         </p>
       </header>
 
-      <DemoDataNotice
-        title="Example resource library"
-        description="Resource titles and summaries are demo content. Stage logic, reviewed labels, and action framing show how the real system would guide a parent."
-        compact
-      />
-
       <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -134,7 +127,7 @@ export default function ResourcesPage() {
             eyebrow="Resource guardrails"
             title="Built to guide a decision, not replace professional care"
             description="Resources explain what matters now, who they are for, and what action they support. They do not replace therapy, school advice, or crisis support."
-            meta={['Reviewed labels visible', 'Stage-aware recommendations', 'Example content clearly marked']}
+            meta={['Reviewed by authoritative sources', 'Stage-aware recommendations', 'Real external links to trusted organizations']}
             icon={Sparkles}
             tone="muted"
           />
@@ -245,11 +238,20 @@ export default function ResourcesPage() {
                   </span>
                   <span>{resource.reviewedBy}</span>
                 </div>
-                {resource.isDemo && (
+                {resource.url ? (
+                  <a
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary hover:text-white"
+                  >
+                    Visit resource <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                ) : resource.isDemo ? (
                   <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800">
                     Example content
                   </span>
-                )}
+                ) : null}
               </div>
             </article>
           );
