@@ -52,10 +52,12 @@ export default function HomePage() {
       </nav>
 
       {/* ─────────────────────────────────────────
-          HERO — full bleed, white text over dark photo
+          HERO — full bleed photo, split layout:
+          left = emotional headline, right = action guide
       ───────────────────────────────────────── */}
-      <section className="relative min-h-[580px] overflow-hidden pt-16 lg:min-h-[640px]">
-        {/* Photo — full bleed, edge to edge, no card */}
+      <section className="relative overflow-hidden pt-16" style={{ minHeight: '680px' }}>
+
+        {/* Photo — full bleed, framed on therapist face + logo */}
         <div className="absolute inset-0">
           <Image
             src="/hero-texas-aba.jpg"
@@ -63,69 +65,158 @@ export default function HomePage() {
             fill
             priority
             className="object-cover"
-            style={{ objectPosition: '68% 28%' }}
+            style={{ objectPosition: '55% 18%' }}
           />
-          {/* Dark gradient over left half so white text pops */}
+          {/* Strong left dark zone for headline legibility */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(to right, rgba(8,15,30,0.90) 0%, rgba(8,15,30,0.78) 30%, rgba(8,15,30,0.40) 58%, rgba(8,15,30,0.0) 100%)',
+                'linear-gradient(105deg, rgba(8,15,30,0.96) 0%, rgba(8,15,30,0.88) 32%, rgba(8,15,30,0.55) 54%, rgba(8,15,30,0.18) 70%, rgba(8,15,30,0.0) 100%)',
             }}
           />
-          {/* Bottom fade into the page — long and smooth */}
+          {/* Bottom fade into page */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-56"
-            style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(244,239,232,0.5) 50%, #f4efe8 100%)' }}
+            className="absolute bottom-0 left-0 right-0"
+            style={{
+              height: '220px',
+              background: 'linear-gradient(to bottom, transparent 0%, rgba(244,239,232,0.45) 55%, #f4efe8 100%)'
+            }}
           />
-          {/* Top fade — softens the nav edge */}
+          {/* Top fade — nav edge */}
           <div
-            className="absolute top-0 left-0 right-0 h-24"
-            style={{ background: 'linear-gradient(to bottom, rgba(8,15,30,0.45) 0%, transparent 100%)' }}
+            className="absolute top-0 left-0 right-0 h-20"
+            style={{ background: 'linear-gradient(to bottom, rgba(8,15,30,0.55) 0%, transparent 100%)' }}
           />
         </div>
 
-        {/* Text — sits over the dark gradient area */}
-        <div className="relative mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-10">
-          <div className="max-w-xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
-              <Heart className="h-3 w-3 text-rose-400" /> Care begins with understanding.
-            </span>
-            <h1 className="mt-6 text-balance text-5xl font-bold leading-[1.06] tracking-tight text-white lg:text-6xl">
-              You don&apos;t have to figure this out alone.
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-white/75">
-              Common Ground is here for every family in Texas — whether you&apos;re just getting
-              started or years into the journey. Support, answers, and real help are right here.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-5 text-sm text-white/70">
-              <div className="flex items-start gap-2">
-                <Heart className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-                <span>Made for parents, by people who care</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                <span>Trusted resources, verified for you</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Users className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
-                <span>All in one place, when you need it</span>
+        {/* Content — two column: headline left, action guide right */}
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="flex min-h-[620px] flex-col justify-center gap-10 py-16 lg:flex-row lg:items-center lg:gap-16">
+
+            {/* ── LEFT: Emotional headline ── */}
+            <div className="flex-1 max-w-lg">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
+                <Heart className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Common Ground
+              </span>
+              <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+                You don&apos;t have to figure this out alone.
+              </h1>
+              <p className="mt-4 text-base leading-7 text-white/72 sm:text-lg sm:leading-8">
+                Guidance, resources, and mental health support — built for every parent raising a child with support needs.
+              </p>
+              {/* Trust row */}
+              <div className="mt-7 flex flex-col gap-2 text-sm text-white/65">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <span>Parent mental health tools & therapist referrals</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <span>Clinically reviewed by BCBAs at Texas ABA Centers</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                  <span>Free for every family — no sign-up required</span>
+                </div>
               </div>
             </div>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/support"
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-primary shadow-sm transition hover:bg-white/90"
-              >
-                Care Navigation <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/client"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-              >
-                <Lock className="h-4 w-4" /> Client sign in
-              </Link>
+
+            {/* ── RIGHT: Action guide panel ── */}
+            <div
+              className="w-full lg:w-[360px] lg:shrink-0 rounded-3xl overflow-hidden shadow-2xl"
+              style={{
+                background: 'rgba(8,15,30,0.72)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255,255,255,0.13)',
+              }}
+            >
+              {/* Panel header */}
+              <div className="px-6 pt-6 pb-4 border-b border-white/10">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/50">Start here</p>
+                <p className="mt-1 text-lg font-bold text-white">What brings you here today?</p>
+              </div>
+
+              {/* Choice rows */}
+              <div className="p-3 flex flex-col gap-2">
+
+                {/* Choice 1 — I need support now (most urgent) */}
+                <Link
+                  href="/support/caregiver"
+                  className="group flex items-center gap-4 rounded-2xl px-4 py-4 transition-all hover:bg-white/10"
+                  style={{ background: 'rgba(225,40,60,0.18)', border: '1px solid rgba(225,40,60,0.30)' }}
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(225,40,60,0.35)' }}>
+                    <HeartHandshake className="h-5 w-5 text-rose-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white">I need support right now</p>
+                    <p className="text-xs text-white/55 mt-0.5">Burnout tools, grounding, therapist referrals</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:text-white/70" />
+                </Link>
+
+                {/* Choice 2 — I don't know where to start */}
+                <Link
+                  href="/support/next-steps"
+                  className="group flex items-center gap-4 rounded-2xl px-4 py-4 transition-all hover:bg-white/10"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.11)' }}
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(56,189,248,0.20)' }}>
+                    <Compass className="h-5 w-5 text-sky-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white">I don&apos;t know where to start</p>
+                    <p className="text-xs text-white/55 mt-0.5">Guided next steps, takes 2 minutes</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:text-white/70" />
+                </Link>
+
+                {/* Choice 3 — I want to learn more */}
+                <Link
+                  href="/support/resources"
+                  className="group flex items-center gap-4 rounded-2xl px-4 py-4 transition-all hover:bg-white/10"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.11)' }}
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(251,191,36,0.20)' }}>
+                    <BookOpen className="h-5 w-5 text-amber-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white">I want to understand more</p>
+                    <p className="text-xs text-white/55 mt-0.5">Resource library, plain-language guides</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:text-white/70" />
+                </Link>
+
+                {/* Choice 4 — Connect with families */}
+                <Link
+                  href="/support/connect"
+                  className="group flex items-center gap-4 rounded-2xl px-4 py-4 transition-all hover:bg-white/10"
+                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.11)' }}
+                >
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: 'rgba(167,139,250,0.22)' }}>
+                    <Users className="h-5 w-5 text-violet-300" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-white">I feel alone in this</p>
+                    <p className="text-xs text-white/55 mt-0.5">Community, local meetups, parent connection</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-0.5 group-hover:text-white/70" />
+                </Link>
+
+              </div>
+
+              {/* Panel footer — client sign in */}
+              <div className="px-6 pb-5 pt-1">
+                <Link
+                  href="/client"
+                  className="flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/6 py-2.5 text-xs font-semibold text-white/60 transition hover:bg-white/12 hover:text-white/80"
+                >
+                  <Lock className="h-3.5 w-3.5" /> Existing client? Sign in here
+                </Link>
+              </div>
             </div>
+
           </div>
         </div>
       </section>
