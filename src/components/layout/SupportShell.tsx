@@ -15,9 +15,6 @@ import {
   Compass as CompassIcon,
   Lock,
   ArrowRight,
-  MapPin,
-  Users,
-  Phone,
 } from 'lucide-react';
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
 import { cn } from '@/lib/utils';
@@ -36,10 +33,7 @@ const navItems = [
   { href: '/support/connect', label: 'Connect', icon: Link2 },
   { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
   { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
-  { href: '/support/providers', label: 'Find Providers', icon: Search },
-  { href: '/support/sensory-friendly', label: 'Sensory-Friendly', icon: MapPin },
-  { href: '/support/community', label: 'Community', icon: Users },
-  { href: '/support/help', label: 'Help & Hotlines', icon: Phone },
+  { href: '/support/find', label: 'Find Support', icon: Search },
 ];
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
