@@ -15,6 +15,9 @@ import {
   Compass as CompassIcon,
   Lock,
   ArrowRight,
+  MapPin,
+  Users,
+  Phone,
 } from 'lucide-react';
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
 import { cn } from '@/lib/utils';
