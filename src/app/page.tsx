@@ -80,7 +80,7 @@ export default function HomePage() {
             className="absolute bottom-0 left-0 right-0"
             style={{
               height: '220px',
-              background: 'linear-gradient(to bottom, transparent 0%, rgba(244,239,232,0.45) 55%, #f4efe8 100%)'
+              background: 'linear-gradient(to bottom, transparent 0%, #f4efe8 100%)'
             }}
           />
           {/* Top fade — nav edge */}
