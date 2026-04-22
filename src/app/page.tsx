@@ -62,7 +62,8 @@ export default function HomePage() {
             alt="Texas ABA Centers therapist working with child"
             fill
             priority
-            className="object-cover object-[55%_20%]"
+            className="object-cover"
+            style={{ objectPosition: '60% 35%', transform: 'scale(0.82)', transformOrigin: 'center center' }}
           />
           {/* Dark gradient over left half so white text pops */}
           <div
