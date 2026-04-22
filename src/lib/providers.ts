@@ -892,3 +892,5 @@ export const providers: Provider[] = [
     recommendation_level: 'great-first-call',
   },
 ];
+
+export const verifiedProviders = providers;

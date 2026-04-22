@@ -90,7 +90,7 @@ export default function SupportHome() {
                   <HeartHandshake className="h-4 w-4" /> Support for you
                 </Link>
                 <Link
-                  href="/support/help"
+                  href="/support/find"
                   className="inline-flex items-center gap-2 rounded-2xl border border-brand-plum-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
                 >
                   Help lines &amp; hotlines
@@ -223,7 +223,7 @@ export default function SupportHome() {
       {/* Bottom paths */}
       <section className="grid gap-4 md:grid-cols-3">
         <Link
-          href="/support/community"
+          href="/support/find"
           className="group rounded-3xl border border-surface-border bg-white p-6 transition hover:border-primary/30 hover:shadow-soft"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
@@ -239,7 +239,7 @@ export default function SupportHome() {
         </Link>
 
         <Link
-          href="/support/sensory-friendly"
+          href="/support/find"
           className="group rounded-3xl border border-surface-border bg-white p-6 transition hover:border-primary/30 hover:shadow-soft"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100">
@@ -255,7 +255,7 @@ export default function SupportHome() {
         </Link>
 
         <Link
-          href="/support/help"
+          href="/support/find"
           className="group rounded-3xl border border-surface-border bg-white p-6 transition hover:border-primary/30 hover:shadow-soft"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10">
