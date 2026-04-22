@@ -52,23 +52,44 @@ export default function HomePage() {
       </nav>
 
       {/* ─────────────────────────────────────────
-          HERO — split layout, cream bg, real photo
+          HERO — full bleed photo, text overlays fade
       ───────────────────────────────────────── */}
-      <section
-        className="relative overflow-hidden pt-16"
-        style={{ background: 'linear-gradient(135deg, #fdf6ee 0%, #faf4f0 40%, #f5f0f8 100%)' }}
-      >
-        <div className="mx-auto grid max-w-6xl items-center gap-0 px-6 py-14 sm:py-20 lg:grid-cols-[1fr_420px] lg:gap-12 sm:px-8">
-          {/* Left — headline */}
-          <div className="order-2 lg:order-1">
-            <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white px-3 py-1.5 text-xs font-semibold text-rose-600">
+      <section className="relative min-h-[560px] overflow-hidden pt-16 sm:min-h-[620px]">
+        {/* Photo — fills entire hero, right-aligned */}
+        <div className="absolute inset-0">
+          <Image
+            src="/hero-mom-child.png"
+            alt="Mother holding her child at home"
+            fill
+            className="object-cover object-[70%_20%]"
+            priority
+          />
+          {/* Gradient fade — left side where text lives */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, #fdf6ee 0%, #fdf6ee 30%, rgba(253,246,238,0.92) 48%, rgba(253,246,238,0.55) 65%, transparent 85%)',
+            }}
+          />
+          {/* Bottom fade into page */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-24"
+            style={{ background: 'linear-gradient(to bottom, transparent, #f9f8f6)' }}
+          />
+        </div>
+
+        {/* Content — sits over the fade */}
+        <div className="relative mx-auto max-w-6xl px-6 py-16 sm:py-24 sm:px-8">
+          <div className="max-w-lg">
+            <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-rose-600 backdrop-blur-sm">
               <Heart className="h-3.5 w-3.5" /> Care begins with understanding.
             </span>
             <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight text-stone-900 sm:text-5xl md:text-[3.5rem]">
               You don&apos;t have to<br />
               figure this out alone.
             </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-stone-600 sm:text-lg">
+            <p className="mt-5 max-w-md text-base leading-relaxed text-stone-700 sm:text-lg">
               Common Ground is here for every family in Texas — whether you&apos;re just getting
               started or years into the journey. Support, answers, and real help are right here.
             </p>
@@ -83,7 +104,7 @@ export default function HomePage() {
                   <item.icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <div>
                     <p className="text-[13px] font-semibold text-stone-800">{item.label}</p>
-                    <p className="text-[12px] text-stone-500">{item.sub}</p>
+                    <p className="text-[12px] text-stone-600">{item.sub}</p>
                   </div>
                 </div>
               ))}
@@ -97,32 +118,13 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/client"
-                className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white px-6 py-3 text-sm font-semibold text-stone-700 shadow-sm transition hover:border-stone-300"
+                className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white/90 px-6 py-3 text-sm font-semibold text-stone-700 shadow-sm backdrop-blur-sm transition hover:border-stone-300"
               >
                 <Lock className="h-4 w-4 text-accent" /> Client sign in
               </Link>
             </div>
           </div>
-          {/* Right — photo */}
-          <div className="order-1 mx-auto w-full max-w-sm lg:order-2 lg:max-w-none">
-            <div className="relative overflow-hidden rounded-[2rem] shadow-2xl">
-              <Image
-                src="/hero-mom-child.png"
-                alt="Mother holding her child at home"
-                width={420}
-                height={560}
-                className="h-auto w-full object-cover"
-                priority
-              />
-            </div>
-          </div>
         </div>
-
-        {/* Subtle bottom fade */}
-        <div
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-16"
-          style={{ background: 'linear-gradient(to bottom, transparent, #f9f8f6)' }}
-        />
       </section>
 
       {/* ─────────────────────────────────────────
