@@ -110,7 +110,7 @@ export default function HomePage() {
                 alt="Parent holding child in a calm, supportive moment"
                 fill
                 priority
-                className="object-cover object-[50%_18%]"
+                className="object-cover object-[50%_25%]"
               />
               {/* Soft premium overlay */}
               <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-white/15" />
