@@ -55,7 +55,7 @@ export default function HomePage() {
           HERO — 2-column, image in rounded card
       ───────────────────────────────────────── */}
       <section className="relative overflow-hidden pt-16" style={{ backgroundColor: '#f7f2eb' }}>
-        <div className="mx-auto grid min-h-[560px] max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-14 lg:px-10 lg:py-20">
+        <div className="mx-auto grid min-h-[560px] max-w-6xl items-center gap-10 px-6 py-14 lg:grid-cols-2 lg:gap-14 lg:px-8 lg:py-18">
 
           {/* LEFT — text */}
           <div className="max-w-xl">
@@ -65,6 +65,9 @@ export default function HomePage() {
             <h1 className="mt-6 text-balance text-5xl font-semibold leading-[1.08] tracking-tight text-slate-900 lg:text-6xl">
               You don&apos;t have to figure this out alone.
             </h1>
+            <p className="mt-4 text-sm font-semibold tracking-wide text-primary/80">
+              Support for every step of your journey.
+            </p>
             <p className="mt-5 text-lg leading-8 text-slate-600">
               Common Ground is here for every family in Texas — whether you&apos;re just getting
               started or years into the journey. Support, answers, and real help are right here.
@@ -120,7 +123,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────
           CHOOSE THE DOOR
       ───────────────────────────────────────── */}
-      <section className="px-6 py-16 sm:py-20 sm:px-8" style={{ backgroundColor: '#f9f8f6' }}>
+      <section className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: '#f9f8f6' }}>
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
@@ -136,11 +139,11 @@ export default function HomePage() {
 
           <div className="grid gap-5 lg:grid-cols-2">
             {/* Care Navigation */}
-            <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white p-8 shadow-sm transition hover:shadow-md sm:p-10">
+            <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-primary/20 bg-white p-8 shadow-sm transition hover:shadow-md sm:p-10">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
                 <Compass className="h-6 w-6 text-primary" />
               </div>
-              <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
+              <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/25 bg-primary/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
                 <Compass className="h-3 w-3" /> For every family
               </span>
               <h3 className="text-2xl font-bold text-stone-900">Care Navigation</h3>
@@ -153,16 +156,13 @@ export default function HomePage() {
               </p>
               <ul className="mt-5 space-y-2.5">
                 {[
-                  { label: 'Guided next steps', sub: 'A short plan for where you are — not the whole journey at once.' },
-                  { label: 'Support for you', sub: 'Caregiver wellness, grounding tools, and mental health resources.' },
-                  { label: 'Local resources & community', sub: 'Sensory-friendly places, local groups, and help from near you.' },
+                  'Guided next steps for today',
+                  'Support for your wellbeing',
+                  'Local resources and community',
                 ].map((item) => (
-                  <li key={item.label} className="flex items-start gap-2.5">
+                  <li key={item} className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <span className="text-sm">
-                      <span className="font-semibold text-stone-800">{item.label}</span>
-                      <span className="block text-stone-500">{item.sub}</span>
-                    </span>
+                    <span className="text-sm font-medium text-stone-700">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -177,12 +177,12 @@ export default function HomePage() {
             </article>
 
             {/* Client Portal */}
-            <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white p-8 shadow-sm transition hover:shadow-md sm:p-10">
+            <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white p-8 shadow-sm transition hover:shadow-md sm:p-10">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10">
                 <Lock className="h-6 w-6 text-accent" />
               </div>
-              <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent">
-                <Lock className="h-3 w-3" /> Client portal — sign-in required
+              <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-accent">
+                <Lock className="h-3 w-3" /> Sign-in required
               </span>
               <h3 className="text-2xl font-bold text-stone-900">Client Portal</h3>
               <p className="mt-1.5 text-sm font-semibold text-accent">
@@ -194,15 +194,12 @@ export default function HomePage() {
               </p>
               <ul className="mt-5 space-y-2.5">
                 {[
-                  { label: "Your child's plan & progress", sub: 'View goals, session notes, updates, and parent coaching in one place.' },
-                  { label: 'Care team messaging', sub: 'Reach your BCBAs & RBT directly. HIPAA-protected, only your team can see it.' },
+                  "Your child's plan and progress",
+                  'Secure care team messaging',
                 ].map((item) => (
-                  <li key={item.label} className="flex items-start gap-2.5">
+                  <li key={item} className="flex items-start gap-2.5">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                    <span className="text-sm">
-                      <span className="font-semibold text-stone-800">{item.label}</span>
-                      <span className="block text-stone-500">{item.sub}</span>
-                    </span>
+                    <span className="text-sm font-medium text-stone-700">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -220,73 +217,18 @@ export default function HomePage() {
       </section>
 
       {/* ─────────────────────────────────────────
-          CRISIS BAR
+          WHAT DO YOU NEED
       ───────────────────────────────────────── */}
-      <div className="border-y border-rose-100 bg-rose-50 px-6 py-3 sm:px-8">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center text-sm">
-          <span className="flex items-center gap-2 font-semibold text-rose-600">
-            <Phone className="h-3.5 w-3.5" /> Need immediate help?
-          </span>
-          <span className="text-stone-600">Call or text <a href="tel:988" className="font-bold text-rose-600 hover:underline">988</a></span>
-          <span className="hidden text-stone-300 sm:inline">·</span>
-          <span className="text-stone-600">Harris Center Crisis Line <a href="tel:7139707000" className="font-bold text-rose-600 hover:underline">(713) 970-7000</a></span>
-          <span className="hidden text-stone-300 sm:inline">·</span>
-          <span className="text-stone-600">Life-threatening emergency: call <span className="font-bold text-rose-600">911</span></span>
-        </div>
-      </div>
-
-      {/* ─────────────────────────────────────────
-          YOU ARE NOT ALONE
-      ───────────────────────────────────────── */}
-      <section className="px-6 py-12 sm:py-16 sm:px-8" style={{ backgroundColor: '#f9f8f6' }}>
-        <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-50/80">
-          <div className="grid gap-6 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
-            {/* Left */}
-            <div className="flex items-start gap-5">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-                <HeartHandshake className="h-7 w-7 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-stone-900 sm:text-2xl">
-                  You are not alone, and you are doing enough.
-                </h2>
-                <p className="mt-2 max-w-lg text-sm leading-relaxed text-stone-600">
-                  Parenting a child with support needs can feel overwhelming. It&apos;s okay to
-                  ask for help. We see you, we hear you, and we&apos;re with you.
-                </p>
-              </div>
-            </div>
-            {/* Right — 3 values */}
-            <div className="flex flex-wrap gap-3 lg:gap-4">
-              {[
-                { icon: Star, label: 'Every family', sub: 'Every stage. Every step.' },
-                { icon: Heart, label: 'Real support', sub: 'From real people who understand.' },
-                { icon: Shield, label: 'Safe, private,', sub: 'and here when you need us.' },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-center shadow-sm">
-                  <item.icon className="h-5 w-5 text-primary" />
-                  <p className="text-xs font-semibold text-stone-800">{item.label}</p>
-                  <p className="text-[11px] text-stone-500">{item.sub}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────
-          WHAT DO YOU NEED — dark navy
-      ───────────────────────────────────────── */}
-      <section className="px-6 py-16 sm:py-20 sm:px-8" style={{ backgroundColor: '#1a2e52' }}>
+      <section className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: '#f4efe8' }}>
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/50">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
               Start here
             </p>
-            <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+            <h2 className="mt-3 text-3xl font-bold text-stone-900 sm:text-4xl md:text-5xl">
               What do you need right now?
             </h2>
-            <p className="mx-auto mt-3 max-w-xl text-base text-white/60">
+            <p className="mx-auto mt-3 max-w-xl text-base text-stone-500">
               Pick the one that sounds like your week. We&apos;ll take it from there.
             </p>
           </div>
@@ -294,31 +236,30 @@ export default function HomePage() {
           {/* Primary CTA */}
           <Link
             href="/support/next-steps"
-            className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-7 backdrop-blur-sm transition hover:bg-white/15 sm:p-9"
+            className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border border-primary/20 bg-white p-7 shadow-sm transition hover:shadow-md sm:p-9"
           >
             <div className="flex items-start gap-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                <Compass className="h-6 w-6 text-white" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                <Compass className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-white/50">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-primary/70">
                   Most parents start here
                 </p>
-                <h3 className="mt-1 text-xl font-bold text-white sm:text-2xl">
+                <h3 className="mt-1 text-xl font-bold text-stone-900 sm:text-2xl">
                   &ldquo;I don&apos;t know what to do next.&rdquo;
                 </h3>
-                <p className="mt-1 text-sm font-semibold text-white/80">We will walk you through it.</p>
-                <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/55">
-                  A short plan for where you are today — not the whole journey at once. Clear
-                  direction, nothing overwhelming, just the next right step.
+                <p className="mt-1 text-sm font-semibold text-primary">We will walk you through it.</p>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-stone-600">
+                  A short plan for where you are today — just the next right step.
                 </p>
               </div>
             </div>
             <div className="hidden shrink-0 flex-col items-center gap-1.5 sm:flex">
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-primary shadow-sm transition group-hover:bg-white/95">
+              <span className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition group-hover:bg-primary/90">
                 Start guided next steps <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
-              <span className="text-xs text-white/40">Takes about 2 minutes</span>
+              <span className="text-xs text-stone-400">Takes about 2 minutes</span>
             </div>
           </Link>
 
@@ -359,13 +300,13 @@ export default function HomePage() {
               <Link
                 key={card.title}
                 href={card.href}
-                className="group flex flex-col rounded-3xl border border-white/10 bg-white/8 p-6 transition hover:bg-white/15"
+                className="group flex flex-col rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition hover:shadow-md"
               >
                 <p className={`text-[10px] font-semibold uppercase tracking-widest ${card.eyebrow_color}`}>
                   {card.eyebrow}
                 </p>
-                <h3 className="mt-2 text-base font-bold text-white">{card.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-white/55">{card.desc}</p>
+                <h3 className="mt-2 text-base font-bold text-stone-900">{card.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-stone-600">{card.desc}</p>
                 <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${card.color}`}>
                   {card.cta} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
@@ -374,6 +315,22 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─────────────────────────────────────────
+          CRISIS BAR
+      ───────────────────────────────────────── */}
+      <div className="border-y border-rose-100 bg-rose-50 px-6 py-3 sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center text-sm">
+          <span className="flex items-center gap-2 font-semibold text-rose-600">
+            <Phone className="h-3.5 w-3.5" /> Need immediate help?
+          </span>
+          <span className="text-stone-600">Call or text <a href="tel:988" className="font-bold text-rose-600 hover:underline">988</a></span>
+          <span className="hidden text-stone-300 sm:inline">·</span>
+          <span className="text-stone-600">Harris Center Crisis Line <a href="tel:7139707000" className="font-bold text-rose-600 hover:underline">(713) 970-7000</a></span>
+          <span className="hidden text-stone-300 sm:inline">·</span>
+          <span className="text-stone-600">Life-threatening emergency: call <span className="font-bold text-rose-600">911</span></span>
+        </div>
+      </div>
 
       {/* ─────────────────────────────────────────
           PARENT SUPPORT — two col
@@ -441,6 +398,45 @@ export default function HomePage() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────
+          YOU ARE NOT ALONE
+      ───────────────────────────────────────── */}
+      <section className="px-6 py-12 sm:px-8 sm:py-16" style={{ backgroundColor: '#f9f8f6' }}>
+        <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-50/80">
+          <div className="grid gap-6 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+            {/* Left */}
+            <div className="flex items-start gap-5">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
+                <HeartHandshake className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-stone-900 sm:text-2xl">
+                  You are not alone, and you are doing enough.
+                </h2>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-stone-600">
+                  Parenting a child with support needs can feel overwhelming. It&apos;s okay to
+                  ask for help. We see you, we hear you, and we&apos;re with you.
+                </p>
+              </div>
+            </div>
+            {/* Right — 3 values */}
+            <div className="flex flex-wrap gap-3 lg:gap-4">
+              {[
+                { icon: Star, label: 'Every family', sub: 'Every stage. Every step.' },
+                { icon: Heart, label: 'Real support', sub: 'From real people who understand.' },
+                { icon: Shield, label: 'Safe, private,', sub: 'and here when you need us.' },
+              ].map((item) => (
+                <div key={item.label} className="flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-5 py-4 text-center shadow-sm">
+                  <item.icon className="h-5 w-5 text-primary" />
+                  <p className="text-xs font-semibold text-stone-800">{item.label}</p>
+                  <p className="text-[11px] text-stone-500">{item.sub}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
