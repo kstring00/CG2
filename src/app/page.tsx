@@ -106,7 +106,7 @@ export default function HomePage() {
           <div className="relative">
             <div className="relative h-[400px] overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.09)] lg:h-[520px]">
               <Image
-                src="/hero-mom-child.png"
+                src="/hero-texas-aba.jpg"
                 alt="Parent holding child in a calm, supportive moment"
                 fill
                 priority
