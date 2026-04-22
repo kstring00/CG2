@@ -60,7 +60,7 @@ export default function HomePage() {
         {/* Photo — full bleed, framed on therapist face + logo */}
         <div className="absolute inset-0">
           <Image
-            src="/hero-texas-aba7.jpg"
+            src="/hero-texas-aba8.jpg"
             alt="Texas ABA Centers therapist working with child"
             fill
             priority
