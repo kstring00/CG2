@@ -23,7 +23,9 @@
   }
 
   body {
-    @apply bg-surface text-brand-muted-800;
+    /* Warm light grey — off-white with a hint of blue-grey, much warmer than pure white */
+    background-color: #f2f4f8;
+    @apply text-brand-muted-800;
   }
 
   h1, h2, h3, h4 {
@@ -101,7 +103,11 @@
   }
 
   .soft-panel {
-    @apply rounded-3xl border border-surface-border bg-gradient-to-br from-white to-brand-warm-50 p-5 sm:p-6 shadow-soft;
+    @apply rounded-3xl border border-surface-border bg-gradient-to-br from-white to-brand-warm-100 p-5 sm:p-6 shadow-soft;
+  }
+
+  .card-elevated {
+    @apply bg-white rounded-3xl border border-surface-border p-6 shadow-card transition-all duration-300 hover:shadow-card-hover;
   }
 
   .pill {
@@ -119,10 +125,32 @@
   }
 
   .gradient-warm {
-    background: linear-gradient(180deg, #fbfbfd 0%, #f2f4f9 55%, #ffffff 100%);
+    background: linear-gradient(180deg, #eef0f6 0%, #f2f4f8 55%, #f2f4f8 100%);
   }
 
   .gradient-brand-hearts {
     background: linear-gradient(135deg, #e2283a 0%, #8b2442 30%, #703068 62%, #32175a 82%, #1a2e52 100%);
+  }
+
+  /* Texas ABA wave divider — matches brand website wave shape */
+  .wave-divider-navy {
+    background: #1a2e52;
+    clip-path: ellipse(100% 60% at 50% 100%);
+  }
+
+  .wave-divider-top {
+    position: relative;
+  }
+  .wave-divider-top::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -40px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: inherit;
+    clip-path: ellipse(55% 100% at 50% 100%);
+    z-index: 1;
   }
 }

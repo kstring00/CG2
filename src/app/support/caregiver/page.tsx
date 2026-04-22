@@ -2,6 +2,7 @@ import Link from 'next/link';
 import {
   ArrowRight,
   ArrowUpRight,
+  Brain,
   Heart,
   HeartHandshake,
   Leaf,
@@ -10,6 +11,8 @@ import {
   Shield,
   Wind,
   Zap,
+  Users,
+  Calendar,
 } from 'lucide-react';
 
 const stressChecks = [
@@ -44,44 +47,115 @@ const groundingTools = [
   },
 ];
 
-const supportResources = [
+const mentalHealthResources = [
+  {
+    title: 'Psychology Today — Therapist Directory',
+    description: 'Filter by your insurance, location, and specialty. Look for "autism families," "caregiver stress," or "family therapy."',
+    url: 'https://www.psychologytoday.com/us/therapists',
+    source: 'Psychology Today',
+    tag: 'Find a therapist',
+  },
+  {
+    title: 'NAMI Texas — Family Support',
+    description: 'Free peer-led support groups for family members and caregivers. No clinical background required — just shared experience.',
+    url: 'https://namitexas.org',
+    source: 'NAMI Texas',
+    tag: 'Support groups',
+  },
   {
     title: 'Autism Speaks Caregiver Stress Resources',
     description: 'Practical guides on managing stress, burnout prevention, and building your personal support network.',
     url: 'https://www.autismspeaks.org/caregiver-stress',
     source: 'Autism Speaks',
+    tag: 'Burnout & stress',
   },
   {
     title: 'Organization for Autism Research — Parent Guides',
     description: 'Free downloadable guides on routines, transitions, sibling support, and day-to-day caregiver strategies.',
     url: 'https://researchautism.org',
     source: 'OAR',
+    tag: 'Free guides',
   },
   {
     title: 'SPARK for Autism — Family Community',
     description: 'Connect with other autism families, access expert webinars, and stay informed on the latest research.',
     url: 'https://sparkforautism.org',
     source: 'Simons Foundation',
+    tag: 'Community',
+  },
+];
+
+const referralSteps = [
+  {
+    step: '1',
+    title: 'Acknowledge the need',
+    description: 'You are allowed to need support. You are not "abandoning" your child by taking care of yourself — you are protecting your ability to show up for them.',
+  },
+  {
+    step: '2',
+    title: 'Check your insurance',
+    description: 'Most plans cover outpatient mental health. Call the number on the back of your insurance card and ask about "outpatient behavioral health" coverage.',
+  },
+  {
+    step: '3',
+    title: 'Search Psychology Today',
+    description: 'Filter by your insurance, zip code, and "family therapy" or "caregiver stress." Look for someone who mentions working with parents of children with special needs.',
+  },
+  {
+    step: '4',
+    title: 'Ask your child\'s care coordinator',
+    description: 'Texas ABA Centers care coordinators can help connect you to local therapist referrals — you do not have to search alone.',
   },
 ];
 
 export default function CaregiverSupportPage() {
   return (
     <div className="page-shell">
+
+      {/* ── HEADER ── */}
       <header className="page-header">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1 text-xs font-semibold text-brand-plum-700">
-          <HeartHandshake className="h-3.5 w-3.5" /> Support for you
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1.5 text-xs font-semibold text-brand-plum-700">
+          <HeartHandshake className="h-3.5 w-3.5" /> Support for you — the parent
         </div>
-        <h1 className="page-title">You need support too.</h1>
-        <p className="page-description">
-          This section is not about your child — it is about you. Caregivers who are supported
-          give better care. That is not an opinion, it is what the research shows. You deserve
-          to be on this list.
+        <h1 className="page-title text-3xl font-bold sm:text-4xl">You need support too.</h1>
+        <p className="page-description text-base leading-relaxed">
+          This section is not about your child&apos;s progress — it is about you. Caregivers who
+          are supported give better care. That is not an opinion, that is what the research shows.
+          Your wellbeing is part of the plan.
         </p>
       </header>
 
-      {/* Stress check-in */}
-      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
+      {/* ── EMOTIONAL ANCHOR ── */}
+      <div className="overflow-hidden rounded-[2rem] border-2 border-brand-plum-200 bg-white shadow-card">
+        <div className="gradient-brand-hearts px-6 py-5 sm:px-8">
+          <div className="flex items-center gap-3">
+            <Heart className="h-6 w-6 text-white/80" />
+            <p className="text-sm font-semibold text-white">
+              Taking care of yourself is part of taking care of your child.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-6 p-6 sm:grid-cols-3 sm:p-8">
+          <div className="flex flex-col items-center gap-2 text-center">
+            <Brain className="h-8 w-8 text-brand-plum-600" />
+            <p className="text-sm font-semibold text-brand-muted-900">Mental clarity</p>
+            <p className="text-xs leading-relaxed text-brand-muted-600">Your ability to make clear decisions for your child depends on your own emotional state.</p>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <Heart className="h-8 w-8 text-accent" />
+            <p className="text-sm font-semibold text-brand-muted-900">Better outcomes</p>
+            <p className="text-xs leading-relaxed text-brand-muted-600">Research shows caregiver wellbeing directly affects child progress in therapy.</p>
+          </div>
+          <div className="flex flex-col items-center gap-2 text-center">
+            <Users className="h-8 w-8 text-primary" />
+            <p className="text-sm font-semibold text-brand-muted-900">You are not alone</p>
+            <p className="text-xs leading-relaxed text-brand-muted-600">Every family in our care carries weight. You deserve support alongside your child.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── STRESS CHECK-IN ── */}
+      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6 shadow-card">
         <div className="flex items-center gap-2 text-brand-muted-900">
           <Zap className="h-5 w-5 text-brand-plum-600" />
           <h2 className="text-lg font-semibold">Signs you might be running low</h2>
@@ -101,7 +175,7 @@ export default function CaregiverSupportPage() {
             </li>
           ))}
         </ul>
-        <div className="mt-5 rounded-2xl border border-brand-plum-100 bg-brand-plum-50 p-4">
+        <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
           <p className="text-sm font-semibold text-brand-plum-800">
             If you said yes to 3 or more, please reach out for support this week.
           </p>
@@ -109,11 +183,17 @@ export default function CaregiverSupportPage() {
             Talk to your child&apos;s care coordinator, your own doctor, or a counselor. You do not
             have to wait until things are critical.
           </p>
+          <Link
+            href="/support/help"
+            className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-plum-700 hover:underline"
+          >
+            See help lines & hotlines <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
-      {/* Grounding tools */}
-      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
+      {/* ── GROUNDING TOOLS ── */}
+      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6 shadow-card">
         <div className="flex items-center gap-2 text-brand-muted-900">
           <Leaf className="h-5 w-5 text-emerald-600" />
           <h2 className="text-lg font-semibold">Right now — grounding tools</h2>
@@ -139,21 +219,58 @@ export default function CaregiverSupportPage() {
         </div>
       </section>
 
-      {/* Support for the long haul */}
-      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
+      {/* ── THERAPIST REFERRAL PATH ── */}
+      <section className="rounded-3xl border-2 border-primary/20 bg-white p-5 sm:p-6 shadow-card">
         <div className="flex items-center gap-2 text-brand-muted-900">
-          <Shield className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold">Support for the long haul</h2>
+          <Calendar className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold">How to find a therapist — for you</h2>
         </div>
         <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-          Caregiver burnout is real and it builds slowly. These resources are for the bigger picture — not just today.
+          Caregiver therapy is not a luxury. It is one of the most effective tools for sustaining
+          long-term capacity to support your child. Here is how to get started.
+        </p>
+        <div className="mt-5 space-y-4">
+          {referralSteps.map((step) => (
+            <div key={step.step} className="flex gap-4">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                {step.step}
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-brand-muted-900">{step.title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a
+          href="https://www.psychologytoday.com/us/therapists"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+        >
+          Find a therapist near you <ArrowUpRight className="h-4 w-4" />
+        </a>
+      </section>
+
+      {/* ── MENTAL HEALTH RESOURCES ── */}
+      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6 shadow-card">
+        <div className="flex items-center gap-2 text-brand-muted-900">
+          <Shield className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold">Mental health & support resources</h2>
+        </div>
+        <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
+          Vetted resources for caregiver mental health — not generic wellness content, but things
+          specifically relevant to parents of children with autism.
         </p>
         <ul className="mt-4 space-y-3">
-          {supportResources.map((r) => (
+          {mentalHealthResources.map((r) => (
             <li key={r.title} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
               <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400">{r.source}</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400">{r.source}</p>
+                    <span className="rounded-full border border-primary/20 bg-primary/5 px-2 py-0.5 text-[10px] font-semibold text-primary">{r.tag}</span>
+                  </div>
                   <h3 className="mt-1 text-sm font-semibold text-brand-muted-900">{r.title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{r.description}</p>
                 </div>
@@ -171,8 +288,8 @@ export default function CaregiverSupportPage() {
         </ul>
       </section>
 
-      {/* Crisis / get help now */}
-      <section className="rounded-3xl border-2 border-accent/20 bg-gradient-to-br from-accent/5 to-white p-6 sm:p-8">
+      {/* ── CRISIS / GET HELP ── */}
+      <section className="rounded-3xl border-2 border-accent/20 bg-gradient-to-br from-accent/5 to-white p-6 sm:p-8 shadow-card">
         <div className="flex items-start gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
             <Phone className="h-5 w-5 text-accent" />
@@ -210,8 +327,8 @@ export default function CaregiverSupportPage() {
         </div>
       </section>
 
-      {/* Closing affirmation */}
-      <div className="rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/5 to-white p-6 text-center">
+      {/* ── CLOSING AFFIRMATION ── */}
+      <div className="rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/5 to-white p-6 text-center shadow-soft">
         <Heart className="mx-auto h-8 w-8 text-accent" />
         <h2 className="mt-4 text-xl font-semibold text-brand-muted-900">
           Taking care of yourself is part of taking care of your child.

@@ -130,7 +130,7 @@ export default function SupportHome() {
       )}
 
       {/* Stage selector + This Week focus */}
-      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
+      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6 shadow-card">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
@@ -223,15 +223,15 @@ export default function SupportHome() {
       {/* Bottom paths */}
       <section className="grid gap-4 md:grid-cols-3">
         <Link
-          href="/support/find"
-          className="group rounded-3xl border border-surface-border bg-white p-6 transition hover:border-primary/30 hover:shadow-soft"
+          href="/support/connect"
+          className="group rounded-3xl border border-surface-border bg-white p-6 shadow-card transition hover:border-primary/30 hover:shadow-card-hover"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
             <Users className="h-5 w-5 text-primary" />
           </div>
           <h3 className="font-semibold text-brand-muted-900">You are not alone</h3>
           <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-            Local groups and online spaces where Texas parents share what is working.
+            Local groups and online spaces where parents share what is working.
           </p>
           <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
             Find your people <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -239,15 +239,15 @@ export default function SupportHome() {
         </Link>
 
         <Link
-          href="/support/find"
-          className="group rounded-3xl border border-surface-border bg-white p-6 transition hover:border-primary/30 hover:shadow-soft"
+          href="/support/sensory-friendly"
+          className="group rounded-3xl border border-surface-border bg-white p-6 shadow-card transition hover:border-emerald-200 hover:shadow-card-hover"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100">
             <MapPin className="h-5 w-5 text-emerald-700" />
           </div>
           <h3 className="font-semibold text-brand-muted-900">Local sensory-friendly places</h3>
           <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-            Haircuts, dentists, parks — real Houston-area places that are good with your child.
+            Haircuts, dentists, parks — real places near you that are good with your child.
           </p>
           <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700">
             See the guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -255,8 +255,8 @@ export default function SupportHome() {
         </Link>
 
         <Link
-          href="/support/find"
-          className="group rounded-3xl border border-surface-border bg-white p-6 transition hover:border-primary/30 hover:shadow-soft"
+          href="/support/help"
+          className="group rounded-3xl border border-surface-border bg-white p-6 shadow-card transition hover:border-accent/30 hover:shadow-card-hover"
         >
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10">
             <HelpCircle className="h-5 w-5 text-accent" />
@@ -272,7 +272,7 @@ export default function SupportHome() {
       </section>
 
       {/* Reassurance footer */}
-      <div className="rounded-3xl border border-primary/10 bg-gradient-to-br from-primary/5 to-white p-6 sm:p-8">
+      <div className="rounded-3xl border border-primary/10 bg-white p-6 sm:p-8 shadow-soft">
         <div className="flex items-start gap-4">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
             <Heart className="h-5 w-5 text-accent" />

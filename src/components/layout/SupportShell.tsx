@@ -29,11 +29,14 @@ import { cn } from '@/lib/utils';
  */
 const navItems = [
   { href: '/support', label: 'Home', icon: LayoutDashboard },
-  { href: '/support/caregiver', label: 'Support for You', icon: HeartHandshake },
+  { href: '/support/caregiver', label: 'Support for You', icon: HeartHandshake, highlight: true },
   { href: '/support/connect', label: 'Connect', icon: Link2 },
   { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
   { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
-  { href: '/support/find', label: 'Find Support', icon: Search },
+  { href: '/support/providers', label: 'Find Providers', icon: Search },
+  { href: '/support/sensory-friendly', label: 'Sensory-Friendly', icon: MapPin },
+  { href: '/support/community', label: 'Community', icon: Users },
+  { href: '/support/help', label: 'Help & Hotlines', icon: Phone },
 ];
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
@@ -63,6 +66,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             const isActive =
               pathname === item.href ||
               (item.href !== '/support' && pathname.startsWith(item.href));
+            const isHighlight = (item as { highlight?: boolean }).highlight;
             return (
               <li key={item.href}>
                 <a
@@ -72,11 +76,16 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                     'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                     isActive
                       ? 'bg-primary text-white shadow-soft'
+                      : isHighlight
+                      ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
                       : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
                   )}
                 >
                   <item.icon className="h-5 w-5 shrink-0" />
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {isHighlight && !isActive && (
+                    <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">You</span>
+                  )}
                 </a>
               </li>
             );
@@ -115,7 +124,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-brand-warm-50 via-surface-muted to-surface-muted">
+    <div className="flex min-h-screen" style={{ backgroundColor: '#f2f4f8' }}>
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-surface-border bg-white lg:flex">
         <SidebarContent />
       </aside>
@@ -148,7 +157,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
-              Care Navigation · open to every family in Texas
+              Care Navigation · open to every family
             </p>
             <Link
               href="/client"
@@ -172,7 +181,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                 Common Ground · Care Navigation
               </p>
               <p className="truncate text-sm text-brand-muted-700">
-                For every family in Texas
+                For every family
               </p>
             </div>
           </div>

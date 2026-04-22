@@ -107,9 +107,12 @@ const config: Config = {
         },
         surface: {
           DEFAULT: '#ffffff',
-          muted: '#f7f8fa',
-          subtle: '#eef0f4',
-          border: '#dfe3ea',
+          muted: '#eaecf2',
+          subtle: '#e2e5ed',
+          border: '#d4d8e3',
+        },
+        page: {
+          DEFAULT: '#f2f4f8',
         },
       },
       fontFamily: {
