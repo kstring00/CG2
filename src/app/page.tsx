@@ -52,78 +52,68 @@ export default function HomePage() {
       </nav>
 
       {/* ─────────────────────────────────────────
-          HERO — full bleed photo, text overlays fade
+          HERO — 2-column, image in rounded card
       ───────────────────────────────────────── */}
-      <section className="relative min-h-[560px] overflow-hidden pt-16 sm:min-h-[620px]">
-        {/* Photo — fills entire hero, right-aligned */}
-        <div className="absolute inset-0">
-          <Image
-            src="/hero-mom-child.png"
-            alt="Mother holding her child at home"
-            fill
-            className="object-cover object-[65%_15%] scale-110"
-            priority
-          />
-          {/* Gradient fade — left side where text lives */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(to right, #fdf6ee 0%, #fdf6ee 28%, rgba(253,246,238,0.88) 44%, rgba(253,246,238,0.40) 62%, transparent 80%)',
-            }}
-          />
-          {/* Bottom fade into page */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-24"
-            style={{ background: 'linear-gradient(to bottom, transparent, #f9f8f6)' }}
-          />
-        </div>
+      <section className="relative overflow-hidden pt-16" style={{ backgroundColor: '#f7f2eb' }}>
+        <div className="mx-auto grid min-h-[560px] max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-14 lg:px-10 lg:py-20">
 
-        {/* Content — sits over the fade */}
-        <div className="relative mx-auto max-w-6xl px-6 py-16 sm:py-24 sm:px-8">
-          <div className="max-w-lg">
-            <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-rose-200 bg-white/80 px-3 py-1.5 text-xs font-semibold text-rose-600 backdrop-blur-sm">
-              <Heart className="h-3.5 w-3.5" /> Care begins with understanding.
+          {/* LEFT — text */}
+          <div className="max-w-xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-white/80 px-3 py-1 text-xs font-medium text-rose-500">
+              <Heart className="h-3 w-3" /> Care begins with understanding.
             </span>
-            <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight text-stone-900 sm:text-5xl md:text-[3.5rem]">
-              You don&apos;t have to<br />
-              figure this out alone.
+            <h1 className="mt-6 text-balance text-5xl font-semibold leading-[1.08] tracking-tight text-slate-900 lg:text-6xl">
+              You don&apos;t have to figure this out alone.
             </h1>
-            <p className="mt-5 max-w-md text-base leading-relaxed text-stone-700 sm:text-lg">
+            <p className="mt-5 text-lg leading-8 text-slate-600">
               Common Ground is here for every family in Texas — whether you&apos;re just getting
               started or years into the journey. Support, answers, and real help are right here.
             </p>
-            {/* Trust row */}
-            <div className="mt-8 flex flex-wrap gap-5">
-              {[
-                { icon: Heart, label: 'Made for parents,', sub: 'by people who care' },
-                { icon: Shield, label: 'Trusted resources,', sub: 'verified for you' },
-                { icon: Users, label: 'All in one place,', sub: 'when you need it' },
-              ].map((item) => (
-                <div key={item.label} className="flex items-start gap-2.5">
-                  <item.icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-[13px] font-semibold text-stone-800">{item.label}</p>
-                    <p className="text-[12px] text-stone-600">{item.sub}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-600">
+              <div className="flex items-start gap-2">
+                <Heart className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <span>Made for parents, by people who care</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                <span>Trusted resources, verified for you</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Users className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
+                <span>All in one place, when you need it</span>
+              </div>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/support"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
               >
                 Care Navigation <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/client"
-                className="inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-white/90 px-6 py-3 text-sm font-semibold text-stone-700 shadow-sm backdrop-blur-sm transition hover:border-stone-300"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
               >
                 <Lock className="h-4 w-4 text-accent" /> Client sign in
               </Link>
             </div>
           </div>
+
+          {/* RIGHT — framed image card */}
+          <div className="relative">
+            <div className="relative h-[400px] overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.09)] lg:h-[520px]">
+              <Image
+                src="/hero-mom-child.png"
+                alt="Parent holding child in a calm, supportive moment"
+                fill
+                priority
+                className="object-cover object-[50%_18%]"
+              />
+              {/* Soft premium overlay */}
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-white/15" />
+            </div>
+          </div>
+
         </div>
       </section>
 
