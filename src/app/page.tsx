@@ -64,6 +64,8 @@ export default function HomePage() {
             alt="Texas ABA Centers therapist working with child"
             fill
             priority
+            quality={100}
+            sizes="100vw"
             className="object-cover"
             style={{ objectPosition: '60% 20%' }}
           />
