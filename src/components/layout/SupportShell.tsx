@@ -6,12 +6,10 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   BookOpen,
-  HandHeart,
   HeartHandshake,
   Link2,
-  Users,
   Compass,
-  MapPin,
+  Search,
   Menu,
   X,
   Compass as CompassIcon,
@@ -35,10 +33,7 @@ const navItems = [
   { href: '/support/connect', label: 'Connect', icon: Link2 },
   { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
   { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
-  { href: '/support/providers', label: 'Providers & Services', icon: MapPin },
-  { href: '/support/sensory-friendly', label: 'Sensory-Friendly Guide', icon: HandHeart },
-  { href: '/support/community', label: 'Community', icon: Users },
-  { href: '/support/help', label: 'Help & Hotlines', icon: HandHeart },
+  { href: '/support/find', label: 'Find Support', icon: Search },
 ];
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
