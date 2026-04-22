@@ -52,71 +52,75 @@ export default function HomePage() {
       </nav>
 
       {/* ─────────────────────────────────────────
-          HERO — 2-column, image in rounded card
+          HERO — full bleed, white text over dark photo
       ───────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-16" style={{ backgroundColor: '#f7f2eb' }}>
-        <div className="mx-auto grid min-h-[560px] max-w-6xl items-center gap-10 px-6 py-14 lg:grid-cols-2 lg:gap-14 lg:px-8 lg:py-18">
+      <section className="relative min-h-[580px] overflow-hidden pt-16 lg:min-h-[640px]">
+        {/* Photo — full bleed, edge to edge, no card */}
+        <div className="absolute inset-0">
+          <Image
+            src="/hero-texas-aba.jpg"
+            alt="Texas ABA Centers therapist working with child"
+            fill
+            priority
+            className="object-cover object-[55%_20%]"
+          />
+          {/* Dark gradient over left half so white text pops */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(8,15,30,0.90) 0%, rgba(8,15,30,0.78) 30%, rgba(8,15,30,0.40) 58%, rgba(8,15,30,0.0) 100%)',
+            }}
+          />
+          {/* Bottom fade into the page */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-32"
+            style={{ background: 'linear-gradient(to bottom, transparent 0%, #f9f8f6 100%)' }}
+          />
+        </div>
 
-          {/* LEFT — text */}
+        {/* Text — sits over the dark gradient area */}
+        <div className="relative mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-10">
           <div className="max-w-xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-white/80 px-3 py-1 text-xs font-medium text-rose-500">
-              <Heart className="h-3 w-3" /> Care begins with understanding.
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
+              <Heart className="h-3 w-3 text-rose-400" /> Care begins with understanding.
             </span>
-            <h1 className="mt-6 text-balance text-5xl font-semibold leading-[1.08] tracking-tight text-slate-900 lg:text-6xl">
+            <h1 className="mt-6 text-balance text-5xl font-bold leading-[1.06] tracking-tight text-white lg:text-6xl">
               You don&apos;t have to figure this out alone.
             </h1>
-            <p className="mt-4 text-sm font-semibold tracking-wide text-primary/80">
-              Support for every step of your journey.
-            </p>
-            <p className="mt-5 text-lg leading-8 text-slate-600">
+            <p className="mt-5 text-lg leading-8 text-white/75">
               Common Ground is here for every family in Texas — whether you&apos;re just getting
               started or years into the journey. Support, answers, and real help are right here.
             </p>
-            <div className="mt-8 flex flex-wrap gap-5 text-sm text-slate-600">
+            <div className="mt-8 flex flex-wrap gap-5 text-sm text-white/70">
               <div className="flex items-start gap-2">
-                <Heart className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <Heart className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
                 <span>Made for parents, by people who care</span>
               </div>
               <div className="flex items-start gap-2">
-                <Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                <Shield className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
                 <span>Trusted resources, verified for you</span>
               </div>
               <div className="flex items-start gap-2">
-                <Users className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" />
+                <Users className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
                 <span>All in one place, when you need it</span>
               </div>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/support"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-primary shadow-sm transition hover:bg-white/90"
               >
                 Care Navigation <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/client"
-                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
               >
-                <Lock className="h-4 w-4 text-accent" /> Client sign in
+                <Lock className="h-4 w-4" /> Client sign in
               </Link>
             </div>
           </div>
-
-          {/* RIGHT — framed image card */}
-          <div className="relative">
-            <div className="relative h-[400px] overflow-hidden rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.09)] lg:h-[520px]">
-              <Image
-                src="/hero-texas-aba.jpg"
-                alt="Parent holding child in a calm, supportive moment"
-                fill
-                priority
-                className="object-cover object-[55%_20%]"
-              />
-              {/* Soft premium overlay */}
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/5 to-white/15" />
-            </div>
-          </div>
-
         </div>
       </section>
 
