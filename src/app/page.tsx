@@ -125,60 +125,8 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ── HERO ── */}
-      <section className="relative overflow-hidden px-6 pb-20 pt-32 sm:pt-36" style={{ background: 'linear-gradient(160deg, #1a2e52 0%, #32175a 55%, #703068 100%)' }}>
-        {/* Decorative blobs */}
-        <div className="pointer-events-none absolute -left-24 top-8 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/3 blur-3xl" />
-
-        <div className="relative mx-auto max-w-4xl text-center">
-          <span className="pill mb-6 border-white/20 bg-white/10 text-white/90 backdrop-blur-sm">
-            <Heart className="h-3.5 w-3.5 text-accent" /> By Texas ABA Centers
-          </span>
-          <h1 className="text-balance text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
-            You don&apos;t have to figure<br />
-            <span className="text-accent">this out alone.</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
-            Common Ground gives every family — whether you just got a diagnosis, are on a
-            waitlist, or have been in therapy for years — real guidance, real resources,
-            and real support.
-          </p>
-
-          {/* ── EMOTIONAL CHECK-IN ── */}
-          <div className="mx-auto mt-10 max-w-2xl">
-            <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/60">
-              How are things feeling right now?
-            </p>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {checkInOptions.map((opt) => (
-                <Link
-                  key={opt.label}
-                  href={opt.href}
-                  className={`group flex flex-col items-center gap-2 rounded-2xl border-2 p-4 text-center transition-all hover:-translate-y-0.5 hover:shadow-card ${opt.bg}`}
-                >
-                  <span className="text-2xl">{opt.emoji}</span>
-                  <span className={`text-sm font-semibold leading-snug ${opt.label_color}`}>
-                    {opt.label}
-                  </span>
-                  <span className={`text-xs ${opt.sub_color}`}>{opt.sub}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Wave bottom */}
-        <div className="pointer-events-none absolute -bottom-1 left-0 right-0">
-          <svg viewBox="0 0 1440 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
-            <path d="M0,40 C360,80 1080,0 1440,40 L1440,72 L0,72 Z" fill="#f2f4f8"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* ── TWO DOORS ── */}
-      <section className="relative px-6 pb-20 pt-12 sm:pb-24">
+      {/* ── TWO DOORS — leads the page ── */}
+      <section className="relative px-6 pb-20 pt-32 sm:pb-24 sm:pt-36">
         <div className="relative mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="pill bg-white">
@@ -289,6 +237,74 @@ export default function HomePage() {
               </div>
             </article>
           </div>
+        </div>
+      </section>
+
+      {/* ── HERO — after the two doors ── */}
+      <section className="relative overflow-hidden px-6 pb-20 pt-4" style={{ background: 'linear-gradient(160deg, #1a2e52 0%, #32175a 55%, #703068 100%)' }}>
+        {/* Top wave */}
+        <div className="pointer-events-none absolute -top-1 left-0 right-0">
+          <svg viewBox="0 0 1440 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full rotate-180" preserveAspectRatio="none">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,72 L0,72 Z" fill="#f2f4f8"/>
+          </svg>
+        </div>
+        {/* Decorative blobs */}
+        <div className="pointer-events-none absolute -left-24 top-8 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+
+        <div className="relative mx-auto max-w-4xl pt-16 text-center">
+          <span className="pill mb-6 border-white/20 bg-white/10 text-white/90 backdrop-blur-sm">
+            <Heart className="h-3.5 w-3.5 text-accent" /> By Texas ABA Centers
+          </span>
+          <h2 className="text-balance text-4xl font-bold leading-tight text-white sm:text-5xl md:text-6xl">
+            You don&apos;t have to figure<br />
+            <span className="text-accent">this out alone.</span>
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/80 sm:text-lg">
+            Common Ground gives every family — whether you just got a diagnosis, are on a
+            waitlist, or have been in therapy for years — real guidance, real resources,
+            and real support.
+          </p>
+
+          {/* ── CHECK-IN — white cards on dark background, fully readable ── */}
+          <div className="mx-auto mt-10 max-w-2xl">
+            <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-white/60">
+              How are things feeling right now?
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Link
+                href="/support/caregiver"
+                className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-white/20 bg-white/95 p-4 text-center shadow-card transition-all hover:-translate-y-0.5 hover:border-white hover:shadow-card-hover"
+              >
+                <span className="text-2xl">😔</span>
+                <span className="text-sm font-semibold leading-snug text-brand-muted-900">I&apos;m overwhelmed</span>
+                <span className="text-xs text-brand-plum-600">Start with support for you</span>
+              </Link>
+              <Link
+                href="/support/next-steps"
+                className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-white/20 bg-white/95 p-4 text-center shadow-card transition-all hover:-translate-y-0.5 hover:border-white hover:shadow-card-hover"
+              >
+                <span className="text-2xl">🤷</span>
+                <span className="text-sm font-semibold leading-snug text-brand-muted-900">I don&apos;t know where to start</span>
+                <span className="text-xs text-primary">We&apos;ll walk you through it</span>
+              </Link>
+              <Link
+                href="/support/find"
+                className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-white/20 bg-white/95 p-4 text-center shadow-card transition-all hover:-translate-y-0.5 hover:border-white hover:shadow-card-hover"
+              >
+                <span className="text-2xl">🔍</span>
+                <span className="text-sm font-semibold leading-snug text-brand-muted-900">I need specific help</span>
+                <span className="text-xs text-amber-700">Resources, providers &amp; guides</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom wave */}
+        <div className="pointer-events-none absolute -bottom-1 left-0 right-0">
+          <svg viewBox="0 0 1440 72" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full" preserveAspectRatio="none">
+            <path d="M0,40 C360,80 1080,0 1440,40 L1440,72 L0,72 Z" fill="#f2f4f8"/>
+          </svg>
         </div>
       </section>
 
