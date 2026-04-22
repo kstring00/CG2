@@ -289,11 +289,11 @@ export default function FindSupportPage() {
       isDemo: group.isDemo,
       stages: ['just-diagnosed', 'struggling-home', 'burned-out'],
       bestFor: group.audience,
-      whenToUse: 'Use this when you need people who understand what your week really feels like.',
+      whenToUse: 'Use this when you need connection, encouragement, or practical ideas from families who get it.',
       whatToExpect: group.moderation,
       priorityLabel: group.type === 'online' ? 'Good first step' : undefined,
       priorityColor: 'bg-purple-50 text-purple-700 border-purple-200',
-      verifiedLabel: 'Community listing reviewed',
+      verifiedLabel: 'Recommended by local parents',
       verifiedDate: group.lastReviewed,
       verifiedColor: 'bg-purple-50 text-purple-700 border-purple-200',
       details: [
@@ -418,7 +418,7 @@ export default function FindSupportPage() {
           <input
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search by name, type, description, location, or tag..."
+            placeholder="Search by need, service, location, or keyword..."
             className="w-full rounded-xl border border-surface-border bg-white py-2.5 pl-9 pr-10 text-sm outline-none ring-primary/20 transition focus:ring-2"
           />
           {searchQuery && (
@@ -471,7 +471,7 @@ export default function FindSupportPage() {
         <section className="rounded-3xl border border-dashed border-surface-border bg-white p-10 text-center">
           <p className="text-base font-semibold text-brand-muted-900">No results found.</p>
           <p className="mt-2 text-sm text-brand-muted-600">
-            Try a broader search or clear filters to see all support options.
+            Try broadening your search or clearing filters to explore more support options.
           </p>
           {hasFilters && (
             <button
