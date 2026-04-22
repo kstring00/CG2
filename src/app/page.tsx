@@ -21,7 +21,7 @@ import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#f9f8f6' }}>
+    <main className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
 
       {/* ─────────────────────────────────────────
           NAV
@@ -73,10 +73,15 @@ export default function HomePage() {
                 'linear-gradient(to right, rgba(8,15,30,0.90) 0%, rgba(8,15,30,0.78) 30%, rgba(8,15,30,0.40) 58%, rgba(8,15,30,0.0) 100%)',
             }}
           />
-          {/* Bottom fade into the page */}
+          {/* Bottom fade into the page — long and smooth */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-32"
-            style={{ background: 'linear-gradient(to bottom, transparent 0%, #f9f8f6 100%)' }}
+            className="absolute bottom-0 left-0 right-0 h-56"
+            style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(244,239,232,0.5) 50%, #f4efe8 100%)' }}
+          />
+          {/* Top fade — softens the nav edge */}
+          <div
+            className="absolute top-0 left-0 right-0 h-24"
+            style={{ background: 'linear-gradient(to bottom, rgba(8,15,30,0.45) 0%, transparent 100%)' }}
           />
         </div>
 
