@@ -75,14 +75,7 @@ export default function HomePage() {
                 'linear-gradient(to right, rgba(8,15,30,0.82) 0%, rgba(8,15,30,0.70) 28%, rgba(8,15,30,0.30) 52%, rgba(8,15,30,0.0) 72%)',
             }}
           />
-          {/* Bottom fade into page */}
-          <div
-            className="absolute bottom-0 left-0 right-0"
-            style={{
-              height: '220px',
-              background: 'linear-gradient(to bottom, transparent 0%, #f4efe8 100%)'
-            }}
-          />
+          {/* No bottom fade — crisp edge */}
           {/* Top fade — nav edge */}
           <div
             className="absolute top-0 left-0 right-0 h-20"
