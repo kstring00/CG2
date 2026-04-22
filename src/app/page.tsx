@@ -63,7 +63,7 @@ export default function HomePage() {
             fill
             priority
             className="object-cover"
-            style={{ objectPosition: '60% 35%', transform: 'scale(0.82)', transformOrigin: 'center center' }}
+            style={{ objectPosition: '68% 28%' }}
           />
           {/* Dark gradient over left half so white text pops */}
           <div
