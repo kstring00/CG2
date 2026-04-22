@@ -61,7 +61,7 @@ export default function HomePage() {
             src="/hero-mom-child.png"
             alt="Mother holding her child at home"
             fill
-            className="object-cover object-[70%_20%]"
+            className="object-cover object-[65%_15%] scale-110"
             priority
           />
           {/* Gradient fade — left side where text lives */}
@@ -69,7 +69,7 @@ export default function HomePage() {
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(to right, #fdf6ee 0%, #fdf6ee 30%, rgba(253,246,238,0.92) 48%, rgba(253,246,238,0.55) 65%, transparent 85%)',
+                'linear-gradient(to right, #fdf6ee 0%, #fdf6ee 28%, rgba(253,246,238,0.88) 44%, rgba(253,246,238,0.40) 62%, transparent 80%)',
             }}
           />
           {/* Bottom fade into page */}
