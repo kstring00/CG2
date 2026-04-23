@@ -18,6 +18,7 @@ import {
   Wind,
 } from 'lucide-react';
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
+import { CommonGroundLogo } from '@/components/brand/CommonGroundLogo';
 
 export default function HomePage() {
   return (
@@ -30,8 +31,8 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="Common Ground home">
             <TexasAbaLogo priority decorative className="h-7 w-auto sm:h-8" />
-            <span className="border-l border-stone-200 pl-3 font-display text-base font-bold text-stone-900 sm:text-lg">
-              Common Ground
+            <span className="border-l border-stone-200 pl-3">
+              <CommonGroundLogo className="h-7 w-auto sm:h-8" />
             </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">

@@ -24,6 +24,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
+import { CommonGroundLogo } from '@/components/brand/CommonGroundLogo';
 import { cn } from '@/lib/utils';
 
 /**
@@ -74,9 +75,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       <div className="border-b border-surface-border px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0 space-y-2">
           <TexasAbaLogo decorative className="h-8 w-auto" />
-          <span className="block font-display text-sm font-bold leading-tight text-brand-muted-900">
-            Common<span className="text-primary"> Ground</span>
-          </span>
+          <CommonGroundLogo className="h-6 w-auto" />
         </Link>
         <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
           <CompassIcon className="h-3 w-3" /> Care Navigation
