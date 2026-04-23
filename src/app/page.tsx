@@ -60,14 +60,14 @@ export default function HomePage() {
         {/* Photo — full bleed, framed on therapist face + logo */}
         <div className="absolute inset-0">
           <Image
-            src="/hero-variant3.png"
-            alt="Mother and toddler playing with Texas ABA Centers blocks on the living room floor"
+            src="/hero-selected.jpg"
+            alt="Father and daughter doing a puzzle with Texas ABA Centers therapy kit"
             fill
             priority
             quality={100}
             sizes="100vw"
             className="object-cover"
-            style={{ objectPosition: '58% 22%' }}
+            style={{ objectPosition: '62% 28%' }}
           />
           {/* Left overlay — photo is naturally bright on left so use a warm dark tint */}
           <div
