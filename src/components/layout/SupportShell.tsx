@@ -74,7 +74,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       <div className="border-b border-surface-border px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0">
           <Image
-            src="/logos/cg2-lockup.svg"
+            src="/logos/cg2-lockup-final.png"
             alt="Texas ABA Centers | Common Ground"
             width={280}
             height={42}

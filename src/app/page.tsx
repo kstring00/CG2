@@ -30,7 +30,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
             <Image
-              src="/logos/cg2-lockup.svg"
+              src="/logos/cg2-lockup-final.png"
               alt="Texas ABA Centers | Common Ground"
               width={320}
               height={48}
