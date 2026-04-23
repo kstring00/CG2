@@ -186,7 +186,7 @@ export default function ResourcesPage() {
           <BookOpen className="mx-auto h-10 w-10 text-brand-muted-300" />
           <h3 className="mt-4 text-lg font-semibold text-brand-muted-600">No resources match this view</h3>
           <p className="mt-1 text-sm text-brand-muted-500">
-            Try a broader search or a different category for {stageMeta[activeStage].label.toLowerCase()}.
+            Try a broader search or a different category.
           </p>
         </div>
       )}
