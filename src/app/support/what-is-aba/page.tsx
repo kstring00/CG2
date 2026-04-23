@@ -113,16 +113,16 @@ export default function WhatIsABAPage() {
       ══════════════════════════════════════════ */}
 
       <header className="page-header">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">Understanding ABA</p>
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700">
-          <BookOpen className="h-3.5 w-3.5" /> What Is ABA Really?
+          <BookOpen className="h-3.5 w-3.5" /> Plain English. No jargon.
         </div>
         <h1 className="page-title text-3xl font-bold sm:text-4xl">
           What ABA actually is — and what it isn&apos;t.
         </h1>
         <p className="page-description text-base leading-relaxed">
-          You&apos;ve heard the term. You may have heard things that scared you. Here is the honest, plain-English
-          guide to what Applied Behavior Analysis is, what a real session looks like, and what you are
-          allowed — and encouraged — to ask.
+          You heard the term. You may have heard things that worried you.
+          Here is the honest guide: what ABA looks like in a real session, what you are allowed to ask your BCBA, and what modern therapy is not.
         </p>
       </header>
 
@@ -435,26 +435,26 @@ export default function WhatIsABAPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
           <Heart className="h-6 w-6 text-brand-plum-600" />
         </div>
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-600 mb-2">You&apos;re more than the driver.</p>
         <h2 className="text-xl font-bold text-brand-muted-900">
-          You made a brave choice getting your child into therapy.
+          You are part of your child&apos;s therapy.
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
-          You are allowed to understand what&apos;s happening in those sessions. You are allowed to ask hard
-          questions. You are allowed to be a full partner in your child&apos;s care — not just the person
-          who drops them off. That involvement isn&apos;t an intrusion. It is part of how this works.
+          Understanding what happens in those sessions makes everything work better — for your child,
+          and for you. Ask hard questions. Show up. That is not overstepping. It is part of how this works.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
-            href="/support/caregiver"
+            href="/support/next-steps"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
           >
-            Support for you, the caregiver <ArrowRight className="h-4 w-4" />
+            See your next steps <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/support/next-steps"
+            href="/support/caregiver"
             className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
           >
-            <Lightbulb className="h-4 w-4" /> Guided next steps
+            <Lightbulb className="h-4 w-4" /> Support for you
           </Link>
         </div>
       </div>

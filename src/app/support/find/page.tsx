@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {
+  ArrowRight,
   ChevronDown,
   ChevronUp,
   ExternalLink,
@@ -97,7 +98,11 @@ function SupportCard({ item }: { item: UnifiedItem }) {
               {item.verifiedLabel}
             </span>
           )}
-          {item.verifiedDate && <p className="mt-1 text-[11px] text-brand-muted-400">Last reviewed {item.verifiedDate}</p>}
+          {item.verifiedDate && (
+            <p className="mt-1 text-[11px] font-medium text-brand-muted-500">
+              Reviewed {item.verifiedDate}
+            </p>
+          )}
         </div>
       </div>
 
@@ -391,7 +396,12 @@ export default function FindSupportPage() {
   return (
     <div className="page-shell">
       <header className="page-header">
-        <h1 className="page-title">Find Support</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">Find Support</p>
+        <h1 className="page-title">Real help, near you.</h1>
+        <p className="page-description">
+          Every provider, place, and group here has been reviewed by our care navigation team.
+          Filter by your situation — we will show you what fits.
+        </p>
       </header>
 
       <section className="rounded-2xl border border-red-200 bg-red-50 p-4">
@@ -497,6 +507,35 @@ export default function FindSupportPage() {
       <p className="text-xs text-brand-muted-400">
         For direct websites, choose <ExternalLink className="mx-1 inline h-3 w-3" /> Website on each card.
       </p>
+
+      {/* Bottom CTA */}
+      <div className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/60 p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-600">Not finding what you need?</p>
+            <h3 className="mt-1.5 text-base font-semibold text-brand-muted-900">
+              Your care navigation team can help.
+            </h3>
+            <p className="mt-1 text-sm text-brand-muted-600">
+              If nothing here fits, reach out — we will point you toward the right resource for your situation.
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-wrap gap-3">
+            <a
+              href="/support/connect"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand-plum-700 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-brand-plum-800"
+            >
+              Connect with a parent <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+              href="/support/next-steps"
+              className="inline-flex items-center gap-2 rounded-2xl border border-brand-plum-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
+            >
+              See your next steps
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

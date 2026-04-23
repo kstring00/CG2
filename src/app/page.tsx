@@ -103,7 +103,7 @@ export default function HomePage() {
                 You don&apos;t have to figure this out alone.
               </h1>
               <p className="mt-4 max-w-md text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
-                Guidance, resources, and mental health support — built for every parent raising a child with support needs.
+                Common Ground helps parents understand what to do next — with clear guidance, local support, and real help for you, not just your child.
               </p>
               <div className="mt-7 flex flex-col gap-2.5 text-sm text-white/70">
                 <div className="flex items-center gap-2.5">
@@ -121,16 +121,16 @@ export default function HomePage() {
               </div>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Link
-                  href="/support"
+                  href="/support/next-steps"
                   className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary shadow-md transition hover:bg-white/92"
                 >
-                  Care Navigation <ArrowRight className="h-4 w-4" />
+                  Start Here <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/client"
+                  href="/support"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
                 >
-                  <Lock className="h-4 w-4" /> Client sign in
+                  Explore Support Options
                 </Link>
               </div>
             </div>
@@ -140,7 +140,33 @@ export default function HomePage() {
       </section>
 
       {/* ─────────────────────────────────────────
-          CRISIS BAR — unmissable, right below hero
+          HOW THIS WORKS — 3-step, right below hero
+      ───────────────────────────────────────── */}
+      <section className="border-b border-stone-100 bg-white px-6 py-8 sm:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-6 sm:grid-cols-3">
+            {[
+              { n: '1', title: 'Understand where you are', desc: 'Quick guidance based on your situation — no jargon.' },
+              { n: '2', title: 'Get your next steps', desc: 'Clear, simple actions. No guessing. No overwhelm.' },
+              { n: '3', title: 'Find real support', desc: 'Local providers, parent connections, and help for you.' },
+            ].map((step) => (
+              <div key={step.n} className="flex items-start gap-4">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">{step.n}</div>
+                <div>
+                  <p className="text-sm font-semibold text-stone-900">{step.title}</p>
+                  <p className="mt-0.5 text-sm text-stone-500">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 border-t border-stone-100 pt-5 text-center text-xs text-stone-400">
+            Built by <span className="font-semibold text-stone-600">Texas ABA Centers</span> to support families — not just clients.
+          </p>
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────
+          CRISIS BAR
       ───────────────────────────────────────── */}
       <div className="border-b border-rose-200 bg-rose-600 px-6 py-3 sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center text-sm">
@@ -161,10 +187,7 @@ export default function HomePage() {
       <section className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: '#f4efe8' }}>
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">
-              Start here
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-stone-900 sm:text-4xl md:text-5xl">
+            <h2 className="text-3xl font-bold text-stone-900 sm:text-4xl">
               What do you need right now?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-stone-500">

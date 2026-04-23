@@ -78,10 +78,10 @@ export default function ClientSignInPage() {
               </span>
 
               <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl">
-                Welcome back.
+                Your family&apos;s care, in one place.
               </h1>
               <p className="mt-4 max-w-md text-base leading-7 text-white/80 sm:text-lg">
-                Your family&apos;s care plan, progress, and team — all in one place.
+                Session notes, goals, and direct messaging with your BCBA and RBT — all tied to your child&apos;s actual program.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -106,6 +106,20 @@ export default function ClientSignInPage() {
 
       {/* ── CONTENT CARDS ───────────────────────────────────────── */}
       <section className="mx-auto max-w-2xl px-6 py-12 sm:py-16">
+
+        {/* Value line above sign-in card */}
+        <div className="mb-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-center">
+          {[
+            { label: 'Session notes from every visit' },
+            { label: 'Your child’s active goals & progress' },
+            { label: 'Message your BCBA or RBT directly' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-1.5 text-xs font-medium text-stone-500">
+              <ShieldCheck className="h-3.5 w-3.5 text-primary/60" />
+              {item.label}
+            </div>
+          ))}
+        </div>
 
         {/* Sign-in card */}
         <div className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm sm:p-10">

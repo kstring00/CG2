@@ -43,10 +43,12 @@ export default function SupportHome() {
     <div className="page-shell">
       {/* Header */}
       <header className="page-header">
-        <h1 className="page-title">You are in the right place.</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">
+          Care Navigation
+        </p>
+        <h1 className="page-title">What do you need right now?</h1>
         <p className="page-description">
-          Tell us where you are today and we will keep the next move simple.
-          You do not have to figure this out all at once.
+          Pick what fits today. We will keep the next step simple — one thing at a time.
         </p>
       </header>
 
@@ -219,6 +221,15 @@ export default function SupportHome() {
           </article>
         </div>
       </section>
+
+      {/* Decision-path section label */}
+      <div className="flex items-center gap-3">
+        <div className="h-px flex-1 bg-surface-border" />
+        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
+          Or go directly to
+        </span>
+        <div className="h-px flex-1 bg-surface-border" />
+      </div>
 
       {/* Bottom paths */}
       <section className="grid gap-4 md:grid-cols-3">

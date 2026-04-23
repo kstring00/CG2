@@ -303,15 +303,29 @@ export default function ConnectPage() {
     <div className="page-shell">
       {/* Header */}
       <header className="page-header">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
-          <Link2 className="h-3.5 w-3.5" /> Parent connection
-        </div>
-        <h1 className="page-title">Connect with parents who get it.</h1>
-        <p className="page-description">
-          Protected parent-to-parent support for the moments when you need someone who understands —
-          with clear privacy boundaries, moderation, and a path to more support if peer connection
-          is not enough.
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">
+          Parent Connection
         </p>
+        <h1 className="page-title">You don&apos;t have to explain it. They already know.</h1>
+        <p className="page-description">
+          Connect with other parents who are living this — same stage, same struggles, same long days.
+          Moderated, private, and low-pressure.
+        </p>
+        {/* CTA above fold */}
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            onClick={() => setActiveTab('get-started')}
+            className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+          >
+            Find my match <ArrowRight className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setActiveTab('groups')}
+            className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:border-primary/30 hover:text-primary"
+          >
+            Browse small groups
+          </button>
+        </div>
       </header>
 
       {/* Four feature cards */}
@@ -320,33 +334,33 @@ export default function ConnectPage() {
           {
             icon: Shield,
             eyebrow: 'Moderation',
-            title: 'Conversations are moderated',
-            body: 'A protected parent space with community boundaries, moderator oversight, and escalation guidance when peer support is not enough.',
+            title: 'A safe, guided space',
+            body: 'Every group has a moderator. Conversations follow clear norms. You will not be left to navigate it alone.',
             tags: ['Guided onboarding', 'Moderator support', 'Clear group norms'],
             color: 'bg-primary/10 text-primary',
           },
           {
             icon: Shield,
             eyebrow: 'Privacy',
-            title: 'Only limited details are shared',
-            body: 'Parents share stage, support preferences, and broad struggle themes. Identifying child details stay private until you choose otherwise.',
+            title: 'Your child stays private',
+            body: 'No identifying child details are shared. You control what you share — stage, struggles, and format only.',
             tags: ['No child records shared', 'No address required', 'Opt-in only'],
             color: 'bg-emerald-100 text-emerald-700',
           },
           {
             icon: Sparkles,
             eyebrow: 'Matching',
-            title: 'Matches based on stage and fit',
-            body: 'Common Ground uses child age range, journey stage, struggle themes, support style, and preferred format to shape matches.',
+            title: 'Matched by stage and fit',
+            body: 'We pair you with parents at the same stage, with the same struggles, and the same support style you prefer.',
             tags: ['Age range', 'Journey stage', 'Support preference'],
             color: 'bg-brand-plum-100 text-brand-plum-700',
           },
           {
             icon: Heart,
-            eyebrow: 'Escalation',
-            title: 'Peer support is not the final stop',
-            body: 'If a parent needs therapy, advocacy, respite, or more structured help, Common Ground routes them there rather than leaving them unsupported.',
-            tags: ['Use support services', 'Escalate early', 'Do not carry this alone'],
+            eyebrow: 'When you need more',
+            title: 'Peer support is not the last stop',
+            body: 'If you need therapy, respite, or real clinical help — we will point you there. You do not have to carry this alone.',
+            tags: ['Routes to real help', 'No dead ends', 'Your pace'],
             color: 'bg-accent/10 text-accent',
           },
         ].map((card) => (

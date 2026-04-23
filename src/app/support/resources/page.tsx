@@ -49,10 +49,27 @@ export default function ResourcesPage() {
   return (
     <div className="page-shell">
       <header className="page-header">
-        <h1 className="page-title">Resources that actually help</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">Resource Library</p>
+        <h1 className="page-title">Resources that actually help.</h1>
         <p className="page-description">
           Vetted, trusted resources — not a firehose. Each one was chosen because it answers a
-          real question parents are asking. Search by topic or filter by category.
+          real question parents are asking.
+        </p>
+        {/* 3-bucket guide */}
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {[
+            { label: 'Right Now', desc: 'If today is hard — grounding tools, crisis lines, quick relief.', color: 'border-rose-200 bg-rose-50 text-rose-700' },
+            { label: 'Understanding', desc: 'ABA, IEP, insurance, therapy jargon — explained in plain English.', color: 'border-sky-200 bg-sky-50 text-sky-700' },
+            { label: 'Support for You', desc: 'Burnout, mental health, community, couples — because you matter too.', color: 'border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700' },
+          ].map((bucket) => (
+            <div key={bucket.label} className={`rounded-2xl border px-4 py-3 ${bucket.color}`}>
+              <p className="text-xs font-bold uppercase tracking-wide">{bucket.label}</p>
+              <p className="mt-1 text-xs leading-relaxed opacity-80">{bucket.desc}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-brand-muted-500">
+          Not sure where to start? Search by what you are going through right now.
         </p>
       </header>
 

@@ -61,8 +61,8 @@ function NextStepsPageInner() {
   return (
     <div className="page-shell">
       <header className="page-header">
-        <h1 className="page-title">Your next steps</h1>
-        <p className="page-description">Start with what matters now. The rest can wait.</p>
+        <h1 className="page-title">Let&apos;s take this one step at a time.</h1>
+        <p className="page-description">Pick the stage that fits today — then focus only on the next right move. Not the whole plan. Just the next step.</p>
       </header>
 
       {/* Stage picker */}
@@ -277,7 +277,20 @@ function NextStepsPageInner() {
 
 export default function NextStepsPage() {
   return (
-    <Suspense fallback={<div className="page-shell"><p className="text-brand-muted-500">Loading your next steps…</p></div>}>
+    <Suspense
+      fallback={
+        <div className="page-shell">
+          <header className="page-header">
+            <h1 className="page-title">Let&apos;s take this one step at a time.</h1>
+            <p className="page-description">Start with what matters now. The rest can wait.</p>
+          </header>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 rounded-3xl bg-surface-muted" />
+            <div className="h-48 rounded-3xl bg-surface-muted" />
+          </div>
+        </div>
+      }
+    >
       <NextStepsPageInner />
     </Suspense>
   );
