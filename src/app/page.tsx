@@ -196,10 +196,10 @@ export default function HomePage() {
               },
               {
                 eyebrow: 'I want to understand more',
-                title: 'Resource library',
-                desc: 'Short, curated guides for the stage you\'re in. Not too long. Straight talk. Written by people who get it.',
-                cta: 'Browse the library',
-                href: '/support/resources',
+                title: 'What is ABA, really?',
+                desc: 'Plain answers to the questions every parent has. No jargon. Just clarity on what ABA therapy actually looks like day to day.',
+                cta: 'Get clear answers',
+                href: '/support/what-is-aba',
                 icon: BookOpen,
                 color: 'text-amber-400',
                 eyebrow_color: 'text-amber-400',
@@ -230,6 +230,31 @@ export default function HomePage() {
                 </span>
               </Link>
             ))}
+          </div>
+
+          {/* Quiet secondary links — for parents who need a more specific path */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+            <p className="w-full text-center text-[11px] font-medium uppercase tracking-widest text-stone-400">Or go straight to what you need</p>
+            <Link
+              href="/support/caregiver"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline"
+            >
+              <Heart className="h-3.5 w-3.5" /> I need support too
+            </Link>
+            <span className="text-stone-300">·</span>
+            <Link
+              href="/support/siblings"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline"
+            >
+              <Users className="h-3.5 w-3.5" /> My other kids are struggling
+            </Link>
+            <span className="text-stone-300">·</span>
+            <Link
+              href="/support/hard-days"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 underline-offset-2 hover:underline"
+            >
+              <Wind className="h-3.5 w-3.5" /> I need support right now
+            </Link>
           </div>
         </div>
       </section>
