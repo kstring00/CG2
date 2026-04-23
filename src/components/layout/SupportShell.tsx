@@ -15,6 +15,13 @@ import {
   Compass as CompassIcon,
   Lock,
   ArrowRight,
+  Moon,
+  Heart,
+  DollarSign,
+  Users,
+  AlertTriangle,
+  User,
+  HelpCircle,
 } from 'lucide-react';
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
 import { cn } from '@/lib/utils';
@@ -27,13 +34,35 @@ import { cn } from '@/lib/utils';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
-const navItems = [
-  { href: '/support', label: 'Home', icon: LayoutDashboard },
-  { href: '/support/caregiver', label: 'Support for You', icon: HeartHandshake, highlight: true },
-  { href: '/support/connect', label: 'Connect', icon: Link2 },
-  { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
-  { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
-  { href: '/support/find', label: 'Find Support', icon: Search },
+const navGroups = [
+  {
+    label: 'Care Navigation',
+    items: [
+      { href: '/support', label: 'Home', icon: LayoutDashboard },
+      { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
+      { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
+      { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
+      { href: '/support/find', label: 'Find Support', icon: Search },
+      { href: '/support/connect', label: 'Connect', icon: Link2 },
+    ],
+  },
+  {
+    label: 'Support for You',
+    items: [
+      { href: '/support/caregiver', label: 'Your Mental Health', icon: HeartHandshake, highlight: true },
+      { href: '/support/caregiver/identity', label: 'Caregiver Identity', icon: User },
+      { href: '/support/sleep', label: 'Sleep & Rest', icon: Moon },
+      { href: '/support/couples', label: 'Couples Support', icon: Heart },
+      { href: '/support/financial', label: 'Financial Resources', icon: DollarSign },
+      { href: '/support/hard-days', label: 'Hard Days & Crisis', icon: AlertTriangle },
+    ],
+  },
+  {
+    label: 'Your Family',
+    items: [
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+    ],
+  },
 ];
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
@@ -55,39 +84,43 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Care Navigation">
-        <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-          Care Navigation
-        </p>
-        <ul className="m-0 flex list-none flex-col gap-1 p-0">
-          {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== '/support' && pathname.startsWith(item.href));
-            const isHighlight = (item as { highlight?: boolean }).highlight;
-            return (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
-                    isActive
-                      ? 'bg-primary text-white shadow-soft'
-                      : isHighlight
-                      ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
-                      : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-                  )}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  <span className="flex-1">{item.label}</span>
-                  {isHighlight && !isActive && (
-                    <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">You</span>
-                  )}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
+        {navGroups.map((group, gi) => (
+          <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
+            <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+              {group.label}
+            </p>
+            <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
+              {group.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/support' && pathname.startsWith(item.href));
+                const isHighlight = (item as { highlight?: boolean }).highlight;
+                return (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
+                        isActive
+                          ? 'bg-primary text-white shadow-soft'
+                          : isHighlight
+                          ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
+                          : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
+                      )}
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      <span className="flex-1 text-[13px]">{item.label}</span>
+                      {isHighlight && !isActive && (
+                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">You</span>
+                      )}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
 
         {/* Cross-layer handoff — clearly labeled, visually distinct */}
         <div className="mt-6 border-t border-surface-border/60 pt-4">
