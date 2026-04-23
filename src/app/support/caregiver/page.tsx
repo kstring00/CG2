@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import BreathingOrb from '@/components/BreathingOrb';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -51,14 +52,9 @@ const quickTools = [
     title: '4-7-8 Breathing',
     tag: '2 min',
     color: 'emerald',
-    steps: [
-      'Find a comfortable position and close your eyes.',
-      'Inhale slowly through your nose for 4 counts.',
-      'Hold your breath for 7 counts.',
-      'Exhale completely through your mouth for 8 counts.',
-      'Repeat 3 times. Your nervous system will start to slow.',
-    ],
-    note: 'This activates your parasympathetic nervous system — the part that tells your body the danger has passed.',
+    isOrb: true,
+    steps: [],
+    note: '',
   },
   {
     title: '5-4-3-2-1 Grounding',
@@ -338,25 +334,30 @@ export default function CaregiverSupportPage() {
                 </div>
                 {openTool === i
                   ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                  : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                }
+                  : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
               </button>
               {openTool === i && (
                 <div className="px-5 pb-5">
-                  <ol className="space-y-2">
-                    {tool.steps.map((step, j) => (
-                      <li key={j} className="flex gap-3 text-sm text-brand-muted-700">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white border border-surface-border text-[11px] font-bold text-brand-muted-400">
-                          {j + 1}
-                        </span>
-                        <span className="leading-relaxed">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                  {tool.note && (
-                    <p className="mt-4 text-xs leading-relaxed text-brand-muted-500 italic border-t border-surface-border pt-3">
-                      {tool.note}
-                    </p>
+                  {'isOrb' in tool && tool.isOrb ? (
+                    <BreathingOrb />
+                  ) : (
+                    <>
+                      <ol className="space-y-2">
+                        {tool.steps.map((step, j) => (
+                          <li key={j} className="flex gap-3 text-sm text-brand-muted-700">
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white border border-surface-border text-[11px] font-bold text-brand-muted-400">
+                              {j + 1}
+                            </span>
+                            <span className="leading-relaxed">{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                      {tool.note && (
+                        <p className="mt-4 text-xs leading-relaxed text-brand-muted-500 italic border-t border-surface-border pt-3">
+                          {tool.note}
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               )}
