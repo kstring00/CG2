@@ -9,8 +9,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
-import { CommonGroundLogo } from '@/components/brand/CommonGroundLogo';
+
 
 export default function ClientSignInPage() {
   return (
@@ -19,11 +18,16 @@ export default function ClientSignInPage() {
       {/* ── NAV ─────────────────────────────────────────────────── */}
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
-          <Link href="/" className="flex items-center gap-3" aria-label="Common Ground home">
-            <TexasAbaLogo priority decorative className="h-7 w-auto sm:h-8" />
-            <span className="border-l border-stone-200 pl-3">
-              <CommonGroundLogo className="h-7 w-auto sm:h-8" />
-            </span>
+          <Link href="/" aria-label="Common Ground home">
+            <Image
+              src="/logos/cg2-lockup.jpg"
+              alt="Texas ABA Centers | Common Ground"
+              width={320}
+              height={48}
+              priority
+              className="h-8 w-auto sm:h-9"
+              style={{ objectFit: 'contain' }}
+            />
           </Link>
           <Link
             href="/"
