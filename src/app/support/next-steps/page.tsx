@@ -12,7 +12,6 @@ import {
   Flag,
   HandHeart,
 } from 'lucide-react';
-import { DemoDataNotice } from '@/components/ui/DemoDataNotice';
 import { guidedSteps, resources, stageMeta, type JourneyStageId } from '@/lib/data';
 
 const validStageIds: JourneyStageId[] = [
@@ -66,33 +65,35 @@ function NextStepsPageInner() {
         <p className="page-description">Start with what matters now. The rest can wait.</p>
       </header>
 
-      <DemoDataNotice
-        compact
-        title="Example stage plan"
-        description="Stage pathways, resources, and support cues use demo content. The simplified navigation flow is the product behavior being shown."
-      />
-
+      {/* Stage picker */}
       <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Choose your stage</p>
-            <h2 className="mt-1 text-2xl font-semibold text-brand-muted-900">{stageMeta[activeStage].label}</h2>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {guidedSteps.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveStage(item.id)}
-                className={`rounded-xl border px-3.5 py-2 text-sm font-medium transition-all ${
-                  activeStage === item.id
-                    ? 'border-primary bg-primary text-white shadow-soft'
-                    : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30 hover:text-primary'
-                }`}
-              >
-                {stageMeta[item.id].shortLabel}
-              </button>
-            ))}
-          </div>
+        <div className="mb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Where are you right now?</p>
+          <p className="mt-1 text-sm text-brand-muted-500">Pick the stage that sounds most like your family today. Not sure? Start with &ldquo;Just Diagnosed.&rdquo;</p>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            { id: 'pre-diagnosis' as const, hint: 'Something feels off, waiting on answers' },
+            { id: 'just-diagnosed' as const, hint: 'Got the diagnosis in the last few months' },
+            { id: 'starting-therapy' as const, hint: 'ABA or therapy is underway' },
+            { id: 'school-transition' as const, hint: 'Navigating IEP, school placement' },
+            { id: 'family-sustainability' as const, hint: 'Finding long-term balance' },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveStage(item.id)}
+              className={`flex flex-col rounded-2xl border p-3 text-left transition-all ${
+                activeStage === item.id
+                  ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                  : 'border-surface-border bg-white hover:border-primary/30'
+              }`}
+            >
+              <span className={`text-sm font-semibold ${
+                activeStage === item.id ? 'text-primary' : 'text-brand-muted-800'
+              }`}>{stageMeta[item.id].shortLabel}</span>
+              <span className="mt-0.5 text-[11px] leading-relaxed text-brand-muted-400">{item.hint}</span>
+            </button>
+          ))}
         </div>
       </section>
 

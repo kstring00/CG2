@@ -140,6 +140,22 @@ export default function HomePage() {
       </section>
 
       {/* ─────────────────────────────────────────
+          CRISIS BAR — unmissable, right below hero
+      ───────────────────────────────────────── */}
+      <div className="border-b border-rose-200 bg-rose-600 px-6 py-3 sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center text-sm">
+          <span className="flex items-center gap-2 font-bold text-white">
+            <Phone className="h-3.5 w-3.5" /> Need help right now?
+          </span>
+          <span className="text-rose-100">Call or text <a href="tel:988" className="font-bold text-white underline hover:text-rose-200">988</a></span>
+          <span className="hidden text-rose-300 sm:inline">·</span>
+          <span className="text-rose-100">Harris Center <a href="tel:7139707000" className="font-bold text-white underline hover:text-rose-200">(713) 970-7000</a></span>
+          <span className="hidden text-rose-300 sm:inline">·</span>
+          <span className="text-rose-100">Emergency: call <span className="font-bold text-white">911</span></span>
+        </div>
+      </div>
+
+      {/* ─────────────────────────────────────────
           WHAT DO YOU NEED
       ───────────────────────────────────────── */}
       <section className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: '#f4efe8' }}>
@@ -156,33 +172,32 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Primary CTA */}
+          {/* Primary CTA — dominant, unmissable */}
           <Link
             href="/support/next-steps"
-            className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border border-primary/20 bg-white p-7 shadow-sm transition hover:shadow-md sm:p-9"
+            className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border-2 border-primary bg-primary p-7 shadow-md transition hover:bg-primary/95 sm:p-9"
           >
             <div className="flex items-start gap-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-                <Compass className="h-6 w-6 text-primary" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20">
+                <Compass className="h-6 w-6 text-white" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-primary/70">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                   Most parents start here
                 </p>
-                <h3 className="mt-1 text-xl font-bold text-stone-900 sm:text-2xl">
+                <h3 className="mt-1 text-xl font-bold text-white sm:text-2xl">
                   &ldquo;I don&apos;t know what to do next.&rdquo;
                 </h3>
-                <p className="mt-1 text-sm font-semibold text-primary">We will walk you through it.</p>
-                <p className="mt-2 max-w-lg text-sm leading-relaxed text-stone-600">
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/80">
                   A short plan for where you are today — just the next right step.
                 </p>
               </div>
             </div>
             <div className="hidden shrink-0 flex-col items-center gap-1.5 sm:flex">
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-sm transition group-hover:bg-primary/90">
-                Start guided next steps <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <span className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-primary shadow-sm transition group-hover:bg-white/95">
+                Start here <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </span>
-              <span className="text-xs text-stone-400">Takes about 2 minutes</span>
+              <span className="text-xs text-white/50">Takes about 2 minutes</span>
             </div>
           </Link>
 
@@ -237,48 +252,25 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Quiet secondary links — for parents who need a more specific path */}
+          {/* Quiet secondary links */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
             <p className="w-full text-center text-[11px] font-medium uppercase tracking-widest text-stone-400">Or go straight to what you need</p>
-            <Link
-              href="/support/caregiver"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline"
-            >
+            <Link href="/support/caregiver" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
               <Heart className="h-3.5 w-3.5" /> I need support too
             </Link>
             <span className="text-stone-300">·</span>
-            <Link
-              href="/support/siblings"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline"
-            >
+            <Link href="/support/siblings" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
               <Users className="h-3.5 w-3.5" /> My other kids are struggling
             </Link>
             <span className="text-stone-300">·</span>
-            <Link
-              href="/support/hard-days"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 underline-offset-2 hover:underline"
-            >
+            <Link href="/support/hard-days" className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 underline-offset-2 hover:underline">
               <Wind className="h-3.5 w-3.5" /> I need support right now
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────
-          CRISIS BAR
-      ───────────────────────────────────────── */}
-      <div className="border-y border-rose-100 bg-rose-50 px-6 py-3 sm:px-8">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-6 gap-y-1 text-center text-sm">
-          <span className="flex items-center gap-2 font-semibold text-rose-600">
-            <Phone className="h-3.5 w-3.5" /> Need immediate help?
-          </span>
-          <span className="text-stone-600">Call or text <a href="tel:988" className="font-bold text-rose-600 hover:underline">988</a></span>
-          <span className="hidden text-stone-300 sm:inline">·</span>
-          <span className="text-stone-600">Harris Center Crisis Line <a href="tel:7139707000" className="font-bold text-rose-600 hover:underline">(713) 970-7000</a></span>
-          <span className="hidden text-stone-300 sm:inline">·</span>
-          <span className="text-stone-600">Life-threatening emergency: call <span className="font-bold text-rose-600">911</span></span>
-        </div>
-      </div>
+
 
       {/* ─────────────────────────────────────────
           PARENT SUPPORT — two col
@@ -315,7 +307,7 @@ export default function HomePage() {
                 href="/support/caregiver"
                 className="mt-7 inline-flex items-center gap-2 rounded-xl bg-brand-plum-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-plum-800"
               >
-                <HeartHandshake className="h-4 w-4" /> Support for you
+                <HeartHandshake className="h-4 w-4" /> Your mental health
               </Link>
             </div>
 
@@ -448,16 +440,10 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/support"
+              href="/support/next-steps"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-semibold text-primary shadow-sm transition hover:bg-white/95"
             >
-              Care Navigation <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/support/caregiver"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
-            >
-              <Heart className="h-4 w-4 text-rose-400" /> Support for you
+              Start here <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <p className="mt-10 text-xs text-white/35">

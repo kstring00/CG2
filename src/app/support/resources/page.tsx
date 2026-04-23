@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, BookOpen, Clock, Search } from 'lucide-react';
+import { ArrowUpRight, Bookmark, BookOpen, Clock, Search, Tag } from 'lucide-react';
 import {
   categoryMeta,
   resources,
@@ -49,11 +49,10 @@ export default function ResourcesPage() {
   return (
     <div className="page-shell">
       <header className="page-header">
-        <h1 className="page-title">Helpful right now</h1>
+        <h1 className="page-title">Resources that actually help</h1>
         <p className="page-description">
-          Choose your stage and we surface the resources that matter for where you are — not a
-          giant list to scroll through. Each one is from a trusted source and chosen because it
-          answers a real question parents in your stage are asking.
+          Vetted, trusted resources — not a firehose. Each one was chosen because it answers a
+          real question parents are asking. Search by topic or filter by category.
         </p>
       </header>
 
@@ -124,37 +123,19 @@ export default function ResourcesPage() {
                 </button>
               </div>
 
-              <h3 className="text-lg font-semibold leading-snug text-brand-muted-900">{resource.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{resource.description}</p>
+              <h3 className="text-base font-semibold leading-snug text-brand-muted-900">{resource.title}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">{resource.description}</p>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">Who it is for</p>
-                  <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{resource.whoItsFor}</p>
-                </div>
-                <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">Question it helps answer</p>
-                  <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{resource.question}</p>
-                </div>
-                <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">Why this matters now</p>
-                  <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{resource.whyNow}</p>
-                </div>
-                <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary">Action it supports</p>
-                  <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{resource.action}</p>
-                </div>
-              </div>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {resource.tags.map((tag) => (
-                  <span key={tag} className="rounded-md border border-surface-border bg-surface-muted px-2 py-1 text-xs text-brand-muted-500">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-brand-muted-400">
+                <Tag className="h-3 w-3" />
+                {resource.tags.slice(0, 3).map((tag) => (
+                  <span key={tag} className="rounded-md border border-surface-border bg-surface-muted px-2 py-0.5">
                     {tag}
                   </span>
                 ))}
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-surface-border pt-3 text-xs text-brand-muted-500">
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-surface-border pt-3 text-xs text-brand-muted-500">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="inline-flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" /> {resource.readTime}

@@ -18,6 +18,7 @@ import {
   Users,
   Wind,
 } from 'lucide-react';
+import BreathingOrb from '@/components/BreathingOrb';
 
 /* ─── data ─────────────────────────────────────────────────── */
 
@@ -327,8 +328,44 @@ export default function HardDaysPage() {
         </p>
       </header>
 
-      {/* Crisis card — warm, not alarming */}
-      <div className="rounded-3xl border-2 border-rose-200 bg-gradient-to-br from-rose-50 to-white p-6 sm:p-8">
+      {/* Anchor nav — parent at 10:47pm can jump directly to what they need */}
+      <nav className="rounded-2xl border border-surface-border bg-white px-4 py-3 shadow-sm">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">Jump to</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { label: 'Breathe', href: '#breathe' },
+            { label: 'Crisis line', href: '#crisis' },
+            { label: 'I feel...', href: '#feelings' },
+            { label: 'First hour after a breakdown', href: '#breakdown' },
+            { label: 'Repair conversation', href: '#repair' },
+            { label: 'Get help today', href: '#support' },
+          ].map(({ label, href }) => (
+            <a
+              key={label}
+              href={href}
+              className="rounded-xl border border-surface-border bg-surface-muted px-3 py-1.5 text-xs font-medium text-brand-muted-600 transition hover:border-primary/30 hover:text-primary"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      {/* Breathing tool — first thing, for the parent who is flooded right now */}
+      <section id="breathe" className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Leaf className="h-5 w-5 text-emerald-600" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">Start here — breathe first</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          If you are flooded right now, your brain cannot process information until your nervous system calms down. This takes 2 minutes.
+        </p>
+        <BreathingOrb />
+        <p className="mt-4 text-xs text-brand-muted-500 text-center">Inhale 4 counts · Hold 7 · Exhale 8 · Repeat 4 times</p>
+      </section>
+
+      {/* Crisis card */}
+      <div id="crisis" className="rounded-3xl border-2 border-rose-200 bg-gradient-to-br from-rose-50 to-white p-6 sm:p-8">
         <div className="flex items-start gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-100">
             <Phone className="h-5 w-5 text-rose-600" />
@@ -643,11 +680,11 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Your personal warning signs</h2>
+          <h2 className="text-lg font-semibold text-brand-muted-900">Signs you need support — not just rest</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
-          Check anything that feels true for you right now. This is not a test. It is a tool to help you
-          recognize where you are before things become a crisis.
+          Check anything that feels true. If even one of these resonates, that is enough reason to reach out today.
+          You do not have to earn the right to ask for help.
         </p>
         <ul className="space-y-3 mb-6">
           {warningSigns.map((sign, i) => (
@@ -735,7 +772,8 @@ export default function HardDaysPage() {
         </div>
       </section>
 
-      {/* Building your support team */}
+      {/* Support */}
+      <div id="support" />
       <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-5 w-5 text-primary" />

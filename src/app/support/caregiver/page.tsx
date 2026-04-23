@@ -218,6 +218,23 @@ export default function CaregiverSupportPage() {
   const [openTool, setOpenTool] = useState<number | null>(0);
   const [openCategory, setOpenCategory] = useState<number | null>(0);
   const [affirmIdx] = useState(() => Math.floor(Math.random() * affirmations.length));
+  const [quizChecked, setQuizChecked] = useState<Set<number>>(new Set());
+
+  const toggleQuiz = (i: number) => {
+    setQuizChecked((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  };
+  const quizCount = quizChecked.size;
+  const quizResult = quizCount === 0
+    ? null
+    : quizCount <= 2
+    ? { level: 'low', label: 'Some strain', msg: 'You\'re managing, but these feelings are worth paying attention to. Small acts of self-care now prevent bigger depletion later.' }
+    : quizCount <= 5
+    ? { level: 'mid', label: 'Depletion — not weakness', msg: 'What you\'re feeling has a clinical name: caregiver burnout. It is not a character flaw. It is what happens when you give more than you receive for too long. You need and deserve support.' }
+    : { level: 'high', label: 'You are running on empty', msg: 'This level of depletion is serious. Please reach out to someone today — a therapist, your care coordinator, or a crisis line. You cannot keep pouring from an empty cup, and you don\'t have to.' };
 
   return (
     <div className="page-shell">
@@ -230,7 +247,7 @@ export default function CaregiverSupportPage() {
       {/* Hero header */}
       <header className="page-header">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1.5 text-xs font-semibold text-brand-plum-700">
-          <HeartHandshake className="h-3.5 w-3.5" /> Support for you — the parent
+          <HeartHandshake className="h-3.5 w-3.5" /> Your mental health
         </div>
         <h1 className="page-title text-3xl font-bold sm:text-4xl">
           You matter in this too.
@@ -253,6 +270,19 @@ export default function CaregiverSupportPage() {
         </div>
       </div>
 
+      {/* BREATHING TOOL — moved to top so it’s immediately accessible */}
+      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Leaf className="h-5 w-5 text-emerald-600" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">Need to breathe right now?</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          Before anything else — if today is hard, start here. 4-7-8 breathing calms your nervous system in under 2 minutes.
+        </p>
+        <BreathingOrb />
+        <p className="mt-4 text-xs text-brand-muted-500 text-center">Inhale 4 counts · Hold 7 · Exhale 8 · Repeat 4 times</p>
+      </section>
+
       {/* The honest truth block */}
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <h2 className="text-xl font-bold text-brand-muted-900">What nobody tells you about this journey</h2>
@@ -271,29 +301,67 @@ export default function CaregiverSupportPage() {
         </div>
       </section>
 
-      {/* Burnout check-in */}
+      {/* Burnout quiz */}
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Zap className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Signs you might be running on empty</h2>
+          <h2 className="text-lg font-semibold text-brand-muted-900">Are you running on empty?</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          If any of these feel familiar, you are not broken — you are depleted. That is different, and it is something that can change with the right support.
+          Check everything that feels true right now. No right or wrong answers.
         </p>
         <ul className="grid gap-3 sm:grid-cols-2">
-          {burnoutSigns.map((item) => (
-            <li key={item.label} className="flex items-center gap-3 rounded-2xl border border-surface-border bg-surface-muted px-4 py-3">
-              <item.icon className="h-4 w-4 shrink-0 text-brand-plum-400" />
-              <span className="text-sm text-brand-muted-700">{item.label}</span>
-            </li>
-          ))}
+          {burnoutSigns.map((item, i) => {
+            const checked = quizChecked.has(i);
+            return (
+              <li key={item.label}>
+                <button
+                  onClick={() => toggleQuiz(i)}
+                  className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
+                    checked
+                      ? 'border-brand-plum-300 bg-brand-plum-50'
+                      : 'border-surface-border bg-surface-muted hover:border-brand-plum-200'
+                  }`}
+                >
+                  <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all ${
+                    checked ? 'border-brand-plum-500 bg-brand-plum-500' : 'border-brand-muted-300 bg-white'
+                  }`}>
+                    {checked && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
+                  </div>
+                  <item.icon className="h-4 w-4 shrink-0 text-brand-plum-400" />
+                  <span className="text-sm text-brand-muted-700">{item.label}</span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
-        <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
-          <p className="text-sm font-semibold text-brand-plum-800">If 3 or more of these feel true — please keep reading.</p>
-          <p className="mt-1 text-sm leading-relaxed text-brand-plum-700">
-            This page has tools for right now and resources to help you build something more sustainable. You do not have to wait until things are critical.
-          </p>
-        </div>
+
+        {/* Quiz result */}
+        {quizCount > 0 && (
+          <div className={`mt-5 rounded-2xl border p-5 ${
+            quizResult?.level === 'high' ? 'border-rose-200 bg-rose-50' :
+            quizResult?.level === 'mid' ? 'border-amber-200 bg-amber-50' :
+            'border-brand-plum-200 bg-brand-plum-50'
+          }`}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-xs font-bold uppercase tracking-wide ${
+                quizResult?.level === 'high' ? 'text-rose-600' :
+                quizResult?.level === 'mid' ? 'text-amber-700' :
+                'text-brand-plum-700'
+              }`}>{quizCount} of 8 · {quizResult?.label}</span>
+            </div>
+            <p className={`text-sm leading-relaxed ${
+              quizResult?.level === 'high' ? 'text-rose-800' :
+              quizResult?.level === 'mid' ? 'text-amber-800' :
+              'text-brand-plum-800'
+            }`}>{quizResult?.msg}</p>
+            {quizResult?.level === 'high' && (
+              <a href="tel:988" className="mt-3 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">
+                <Phone className="h-3.5 w-3.5" /> Call or text 988
+              </a>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ══════════════════════════════════════════
@@ -307,17 +375,17 @@ export default function CaregiverSupportPage() {
         <div className="h-px flex-1 bg-surface-border" />
       </div>
 
-      {/* Quick grounding tools — accordion */}
+      {/* Quick grounding tools — accordion (breathing already shown above, skip it here) */}
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Leaf className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Tools for right now — no app needed</h2>
+          <h2 className="text-lg font-semibold text-brand-muted-900">More tools for hard moments</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          These work in the middle of a hard day. Open one and try it before you keep scrolling.
+          Open one and try it before you keep scrolling.
         </p>
         <div className="space-y-3">
-          {quickTools.map((tool, i) => (
+          {quickTools.filter(t => !t.isOrb).map((tool, i) => (
             <div
               key={tool.title}
               className={`rounded-2xl border transition-all ${openTool === i ? colorMap[tool.color] : 'border-surface-border bg-surface-muted'}`}
@@ -338,26 +406,20 @@ export default function CaregiverSupportPage() {
               </button>
               {openTool === i && (
                 <div className="px-5 pb-5">
-                  {'isOrb' in tool && tool.isOrb ? (
-                    <BreathingOrb />
-                  ) : (
-                    <>
-                      <ol className="space-y-2">
-                        {tool.steps.map((step, j) => (
-                          <li key={j} className="flex gap-3 text-sm text-brand-muted-700">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white border border-surface-border text-[11px] font-bold text-brand-muted-400">
-                              {j + 1}
-                            </span>
-                            <span className="leading-relaxed">{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                      {tool.note && (
-                        <p className="mt-4 text-xs leading-relaxed text-brand-muted-500 italic border-t border-surface-border pt-3">
-                          {tool.note}
-                        </p>
-                      )}
-                    </>
+                  <ol className="space-y-2">
+                    {tool.steps.map((step, j) => (
+                      <li key={j} className="flex gap-3 text-sm text-brand-muted-700">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white border border-surface-border text-[11px] font-bold text-brand-muted-400">
+                          {j + 1}
+                        </span>
+                        <span className="leading-relaxed">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  {tool.note && (
+                    <p className="mt-4 text-xs leading-relaxed text-brand-muted-500 italic border-t border-surface-border pt-3">
+                      {tool.note}
+                    </p>
                   )}
                 </div>
               )}
@@ -421,8 +483,8 @@ export default function CaregiverSupportPage() {
             },
             {
               n: '2',
-              title: 'Check your insurance',
-              desc: 'Most plans cover outpatient mental health. Call the number on the back of your insurance card and ask about "outpatient behavioral health." Most have $0–$30 copays.',
+              title: 'Check your coverage',
+              desc: 'Private insurance: call the number on the back of your card and ask about "outpatient behavioral health" — most have $0–$30 copays. On Medicaid or CHIP? Search "behavioral health" on your Texas Medicaid portal (tmhp.com) or ask your care coordinator — they can help you find covered providers directly.',
             },
             {
               n: '3',
