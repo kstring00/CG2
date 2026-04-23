@@ -1,14 +1,10 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, BookOpen, Clock, Search, Sparkles } from 'lucide-react';
-import { TrustPanel } from '@/components/ui/TrustPanel';
+import { ArrowUpRight, Bookmark, BookOpen, Clock, Search } from 'lucide-react';
 import {
   categoryMeta,
-  guidedSteps,
   resources,
-  stageMeta,
-  type JourneyStageId,
   type ResourceCategory,
 } from '@/lib/data';
 import { cn } from '@/lib/utils';
@@ -23,7 +19,6 @@ const allCategories: { key: ResourceCategory | 'all'; label: string }[] = [
 
 export default function ResourcesPage() {
   const [activeCategory, setActiveCategory] = useState<ResourceCategory | 'all'>('all');
-  const [activeStage, setActiveStage] = useState<JourneyStageId>('just-diagnosed');
   const [searchQuery, setSearchQuery] = useState('');
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
@@ -31,24 +26,15 @@ export default function ResourcesPage() {
     () =>
       resources.filter((resource) => {
         const matchesCategory = activeCategory === 'all' || resource.category === activeCategory;
-        const matchesStage = resource.journeyStages.includes(activeStage);
         const matchesSearch =
           !searchQuery ||
           resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           resource.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
           resource.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
           resource.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-        return matchesCategory && matchesStage && matchesSearch;
+        return matchesCategory && matchesSearch;
       }),
-    [activeCategory, activeStage, searchQuery],
-  );
-
-  const recommended = useMemo(
-    () =>
-      resources.find((resource) => resource.isFeatured && resource.journeyStages.includes(activeStage)) ??
-      resources.find((resource) => resource.journeyStages.includes(activeStage)) ??
-      resources[0],
-    [activeStage],
+    [activeCategory, searchQuery],
   );
 
   const toggleSave = (id: string) => {
@@ -71,70 +57,6 @@ export default function ResourcesPage() {
         </p>
       </header>
 
-      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h2 className="section-title">For your stage</h2>
-            <p className="mt-1 text-sm text-brand-muted-500">
-              Pick the stage that fits your family right now. We will show the resources most useful for where you are.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {guidedSteps.map((stage) => (
-              <button
-                key={stage.id}
-                onClick={() => setActiveStage(stage.id)}
-                className={`rounded-xl border px-3.5 py-2 text-sm font-medium transition-all ${
-                  activeStage === stage.id
-                    ? 'border-primary bg-primary text-white shadow-soft'
-                    : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30 hover:text-primary'
-                }`}
-              >
-                {stageMeta[stage.id].label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-3xl border border-surface-border bg-surface-muted p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Recommended now</p>
-                <h3 className="mt-2 text-xl font-semibold text-brand-muted-900">{recommended.title}</h3>
-              </div>
-              <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand-muted-500">
-                {recommended.readTime}
-              </span>
-            </div>
-            <p className="mt-3 text-sm leading-relaxed text-brand-muted-600">{recommended.description}</p>
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <div className="rounded-2xl border border-surface-border bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">Why this matters now</p>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{recommended.whyNow}</p>
-              </div>
-              <div className="rounded-2xl border border-surface-border bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">Question it helps answer</p>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{recommended.question}</p>
-              </div>
-              <div className="rounded-2xl border border-surface-border bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">Action it supports</p>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{recommended.action}</p>
-              </div>
-            </div>
-          </article>
-
-          <TrustPanel
-            eyebrow="Resource guardrails"
-            title="Built to guide a decision, not replace professional care"
-            description="Resources explain what matters now, who they are for, and what action they support. They do not replace therapy, school advice, or crisis support."
-            meta={['Reviewed by authoritative sources', 'Stage-aware recommendations', 'Real external links to trusted organizations']}
-            icon={Sparkles}
-            tone="muted"
-          />
-        </div>
-      </section>
-
       <section className="rounded-3xl border border-surface-border bg-white p-4 sm:p-5">
         <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="relative">
@@ -148,7 +70,7 @@ export default function ResourcesPage() {
             />
           </div>
           <p className="text-sm text-brand-muted-500">
-            {filtered.length} resource{filtered.length !== 1 ? 's' : ''} for {stageMeta[activeStage].label.toLowerCase()}
+            {filtered.length} resource{filtered.length !== 1 ? 's' : ''}
           </p>
         </div>
 
