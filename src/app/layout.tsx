@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ChatWidget from '@/components/ChatWidget';
 
 export const metadata: Metadata = {
   title: 'Common Ground — Parent Navigation System',
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-surface font-body antialiased">
         {children}
+        <ChatWidget />
       </body>
     </html>
   );
