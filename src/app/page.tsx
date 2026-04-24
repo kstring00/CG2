@@ -472,6 +472,11 @@ export default function HomePage() {
           <p className="mt-10 text-xs text-white/35">
             Powered by <span className="font-semibold text-white/60">Texas ABA Centers</span> · Common Ground is available to every family in Texas.
           </p>
+          <p className="mt-2 text-xs text-white/25">
+            <Link href="/privacy" className="underline hover:text-white/50 transition">Privacy Policy</Link>
+            {' · '}
+            <span>AI-assisted features disclosed per Texas HB 149</span>
+          </p>
         </div>
       </section>
 
