@@ -453,66 +453,7 @@ function NextStepsPageInner() {
         </section>
       )}
 
-      <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-        <article className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Compass className="h-4.5 w-4.5 text-primary" />
-              <h2 className="section-title">Start with these 3 steps</h2>
-            </div>
-            <span className="rounded-full bg-surface-muted px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-brand-muted-500">
-              {checkedSet.size} done
-            </span>
-          </div>
 
-          <div className="mt-4 space-y-2">
-            {firstSteps.map((item, index) => {
-              const isDone = checkedSet.has(index);
-              return (
-                <button
-                  key={item}
-                  onClick={() => toggleCheck(index)}
-                  className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${
-                    isDone
-                      ? 'border-green-200 bg-green-50'
-                      : 'border-surface-border hover:bg-surface-muted'
-                  }`}
-                >
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-semibold text-primary ring-1 ring-primary/10">
-                    {index + 1}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className={`text-sm leading-relaxed ${isDone ? 'text-green-700 line-through' : 'text-brand-muted-700'}`}>
-                      {item}
-                    </p>
-                  </div>
-                  {isDone && <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600" />}
-                </button>
-              );
-            })}
-          </div>
-        </article>
-
-        <div className="space-y-5">
-          {featuredResource && (
-            <article className="rounded-3xl border border-surface-border bg-white p-5">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4.5 w-4.5 text-primary" />
-                <h2 className="section-title">Helpful right now</h2>
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-brand-muted-900">{featuredResource.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{featuredResource.whyNow}</p>
-              <Link href="/support/resources" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-                Find help for this stage <ArrowRight className="h-4 w-4" />
-              </Link>
-            </article>
-          )}
-
-          <Link href="/support/community" className="btn-secondary w-full justify-between py-3">
-            Find a local group or event <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
 
       <details className="group rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
