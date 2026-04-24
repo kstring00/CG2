@@ -22,151 +22,263 @@ import {
   AlertTriangle,
   User,
   HelpCircle,
+  ChevronDown,
+  Phone,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { SupportDirectory } from '@/components/layout/SupportDirectory';
 
 /**
- * SupportShell — the layout for the public-facing Care Navigation experience.
+ * SupportShell — redesigned sidebar.
  *
- * Visual language: warm palette (cream/navy), a primary-navy "Care Navigation"
- * chip, and a persistent rail reminder that this layer is open to every family
- * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
- * content. If a link needs to go there, send users to /client to sign in first.
+ * Groups are now accordion rows: icon + bold label + chevron toggle.
+ * Each group expands to show bullet sub-items. The active sub-item
+ * gets a primary left-rail accent, bold text, and a tinted background.
+ * Matches the reference design (image.jpg) — minus the dark top header.
  */
-const navGroups = [
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon?: React.ElementType;
+}
+
+interface NavGroup {
+  label: string;
+  icon: React.ElementType;
+  items: NavItem[];
+  defaultOpen?: boolean;
+}
+
+const navGroups: NavGroup[] = [
   {
     label: 'Care Navigation',
+    icon: Compass,
+    defaultOpen: true,
     items: [
-      { href: '/support', label: 'Home', icon: LayoutDashboard },
-      { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
-      { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
-      { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
-      { href: '/support/find', label: 'Find Support', icon: Search },
-      { href: '/support/connect', label: 'Connect', icon: Link2 },
+      { href: '/support/next-steps', label: 'Guided Next Steps' },
+      { href: '/support/what-is-aba', label: 'What Is ABA?' },
+      { href: '/support/resources', label: 'Resource Library' },
+      { href: '/support/find', label: 'Find Support' },
+      { href: '/support/connect', label: 'Connect' },
     ],
   },
   {
     label: 'Support for You',
+    icon: HeartHandshake,
+    defaultOpen: true,
     items: [
-      { href: '/support/caregiver', label: 'Your Mental Health', icon: HeartHandshake, highlight: true },
-      { href: '/support/caregiver/identity', label: 'Caregiver Identity', icon: User },
-      { href: '/support/sleep', label: 'Sleep & Rest', icon: Moon },
-      { href: '/support/couples', label: 'Couples Support', icon: Heart },
-      { href: '/support/financial', label: 'Financial Resources', icon: DollarSign },
-      { href: '/support/hard-days', label: 'Hard Days & Crisis', icon: AlertTriangle },
+      { href: '/support/caregiver', label: 'Your Mental Health' },
+      { href: '/support/caregiver/identity', label: 'Caregiver Identity' },
+      { href: '/support/sleep', label: 'Sleep & Rest' },
+      { href: '/support/couples', label: 'Couples Support' },
+      { href: '/support/financial', label: 'Financial Resources' },
+      { href: '/support/hard-days', label: 'Hard Days & Crisis' },
     ],
   },
   {
     label: 'Your Family',
+    icon: Users,
+    defaultOpen: true,
     items: [
-      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+      { href: '/support/siblings', label: 'Sibling Support' },
     ],
   },
 ];
+
+/* ─── Accordion group ────────────────────────────────────────────────────── */
+
+function NavGroup({
+  group,
+  pathname,
+  closeSidebar,
+}: {
+  group: NavGroup;
+  pathname: string;
+  closeSidebar: () => void;
+}) {
+  const isAnyActive = group.items.some(
+    (item) =>
+      pathname === item.href ||
+      (item.href !== '/support' && pathname.startsWith(item.href))
+  );
+
+  const [open, setOpen] = useState(group.defaultOpen ?? isAnyActive);
+
+  return (
+    <div className="mb-1">
+      {/* Group header row — clickable to expand/collapse */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-subtle"
+      >
+        {/* Icon circle */}
+        <span className={cn(
+          'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors',
+          isAnyActive ? 'bg-primary/10' : 'bg-surface-subtle'
+        )}>
+          <group.icon className={cn('h-4 w-4', isAnyActive ? 'text-primary' : 'text-brand-muted-400')} />
+        </span>
+        <span className={cn(
+          'flex-1 text-left text-[13.5px] font-bold',
+          isAnyActive ? 'text-brand-muted-900' : 'text-brand-muted-700'
+        )}>
+          {group.label}
+        </span>
+        <ChevronDown className={cn(
+          'h-4 w-4 shrink-0 text-brand-muted-300 transition-transform duration-200',
+          open ? 'rotate-180' : ''
+        )} />
+      </button>
+
+      {/* Sub-items */}
+      <div className={cn(
+        'overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+        open ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+      )}>
+        <ul className="mb-1 ml-[42px] mt-0.5 flex list-none flex-col gap-0 p-0 pr-2">
+          {group.items.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/support' && pathname.startsWith(item.href));
+
+            return (
+              <li key={item.href} className="relative">
+                {/* Active left rail */}
+                {isActive && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -left-3 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
+                  />
+                )}
+                <a
+                  href={item.href}
+                  onClick={closeSidebar}
+                  className={cn(
+                    'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-all',
+                    isActive
+                      ? 'bg-primary/[0.07] font-semibold text-primary'
+                      : 'font-medium text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900'
+                  )}
+                >
+                  {/* Bullet dot */}
+                  <span className={cn(
+                    'h-1.5 w-1.5 shrink-0 rounded-full transition-colors',
+                    isActive ? 'bg-primary' : 'bg-brand-muted-300'
+                  )} />
+                  {item.label}
+                </a>
+
+                {/* Section jump nav — only on active page */}
+                {isActive && <SupportDirectory isActive={true} />}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* Divider between groups */}
+      <div className="mx-3 mt-1 border-t border-surface-border/60" />
+    </div>
+  );
+}
+
+/* ─── Shell ──────────────────────────────────────────────────────────────── */
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const SidebarContent = () => (
-    <>
-      {/* ── Logo + badge ───────────────────────────────────────────────────── */}
-      <div className="border-b border-surface-border px-6 py-5">
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* ── Logo ──────────────────────────────────────────────────── */}
+      <div className="border-b border-surface-border px-5 py-4">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0">
           <Image
             src="/logos/cg2-lockup-final.png"
             alt="Texas ABA Centers | Common Ground"
             width={280}
             height={42}
-            className="h-auto w-full max-w-[200px]"
+            className="h-auto w-full max-w-[190px]"
             style={{ objectFit: 'contain' }}
           />
         </Link>
-        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-          <CompassIcon className="h-3 w-3" /> Care Navigation
-        </span>
       </div>
 
-      {/* ── Nav groups ─────────────────────────────────────────────────────── */}
-      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Care Navigation">
-        {navGroups.map((group, gi) => (
-          <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
-            <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-              {group.label}
-            </p>
+      {/* ── Section label + Home ───────────────────────────────────── */}
+      <div className="px-5 pb-1 pt-4">
+        <p className="text-[11px] font-bold text-brand-muted-900">Support</p>
+        <p className="text-[11px] text-brand-muted-400">Resources for your journey</p>
+      </div>
 
-            <ul className="m-0 flex list-none flex-col p-0">
-              {group.items.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== '/support' && pathname.startsWith(item.href));
-                const isHighlight = (item as { highlight?: boolean }).highlight;
+      {/* Home standalone link */}
+      <div className="px-3 pb-2 pt-1">
+        <a
+          href="/support"
+          onClick={() => setSidebarOpen(false)}
+          className={cn(
+            'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-bold transition-all',
+            pathname === '/support'
+              ? 'bg-primary/[0.07] text-primary'
+              : 'text-brand-muted-700 hover:bg-surface-subtle hover:text-brand-muted-900'
+          )}
+        >
+          <span className={cn(
+            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+            pathname === '/support' ? 'bg-primary/10' : 'bg-surface-subtle'
+          )}>
+            <LayoutDashboard className={cn('h-4 w-4', pathname === '/support' ? 'text-primary' : 'text-brand-muted-400')} />
+          </span>
+          Support Home
+        </a>
+        <div className="mx-3 mt-1 border-t border-surface-border/60" />
+      </div>
 
-                return (
-                  <li key={item.href}>
-                    {/* ── Nav row ─────────────────────────────────────────── */}
-                    <a
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={cn(
-                        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
-                        isActive
-                          ? 'bg-primary text-white shadow-soft'
-                          : isHighlight
-                          ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
-                          : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-                      )}
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span className="flex-1 text-[13px]">{item.label}</span>
-                      {isHighlight && !isActive && (
-                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">
-                          You
-                        </span>
-                      )}
-                    </a>
-
-                    {/* ── Section jump nav (active page only) ────────────── */}
-                    <SupportDirectory isActive={isActive} />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+      {/* ── Accordion nav groups ───────────────────────────────────── */}
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4" aria-label="Support navigation">
+        {navGroups.map((group) => (
+          <NavGroup
+            key={group.label}
+            group={group}
+            pathname={pathname}
+            closeSidebar={() => setSidebarOpen(false)}
+          />
         ))}
-
-        {/* ── Cross-layer handoff ────────────────────────────────────────── */}
-        <div className="mt-6 border-t border-surface-border/60 pt-4">
-          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-            Current Texas ABA client?
-          </p>
-          <Link
-            href="/client"
-            className="group flex items-center justify-between gap-3 rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 text-sm font-semibold text-accent transition-all hover:bg-accent/10"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Lock className="h-4 w-4" />
-              Go to client portal
-            </span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
       </nav>
 
-      {/* ── Bottom CTA ─────────────────────────────────────────────────────── */}
-      <div className="border-t border-surface-border px-4 py-4">
-        <div className="rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 text-center">
-          <p className="text-xs font-semibold text-primary">
-            Start with Guided Next Steps
-          </p>
-          <p className="mt-0.5 text-[11px] text-brand-muted-500">
-            Keep the next move simple
-          </p>
+      {/* ── Bottom: urgent help card ───────────────────────────────── */}
+      <div className="border-t border-surface-border px-4 py-4 space-y-2">
+        {/* Client portal */}
+        <Link
+          href="/client"
+          className="group flex items-center justify-between gap-3 rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 text-sm font-semibold text-accent transition-all hover:bg-accent/10"
+        >
+          <span className="inline-flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            Go to client portal
+          </span>
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+
+        {/* Need immediate support */}
+        <div className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-subtle/60 px-3 py-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+            <Phone className="h-4 w-4 text-primary" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[12px] font-bold text-brand-muted-900">Need immediate support?</p>
+            <p className="text-[11px] text-brand-muted-500">We&apos;re here to help.</p>
+            <Link
+              href="/support/hard-days#sec-support-today"
+              className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline"
+            >
+              Contact Us <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   return (
@@ -202,7 +314,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
 
       {/* Main content */}
       <div className="flex-1 lg:ml-64">
-        {/* Persistent mode banner */}
+        {/* Top banner */}
         <div className="border-b border-primary/15 bg-primary/5">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
