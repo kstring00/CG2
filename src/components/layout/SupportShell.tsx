@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { PageOutline } from '@/components/layout/PageOutline';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -125,6 +126,9 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
         ))}
+
+        {/* On-this-page outline — auto-populated from page headings */}
+        <PageOutline />
 
         {/* Cross-layer handoff — clearly labeled, visually distinct */}
         <div className="mt-6 border-t border-surface-border/60 pt-4">
