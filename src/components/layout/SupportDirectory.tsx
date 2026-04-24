@@ -26,8 +26,8 @@ const PAGE_SECTIONS: Record<string, Section[]> = {
   '/support/what-is-aba': [
     { id: 'sec-definition',     label: 'What behavior analysts study' },
     { id: 'sec-real-session',   label: 'A real therapy session' },
-    { id: 'sec-myths',          label: 'Myths & what's actually true' },
-    { id: 'sec-green-flags',    label: 'How to know it's working' },
+    { id: 'sec-myths',          label: "Myths & what's actually true" },
+    { id: 'sec-green-flags',    label: "How to know it's working" },
     { id: 'sec-questions',      label: 'Questions you can ask' },
     { id: 'sec-parent-research',label: 'Parent involvement & outcomes' },
     { id: 'sec-glossary',       label: 'ABA terms in plain English' },
@@ -44,7 +44,7 @@ const PAGE_SECTIONS: Record<string, Section[]> = {
     { id: 'sec-why-disrupted',  label: 'Why sleep gets disrupted' },
     { id: 'sec-self-check',     label: 'Sleep quality self-check' },
     { id: 'sec-wind-down',      label: '10-min wind-down routine' },
-    { id: 'sec-child-sleep',    label: "When your child's sleep affects yours" },
+    { id: 'sec-child-sleep',    label: "When your child\u2019s sleep affects yours" },
     { id: 'sec-myths',          label: 'Sleep myths keeping you stuck' },
   ],
   '/support/couples': [
@@ -58,7 +58,7 @@ const PAGE_SECTIONS: Record<string, Section[]> = {
   '/support/hard-days': [
     { id: 'sec-breathe',        label: 'Start here — breathe first' },
     { id: 'sec-right-now',      label: 'For right now' },
-    { id: 'sec-not-bad-parent', label: "You're not a bad parent" },
+    { id: 'sec-not-bad-parent', label: "You\u2019re not a bad parent" },
     { id: 'sec-first-hour',     label: 'First hour after a breakdown' },
     { id: 'sec-repair',         label: 'The repair conversation' },
     { id: 'sec-what-not-to-do', label: 'What not to do' },
