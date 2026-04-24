@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { PageOutline } from '@/components/layout/PageOutline';
+import { PageOutlineDropdown } from '@/components/layout/PageOutline';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -72,6 +72,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
 
   const SidebarContent = () => (
     <>
+      {/* ── Logo + badge ───────────────────────────────────────────────────── */}
       <div className="border-b border-surface-border px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0">
           <Image
@@ -88,20 +89,24 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         </span>
       </div>
 
+      {/* ── Nav groups ─────────────────────────────────────────────────────── */}
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Care Navigation">
         {navGroups.map((group, gi) => (
           <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
             <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
               {group.label}
             </p>
-            <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
+
+            <ul className="m-0 flex list-none flex-col p-0">
               {group.items.map((item) => {
                 const isActive =
                   pathname === item.href ||
                   (item.href !== '/support' && pathname.startsWith(item.href));
                 const isHighlight = (item as { highlight?: boolean }).highlight;
+
                 return (
                   <li key={item.href}>
+                    {/* ── Nav row ─────────────────────────────────────────── */}
                     <a
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
@@ -117,9 +122,14 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                       <item.icon className="h-4 w-4 shrink-0" />
                       <span className="flex-1 text-[13px]">{item.label}</span>
                       {isHighlight && !isActive && (
-                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">You</span>
+                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">
+                          You
+                        </span>
                       )}
                     </a>
+
+                    {/* ── Inline popdown outline (active page only) ───────── */}
+                    <PageOutlineDropdown isActive={isActive} />
                   </li>
                 );
               })}
@@ -127,10 +137,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </div>
         ))}
 
-        {/* On-this-page outline — auto-populated from page headings */}
-        <PageOutline />
-
-        {/* Cross-layer handoff — clearly labeled, visually distinct */}
+        {/* ── Cross-layer handoff ────────────────────────────────────────── */}
         <div className="mt-6 border-t border-surface-border/60 pt-4">
           <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
             Current Texas ABA client?
@@ -148,6 +155,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
+      {/* ── Bottom CTA ─────────────────────────────────────────────────────── */}
       <div className="border-t border-surface-border px-4 py-4">
         <div className="rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 text-center">
           <p className="text-xs font-semibold text-primary">
@@ -163,10 +171,12 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: '#f2f4f8' }}>
+      {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-surface-border bg-white lg:flex">
         <SidebarContent />
       </aside>
 
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/35 lg:hidden"
@@ -174,6 +184,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         />
       )}
 
+      {/* Mobile sidebar */}
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex min-h-0 w-64 flex-col bg-white transition-transform duration-300 lg:hidden',
@@ -189,8 +200,9 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <SidebarContent />
       </aside>
 
+      {/* Main content */}
       <div className="flex-1 lg:ml-64">
-        {/* Persistent mode banner — makes the layer unmistakable at all times */}
+        {/* Persistent mode banner */}
         <div className="border-b border-primary/15 bg-primary/5">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
