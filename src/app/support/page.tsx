@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Compass,
   MapPin,
+  Phone,
   Users,
   Wind,
 } from 'lucide-react';
@@ -233,53 +234,76 @@ export default function SupportHome() {
 
       {/* Bottom paths */}
       <section className="grid gap-4 md:grid-cols-3">
+
+        {/* Card 1 — Community */}
         <Link
           href="/support/connect"
-          className="group rounded-3xl border border-surface-border bg-white p-6 shadow-card transition hover:border-primary/30 hover:shadow-card-hover"
+          className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
+          style={{ background: 'linear-gradient(135deg, #1a2e52 0%, #32175a 100%)' }}
         >
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
-            <Users className="h-5 w-5 text-primary" />
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 60%)' }} />
+          <div className="relative">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
+              <Users className="h-5 w-5 text-white" />
+            </div>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">Community</p>
+            <h3 className="text-lg font-bold text-white leading-snug">You are not alone in this.</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              Local groups and online spaces where parents share what is actually working — not just what sounds good.
+            </p>
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white/90">
+              Find your people <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
           </div>
-          <h3 className="font-semibold text-brand-muted-900">You are not alone</h3>
-          <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-            Local groups and online spaces where parents share what is working.
-          </p>
-          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-            Find your people <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </span>
         </Link>
 
+        {/* Card 2 — Sensory-friendly */}
         <Link
           href="/support/sensory-friendly"
-          className="group rounded-3xl border border-surface-border bg-white p-6 shadow-card transition hover:border-emerald-200 hover:shadow-card-hover"
+          className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
+          style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)' }}
         >
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100">
-            <MapPin className="h-5 w-5 text-emerald-700" />
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, #ffffff 0%, transparent 60%)' }} />
+          <div className="relative">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
+              <MapPin className="h-5 w-5 text-white" />
+            </div>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">Local Guide</p>
+            <h3 className="text-lg font-bold text-white leading-snug">Places that actually get it.</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              Haircuts, dentists, parks, restaurants — real Houston-area spots that are good with your child.
+            </p>
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white/90">
+              See the guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
           </div>
-          <h3 className="font-semibold text-brand-muted-900">Local sensory-friendly places</h3>
-          <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-            Haircuts, dentists, parks — real places near you that are good with your child.
-          </p>
-          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700">
-            See the guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </span>
         </Link>
 
+        {/* Card 3 — Crisis / Help lines */}
         <Link
           href="/support/help"
-          className="group rounded-3xl border border-surface-border bg-white p-6 shadow-card transition hover:border-accent/30 hover:shadow-card-hover"
+          className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
+          style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)' }}
         >
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10">
-            <HelpCircle className="h-5 w-5 text-accent" />
+          <div className="absolute inset-0 opacity-10"
+            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #ffffff 0%, transparent 55%)' }} />
+          <div className="relative">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
+              <Phone className="h-5 w-5 text-white" />
+            </div>
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">Crisis Support</p>
+            <h3 className="text-lg font-bold text-white leading-snug">Someone is always there.</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              Real numbers, always staffed. If today is hard — or if you need to talk right now.
+            </p>
+            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white/90">
+              See help lines <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
           </div>
-          <h3 className="font-semibold text-brand-muted-900">Help lines &amp; hotlines</h3>
-          <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-            If you need to talk to someone right now — real numbers, always staffed.
-          </p>
-          <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent">
-            See help lines <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </span>
         </Link>
+
       </section>
 
       {/* Reassurance footer */}
