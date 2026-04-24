@@ -245,8 +245,159 @@ function NextStepsPageInner() {
         </>
       )}
 
-      {/* Non-pre-diagnosis: show original main card + what matters now */}
-      {activeStage !== 'pre-diagnosis' && (
+      {/* ── Just Diagnosed: warm narrative layout ── */}
+      {activeStage === 'just-diagnosed' && (
+        <>
+          {/* 1. Emotional acknowledgment — full width, warm */}
+          <section className="rounded-3xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #f4efe8 0%, #fff8f8 100%)', border: '1px solid #e8e0d8' }}>
+            <div className="px-6 pt-7 pb-6 sm:px-8">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-3" style={{ color: '#8b2442' }}>You are not alone in this</p>
+              <h2 className="text-2xl font-bold leading-snug mb-4" style={{ color: '#1a2e52' }}>
+                What you are feeling right now is real.<br />And it makes complete sense.
+              </h2>
+              <p className="text-base leading-relaxed mb-4" style={{ color: '#474950' }}>
+                Relief. Grief. Love. Fear. Urgency. Confusion. They can all be true at once — and they usually are.
+                A diagnosis is not a ceiling on your child. It is a door to the support they have always deserved.
+              </p>
+              <p className="text-base leading-relaxed" style={{ color: '#474950' }}>
+                The fact that you are here — searching, reading, trying to figure out what comes next —
+                already says everything about the kind of parent you are. <strong style={{ color: '#1a2e52' }}>That love is the foundation everything else is built on.</strong>
+              </p>
+            </div>
+            {/* Mental health bridge */}
+            <div className="border-t px-6 py-4 sm:px-8 flex flex-wrap items-center justify-between gap-3" style={{ borderColor: '#e8e0d8', backgroundColor: 'rgba(139,36,66,0.04)' }}>
+              <p className="text-sm" style={{ color: '#5a5d64' }}>
+                <strong style={{ color: '#8b2442' }}>Your mental health matters too.</strong>{' '}
+                Parents of newly diagnosed children are at significantly higher risk of burnout, anxiety, and grief spirals. You need support as much as your child does.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/support/caregiver" className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-semibold transition hover:opacity-80" style={{ borderColor: '#8b2442', color: '#8b2442', backgroundColor: 'white' }}>
+                  <HeartHandshake className="h-3.5 w-3.5" /> Support for you
+                </Link>
+                <Link href="/support/hard-days" className="inline-flex items-center gap-1.5 rounded-xl border px-4 py-2 text-xs font-semibold transition hover:opacity-80" style={{ borderColor: '#d4d8e3', color: '#1a2e52', backgroundColor: 'white' }}>
+                  <HandHeart className="h-3.5 w-3.5" /> Hard days
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* 2. Why right now matters — early intervention urgency, not clinical */}
+          <section className="rounded-3xl border p-6 sm:p-8" style={{ borderColor: '#d4d8e3', backgroundColor: '#ffffff' }}>
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: '#fff3cd' }}>
+                <TrendingUp className="h-5 w-5" style={{ color: '#92400e' }} />
+              </div>
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wide mb-1" style={{ color: '#92400e' }}>Why the next few weeks matter</p>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1a2e52' }}>Early ABA therapy changes outcomes. The research is not subtle about this.</h3>
+                <p className="text-sm leading-relaxed mb-3" style={{ color: '#5a5d64' }}>
+                  Children who start ABA therapy early — especially before age 5 — show dramatically stronger gains in communication, social connection, and daily independence than those who start later.
+                  Every month of early intervention compounds. The steps you take in the next few weeks are not just logistical. <strong style={{ color: '#1a2e52' }}>They are developmental.</strong>
+                </p>
+                <p className="text-sm leading-relaxed" style={{ color: '#5a5d64' }}>
+                  This is not meant to pressure you. It is meant to tell you the truth: <strong style={{ color: '#1a2e52' }}>what you do next is one of the most important things you will ever do for your child.</strong> And you can do it.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. Texas ABA Centers — why us, warm not salesy */}
+          <section className="overflow-hidden rounded-3xl" style={{ background: 'linear-gradient(135deg, #1a2e52 0%, #32175a 100%)' }}>
+            <div className="px-6 pt-7 pb-5 sm:px-8">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50 mb-2">Texas ABA Centers</p>
+              <h3 className="text-xl font-bold text-white mb-2">We were built for this exact moment.</h3>
+              <p className="text-sm leading-relaxed text-white/75 max-w-2xl">
+                Most families wait 5+ months to get into ABA therapy in Texas. We disrupted that. From your first call to your child’s first therapy session, most families are in care within <strong className="text-white">47 days</strong>. We handle the diagnosis and the therapy in one place — so your child never gets lost between providers.
+              </p>
+            </div>
+            {/* Differentiators — horizontal strip */}
+            <div className="grid gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { icon: <Sparkles className="h-4 w-4" />, label: 'Individualized programs', desc: 'Your child’s BCBA builds a plan around them specifically — not a template' },
+                { icon: <Home className="h-4 w-4" />, label: 'Home, clinic, school & community', desc: 'We go where your child is so skills transfer to real life' },
+                { icon: <Infinity className="h-4 w-4" />, label: 'No aging out', desc: 'We serve children through their teen years — you never have to start over' },
+                { icon: <HeartHandshake className="h-4 w-4" />, label: 'Family included', desc: 'Parent coaching and caregiver support are part of how we work' },
+              ].map((item, i) => (
+                <div key={i} className="flex flex-col gap-2 bg-white/5 px-5 py-4">
+                  <span className="text-white/50">{item.icon}</span>
+                  <p className="text-sm font-bold text-white">{item.label}</p>
+                  <p className="text-xs leading-relaxed text-white/60">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            {/* CTA */}
+            <div className="flex flex-col gap-3 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+              <p className="text-sm text-white/60 max-w-md">
+                One call. Free. They will verify your insurance, answer your questions, and schedule your intake — no referral needed.
+              </p>
+              <a
+                href="tel:8777715725"
+                className="inline-flex shrink-0 items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white shadow-lg transition hover:opacity-90"
+                style={{ backgroundColor: '#e2283a' }}
+              >
+                <Phone className="h-4 w-4" /> Call (877) 771-5725
+              </a>
+            </div>
+          </section>
+
+          {/* 4. Your checklist — warm, not clinical */}
+          <section className="rounded-3xl border p-6 sm:p-8" style={{ borderColor: '#d4d8e3', backgroundColor: '#ffffff' }}>
+            <div className="flex items-center gap-2 mb-5">
+              <Compass className="h-5 w-5" style={{ color: '#1a2e52' }} />
+              <h3 className="text-base font-bold" style={{ color: '#1a2e52' }}>Your next steps — one at a time</h3>
+            </div>
+            <div className="space-y-2">
+              {firstSteps.map((item, index) => {
+                const isDone = checkedSet.has(index);
+                return (
+                  <button
+                    key={item}
+                    onClick={() => toggleCheck(index)}
+                    className={`flex w-full items-start gap-4 rounded-2xl border px-5 py-4 text-left transition-colors ${
+                      isDone ? 'border-green-200 bg-green-50' : 'border-surface-border hover:bg-surface-muted'
+                    }`}
+                  >
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ backgroundColor: isDone ? '#16a34a' : '#1a2e52' }}>
+                      {isDone ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
+                    </div>
+                    <p className={`text-sm leading-relaxed ${ isDone ? 'text-green-700 line-through' : 'text-brand-muted-700' }`}>{item}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 5. If you are struggling — mental health bottom strip */}
+          <section className="rounded-3xl border p-6 sm:p-8" style={{ borderColor: '#e8d5de', backgroundColor: '#fdf6f8' }}>
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: '#f9e4eb' }}>
+                <HandHeart className="h-5 w-5" style={{ color: '#8b2442' }} />
+              </div>
+              <div className="flex-1">
+                <p className="text-[11px] font-bold uppercase tracking-wide mb-1" style={{ color: '#8b2442' }}>For the parent right now</p>
+                <h3 className="text-base font-bold mb-2" style={{ color: '#1a2e52' }}>If you are struggling, that is not weakness. It is love under pressure.</h3>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: '#5a5d64' }}>
+                  Grief after a diagnosis is real. So is the fear, the overwhelm, and the loneliness that can follow. These pages were built for exactly where you are right now.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/support/caregiver" className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold text-white transition hover:opacity-90" style={{ backgroundColor: '#8b2442' }}>
+                    <HeartHandshake className="h-3.5 w-3.5" /> Your mental health
+                  </Link>
+                  <Link href="/support/hard-days" className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition hover:bg-white" style={{ borderColor: '#d4b3cd', color: '#8b2442', backgroundColor: 'transparent' }}>
+                    <HandHeart className="h-3.5 w-3.5" /> Hard days guide
+                  </Link>
+                  <Link href="/support/help" className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-bold transition hover:bg-white" style={{ borderColor: '#d4d8e3', color: '#1a2e52', backgroundColor: 'transparent' }}>
+                    Crisis lines &amp; helplines
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* All other stages — original layout */}
+      {activeStage !== 'pre-diagnosis' && activeStage !== 'just-diagnosed' && (
         <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
           <article className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
             <div className="flex flex-wrap items-center gap-2">
