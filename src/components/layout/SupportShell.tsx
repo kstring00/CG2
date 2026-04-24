@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { PageOutlineDropdown } from '@/components/layout/PageOutline';
+import { SupportDirectory } from '@/components/layout/SupportDirectory';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -128,8 +128,8 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                       )}
                     </a>
 
-                    {/* ── Inline popdown outline (active page only) ───────── */}
-                    <PageOutlineDropdown isActive={isActive} />
+                    {/* ── Section jump nav (active page only) ────────────── */}
+                    <SupportDirectory isActive={isActive} />
                   </li>
                 );
               })}

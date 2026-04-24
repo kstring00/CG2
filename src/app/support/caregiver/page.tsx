@@ -274,7 +274,7 @@ export default function CaregiverSupportPage() {
       <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Leaf className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Need to breathe right now?</h2>
+          <h2 id="sec-breathe" className="text-lg font-semibold text-brand-muted-900">Need to breathe right now?</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Before anything else — if today is hard, start here. 4-7-8 breathing calms your nervous system in under 2 minutes.
@@ -285,7 +285,7 @@ export default function CaregiverSupportPage() {
 
       {/* The honest truth block */}
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <h2 className="text-xl font-bold text-brand-muted-900">What nobody tells you about this journey</h2>
+        <h2 id="sec-truth" className="text-xl font-bold text-brand-muted-900">What nobody tells you about this journey</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {[
             { icon: Moon, text: 'Loving your child deeply and feeling completely depleted by caregiving are not contradictions. Both are true.' },
@@ -305,7 +305,7 @@ export default function CaregiverSupportPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Zap className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Are you running on empty?</h2>
+          <h2 id="sec-empty" className="text-lg font-semibold text-brand-muted-900">Are you running on empty?</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Check everything that feels true right now. No right or wrong answers.
@@ -379,7 +379,7 @@ export default function CaregiverSupportPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Leaf className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">More tools for hard moments</h2>
+          <h2 id="sec-tools" className="text-lg font-semibold text-brand-muted-900">More tools for hard moments</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Open one and try it before you keep scrolling.
@@ -443,7 +443,7 @@ export default function CaregiverSupportPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Sun className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">What the other side of this looks like</h2>
+          <h2 id="sec-other-side" className="text-lg font-semibold text-brand-muted-900">What the other side of this looks like</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           This is hard right now. That is real. And it will not always feel this way. Here is what we know from families who have walked this path.
@@ -469,7 +469,7 @@ export default function CaregiverSupportPage() {
       <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Calendar className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">How to find a therapist — for you</h2>
+          <h2 id="sec-find-therapist" className="text-lg font-semibold text-brand-muted-900">How to find a therapist — for you</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           You spend every day advocating for your child&apos;s care. This is how you advocate for your own. It does not have to be complicated.

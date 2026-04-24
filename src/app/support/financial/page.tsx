@@ -347,7 +347,7 @@ export default function FinancialPage() {
       <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Shield className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-bold text-brand-muted-900">Insurance — where to start</h2>
+          <h2 id="sec-insurance" className="text-xl font-bold text-brand-muted-900">Insurance — where to start</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Insurance is confusing by design. These five sections break down exactly what you need to know —
@@ -462,7 +462,7 @@ export default function FinancialPage() {
         >
           <div className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-brand-plum-600" />
-            <h2 className="text-lg font-semibold text-brand-muted-900">Texas financial assistance programs</h2>
+            <h2 id="sec-texas-programs" className="text-lg font-semibold text-brand-muted-900">Texas financial assistance programs</h2>
           </div>
           {openAssistance
             ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
@@ -535,7 +535,7 @@ export default function FinancialPage() {
         >
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-emerald-600" />
-            <h2 className="text-lg font-semibold text-brand-muted-900">Tax deductions for special needs families</h2>
+            <h2 id="sec-tax" className="text-lg font-semibold text-brand-muted-900">Tax deductions for special needs families</h2>
           </div>
           {openTax
             ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />

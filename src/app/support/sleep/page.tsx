@@ -224,7 +224,7 @@ export default function SleepPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Brain className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Why caregiver sleep is uniquely disrupted</h2>
+          <h2 id="sec-why-disrupted" className="text-lg font-semibold text-brand-muted-900">Why caregiver sleep is uniquely disrupted</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Regular tiredness responds to rest. Caregiver sleep disruption often doesn&apos;t —
@@ -295,7 +295,7 @@ export default function SleepPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <CheckCircle2 className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Sleep quality self-check</h2>
+          <h2 id="sec-self-check" className="text-lg font-semibold text-brand-muted-900">Sleep quality self-check</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Answer honestly — no one is keeping score except you. These are specific, caregiver-specific
@@ -390,7 +390,7 @@ export default function SleepPage() {
       <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Moon className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The 10-minute wind-down routine</h2>
+          <h2 id="sec-wind-down" className="text-lg font-semibold text-brand-muted-900">The 10-minute wind-down routine</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           This is specific and sequential. It is not about creating the perfect sleep environment.
@@ -467,7 +467,7 @@ export default function SleepPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-rose-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Sleep myths that are keeping you stuck</h2>
+          <h2 id="sec-myths" className="text-lg font-semibold text-brand-muted-900">Sleep myths that are keeping you stuck</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Some of what you believe about sleep was wrong before caregiving. In a caregiving context,

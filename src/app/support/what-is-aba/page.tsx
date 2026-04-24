@@ -132,7 +132,7 @@ export default function WhatIsABAPage() {
           <Brain className="mt-1 h-6 w-6 shrink-0 text-sky-500" />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest text-sky-500 mb-2">The honest definition</p>
-            <h2 className="text-lg font-bold text-brand-muted-900 mb-3">What behavior analysts actually study</h2>
+            <h2 id="sec-definition" className="text-lg font-bold text-brand-muted-900 mb-3">What behavior analysts actually study</h2>
             <p className="text-sm leading-relaxed text-brand-muted-700 mb-3">
               Applied Behavior Analysis is the scientific study of how behavior works — specifically, how the
               environment (everything around a person: people, settings, events, consequences) shapes what a person
@@ -165,7 +165,7 @@ export default function WhatIsABAPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-4">
           <Lightbulb className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">What your child is actually experiencing</h2>
+          <h2 id="sec-real-session" className="text-lg font-semibold text-brand-muted-900">What your child is actually experiencing</h2>
         </div>
         <p className="text-sm text-brand-muted-500 italic mb-6">Walk through a typical session — not as a checklist, but as it actually feels.</p>
 
@@ -246,7 +246,7 @@ export default function WhatIsABAPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <HelpCircle className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">What you may have heard — and what is actually true</h2>
+          <h2 id="sec-myths" className="text-lg font-semibold text-brand-muted-900">What you may have heard — and what is actually true</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Every one of these concerns is valid to bring. Click each one to see the reality.
@@ -295,7 +295,7 @@ export default function WhatIsABAPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">How to know if therapy is going well</h2>
+          <h2 id="sec-green-flags" className="text-lg font-semibold text-brand-muted-900">How to know if therapy is going well</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Progress isn&apos;t always visible in the way parents expect. Here are the real signs — and what to
@@ -328,7 +328,7 @@ export default function WhatIsABAPage() {
       </section>
 
       {/* Questions parents are allowed to ask */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="sec-questions" className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <button
           className="flex w-full items-center justify-between gap-3 text-left"
           onClick={() => setOpenQuestions(!openQuestions)}
@@ -362,7 +362,7 @@ export default function WhatIsABAPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-5 w-5 text-sky-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Parent involvement and outcomes — what the research shows</h2>
+          <h2 id="sec-parent-research" className="text-lg font-semibold text-brand-muted-900">Parent involvement and outcomes — what the research shows</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-4">
           The research on this is consistent and significant: children whose parents are actively involved
@@ -399,7 +399,7 @@ export default function WhatIsABAPage() {
       </div>
 
       {/* Glossary — inline, collapsible */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="sec-glossary" className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <button
           className="flex w-full items-center justify-between gap-3 text-left"
           onClick={() => setOpenGlossary(!openGlossary)}

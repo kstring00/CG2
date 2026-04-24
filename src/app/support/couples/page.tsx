@@ -191,7 +191,7 @@ export default function CouplesPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-brand-muted-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Why ABA caregiving strains relationships</h2>
+          <h2 id="sec-strain" className="text-lg font-semibold text-brand-muted-900">Why ABA caregiving strains relationships</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           These are not excuses. They are the specific, named reasons your relationship is under pressure — and
@@ -254,7 +254,7 @@ export default function CouplesPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <MessageCircle className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The 10-minute check-in</h2>
+          <h2 id="sec-checkin" className="text-lg font-semibold text-brand-muted-900">The 10-minute check-in</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-1">
           A structured nightly ritual — not about the kids, not about the schedule, not about what needs
@@ -293,7 +293,7 @@ export default function CouplesPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-5 w-5 text-sky-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The invisible labor problem</h2>
+          <h2 id="sec-labor" className="text-lg font-semibold text-brand-muted-900">The invisible labor problem</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           In most ABA families, one partner carries significantly more of what researchers call &ldquo;invisible labor&rdquo; —
@@ -398,7 +398,7 @@ export default function CouplesPage() {
         >
           <div className="flex items-center gap-2">
             <Heart className="h-5 w-5 text-rose-500" />
-            <h2 className="text-lg font-semibold text-brand-muted-900">Resources for couples</h2>
+            <h2 id="sec-resources" className="text-lg font-semibold text-brand-muted-900">Resources for couples</h2>
           </div>
           {openSection === ACCORDION_RESOURCES
             ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />

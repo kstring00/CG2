@@ -355,7 +355,7 @@ export default function HardDaysPage() {
       <section id="breathe" className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Leaf className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Start here — breathe first</h2>
+          <h2 id="sec-breathe" className="text-lg font-semibold text-brand-muted-900">Start here — breathe first</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           If you are flooded right now, your brain cannot process information until your nervous system calms down. This takes 2 minutes.
@@ -395,7 +395,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Wind className="h-5 w-5 text-brand-plum-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">For right now — before anything else</h2>
+          <h2 id="sec-right-now" className="text-lg font-semibold text-brand-muted-900">For right now — before anything else</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Three things. That is all. You do not have to fix anything else in the next five minutes.
@@ -449,7 +449,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <HeartHandshake className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">If you&apos;ve felt this — you are not a bad parent.</h2>
+          <h2 id="sec-not-bad-parent" className="text-lg font-semibold text-brand-muted-900">If you&apos;ve felt this — you are not a bad parent.</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           These are the things caregivers say when they finally feel safe enough to say them. Open the ones
@@ -535,7 +535,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Shield className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The first hour after a breakdown</h2>
+          <h2 id="sec-first-hour" className="text-lg font-semibold text-brand-muted-900">The first hour after a breakdown</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Five specific things. Do them in order if you can. Skip any one that doesn&apos;t fit your situation.
@@ -559,7 +559,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Heart className="h-5 w-5 text-rose-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The repair conversation with your child</h2>
+          <h2 id="sec-repair" className="text-lg font-semibold text-brand-muted-900">The repair conversation with your child</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Children are more resilient than we give them credit for. A parent who repairs teaches
@@ -579,7 +579,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">What not to do after a hard day</h2>
+          <h2 id="sec-what-not-to-do" className="text-lg font-semibold text-brand-muted-900">What not to do after a hard day</h2>
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {[
@@ -680,7 +680,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Signs you need support — not just rest</h2>
+          <h2 id="sec-signs" className="text-lg font-semibold text-brand-muted-900">Signs you need support — not just rest</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Check anything that feels true. If even one of these resonates, that is enough reason to reach out today.
@@ -812,7 +812,7 @@ export default function HardDaysPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Phone className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">If you need support today</h2>
+          <h2 id="sec-support-today" className="text-lg font-semibold text-brand-muted-900">If you need support today</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           Every resource listed here is real, accessible, and appropriate for caregivers — not only people in

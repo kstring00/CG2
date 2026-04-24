@@ -304,7 +304,7 @@ export default function SiblingsPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Star className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">What siblings need — at each stage</h2>
+          <h2 id="sec-stages" className="text-lg font-semibold text-brand-muted-900">What siblings need — at each stage</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           A three-year-old sibling and a seventeen-year-old sibling are living in completely
@@ -378,7 +378,7 @@ export default function SiblingsPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Signs a sibling is struggling</h2>
+          <h2 id="sec-signs" className="text-lg font-semibold text-brand-muted-900">Signs a sibling is struggling</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           These signals are not bad behavior. They are communication from a child who doesn&apos;t
@@ -410,7 +410,7 @@ export default function SiblingsPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Heart className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The guilt siblings feel — and how to name it with them</h2>
+          <h2 id="sec-guilt" className="text-lg font-semibold text-brand-muted-900">The guilt siblings feel — and how to name it with them</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Siblings carry guilt that they often haven&apos;t named and haven&apos;t been given
@@ -445,7 +445,7 @@ export default function SiblingsPage() {
       <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Smile className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Dedicated 1:1 time — what actually works</h2>
+          <h2 id="sec-one-on-one" className="text-lg font-semibold text-brand-muted-900">Dedicated 1:1 time — what actually works</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
           A sibling who gets real, uninterrupted time with a parent will regulate more, act out less,
@@ -483,7 +483,7 @@ export default function SiblingsPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <BookOpen className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Books and resources for siblings</h2>
+          <h2 id="sec-resources" className="text-lg font-semibold text-brand-muted-900">Books and resources for siblings</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           Reading about other kids in similar situations is enormously validating for siblings.
@@ -511,7 +511,7 @@ export default function SiblingsPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Talking to teachers and school counselors</h2>
+          <h2 id="sec-school" className="text-lg font-semibold text-brand-muted-900">Talking to teachers and school counselors</h2>
         </div>
         <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
           A school counselor who knows what&apos;s happening at home can be a powerful support for
