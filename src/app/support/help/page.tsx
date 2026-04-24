@@ -39,7 +39,7 @@ const filterOptions = [
 
 export default function SupportPage() {
   const [activeFilter, setActiveFilter] = useState('all');
-  const [activeStage, setActiveStage] = useState<JourneyStageId>('family-sustainability');
+  const [activeStage, setActiveStage] = useState<JourneyStageId>('just-diagnosed');
 
   const filtered = useMemo(
     () =>

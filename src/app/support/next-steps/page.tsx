@@ -31,7 +31,6 @@ const validStageIds: JourneyStageId[] = [
   'just-diagnosed',
   'starting-therapy',
   'school-transition',
-  'family-sustainability',
 ];
 
 function NextStepsPageInner() {
@@ -89,7 +88,6 @@ function NextStepsPageInner() {
             { id: 'just-diagnosed' as const, hint: 'Got the diagnosis in the last few months' },
             { id: 'starting-therapy' as const, hint: 'ABA or therapy is underway' },
             { id: 'school-transition' as const, hint: 'Navigating IEP, school placement' },
-            { id: 'family-sustainability' as const, hint: 'Finding long-term balance' },
           ].map((item) => (
             <button
               key={item.id}
@@ -402,117 +400,178 @@ function NextStepsPageInner() {
         <PathToIndependence />
       )}
 
-      {/* All other stages — original layout */}
-      {activeStage !== 'pre-diagnosis' && activeStage !== 'just-diagnosed' && activeStage !== 'starting-therapy' && (
-        <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">{step.timeframe}</span>
-              <span className="rounded-full bg-surface-muted px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-500">{step.lastUpdated}</span>
+      {/* ── School Transition: IEP, placement, advocacy ── */}
+      {activeStage === 'school-transition' && (
+        <>
+          {/* Hero block */}
+          <section
+            className="rounded-3xl p-8 sm:p-10"
+            style={{ background: 'linear-gradient(135deg, #1a2e52 0%, #2d4a7a 60%, #3a5a8a 100%)' }}
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-200 mb-2">School Transition</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+              You don’t need to know every rule.<br />
+              <span className="text-blue-300">You need to know your child.</span>
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-blue-100 max-w-2xl">
+              Whether this is your child’s first IEP meeting, a school transition, or a fight for services that aren’t happening — the system can feel overwhelming. You are the most important person in that room. Here’s how to show up prepared.
+            </p>
+            <a
+              href="tel:+18777715725"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-red-700 transition-colors"
+            >
+              <Phone className="h-4 w-4" /> Talk to our school navigation team — (877) 771-5725
+            </a>
+          </section>
+
+          {/* What the school system owes your child */}
+          <section className="rounded-3xl border border-blue-100 bg-blue-50/60 p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-1">Know Your Rights</p>
+            <h3 className="text-xl font-bold text-brand-muted-900 mb-4">What the school system is required to provide</h3>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                { title: 'Free Appropriate Public Education (FAPE)', desc: 'Every child with a disability is entitled to a free education tailored to their individual needs — at no cost to you.' },
+                { title: 'Least Restrictive Environment (LRE)', desc: 'Your child must be educated alongside non-disabled peers to the maximum extent appropriate.' },
+                { title: 'An Individualized Education Program (IEP)', desc: 'A legally binding document with specific goals, services, accommodations, and timelines your child’s team must follow.' },
+                { title: 'Prior Written Notice', desc: 'The school must notify you in writing before making any change to your child’s placement or services.' },
+                { title: 'Independent Educational Evaluation', desc: 'If you disagree with the school’s evaluation, you have the right to request an IEE at public expense.' },
+                { title: 'Annual Review', desc: 'The IEP must be reviewed at least once per year. You can request a meeting at any time if things change.' },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl bg-white border border-blue-100 p-4">
+                  <p className="text-sm font-bold text-primary mb-1">{item.title}</p>
+                  <p className="text-sm leading-relaxed text-brand-muted-600">{item.desc}</p>
+                </div>
+              ))}
             </div>
-            <h2 className="mt-4 text-2xl font-semibold text-brand-muted-900">{step.title}</h2>
-            <p className="mt-3 text-base leading-relaxed text-brand-muted-600">{step.reassurance}</p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">Current focus</p>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-700">{step.focus}</p>
-              </div>
-              <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary">Next milestone</p>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-700">{step.milestone}</p>
-              </div>
+          </section>
+
+          {/* IEP meeting prep */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-1">Before the Meeting</p>
+            <h3 className="text-xl font-bold text-brand-muted-900 mb-2">How to walk into an IEP meeting prepared</h3>
+            <p className="text-sm text-brand-muted-500 mb-5">You don’t have to be an expert. You just need to be organized and specific about what your child needs. </p>
+            <div className="space-y-3">
+              {[
+                { step: '1', label: 'Gather everything in one place', desc: 'Diagnosis reports, therapy progress notes, teacher feedback, past IEPs. Bring physical copies.' },
+                { step: '2', label: 'Write your parent concerns letter', desc: 'A 1-page summary of what is hard right now, what’s working, and what you need the school to address. This becomes part of the official record.' },
+                { step: '3', label: 'List 2–3 specific goals you want discussed', desc: 'Be concrete: “I want reading support for decoding, not just comprehension.” Vague requests get vague answers.' },
+                { step: '4', label: 'Ask for the agenda in advance', desc: 'You have the right to know what’s on the table before you walk in. Request it in writing at least 2 days prior.' },
+                { step: '5', label: 'Bring someone with you', desc: 'A spouse, advocate, or trusted friend. Two sets of ears catch more. You can also record meetings in Texas with one-party consent.' },
+                { step: '6', label: 'Leave with action items in writing', desc: 'Before you walk out: confirm who owns what, and by when. Follow up with an email summary within 24 hours.' },
+              ].map((item) => (
+                <div key={item.step} className="flex items-start gap-4 rounded-2xl border border-surface-border px-4 py-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">{item.step}</div>
+                  <div>
+                    <p className="text-sm font-semibold text-brand-muted-900">{item.label}</p>
+                    <p className="mt-0.5 text-sm leading-relaxed text-brand-muted-500">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </article>
-          <div className="space-y-5">
-            <article className="rounded-3xl border border-surface-border bg-white p-5">
-              <div className="flex items-center gap-2">
-                <Flag className="h-4.5 w-4.5 text-primary" />
-                <h2 className="section-title">What matters now</h2>
-              </div>
-              <ul className="mt-4 space-y-3 text-sm leading-relaxed text-brand-muted-600">
-                {step.whatMattersNow.slice(0, 3).map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary/60" />
-                    <span>{item}</span>
+          </section>
+
+          {/* Texas ABA in school */}
+          <section
+            className="rounded-3xl p-6 sm:p-8"
+            style={{ background: 'linear-gradient(135deg, #8b2442 0%, #6b1a32 100%)' }}
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-pink-200 mb-2">Texas ABA Centers</p>
+            <h3 className="text-xl font-bold text-white mb-3">We go to school with your child</h3>
+            <p className="text-base leading-relaxed text-pink-100 mb-5">
+              Therapy doesn’t stop at the clinic door. Texas ABA Centers provides support in the school environment so the skills your child builds in therapy transfer directly into the classroom, hallway, and lunch line.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2 mb-6">
+              {[
+                { icon: '🏫', label: 'School-based ABA support', desc: 'BCBAs and RBTs work directly in your child’s school setting' },
+                { icon: '📋', label: 'IEP goal alignment', desc: 'Therapy goals are coordinated with school IEP objectives' },
+                { icon: '🤝', label: 'Teacher collaboration', desc: 'We communicate directly with teachers and school staff' },
+                { icon: '🏠', label: 'Home + clinic + school', desc: 'One seamless plan across every environment your child is in' },
+              ].map((item) => (
+                <div key={item.label} className="rounded-2xl bg-white/10 border border-white/20 p-4">
+                  <p className="text-lg mb-1">{item.icon}</p>
+                  <p className="text-sm font-bold text-white">{item.label}</p>
+                  <p className="text-xs text-pink-200 mt-0.5">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+            <a
+              href="tel:+18777715725"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-accent shadow hover:bg-pink-50 transition-colors"
+            >
+              <Phone className="h-4 w-4" /> Call (877) 771-5725 — no referral needed
+            </a>
+          </section>
+
+          {/* Red flags and advocacy */}
+          <section className="grid gap-5 sm:grid-cols-2">
+            <article className="rounded-3xl border border-amber-200 bg-amber-50/60 p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700 mb-2">Watch For These</p>
+              <h3 className="text-base font-bold text-brand-muted-900 mb-3">Red flags in an IEP meeting</h3>
+              <ul className="space-y-2">
+                {[
+                  'The team discourages you from bringing an advocate',
+                  'Goals are vague (“make progress” with no baseline)',
+                  'Services are cut without a written explanation',
+                  'You’re told “we don’t do that here” without citing policy',
+                  'The meeting feels rushed or pre-decided before you arrived',
+                  'No one asks what you’ve observed at home',
+                ].map((flag) => (
+                  <li key={flag} className="flex items-start gap-2 text-sm text-amber-900">
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                    {flag}
                   </li>
                 ))}
               </ul>
             </article>
-            <article className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/70 p-5">
-              <div className="flex items-center gap-2">
-                <HandHeart className="h-4.5 w-4.5 text-accent" />
-                <h2 className="section-title">If overwhelmed</h2>
-              </div>
-              <p className="mt-4 text-sm leading-relaxed text-brand-muted-700">{step.supportAction}</p>
-              <p className="mt-2 text-sm text-brand-muted-500">One stabilizing action is enough for today.</p>
-              <Link href="/support/help" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline">
-                Get support now <ArrowRight className="h-4 w-4" />
-              </Link>
+            <article className="rounded-3xl border border-surface-border bg-white p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-2">When Things Get Stuck</p>
+              <h3 className="text-base font-bold text-brand-muted-900 mb-3">Escalation options in Texas</h3>
+              <ul className="space-y-3">
+                {[
+                  { label: 'Request mediation', desc: 'TEA offers free mediation between families and districts — less adversarial than due process.' },
+                  { label: 'File a state complaint', desc: 'If the district violates IDEA, you can file a complaint with the Texas Education Agency.' },
+                  { label: 'Request due process', desc: 'A formal legal proceeding. Get an advocate or attorney before this step.' },
+                  { label: 'Contact Disability Rights Texas', desc: 'Free legal advocacy for Texans with disabilities — disabilityrightstx.org' },
+                ].map((item) => (
+                  <li key={item.label} className="flex items-start gap-2">
+                    <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <div>
+                      <p className="text-sm font-semibold text-brand-muted-900">{item.label}</p>
+                      <p className="text-xs text-brand-muted-500 mt-0.5">{item.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </article>
-          </div>
-        </section>
+          </section>
+
+          {/* For the parent */}
+          <section className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/50 p-6 sm:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent mb-2">For You, Not Just Your Child</p>
+            <h3 className="text-xl font-bold text-brand-muted-900 mb-2">IEP meetings are emotionally exhausting.</h3>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-4">
+              Sitting across a table from a team of professionals while advocating for your child is one of the hardest things a parent does. It’s okay to leave a meeting and fall apart in the car. It’s okay to feel like you failed when you didn’t get everything. You showed up. That matters.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/support/caregiver" className="inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-white px-4 py-2 text-sm font-semibold text-accent hover:bg-brand-plum-50 transition-colors">
+                Caregiver support <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              <Link href="/support/hard-days" className="inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-white px-4 py-2 text-sm font-semibold text-accent hover:bg-brand-plum-50 transition-colors">
+                Hard days <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+              <Link href="/support/help" className="inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-white px-4 py-2 text-sm font-semibold text-accent hover:bg-brand-plum-50 transition-colors">
+                Find support now <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </section>
+        </>
       )}
 
 
 
-      <details className="group rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">See more</p>
-            <h2 className="mt-1 text-xl font-semibold text-brand-muted-900">See the rest of this stage</h2>
-          </div>
-          <ChevronDown className="h-5 w-5 text-brand-muted-400 transition-transform group-open:rotate-180" />
-        </summary>
 
-        <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr_1fr]">
-          <article className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">More steps</p>
-            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-brand-muted-600">
-              {extraSteps.map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary/60" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
 
-          <article className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">What can wait</p>
-            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-brand-muted-600">
-              {step.whatCanWait.map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-muted-400" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
 
-          <article className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-primary">When to get more help</p>
-            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-brand-muted-600">
-              {step.supportEscalation.map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-accent/70" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-        </div>
-
-        {linkedResources.length > 1 && (
-          <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            {linkedResources.slice(1).map((resource) => (
-              <article key={resource.id} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                <h3 className="text-base font-semibold text-brand-muted-900">{resource.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{resource.action}</p>
-              </article>
-            ))}
-          </div>
-        )}
-      </details>
     </div>
   );
 }

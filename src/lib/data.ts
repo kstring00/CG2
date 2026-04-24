@@ -2,8 +2,7 @@ export type JourneyStageId =
   | 'pre-diagnosis'
   | 'just-diagnosed'
   | 'starting-therapy'
-  | 'school-transition'
-  | 'family-sustainability';
+  | 'school-transition';
 
 export interface Resource {
   id: string;
@@ -142,7 +141,6 @@ export const stageMeta: Record<JourneyStageId, { label: string; shortLabel: stri
   'just-diagnosed': { label: 'Just Diagnosed', shortLabel: 'Diagnosis' },
   'starting-therapy': { label: 'Starting Therapy', shortLabel: 'Therapy' },
   'school-transition': { label: 'School Transition', shortLabel: 'School' },
-  'family-sustainability': { label: 'Family Sustainability', shortLabel: 'Stability' },
 };
 
 export const categoryMeta: Record<
@@ -235,7 +233,7 @@ export const resources: Resource[] = [
     ageRanges: ['0-2', '2-5', '6-12', '13-17'],
     readTime: '30 min',
     isFeatured: false,
-    journeyStages: ['just-diagnosed', 'starting-therapy', 'family-sustainability'],
+    journeyStages: ['just-diagnosed', 'starting-therapy'],
     whyNow: 'Many parents feel alone after diagnosis. This guide helps you build the full picture of what support looks like \u2014 for your child and for you.',
     whoItsFor: 'Parents at any stage who want a trusted, comprehensive overview of autism and how to navigate it.',
     question: 'Where can I find a reliable, start-to-finish guide written for parents?',
@@ -339,7 +337,7 @@ export const resources: Resource[] = [
     ageRanges: ['2-5', '6-12', '13-17'],
     readTime: '15 min (overview)',
     isFeatured: true,
-    journeyStages: ['school-transition', 'starting-therapy', 'family-sustainability'],
+    journeyStages: ['school-transition', 'starting-therapy'],
     whyNow: 'You have legal rights at every ARD and IEP meeting. Understanding those rights before you walk in the door changes the conversation completely.',
     whoItsFor: 'Any parent whose child is in public school or approaching school age and receiving special education services.',
     question: 'What are my rights at my child\u2019s IEP or ARD meeting, and how do I actually use them?',
@@ -359,7 +357,7 @@ export const resources: Resource[] = [
     ageRanges: ['2-5', '6-12', '13-17'],
     readTime: '15 min',
     isFeatured: false,
-    journeyStages: ['school-transition', 'family-sustainability'],
+    journeyStages: ['school-transition'],
     whyNow: 'Texas has its own rules and terminology for special education. This guide is built specifically for Texas families navigating the ARD process.',
     whoItsFor: 'Texas families whose child is in or approaching public school special education services.',
     question: 'How does the ARD process work in Texas, and what should I know before my first meeting?',
@@ -403,7 +401,7 @@ export const resources: Resource[] = [
     ageRanges: ['0-2', '2-5', '6-12', '13-17'],
     readTime: '10 min to enroll',
     isFeatured: false,
-    journeyStages: ['just-diagnosed', 'starting-therapy', 'family-sustainability'],
+    journeyStages: ['just-diagnosed', 'starting-therapy'],
     whyNow: 'Families who join SPARK stay connected to the latest autism science and receive updates specifically relevant to their child\u2019s profile.',
     whoItsFor: 'Parents who want to stay informed about autism research and contribute to the science that benefits future families.',
     question: 'How do I stay current on autism research without spending hours reading academic journals?',
@@ -423,7 +421,7 @@ export const resources: Resource[] = [
     ageRanges: ['2-5', '6-12', '13-17'],
     readTime: '15 min',
     isFeatured: false,
-    journeyStages: ['starting-therapy', 'family-sustainability'],
+    journeyStages: ['starting-therapy'],
     whyNow: 'ARI translates complex research into readable summaries so parents can evaluate what the science actually supports.',
     whoItsFor: 'Parents who want to go deeper into the research behind autism interventions and treatments.',
     question: 'Where can I find trustworthy, research-backed information that isn\u2019t trying to sell me something?',
@@ -445,7 +443,7 @@ export const resources: Resource[] = [
     ageRanges: ['2-5', '6-12', '13-17'],
     readTime: '20 min per guide',
     isFeatured: false,
-    journeyStages: ['starting-therapy', 'school-transition', 'family-sustainability'],
+    journeyStages: ['starting-therapy', 'school-transition'],
     whyNow: 'Managing daily life with an autistic child requires practical strategies, not just clinical advice. OAR\u2019s guides focus on real situations families actually face.',
     whoItsFor: 'Parents looking for practical, research-backed guides on specific challenges \u2014 routines, transitions, school, siblings, and planning for the future.',
     question: 'Where can I find practical guides for the day-to-day challenges \u2014 not just therapy?',
@@ -476,7 +474,7 @@ export const supportProviders: SupportProvider[] = [
     rating: 4.9,
     verification: 'Demo listing styled as a clinically reviewed referral example',
     lastReviewed: 'March 2026',
-    journeyStages: ['family-sustainability', 'just-diagnosed'],
+    journeyStages: ['just-diagnosed'],
     isDemo: true,
   },
   {
@@ -496,7 +494,7 @@ export const supportProviders: SupportProvider[] = [
     rating: 4.8,
     verification: 'Demo listing styled as a moderated support referral example',
     lastReviewed: 'February 2026',
-    journeyStages: ['just-diagnosed', 'family-sustainability'],
+    journeyStages: ['just-diagnosed'],
     isDemo: true,
   },
   {
@@ -516,7 +514,7 @@ export const supportProviders: SupportProvider[] = [
     rating: 4.7,
     verification: 'Demo listing styled as a verified referral example',
     lastReviewed: 'March 2026',
-    journeyStages: ['just-diagnosed', 'starting-therapy', 'school-transition', 'family-sustainability'],
+    journeyStages: ['just-diagnosed', 'starting-therapy', 'school-transition'],
     isDemo: true,
   },
   {
@@ -536,7 +534,7 @@ export const supportProviders: SupportProvider[] = [
     rating: 4.6,
     verification: 'Demo listing styled as a trusted respite example',
     lastReviewed: 'January 2026',
-    journeyStages: ['family-sustainability'],
+    journeyStages: [],
     isDemo: true,
   },
   {
@@ -721,47 +719,8 @@ export const guidedSteps: GuidedStep[] = [
     reviewedBy: 'Educational advocacy review',
     lastUpdated: 'March 2026',
   },
-  {
-    id: 'family-sustainability',
-    phase: 'Family Sustainability',
-    timeframe: 'Any time you are overloaded',
-    milestone: 'Reduce burnout before it becomes disengagement',
-    focus: 'Use support early so frustration does not turn into shutdown, conflict, or dropout from care.',
-    title: 'What to do when you are frustrated or at your breaking point',
-    description:
-      'You do not need to wait until a crisis to ask for help. This phase is about stabilizing the family system so you can keep moving toward long-term goals.',
-    reassurance:
-      'Feeling stretched does not mean you are failing. It means your family needs a steadier support plan right now.',
-    whatMattersNow: [
-      'Reducing the pressure load enough to think clearly again',
-      'Identifying which part of the plan is creating the most strain',
-      'Getting one real layer of support involved before the next hard week hits',
-    ],
-    whatCanWait: [
-      'Perfecting the long-term plan while you are already overloaded',
-      'Trying to carry every appointment, school task, and home routine alone',
-      'Assuming support should wait until things are worse',
-    ],
-    checklist: [
-      'Name the top 3 warning signs that you are nearing burnout.',
-      'Make a “what can wait” list and remove one nonessential demand this week.',
-      'Choose one person or service to contact before the day ends.',
-      'Create a short backup list for meals, transportation, or child care support.',
-      'Tell one trusted person exactly what kind of help would lighten the load.',
-      'Use one stabilizing family routine instead of trying to fix everything at once.',
-      'Revisit the bigger plan once you are regulated and able to prioritize again.',
-    ],
-    supportEscalation: [
-      'If you feel numb, panicked, highly reactive, or unable to follow through, move parent support to the top of the list.',
-      'If the household feels unsafe, unstable, or one step from breaking down, use the fastest support path available.',
-      'If peer support is not enough, step up to counseling, respite, or a higher-touch support option.',
-    ],
-    supportAction: 'Choose one stabilizing action and one support handoff today.',
-    resources: ['r9', 'r10', 'r11', 'r12'],
-    reviewedBy: 'Caregiver support review',
-    lastUpdated: 'March 2026',
-  },
 ];
+
 
 export const communityGroups: CommunityGroup[] = [
   {

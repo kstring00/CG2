@@ -313,7 +313,7 @@ export default function FindSupportPage() {
           if (stage === 'just-diagnosed') return 'just-diagnosed';
           if (stage === 'starting-therapy') return 'starting-therapy';
           if (stage === 'school-transition') return 'school-challenges';
-          if (stage === 'family-sustainability') return 'burned-out';
+
           return 'struggling-home';
         })
         .filter((stage, idx, arr) => arr.indexOf(stage) === idx);
