@@ -24,6 +24,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { guidedSteps, resources, stageMeta, type JourneyStageId } from '@/lib/data';
+import PathToIndependence from '@/components/PathToIndependence';
 
 const validStageIds: JourneyStageId[] = [
   'pre-diagnosis',
@@ -396,8 +397,13 @@ function NextStepsPageInner() {
         </>
       )}
 
+      {/* Starting Therapy — interactive Path to Independence */}
+      {activeStage === 'starting-therapy' && (
+        <PathToIndependence />
+      )}
+
       {/* All other stages — original layout */}
-      {activeStage !== 'pre-diagnosis' && activeStage !== 'just-diagnosed' && (
+      {activeStage !== 'pre-diagnosis' && activeStage !== 'just-diagnosed' && activeStage !== 'starting-therapy' && (
         <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
           <article className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
             <div className="flex flex-wrap items-center gap-2">
