@@ -5,14 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
-  BookOpen,
   HeartHandshake,
-  Link2,
   Compass,
   Search,
+  Link2,
+  BookOpen,
   Menu,
   X,
-  Compass as CompassIcon,
   Lock,
   ArrowRight,
   Moon,
@@ -24,120 +23,130 @@ import {
   HelpCircle,
   ChevronDown,
   Phone,
+  Compass as CompassIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
-import { SupportDirectory } from '@/components/layout/SupportDirectory';
 
-/**
- * SupportShell — redesigned sidebar.
- *
- * Groups are now accordion rows: icon + bold label + chevron toggle.
- * Each group expands to show bullet sub-items. The active sub-item
- * gets a primary left-rail accent, bold text, and a tinted background.
- * Matches the reference design (image.jpg) — minus the dark top header.
- */
+/* ─── Nav data ───────────────────────────────────────────────────────────── */
 
 interface NavItem {
   href: string;
   label: string;
-  icon?: React.ElementType;
+  icon: React.ElementType;
 }
 
 interface NavGroup {
   label: string;
   icon: React.ElementType;
   items: NavItem[];
-  defaultOpen?: boolean;
 }
 
-const navGroups: NavGroup[] = [
+const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Care Navigation',
     icon: Compass,
-    defaultOpen: true,
     items: [
-      { href: '/support/next-steps', label: 'Guided Next Steps' },
-      { href: '/support/what-is-aba', label: 'What Is ABA?' },
-      { href: '/support/resources', label: 'Resource Library' },
-      { href: '/support/find', label: 'Find Support' },
-      { href: '/support/connect', label: 'Connect' },
+      { href: '/support/next-steps',  label: 'Guided Next Steps', icon: Compass      },
+      { href: '/support/what-is-aba', label: 'What Is ABA?',       icon: HelpCircle   },
+      { href: '/support/resources',   label: 'Resource Library',   icon: BookOpen     },
+      { href: '/support/find',        label: 'Find Support',        icon: Search       },
+      { href: '/support/connect',     label: 'Connect',             icon: Link2        },
     ],
   },
   {
     label: 'Support for You',
     icon: HeartHandshake,
-    defaultOpen: true,
     items: [
-      { href: '/support/caregiver', label: 'Your Mental Health' },
-      { href: '/support/caregiver/identity', label: 'Caregiver Identity' },
-      { href: '/support/sleep', label: 'Sleep & Rest' },
-      { href: '/support/couples', label: 'Couples Support' },
-      { href: '/support/financial', label: 'Financial Resources' },
-      { href: '/support/hard-days', label: 'Hard Days & Crisis' },
+      { href: '/support/caregiver',          label: 'Your Mental Health',   icon: HeartHandshake },
+      { href: '/support/caregiver/identity', label: 'Caregiver Identity',   icon: User           },
+      { href: '/support/sleep',              label: 'Sleep & Rest',          icon: Moon           },
+      { href: '/support/couples',            label: 'Couples Support',       icon: Heart          },
+      { href: '/support/financial',          label: 'Financial Resources',   icon: DollarSign     },
+      { href: '/support/hard-days',          label: 'Hard Days & Crisis',    icon: AlertTriangle  },
     ],
   },
   {
     label: 'Your Family',
     icon: Users,
-    defaultOpen: true,
     items: [
-      { href: '/support/siblings', label: 'Sibling Support' },
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
     ],
   },
 ];
 
-/* ─── Accordion group ────────────────────────────────────────────────────── */
+/* ─── Accordion group component ─────────────────────────────────────────── */
 
-function NavGroup({
+function AccordionGroup({
   group,
   pathname,
-  closeSidebar,
+  onNavigate,
 }: {
   group: NavGroup;
   pathname: string;
-  closeSidebar: () => void;
+  onNavigate: () => void;
 }) {
-  const isAnyActive = group.items.some(
+  const hasActiveChild = group.items.some(
     (item) =>
       pathname === item.href ||
       (item.href !== '/support' && pathname.startsWith(item.href))
   );
 
-  const [open, setOpen] = useState(group.defaultOpen ?? isAnyActive);
+  const [open, setOpen] = useState(true);
 
   return (
-    <div className="mb-1">
-      {/* Group header row — clickable to expand/collapse */}
+    <div>
+      {/* ── Group header ────────────────────────────────────────── */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-surface-subtle"
+        aria-expanded={open}
+        className="group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 hover:bg-surface-subtle"
       >
-        {/* Icon circle */}
-        <span className={cn(
-          'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors',
-          isAnyActive ? 'bg-primary/10' : 'bg-surface-subtle'
-        )}>
-          <group.icon className={cn('h-4 w-4', isAnyActive ? 'text-primary' : 'text-brand-muted-400')} />
+        <span
+          className={cn(
+            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-150',
+            hasActiveChild ? 'bg-primary/10' : 'bg-surface-subtle group-hover:bg-white'
+          )}
+        >
+          <group.icon
+            className={cn(
+              'h-[15px] w-[15px] transition-colors duration-150',
+              hasActiveChild ? 'text-primary' : 'text-brand-muted-400 group-hover:text-brand-muted-600'
+            )}
+          />
         </span>
-        <span className={cn(
-          'flex-1 text-left text-[13.5px] font-bold',
-          isAnyActive ? 'text-brand-muted-900' : 'text-brand-muted-700'
-        )}>
+
+        <span
+          className={cn(
+            'flex-1 text-left text-[13px] font-bold leading-none tracking-[-0.01em]',
+            hasActiveChild ? 'text-brand-muted-900' : 'text-brand-muted-600'
+          )}
+        >
           {group.label}
         </span>
-        <ChevronDown className={cn(
-          'h-4 w-4 shrink-0 text-brand-muted-300 transition-transform duration-200',
-          open ? 'rotate-180' : ''
-        )} />
+
+        <ChevronDown
+          className={cn(
+            'h-3.5 w-3.5 shrink-0 text-brand-muted-300 transition-transform duration-250',
+            open ? 'rotate-180' : ''
+          )}
+        />
       </button>
 
-      {/* Sub-items */}
-      <div className={cn(
-        'overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
-        open ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-      )}>
-        <ul className="mb-1 ml-[42px] mt-0.5 flex list-none flex-col gap-0 p-0 pr-2">
+      {/* ── Sub-items ───────────────────────────────────────────── */}
+      <div
+        className={cn(
+          'overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]',
+          open ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+        )}
+      >
+        <ul className="relative mb-2 ml-[38px] mt-0.5 list-none p-0 pr-2">
+          {/* Continuous left rail line */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-1 left-[-9px] top-1 w-px bg-surface-border"
+          />
+
           {group.items.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -145,41 +154,37 @@ function NavGroup({
 
             return (
               <li key={item.href} className="relative">
-                {/* Active left rail */}
+                {/* Active rail highlight */}
                 {isActive && (
                   <span
                     aria-hidden="true"
-                    className="absolute -left-3 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary"
+                    className="absolute bottom-[3px] left-[-9px] top-[3px] w-px rounded-full bg-primary"
                   />
                 )}
+
                 <a
                   href={item.href}
-                  onClick={closeSidebar}
+                  onClick={onNavigate}
                   className={cn(
-                    'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-all',
+                    'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[12.5px] leading-snug transition-all duration-150',
                     isActive
-                      ? 'bg-primary/[0.07] font-semibold text-primary'
-                      : 'font-medium text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900'
+                      ? 'bg-primary/[0.06] font-semibold text-primary'
+                      : 'font-medium text-brand-muted-500 hover:bg-surface-subtle hover:text-brand-muted-800'
                   )}
                 >
-                  {/* Bullet dot */}
-                  <span className={cn(
-                    'h-1.5 w-1.5 shrink-0 rounded-full transition-colors',
-                    isActive ? 'bg-primary' : 'bg-brand-muted-300'
-                  )} />
+                  <span
+                    className={cn(
+                      'h-[5px] w-[5px] shrink-0 rounded-full transition-colors duration-150',
+                      isActive ? 'bg-primary' : 'bg-brand-muted-300'
+                    )}
+                  />
                   {item.label}
                 </a>
-
-                {/* Section jump nav — only on active page */}
-                {isActive && <SupportDirectory isActive={true} />}
               </li>
             );
           })}
         </ul>
       </div>
-
-      {/* Divider between groups */}
-      <div className="mx-3 mt-1 border-t border-surface-border/60" />
     </div>
   );
 }
@@ -189,135 +194,172 @@ function NavGroup({
 export function SupportShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const closeDrawer = () => setSidebarOpen(false);
 
   const SidebarContent = () => (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+
       {/* ── Logo ──────────────────────────────────────────────────── */}
-      <div className="border-b border-surface-border px-5 py-4">
-        <Link href="/" aria-label="Common Ground home" className="block min-w-0">
+      <div className="shrink-0 border-b border-surface-border px-5 py-4">
+        <Link href="/" aria-label="Common Ground home" className="block">
           <Image
             src="/logos/cg2-lockup-final.png"
             alt="Texas ABA Centers | Common Ground"
             width={280}
             height={42}
-            className="h-auto w-full max-w-[190px]"
+            className="h-auto w-full max-w-[180px]"
             style={{ objectFit: 'contain' }}
+            priority
           />
         </Link>
       </div>
 
-      {/* ── Section label + Home ───────────────────────────────────── */}
-      <div className="px-5 pb-1 pt-4">
-        <p className="text-[11px] font-bold text-brand-muted-900">Support</p>
-        <p className="text-[11px] text-brand-muted-400">Resources for your journey</p>
+      {/* ── Section header ────────────────────────────────────────── */}
+      <div className="shrink-0 px-5 pb-2 pt-4">
+        <p className="text-[12px] font-bold text-brand-muted-900">Support</p>
+        <p className="text-[11px] leading-snug text-brand-muted-400">
+          Resources for your journey
+        </p>
       </div>
 
-      {/* Home standalone link */}
-      <div className="px-3 pb-2 pt-1">
+      {/* ── Support Home ─────────────────────────────────────────── */}
+      <div className="shrink-0 px-3 pb-1">
         <a
           href="/support"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeDrawer}
           className={cn(
-            'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px] font-bold transition-all',
+            'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-150',
             pathname === '/support'
-              ? 'bg-primary/[0.07] text-primary'
-              : 'text-brand-muted-700 hover:bg-surface-subtle hover:text-brand-muted-900'
+              ? 'bg-primary/[0.06] text-primary'
+              : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900'
           )}
         >
-          <span className={cn(
-            'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
-            pathname === '/support' ? 'bg-primary/10' : 'bg-surface-subtle'
-          )}>
-            <LayoutDashboard className={cn('h-4 w-4', pathname === '/support' ? 'text-primary' : 'text-brand-muted-400')} />
+          <span
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+              pathname === '/support' ? 'bg-primary/10' : 'bg-surface-subtle'
+            )}
+          >
+            <LayoutDashboard
+              className={cn(
+                'h-[15px] w-[15px]',
+                pathname === '/support' ? 'text-primary' : 'text-brand-muted-400'
+              )}
+            />
           </span>
-          Support Home
+          <span className={cn(
+            'text-[13px] font-bold leading-none tracking-[-0.01em]',
+            pathname === '/support' ? 'text-primary' : 'text-brand-muted-600'
+          )}>
+            Support Home
+          </span>
         </a>
-        <div className="mx-3 mt-1 border-t border-surface-border/60" />
       </div>
 
-      {/* ── Accordion nav groups ───────────────────────────────────── */}
-      <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4" aria-label="Support navigation">
-        {navGroups.map((group) => (
-          <NavGroup
-            key={group.label}
-            group={group}
-            pathname={pathname}
-            closeSidebar={() => setSidebarOpen(false)}
-          />
-        ))}
+      {/* ── Thin divider ──────────────────────────────────────────── */}
+      <div className="mx-4 mb-2 mt-1 shrink-0 border-t border-surface-border/70" />
+
+      {/* ── Scrollable accordion nav ───────────────────────────────── */}
+      <nav
+        className="min-h-0 flex-1 overflow-y-auto px-3 pb-3"
+        aria-label="Support navigation"
+      >
+        <div className="space-y-0.5">
+          {NAV_GROUPS.map((group, i) => (
+            <div key={group.label}>
+              <AccordionGroup
+                group={group}
+                pathname={pathname}
+                onNavigate={closeDrawer}
+              />
+              {i < NAV_GROUPS.length - 1 && (
+                <div className="mx-3 border-t border-surface-border/50" />
+              )}
+            </div>
+          ))}
+        </div>
       </nav>
 
-      {/* ── Bottom: urgent help card ───────────────────────────────── */}
-      <div className="border-t border-surface-border px-4 py-4 space-y-2">
+      {/* ── Footer ────────────────────────────────────────────────── */}
+      <div className="shrink-0 space-y-2 border-t border-surface-border px-4 py-4">
+
         {/* Client portal */}
         <Link
           href="/client"
-          className="group flex items-center justify-between gap-3 rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 text-sm font-semibold text-accent transition-all hover:bg-accent/10"
+          className="group flex w-full items-center justify-between gap-2 rounded-xl border border-accent/30 bg-accent/[0.04] px-3 py-2.5 transition-all duration-150 hover:bg-accent/[0.09]"
         >
-          <span className="inline-flex items-center gap-2">
-            <Lock className="h-4 w-4" />
+          <span className="inline-flex items-center gap-2 text-[12.5px] font-semibold text-accent">
+            <Lock className="h-3.5 w-3.5 shrink-0" />
             Go to client portal
           </span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-3.5 w-3.5 shrink-0 text-accent transition-transform duration-150 group-hover:translate-x-0.5" />
         </Link>
 
-        {/* Need immediate support */}
-        <div className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-subtle/60 px-3 py-3">
+        {/* Immediate support card */}
+        <div className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-subtle/50 px-3 py-3">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-            <Phone className="h-4 w-4 text-primary" />
+            <Phone className="h-[15px] w-[15px] text-primary" />
           </span>
-          <div className="min-w-0">
-            <p className="text-[12px] font-bold text-brand-muted-900">Need immediate support?</p>
-            <p className="text-[11px] text-brand-muted-500">We&apos;re here to help.</p>
+          <div>
+            <p className="text-[12px] font-bold leading-tight text-brand-muted-900">
+              Need immediate support?
+            </p>
+            <p className="mt-0.5 text-[11px] leading-snug text-brand-muted-400">
+              We&apos;re here to help.
+            </p>
             <Link
-              href="/support/hard-days#sec-support-today"
-              className="mt-0.5 inline-flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline"
+              href="/support/hard-days"
+              className="mt-1 inline-flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline"
             >
               Contact Us <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         </div>
+
       </div>
     </div>
   );
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: '#f2f4f8' }}>
+
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-surface-border bg-white lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[15.5rem] flex-col border-r border-surface-border bg-white shadow-[1px_0_0_0_#d4d8e3] lg:flex">
         <SidebarContent />
       </aside>
 
-      {/* Mobile overlay */}
+      {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/35 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] lg:hidden"
+          onClick={closeDrawer}
         />
       )}
 
-      {/* Mobile sidebar */}
+      {/* Mobile drawer */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex min-h-0 w-64 flex-col bg-white transition-transform duration-300 lg:hidden',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          'fixed inset-y-0 left-0 z-50 flex w-[15.5rem] min-h-0 flex-col bg-white shadow-xl transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
         <button
-          onClick={() => setSidebarOpen(false)}
-          className="absolute right-4 top-4 rounded-lg p-1 hover:bg-surface-subtle"
+          onClick={closeDrawer}
+          aria-label="Close navigation"
+          className="absolute right-3 top-3 z-10 rounded-lg p-1.5 text-brand-muted-400 transition-colors hover:bg-surface-subtle hover:text-brand-muted-700"
         >
-          <X className="h-5 w-5 text-brand-muted-500" />
+          <X className="h-4 w-4" />
         </button>
         <SidebarContent />
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 lg:ml-64">
-        {/* Top banner */}
-        <div className="border-b border-primary/15 bg-primary/5">
+      {/* Page content */}
+      <div className="flex flex-1 flex-col lg:ml-[15.5rem]">
+
+        {/* Care Navigation banner */}
+        <div className="shrink-0 border-b border-primary/10 bg-primary/[0.04]">
           <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
-            <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
+            <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
               Care Navigation · open to every family
             </p>
@@ -330,28 +372,32 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <header className="sticky top-0 z-20 border-b border-surface-border/70 bg-white/85 backdrop-blur-xl">
+        {/* Sticky topbar */}
+        <header className="sticky top-0 z-20 shrink-0 border-b border-surface-border/70 bg-white/90 backdrop-blur-xl">
           <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="rounded-xl p-2 hover:bg-surface-subtle lg:hidden"
+              aria-label="Open navigation"
+              className="rounded-xl p-2 text-brand-muted-500 transition-colors hover:bg-surface-subtle hover:text-brand-muted-800 lg:hidden"
             >
-              <Menu className="h-5 w-5 text-brand-muted-600" />
+              <Menu className="h-5 w-5" />
             </button>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400">
                 Common Ground · Care Navigation
               </p>
-              <p className="truncate text-sm text-brand-muted-700">
+              <p className="truncate text-[13px] font-medium text-brand-muted-700">
                 For every family
               </p>
             </div>
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        {/* Main */}
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           {children}
         </main>
+
       </div>
     </div>
   );
