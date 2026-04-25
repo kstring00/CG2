@@ -147,7 +147,7 @@ export default function MentalHealthCommandCenter() {
   // Initialize from localStorage on mount
   useEffect(() => {
     const onboarded = lsGet('cg-onboarded') === '1';
-    const savedName = lsGet('cg-name') ?? 'Maria';
+    const savedName = lsGet('cg-name') ?? '';
     const savedTheme = lsGet('cg-theme') ?? 'light';
 
     setWasOnboarded(onboarded);

@@ -143,7 +143,11 @@ export function DashboardTab({
     <div>
       <header className={styles.pageHeader}>
         <div className={styles.greeting}>
-          <h1>{isReturning ? 'Welcome back, ' : 'Welcome, '}<em>{userName}</em>.</h1>
+          <h1>
+            {userName
+              ? <>{isReturning ? 'Welcome back, ' : 'Welcome, '}<em>{userName}</em>.</>
+              : (isReturning ? 'Welcome back.' : 'Welcome.')}
+          </h1>
           <p>{getDayGreeting()}</p>
         </div>
         <div className={styles.headerActions}>

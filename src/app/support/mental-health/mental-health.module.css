@@ -964,6 +964,22 @@
 .modalInput:focus { border-color: var(--sage); }
 .modalActions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
 .modalMuted { color: var(--ink-muted); font-size: 13px; }
+.modalSkip {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 0 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ink-faint);
+  font-family: var(--font-body);
+}
+.modalSkip:hover { color: var(--ink-soft); }
 
 /* ============ TOAST ============ */
 .toast {
