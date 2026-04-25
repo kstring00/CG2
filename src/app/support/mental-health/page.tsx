@@ -6,19 +6,19 @@ import {
   LayoutDashboard,
   ClipboardCheck,
   Activity,
-  Lightbulb,
-  Heart,
+  Sparkles,
+  Compass,
   AlertTriangle,
-  Sun,
-  Moon,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
 import styles from './mental-health.module.css';
 import { OnboardingModal } from './components/OnboardingModal';
 import { DashboardTab } from './components/DashboardTab';
 import { CheckInTab } from './components/CheckInTab';
 import { TrendsTab } from './components/TrendsTab';
-import { RecommendationsTab } from './components/RecommendationsTab';
-import { SupportTab } from './components/SupportTab';
+import { CalmingToolsTab } from './components/CalmingToolsTab';
+import { TopicsTab } from './components/TopicsTab';
 import { UrgentTab } from './components/UrgentTab';
 import {
   type Inputs,
@@ -26,7 +26,6 @@ import {
   DEFAULT_INPUTS,
   computeRiskScore,
   wellnessFromRisk,
-  riskState,
   getDrivingFactors,
   buildExplain,
   seedHistory,
@@ -51,7 +50,7 @@ const interTight = Inter_Tight({
 
 // ─── State + Reducer ───────────────────────────────────────────────────────
 
-type TabKey = 'dashboard' | 'checkin' | 'trends' | 'recs' | 'support' | 'urgent';
+type TabKey = 'dashboard' | 'checkin' | 'calming' | 'trends' | 'topics' | 'urgent';
 
 interface AppState {
   userName: string;
@@ -61,18 +60,17 @@ interface AppState {
   metric: string;
   range2: number;
   metric2: string;
-  darkMode: boolean;
 }
 
 type Action =
   | { type: 'SET_INPUT'; key: keyof Inputs; value: number }
+  | { type: 'SET_INPUTS'; inputs: Inputs }
   | { type: 'SET_RANGE'; range: number }
   | { type: 'SET_METRIC'; metric: string }
   | { type: 'SET_RANGE2'; range: number }
   | { type: 'SET_METRIC2'; metric: string }
   | { type: 'SET_USER_NAME'; name: string }
-  | { type: 'SET_HISTORY'; history: HistoryDay[] }
-  | { type: 'TOGGLE_DARK_MODE' };
+  | { type: 'SET_HISTORY'; history: HistoryDay[] };
 
 function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -84,6 +82,12 @@ function reducer(state: AppState, action: Action): AppState {
         history: anchorTodayInHistory(state.history, inputs),
       };
     }
+    case 'SET_INPUTS':
+      return {
+        ...state,
+        inputs: action.inputs,
+        history: anchorTodayInHistory(state.history, action.inputs),
+      };
     case 'SET_RANGE':
       return { ...state, range: action.range };
     case 'SET_METRIC':
@@ -96,8 +100,6 @@ function reducer(state: AppState, action: Action): AppState {
       return { ...state, userName: action.name };
     case 'SET_HISTORY':
       return { ...state, history: action.history };
-    case 'TOGGLE_DARK_MODE':
-      return { ...state, darkMode: !state.darkMode };
     default:
       return state;
   }
@@ -106,11 +108,11 @@ function reducer(state: AppState, action: Action): AppState {
 // ─── Tabs ──────────────────────────────────────────────────────────────────
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode; urgent?: boolean }[] = [
-  { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} /> },
-  { key: 'checkin', label: 'Daily Check-In', icon: <ClipboardCheck size={14} /> },
-  { key: 'trends', label: 'My Trends', icon: <Activity size={14} /> },
-  { key: 'recs', label: 'Recommendations', icon: <Lightbulb size={14} /> },
-  { key: 'support', label: 'Support for Me', icon: <Heart size={14} /> },
+  { key: 'dashboard', label: 'Today', icon: <LayoutDashboard size={14} /> },
+  { key: 'checkin', label: 'Check-In', icon: <ClipboardCheck size={14} /> },
+  { key: 'calming', label: 'Calming Tools', icon: <Sparkles size={14} /> },
+  { key: 'trends', label: 'Trends', icon: <Activity size={14} /> },
+  { key: 'topics', label: 'Topics', icon: <Compass size={14} /> },
   { key: 'urgent', label: 'Urgent Help', icon: <AlertTriangle size={14} />, urgent: true },
 ];
 
@@ -122,97 +124,199 @@ function lsGet(key: string): string | null {
 function lsSet(key: string, value: string): void {
   try { localStorage.setItem(key, value); } catch { /* noop */ }
 }
+function lsRemove(key: string): void {
+  try { localStorage.removeItem(key); } catch { /* noop */ }
+}
+
+// ─── Persistence keys ──────────────────────────────────────────────────────
+const LS_ONBOARDED = 'cg-onboarded';
+const LS_NAME = 'cg-name';
+const LS_INPUTS = 'cg-inputs-v2';
+const LS_HISTORY = 'cg-history-v2';
+const LS_PROFILE = 'cg-profile-v1';
+const LS_LAST_CHECKIN = 'cg-last-checkin';
+const LS_STREAK = 'cg-streak';
 
 // ─── Component ────────────────────────────────────────────────────────────
 
-export default function MentalHealthCommandCenter() {
+export default function MentalHealthCenter() {
   const [state, dispatch] = useReducer(reducer, {
-    userName: 'friend',
+    userName: '',
     inputs: DEFAULT_INPUTS,
     history: [],
     range: 7,
     metric: 'overall',
     range2: 30,
     metric2: 'overall',
-    darkMode: false,
   });
 
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [ready, setReady] = useState(false);
-  // true only if cg-onboarded was already '1' at page load — not set during this session
   const [wasOnboarded, setWasOnboarded] = useState(false);
+  const [profileSignedIn, setProfileSignedIn] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [streak, setStreak] = useState(0);
 
-  // Initialize from localStorage on mount
+  // ─── Initialize from localStorage on mount ────────────────────────────
   useEffect(() => {
-    const onboarded = lsGet('cg-onboarded') === '1';
-    const savedName = lsGet('cg-name') ?? '';
-    const savedTheme = lsGet('cg-theme') ?? 'light';
+    const onboarded = lsGet(LS_ONBOARDED) === '1';
+    const savedName = lsGet(LS_NAME) ?? '';
+    const profile = lsGet(LS_PROFILE);
 
     setWasOnboarded(onboarded);
+    setProfileSignedIn(profile === '1');
     if (!onboarded) setShowOnboarding(true);
     dispatch({ type: 'SET_USER_NAME', name: savedName });
-    if (savedTheme === 'dark') dispatch({ type: 'TOGGLE_DARK_MODE' });
 
-    const h = seedHistory();
-    dispatch({ type: 'SET_HISTORY', history: anchorTodayInHistory(h, DEFAULT_INPUTS) });
+    // Restore inputs if previously saved
+    let inputs = DEFAULT_INPUTS;
+    const rawInputs = lsGet(LS_INPUTS);
+    if (rawInputs) {
+      try {
+        const parsed = JSON.parse(rawInputs) as Partial<Inputs>;
+        inputs = { ...DEFAULT_INPUTS, ...parsed };
+      } catch { /* ignore */ }
+    }
+    dispatch({ type: 'SET_INPUTS', inputs });
+
+    // Restore history if previously saved (with date revival)
+    let history: HistoryDay[] = [];
+    const rawHistory = lsGet(LS_HISTORY);
+    if (rawHistory) {
+      try {
+        const parsed = JSON.parse(rawHistory) as HistoryDay[];
+        history = parsed.map((d) => ({ ...d, date: new Date(d.date) }));
+        // Trim to last 30 days, append today if missing
+        const today = new Date();
+        const lastDate = history[history.length - 1]?.date;
+        const sameDay = lastDate &&
+          lastDate.getFullYear() === today.getFullYear() &&
+          lastDate.getMonth() === today.getMonth() &&
+          lastDate.getDate() === today.getDate();
+        if (!sameDay) {
+          history.push({
+            date: today,
+            overall: wellnessFromRisk(computeRiskScore(inputs)),
+            stress: inputs.stress,
+            anxiety: inputs.anxiety,
+            sleep: inputs.sleep,
+            support: inputs.support,
+            energy: Math.round((inputs.bandwidth + inputs.hopefulness) / 2),
+          });
+          history = history.slice(-30);
+        }
+      } catch { /* ignore */ }
+    }
+    if (history.length === 0) {
+      history = seedHistory();
+    }
+    dispatch({ type: 'SET_HISTORY', history: anchorTodayInHistory(history, inputs) });
+
+    setStreak(parseInt(lsGet(LS_STREAK) ?? '0', 10) || 0);
     setReady(true);
   }, []);
 
-  // Persist dark mode preference
+  // ─── Auto-save inputs whenever they change (after ready) ──────────────
   useEffect(() => {
     if (!ready) return;
-    lsSet('cg-theme', state.darkMode ? 'dark' : 'light');
-  }, [state.darkMode, ready]);
+    lsSet(LS_INPUTS, JSON.stringify(state.inputs));
+  }, [state.inputs, ready]);
+
+  // ─── Auto-save history whenever it changes ────────────────────────────
+  useEffect(() => {
+    if (!ready || state.history.length === 0) return;
+    lsSet(LS_HISTORY, JSON.stringify(state.history));
+  }, [state.history, ready]);
 
   // Derived values — recomputed whenever inputs or history change
   const risk = useMemo(() => computeRiskScore(state.inputs), [state.inputs]);
   const wellness = useMemo(() => wellnessFromRisk(risk), [risk]);
-  const rs = useMemo(() => riskState(risk), [risk]);
   const drivers = useMemo(() => getDrivingFactors(state.inputs), [state.inputs]);
   const explainText = useMemo(() => buildExplain(risk, drivers), [risk, drivers]);
   const recs = useMemo(() => generateRecs(state.inputs, risk, drivers), [state.inputs, risk, drivers]);
   const insights = useMemo(() => generateInsights(state.history), [state.history]);
 
-  // "back" only on a return session — not during the visit they first onboarded
   const isReturning = ready && wasOnboarded;
 
   const handleInputChange = useCallback((key: keyof Inputs, value: number) => {
     dispatch({ type: 'SET_INPUT', key, value });
+    setSavedFlash(true);
+    window.clearTimeout((handleInputChange as unknown as { _t?: number })._t);
+    (handleInputChange as unknown as { _t?: number })._t = window.setTimeout(
+      () => setSavedFlash(false),
+      900,
+    );
   }, []);
 
-  function handleOnboardingComplete(name: string) {
+  function handleOnboardingComplete(name: string, signIn: boolean) {
     dispatch({ type: 'SET_USER_NAME', name });
-    lsSet('cg-onboarded', '1');
-    lsSet('cg-name', name);
+    lsSet(LS_ONBOARDED, '1');
+    if (name) lsSet(LS_NAME, name);
+    if (signIn) {
+      lsSet(LS_PROFILE, '1');
+      setProfileSignedIn(true);
+    }
     setShowOnboarding(false);
   }
 
+  function handleSignOut() {
+    if (typeof window === 'undefined') return;
+    const ok = window.confirm(
+      'Sign out and clear your saved data on this device? Your check-ins and notes will be removed.',
+    );
+    if (!ok) return;
+    [LS_ONBOARDED, LS_NAME, LS_INPUTS, LS_HISTORY, LS_PROFILE, LS_LAST_CHECKIN, LS_STREAK].forEach(lsRemove);
+    window.location.reload();
+  }
+
   function handleCheckinComplete() {
+    // Streak: bump if last check-in wasn't today
+    const today = new Date().toDateString();
+    const last = lsGet(LS_LAST_CHECKIN);
+    if (last !== today) {
+      const newStreak = streak + 1;
+      setStreak(newStreak);
+      lsSet(LS_STREAK, String(newStreak));
+      lsSet(LS_LAST_CHECKIN, today);
+    }
     setActiveTab('dashboard');
   }
 
   return (
-    <div
-      className={`${styles.root} ${fraunces.variable} ${interTight.variable}`}
-      data-theme={state.darkMode ? 'dark' : undefined}
-    >
-      {/* Onboarding modal */}
+    <div className={`${styles.root} ${fraunces.variable} ${interTight.variable}`}>
       {showOnboarding && (
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
 
       {/* Page header row */}
       <div className={styles.pageTop}>
-        <span className={styles.pageTitle}>Mental Health Command Center</span>
-        <button
-          className={styles.themeToggle}
-          onClick={() => dispatch({ type: 'TOGGLE_DARK_MODE' })}
-          aria-label="Toggle dark mode"
-        >
-          {state.darkMode ? <Sun size={14} /> : <Moon size={14} />}
-          {state.darkMode ? 'Light mode' : 'Dark mode'}
-        </button>
+        <span className={styles.pageTitle}>Mental Health Center</span>
+        <div className={styles.pageTopActions}>
+          {savedFlash && (
+            <span className={styles.savedBadge} aria-live="polite">
+              <span className={styles.savedDot} /> Saved
+            </span>
+          )}
+          {profileSignedIn ? (
+            <button
+              className={styles.themeToggle}
+              onClick={handleSignOut}
+              title="Sign out and clear local data"
+            >
+              <LogOut size={13} />
+              {state.userName ? `${state.userName} · sign out` : 'Sign out'}
+            </button>
+          ) : (
+            <button
+              className={styles.themeToggle}
+              onClick={() => setShowOnboarding(true)}
+            >
+              <LogIn size={13} />
+              Sign in to save
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tab bar */}
@@ -248,6 +352,7 @@ export default function MentalHealthCommandCenter() {
         <DashboardTab
           userName={state.userName}
           isReturning={isReturning}
+          streak={streak}
           inputs={state.inputs}
           history={state.history}
           risk={risk}
@@ -258,7 +363,6 @@ export default function MentalHealthCommandCenter() {
           insights={insights}
           range={state.range}
           metric={state.metric}
-          darkMode={state.darkMode}
           onInputChange={handleInputChange}
           onRangeChange={(r) => dispatch({ type: 'SET_RANGE', range: r })}
           onMetricChange={(m) => dispatch({ type: 'SET_METRIC', metric: m })}
@@ -274,21 +378,20 @@ export default function MentalHealthCommandCenter() {
         />
       )}
 
+      {ready && activeTab === 'calming' && <CalmingToolsTab userName={state.userName} />}
+
       {ready && activeTab === 'trends' && (
         <TrendsTab
           history={state.history}
           range={state.range2}
           metric={state.metric2}
           insights={insights}
-          darkMode={state.darkMode}
           onRangeChange={(r) => dispatch({ type: 'SET_RANGE2', range: r })}
           onMetricChange={(m) => dispatch({ type: 'SET_METRIC2', metric: m })}
         />
       )}
 
-      {ready && activeTab === 'recs' && <RecommendationsTab recs={recs} />}
-
-      {ready && activeTab === 'support' && <SupportTab />}
+      {ready && activeTab === 'topics' && <TopicsTab onNavigate={(tab) => setActiveTab(tab as TabKey)} />}
 
       {ready && activeTab === 'urgent' && <UrgentTab />}
     </div>

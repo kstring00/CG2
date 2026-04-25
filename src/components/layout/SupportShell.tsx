@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   BookOpen,
-  HeartHandshake,
   Link2,
   Compass,
   Search,
@@ -15,14 +14,9 @@ import {
   Compass as CompassIcon,
   Lock,
   ArrowRight,
-  Moon,
-  Heart,
-  DollarSign,
   Users,
-  AlertTriangle,
-  User,
   HelpCircle,
-  Activity,
+  HeartPulse,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -37,6 +31,12 @@ import { cn } from '@/lib/utils';
  */
 const navGroups = [
   {
+    label: 'For You',
+    items: [
+      { href: '/support/mental-health', label: 'Mental Health Center', icon: HeartPulse, highlight: true },
+    ],
+  },
+  {
     label: 'Care Navigation',
     items: [
       { href: '/support', label: 'Home', icon: LayoutDashboard },
@@ -45,18 +45,6 @@ const navGroups = [
       { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
       { href: '/support/find', label: 'Find Support', icon: Search },
       { href: '/support/connect', label: 'Connect', icon: Link2 },
-    ],
-  },
-  {
-    label: 'Support for You',
-    items: [
-      { href: '/support/caregiver', label: 'Your Mental Health', icon: HeartHandshake, highlight: true },
-      { href: '/support/mental-health', label: 'Mental Health Command Center', icon: Activity },
-      { href: '/support/caregiver/identity', label: 'Caregiver Identity', icon: User },
-      { href: '/support/sleep', label: 'Sleep & Rest', icon: Moon },
-      { href: '/support/couples', label: 'Couples Support', icon: Heart },
-      { href: '/support/financial', label: 'Financial Resources', icon: DollarSign },
-      { href: '/support/hard-days', label: 'Hard Days & Crisis', icon: AlertTriangle },
     ],
   },
   {
@@ -118,7 +106,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                       <item.icon className="h-4 w-4 shrink-0" />
                       <span className="flex-1 text-[13px]">{item.label}</span>
                       {isHighlight && !isActive && (
-                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">You</span>
+                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">For you</span>
                       )}
                     </a>
                   </li>
