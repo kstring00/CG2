@@ -31,7 +31,7 @@ import {
   seedHistory,
   anchorTodayInHistory,
 } from './components/RiskEngine';
-import { generateRecs, generateInsights } from './components/RecommendationsEngine';
+import { generateRecs, generateInsights, type RecAction } from './components/RecommendationsEngine';
 
 const fraunces = Fraunces({
   subsets: ['latin'],
@@ -151,12 +151,35 @@ export default function MentalHealthCenter() {
   });
 
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
+  const [pendingTool, setPendingTool] = useState<string | null>(null);
+  const [pendingTopic, setPendingTopic] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [ready, setReady] = useState(false);
   const [wasOnboarded, setWasOnboarded] = useState(false);
   const [profileSignedIn, setProfileSignedIn] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [streak, setStreak] = useState(0);
+
+  function dispatchRecAction(action: RecAction) {
+    if (action.kind === 'tab') {
+      setActiveTab(action.tab);
+      return;
+    }
+    if (action.kind === 'tool') {
+      setPendingTool(action.tool);
+      setActiveTab('calming');
+      return;
+    }
+    if (action.kind === 'topic') {
+      setPendingTopic(action.topic);
+      setActiveTab('topics');
+      return;
+    }
+    if (action.kind === 'href') {
+      // External fallback — only used when a topic/tool isn't available inline
+      window.location.href = action.href;
+    }
+  }
 
   // ─── Initialize from localStorage on mount ────────────────────────────
   useEffect(() => {
@@ -367,6 +390,7 @@ export default function MentalHealthCenter() {
           onRangeChange={(r) => dispatch({ type: 'SET_RANGE', range: r })}
           onMetricChange={(m) => dispatch({ type: 'SET_METRIC', metric: m })}
           onNavigate={(tab) => setActiveTab(tab as TabKey)}
+          onRecAction={dispatchRecAction}
         />
       )}
 
@@ -378,7 +402,13 @@ export default function MentalHealthCenter() {
         />
       )}
 
-      {ready && activeTab === 'calming' && <CalmingToolsTab userName={state.userName} />}
+      {ready && activeTab === 'calming' && (
+        <CalmingToolsTab
+          userName={state.userName}
+          initialTool={pendingTool}
+          onToolConsumed={() => setPendingTool(null)}
+        />
+      )}
 
       {ready && activeTab === 'trends' && (
         <TrendsTab
@@ -391,7 +421,13 @@ export default function MentalHealthCenter() {
         />
       )}
 
-      {ready && activeTab === 'topics' && <TopicsTab onNavigate={(tab) => setActiveTab(tab as TabKey)} />}
+      {ready && activeTab === 'topics' && (
+        <TopicsTab
+          onNavigate={(tab) => setActiveTab(tab as TabKey)}
+          initialTopic={pendingTopic as never}
+          onTopicConsumed={() => setPendingTopic(null)}
+        />
+      )}
 
       {ready && activeTab === 'urgent' && <UrgentTab />}
     </div>

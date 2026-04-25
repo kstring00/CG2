@@ -1,14 +1,28 @@
 import type { Inputs, HistoryDay, Driver } from './RiskEngine';
 
+/**
+ * A recommendation routes to either:
+ *   - a tab inside the center (`tab`),
+ *   - an inline calming tool (`tool`),
+ *   - an inline topic (`topic`),
+ *   - or, only as a last resort, an external URL (`href`).
+ *
+ * Internal routing is preferred so the user never leaves the Mental Health Center.
+ */
+export type RecAction =
+  | { kind: 'tab'; tab: 'dashboard' | 'checkin' | 'calming' | 'trends' | 'topics' | 'urgent' }
+  | { kind: 'tool'; tool: 'breath' | 'grounding' | 'journal' | 'ask' | 'body' | 'floor' | 'hard-day' | 'one-thing' }
+  | { kind: 'topic'; topic: 'identity' | 'sleep' | 'couples' | 'hard-days' | 'financial' | 'siblings' }
+  | { kind: 'href'; href: string };
+
 export interface Rec {
   icon: 'priority' | 'support' | 'calm' | 'insight';
   tag: string;
   title: string;
   body: string;
   action: string;
-  /** Navigation target for the action button. Internal paths use Next.js routing;
-   *  tel:/sms:/https: are rendered as <a> tags. Omit to keep the button inert. */
-  href?: string;
+  /** Where the action button takes you. Internal routes are preferred over hrefs. */
+  to: RecAction;
 }
 
 export interface Insight {
@@ -26,8 +40,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       tag: 'Priority',
       title: "Today, the goal is just less heavy.",
       body: "You've had a stretch of hard days. Drop one non-essential thing on the calendar today — laundry, dinner-as-event, an email — and use that 30 minutes to lie down or step outside.",
-      action: "See your hard-day plan →",
-      href: '/support/mental-health/tools/hard-day-plan',
+      action: "Open the hard-day script →",
+      to: { kind: 'topic', topic: 'hard-days' },
     });
   } else if (risk > 50) {
     recs.push({
@@ -36,7 +50,7 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       title: `Your ${top.label.toLowerCase()} is pushing you into the Watch zone.`,
       body: `A 3-minute reset before the next transition (school pickup, dinner, bedtime) can shift the back half of the day. It's smaller than it sounds and it works.`,
       action: "Start a breath reset →",
-      href: '/support/mental-health/tools/breath-reset',
+      to: { kind: 'tool', tool: 'breath' },
     });
   } else {
     recs.push({
@@ -45,7 +59,7 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       title: "You're in a stable place. Notice it.",
       body: "Steady days are when the long-arc work happens. A one-line journal entry today gives future-you something to look back on when it gets harder again.",
       action: "Write one line →",
-      href: '/support/mental-health/tools/one-line-journal',
+      to: { kind: 'tool', tool: 'journal' },
     });
   }
 
@@ -55,8 +69,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       tag: 'Sleep',
       title: "Tonight's priority is rest, not productivity.",
       body: "Three nights of thin sleep raises everything else — stress, anxiety, the 3 AM spirals. Even 30 extra minutes tonight matters more than anything you'd get done after 9 PM.",
-      action: "See a wind-down sequence →",
-      href: '/support/sleep?tab=tonight',
+      action: "Open the sleep guide →",
+      to: { kind: 'topic', topic: 'sleep' },
     });
   }
 
@@ -66,8 +80,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       tag: 'Support',
       title: "You marked low support today.",
       body: `Want help drafting a text to someone you trust? It can be one line — "I'm having a hard one, no need to fix it." That counts as reaching out.`,
-      action: "Draft a text →",
-      href: '/support/mental-health/tools/ask-for-help',
+      action: "Pick a script →",
+      to: { kind: 'tool', tool: 'ask' },
     });
   }
 
@@ -78,7 +92,7 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       title: "Anxiety is up and sleep is down — a familiar pair.",
       body: "When these two move together, the body is asking for slower input. No screens for the last 30 minutes tonight, and a five-minute body scan in bed can interrupt the loop.",
       action: "Try a body scan →",
-      href: '/support/mental-health/tools/body-scan',
+      to: { kind: 'tool', tool: 'body' },
     });
   }
 
@@ -89,7 +103,7 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       title: "Try a 3-minute reset before the evening routine.",
       body: "The evening with a high-need child takes the most regulation from you. A short reset before it starts costs three minutes and saves you the next hour.",
       action: "Start now →",
-      href: '/support/mental-health/tools/breath-reset',
+      to: { kind: 'tool', tool: 'breath' },
     });
   }
 
@@ -98,9 +112,9 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       icon: 'support',
       tag: 'Connection',
       title: "You've had three hard days in a row.",
-      body: "It may help to check in with a counselor — not because something's wrong, but because trained people are easier to talk to than they should be. Your CG navigator can point you to caregiver-specialized therapists.",
-      action: "Browse providers →",
-      href: '/support/caregiver?tab=get-help',
+      body: "It may help to check in with a counselor — not because something's wrong, but because trained people are easier to talk to than they should be. The Topics tab has a guide on identity and reconnection.",
+      action: "Reclaim something small →",
+      to: { kind: 'topic', topic: 'identity' },
     });
   }
 
@@ -110,8 +124,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       tag: 'Bandwidth',
       title: "Your bandwidth is empty. That's information, not failure.",
       body: "Today's not the day to start anything new. Hold the floor — kid fed, kid safe, you breathing — and we'll pick the rest up tomorrow.",
-      action: "See your floor list →",
-      href: '/support/mental-health/tools/floor-list',
+      action: "Open the floor list →",
+      to: { kind: 'tool', tool: 'floor' },
     });
   }
 
@@ -121,8 +135,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       tag: 'Overwhelm',
       title: "Pick one thing, not five.",
       body: "When everything feels equally urgent, that's the overwhelm talking, not the truth. Write down the next 60 minutes only — what has to happen, what doesn't.",
-      action: "Try the one-thing list →",
-      href: '/support/mental-health/tools/one-thing',
+      action: "Try the next-60-minutes list →",
+      to: { kind: 'tool', tool: 'one-thing' },
     });
   }
 
@@ -132,8 +146,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
       tag: 'Pattern',
       title: "Your support score is doing real work.",
       body: "On days you marked support 6+, your wellness ran 12 points higher on average. Whoever showed up this week — that's the lever.",
-      action: "See your support pattern →",
-      href: '/support/mental-health?tab=trends',
+      action: "See your trends →",
+      to: { kind: 'tab', tab: 'trends' },
     });
   }
 

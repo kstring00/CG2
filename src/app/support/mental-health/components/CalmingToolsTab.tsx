@@ -15,6 +15,10 @@ import {
   Pause,
   ArrowLeft,
   Heart,
+  Shield,
+  Target,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import styles from '../mental-health.module.css';
 
@@ -26,7 +30,9 @@ type ToolKey =
   | 'journal'
   | 'ask'
   | 'body'
-  | 'floor';
+  | 'floor'
+  | 'hard-day'
+  | 'one-thing';
 
 interface ToolMeta {
   key: ToolKey;
@@ -86,7 +92,49 @@ const TOOLS: ToolMeta[] = [
     icon: <Footprints size={20} />,
     accent: 'gold',
   },
+  {
+    key: 'hard-day',
+    title: 'Hard-day plan',
+    blurb: 'Decided on a good day, ready for a hard one. What to drop, what to keep, who to text.',
+    duration: '3 min',
+    icon: <Shield size={20} />,
+    accent: 'burgundy',
+  },
+  {
+    key: 'one-thing',
+    title: 'Next 60 minutes',
+    blurb: 'When everything feels equally urgent. One thing that has to happen — the rest can wait.',
+    duration: '2 min',
+    icon: <Target size={20} />,
+    accent: 'blue',
+  },
 ];
+
+// ─── Per-tool streaks (localStorage) ──────────────────────────────────────
+
+interface UsageRecord {
+  total: number;
+  lastUsed: string | null;
+}
+
+function loadUsage(): Record<string, UsageRecord> {
+  try {
+    const raw = localStorage.getItem('cg-tool-usage');
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return {};
+}
+
+function recordUsage(tool: ToolKey): Record<string, UsageRecord> {
+  const usage = loadUsage();
+  const today = new Date().toDateString();
+  const cur = usage[tool] ?? { total: 0, lastUsed: null };
+  cur.total += 1;
+  cur.lastUsed = today;
+  usage[tool] = cur;
+  try { localStorage.setItem('cg-tool-usage', JSON.stringify(usage)); } catch { /* ignore */ }
+  return usage;
+}
 
 const ACCENT_CLASS: Record<ToolMeta['accent'], string> = {
   sage: styles.qaIcon,
@@ -97,15 +145,33 @@ const ACCENT_CLASS: Record<ToolMeta['accent'], string> = {
 
 interface Props {
   userName: string;
+  initialTool?: string | null;
+  onToolConsumed?: () => void;
 }
 
-export function CalmingToolsTab({ userName }: Props) {
+export function CalmingToolsTab({ userName, initialTool = null, onToolConsumed }: Props) {
   const [active, setActive] = useState<ToolKey | null>(null);
   const [recents, setRecents] = useState<ToolKey[]>([]);
+  const [usage, setUsage] = useState<Record<string, UsageRecord>>({});
+
+  useEffect(() => {
+    setUsage(loadUsage());
+  }, []);
+
+  // Honor an externally-requested tool from a recommendation click
+  useEffect(() => {
+    if (initialTool && TOOLS.some((t) => t.key === initialTool)) {
+      setActive(initialTool as ToolKey);
+      setRecents((prev) => [initialTool as ToolKey, ...prev.filter((r) => r !== initialTool)].slice(0, 3));
+      onToolConsumed?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTool]);
 
   function open(key: ToolKey) {
     setActive(key);
     setRecents((prev) => [key, ...prev.filter((r) => r !== key)].slice(0, 3));
+    setUsage(recordUsage(key));
   }
 
   if (active) {
@@ -131,6 +197,8 @@ export function CalmingToolsTab({ userName }: Props) {
           {active === 'ask' && <AskForHelpTool />}
           {active === 'body' && <BodyScanTool />}
           {active === 'floor' && <FloorListTool />}
+          {active === 'hard-day' && <HardDayPlanTool />}
+          {active === 'one-thing' && <OneThingTool />}
         </div>
       </div>
     );
@@ -161,18 +229,28 @@ export function CalmingToolsTab({ userName }: Props) {
       )}
 
       <div className={styles.toolsGrid}>
-        {TOOLS.map((t) => (
-          <button
-            key={t.key}
-            className={styles.toolCard}
-            onClick={() => open(t.key)}
-          >
-            <div className={ACCENT_CLASS[t.accent]}>{t.icon}</div>
-            <div className={styles.toolCardTitle}>{t.title}</div>
-            <p className={styles.toolCardBody}>{t.blurb}</p>
-            <span className={styles.toolCardMeta}>{t.duration} · Tap to open</span>
-          </button>
-        ))}
+        {TOOLS.map((t) => {
+          const used = usage[t.key];
+          return (
+            <button
+              key={t.key}
+              className={styles.toolCard}
+              onClick={() => open(t.key)}
+            >
+              <div className={styles.toolCardHead}>
+                <div className={ACCENT_CLASS[t.accent]}>{t.icon}</div>
+                {used && used.total > 0 && (
+                  <span className={styles.toolUsageBadge} title={`Used ${used.total} time${used.total === 1 ? '' : 's'}`}>
+                    × {used.total}
+                  </span>
+                )}
+              </div>
+              <div className={styles.toolCardTitle}>{t.title}</div>
+              <p className={styles.toolCardBody}>{t.blurb}</p>
+              <span className={styles.toolCardMeta}>{t.duration} · Tap to open</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className={styles.supportQuote}>
@@ -202,10 +280,58 @@ function BreathTool() {
   const [phase, setPhase] = useState<BreathPhase>('idle');
   const [count, setCount] = useState(4);
   const [round, setRound] = useState(0);
+  const [soundOn, setSoundOn] = useState(false);
   const TOTAL_ROUNDS = 4;
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const audioRef = useRef<{ ctx: AudioContext; osc: OscillatorNode; gain: GainNode } | null>(null);
 
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    stopAmbient();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function startAmbient() {
+    if (typeof window === 'undefined' || audioRef.current) return;
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 174; // a low, calming hum (174 Hz, "solfeggio")
+      gain.gain.value = 0;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      // Fade in
+      gain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 1.5);
+      audioRef.current = { ctx, osc, gain };
+    } catch { /* audio unavailable */ }
+  }
+
+  function stopAmbient() {
+    const a = audioRef.current;
+    if (!a) return;
+    try {
+      a.gain.gain.linearRampToValueAtTime(0, a.ctx.currentTime + 0.4);
+      setTimeout(() => {
+        try { a.osc.stop(); } catch { /* noop */ }
+        try { a.ctx.close(); } catch { /* noop */ }
+      }, 500);
+    } catch { /* noop */ }
+    audioRef.current = null;
+  }
+
+  function toggleSound() {
+    if (soundOn) {
+      stopAmbient();
+      setSoundOn(false);
+    } else {
+      startAmbient();
+      setSoundOn(true);
+    }
+  }
 
   function tick(ph: BreathPhase, secsLeft: number, rnd: number) {
     setPhase(ph);
@@ -296,6 +422,13 @@ function BreathTool() {
             <Pause size={14} /> Stop
           </button>
         )}
+        <button
+          className={`${styles.btn} ${styles.btnGhost}`}
+          onClick={toggleSound}
+          title={soundOn ? 'Turn ambient hum off' : 'Turn ambient hum on'}
+        >
+          {soundOn ? <><Volume2 size={14} /> Hum on</> : <><VolumeX size={14} /> Add hum</>}
+        </button>
       </div>
       <p className={styles.toolHint}>Box breathing · 4 rounds · ~1 min total</p>
     </div>
@@ -661,6 +794,178 @@ function FloorListTool() {
           <span>That&apos;s the floor. Everything else today is bonus. Be proud.</span>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ─── Tool: Hard-day plan ─────────────────────────────────────────────── */
+
+interface HardDayPlanData {
+  dropping: string;
+  keeping: string;
+  person: string;
+  savedAt: string | null;
+}
+
+function HardDayPlanTool() {
+  const [data, setData] = useState<HardDayPlanData>({
+    dropping: '',
+    keeping: '',
+    person: '',
+    savedAt: null,
+  });
+  const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('cg-hard-day-plan');
+      if (raw) setData(JSON.parse(raw));
+    } catch { /* ignore */ }
+  }, []);
+
+  function update(key: keyof Omit<HardDayPlanData, 'savedAt'>, val: string) {
+    setData((prev) => ({ ...prev, [key]: val }));
+  }
+
+  function save() {
+    const at = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    const next = { ...data, savedAt: at };
+    setData(next);
+    try { localStorage.setItem('cg-hard-day-plan', JSON.stringify(next)); } catch { /* ignore */ }
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
+  }
+
+  const canSave = data.dropping.trim() || data.keeping.trim() || data.person.trim();
+
+  return (
+    <div className={styles.hardDayBox}>
+      <p className={styles.toolHint} style={{ textAlign: 'left', marginBottom: 18 }}>
+        Build it on a good day. Use it on a bad one. Saved on this device — it&apos;ll be here when you need it.
+      </p>
+
+      <div className={styles.hardDayField}>
+        <label className={styles.hardDayLabel}>What I&apos;ll drop today</label>
+        <textarea
+          className={styles.reclaimInput}
+          placeholder="Laundry. Dinner-as-event. The non-essential email. Pick the heaviest one and let it go."
+          value={data.dropping}
+          onChange={(e) => update('dropping', e.target.value)}
+          rows={2}
+        />
+      </div>
+
+      <div className={styles.hardDayField}>
+        <label className={styles.hardDayLabel}>What stays no matter what</label>
+        <textarea
+          className={styles.reclaimInput}
+          placeholder="Kid fed. Kid safe. You breathing. Pick the floor for today."
+          value={data.keeping}
+          onChange={(e) => update('keeping', e.target.value)}
+          rows={2}
+        />
+      </div>
+
+      <div className={styles.hardDayField}>
+        <label className={styles.hardDayLabel}>One person I&apos;ll text</label>
+        <input
+          className={styles.groundingInput}
+          placeholder="A name. That&apos;s it."
+          value={data.person}
+          onChange={(e) => update('person', e.target.value)}
+        />
+      </div>
+
+      <div className={styles.toolControls} style={{ justifyContent: 'space-between' }}>
+        <span className={styles.toolHint} style={{ margin: 0 }}>
+          {data.savedAt ? `Last saved · ${data.savedAt}` : 'Not yet saved'}
+        </span>
+        <button
+          className={`${styles.btn} ${styles.btnPrimary}`}
+          onClick={save}
+          disabled={!canSave}
+        >
+          {showSaved ? <><Check size={14} /> Saved</> : 'Save my plan'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Tool: Next 60 minutes ───────────────────────────────────────────── */
+
+function OneThingTool() {
+  const [mustDo, setMustDo] = useState('');
+  const [canWait, setCanWait] = useState('');
+  const [done, setDone] = useState(false);
+
+  if (done) {
+    return (
+      <div className={styles.oneThingResult}>
+        {mustDo.trim() && (
+          <div className={`${styles.oneThingCard} ${styles.oneThingCardActive}`}>
+            <span className={styles.oneThingLabel}>Has to happen</span>
+            <p className={styles.oneThingText}>{mustDo}</p>
+          </div>
+        )}
+        {canWait.trim() && (
+          <div className={`${styles.oneThingCard} ${styles.oneThingCardWait}`}>
+            <span className={styles.oneThingLabel}>Can wait until tomorrow</span>
+            <p className={styles.oneThingText}>{canWait}</p>
+          </div>
+        )}
+        <p className={styles.toolHint} style={{ marginTop: 16 }}>
+          The &ldquo;can wait&rdquo; list is still there tomorrow. You don&apos;t have to carry it tonight.
+        </p>
+        <div className={styles.toolControls}>
+          <button
+            className={`${styles.btn} ${styles.btnSecondary}`}
+            onClick={() => { setMustDo(''); setCanWait(''); setDone(false); }}
+          >
+            <RotateCcw size={14} /> Start over
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.oneThingBox}>
+      <p className={styles.toolHint} style={{ textAlign: 'left', marginBottom: 18 }}>
+        For the next hour only. Pick one thing that genuinely has to happen — and one thing that doesn&apos;t.
+      </p>
+
+      <div className={styles.hardDayField}>
+        <label className={styles.hardDayLabel}>The one thing that has to happen</label>
+        <textarea
+          className={styles.reclaimInput}
+          placeholder="Just the next 60 minutes. What's the one thing?"
+          value={mustDo}
+          onChange={(e) => setMustDo(e.target.value)}
+          rows={2}
+        />
+      </div>
+
+      <div className={styles.hardDayField}>
+        <label className={styles.hardDayLabel}>What can wait until tomorrow</label>
+        <textarea
+          className={styles.reclaimInput}
+          placeholder="Everything else. Park it here. Tomorrow-you can pick it up."
+          value={canWait}
+          onChange={(e) => setCanWait(e.target.value)}
+          rows={2}
+        />
+      </div>
+
+      <div className={styles.toolControls}>
+        <button
+          className={`${styles.btn} ${styles.btnPrimary}`}
+          onClick={() => setDone(true)}
+          disabled={!mustDo.trim()}
+        >
+          Show me my hour
+        </button>
+      </div>
     </div>
   );
 }
