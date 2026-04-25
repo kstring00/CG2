@@ -139,7 +139,6 @@ export default function MentalHealthCommandCenter() {
 
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   // true only if cg-onboarded was already '1' at page load — not set during this session
   const [wasOnboarded, setWasOnboarded] = useState(false);
@@ -191,24 +190,6 @@ export default function MentalHealthCommandCenter() {
 
   function handleCheckinComplete() {
     setActiveTab('dashboard');
-  }
-
-  function showToast(msg: string) {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2400);
-  }
-
-  const TOOL_MESSAGES: Record<string, string> = {
-    breathing: '3-minute breath reset starting…',
-    grounding: '5-4-3-2-1 grounding starting…',
-    journal: 'One-line journal opening…',
-    ask: 'Drafting a text to someone you trust…',
-    hardday: 'Opening your hard-day plan…',
-    counselor: 'Browsing caregiver-specialized providers…',
-  };
-
-  function openTool(name: string) {
-    showToast(TOOL_MESSAGES[name] ?? 'Opening…');
   }
 
   return (
@@ -282,7 +263,6 @@ export default function MentalHealthCommandCenter() {
           onRangeChange={(r) => dispatch({ type: 'SET_RANGE', range: r })}
           onMetricChange={(m) => dispatch({ type: 'SET_METRIC', metric: m })}
           onNavigate={(tab) => setActiveTab(tab as TabKey)}
-          onOpenTool={openTool}
         />
       )}
 
@@ -308,12 +288,9 @@ export default function MentalHealthCommandCenter() {
 
       {ready && activeTab === 'recs' && <RecommendationsTab recs={recs} />}
 
-      {ready && activeTab === 'support' && <SupportTab onOpenTool={openTool} />}
+      {ready && activeTab === 'support' && <SupportTab />}
 
       {ready && activeTab === 'urgent' && <UrgentTab />}
-
-      {/* Toast */}
-      {toast && <div className={styles.toast}>{toast}</div>}
     </div>
   );
 }

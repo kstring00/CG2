@@ -4,13 +4,28 @@ import { useEffect, useRef, useState } from 'react';
 
 type Phase = 'idle' | 'in' | 'hold' | 'out' | 'done';
 
-const PHASES: { phase: Phase; label: string; sub: string; duration: number }[] = [
-  { phase: 'in',   label: 'Breathe in',  sub: 'slowly through your nose', duration: 4000 },
-  { phase: 'hold', label: 'Hold',        sub: 'stay still, you\'re safe',  duration: 7000 },
-  { phase: 'out',  label: 'Breathe out', sub: 'slowly through your mouth', duration: 8000 },
+interface PhaseConfig {
+  phase: Phase;
+  label: string;
+  sub: string;
+  duration: number;
+}
+
+// 4-7-8: original technique (default, backward-compatible)
+const PHASES_478: PhaseConfig[] = [
+  { phase: 'in',   label: 'Breathe in',  sub: 'slowly through your nose',   duration: 4000 },
+  { phase: 'hold', label: 'Hold',        sub: "stay still, you're safe",     duration: 7000 },
+  { phase: 'out',  label: 'Breathe out', sub: 'slowly through your mouth',   duration: 8000 },
 ];
 
-const ROUNDS = 3;
+// Box breathing: inhale 4 · hold 4 · exhale 4 · hold 4
+// Both hold phases reuse phase='hold' — visually identical, different sub-label.
+const PHASES_BOX: PhaseConfig[] = [
+  { phase: 'in',   label: 'Breathe in',  sub: 'slowly through your nose',     duration: 4000 },
+  { phase: 'hold', label: 'Hold',        sub: "stay still, you're safe",       duration: 4000 },
+  { phase: 'out',  label: 'Breathe out', sub: 'slowly through your mouth',     duration: 4000 },
+  { phase: 'hold', label: 'Hold',        sub: 'rest before the next breath',   duration: 4000 },
+];
 
 const phaseClass: Record<Phase, string> = {
   idle:  '',
@@ -20,10 +35,19 @@ const phaseClass: Record<Phase, string> = {
   done:  '',
 };
 
-export default function BreathingOrb() {
-  const [phase, setPhase]   = useState<Phase>('idle');
-  const [round, setRound]   = useState(0);
-  const [count, setCount]   = useState(0);
+interface Props {
+  /** Breathing technique. Defaults to '478' for backward compatibility. */
+  technique?: 'box' | '478';
+}
+
+export default function BreathingOrb({ technique = '478' }: Props) {
+  const PHASES = technique === 'box' ? PHASES_BOX : PHASES_478;
+  // Box: 4 rounds × 16s ≈ 1 min. 478: 3 rounds × 19s ≈ 1 min.
+  const ROUNDS = technique === 'box' ? 4 : 3;
+
+  const [phase, setPhase]       = useState<Phase>('idle');
+  const [round, setRound]       = useState(0);
+  const [count, setCount]       = useState(0);
   const [phaseIdx, setPhaseIdx] = useState(0);
   const timerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countRef  = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -39,13 +63,12 @@ export default function BreathingOrb() {
     setPhaseIdx(pIdx);
     setCount(Math.round(p.duration / 1000));
 
-    // countdown
     if (countRef.current) clearInterval(countRef.current);
     let c = Math.round(p.duration / 1000);
     countRef.current = setInterval(() => {
       c -= 1;
       setCount(c);
-      if (c <= 0) { clearInterval(countRef.current!); }
+      if (c <= 0) clearInterval(countRef.current!);
     }, 1000);
 
     timerRef.current = setTimeout(() => {
@@ -82,22 +105,19 @@ export default function BreathingOrb() {
 
   useEffect(() => () => clear(), []);
 
-  const isActive = phase !== 'idle' && phase !== 'done';
-  const currentPhase = PHASES[phaseIdx];
-
-  const orbSize = phase === 'in' || phase === 'hold' ? 'scale-100 opacity-100' : 'scale-[0.72] opacity-50';
+  const isActive       = phase !== 'idle' && phase !== 'done';
+  const currentPhase   = PHASES[phaseIdx];
+  const totalSecs      = PHASES.reduce((a, p) => a + p.duration, 0) * ROUNDS;
+  const techniqueLabel = technique === 'box' ? 'Box breathing · 4-4-4-4' : '4-7-8 breathing';
 
   return (
     <div className="flex flex-col items-center gap-6 py-6">
 
       {/* Orb */}
       <div className="relative flex items-center justify-center">
-        {/* Outer glow ring */}
         {isActive && (
           <span className="absolute inset-0 rounded-full orb-active" style={{ borderRadius: '50%' }} />
         )}
-
-        {/* Main orb */}
         <div
           key={`${phase}-${round}`}
           className={`relative flex h-44 w-44 items-center justify-center rounded-full transition-all ${phaseClass[phase]}`}
@@ -110,7 +130,6 @@ export default function BreathingOrb() {
             boxShadow: isActive ? '0 0 40px 8px rgba(112,48,104,0.25)' : 'none',
           }}
         >
-          {/* Inner text */}
           <div className="text-center px-3">
             {phase === 'idle' && (
               <p className="text-sm font-semibold text-brand-plum-700 leading-tight">Press start<br/>to begin</p>
@@ -139,7 +158,9 @@ export default function BreathingOrb() {
           </>
         )}
         {phase === 'idle' && (
-          <p className="text-sm text-brand-muted-500">4-7-8 breathing · {ROUNDS} rounds · ~{Math.round((PHASES.reduce((a,p) => a + p.duration, 0) * ROUNDS) / 60000)} min</p>
+          <p className="text-sm text-brand-muted-500">
+            {techniqueLabel} · {ROUNDS} rounds · ~{Math.round(totalSecs / 60000)} min
+          </p>
         )}
         {phase === 'done' && (
           <p className="text-sm text-emerald-600 font-medium">You made it through all {ROUNDS} rounds.</p>

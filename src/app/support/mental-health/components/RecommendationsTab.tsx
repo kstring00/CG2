@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import type { Rec } from './RecommendationsEngine';
 import styles from '../mental-health.module.css';
 
@@ -41,6 +42,7 @@ const STATIC_RECS: Rec[] = [
     title: 'Protect one 15-minute window',
     body: 'A short, predictable break each day raises your floor more than any single big self-care moment. Same time, same place if possible.',
     action: 'How others schedule this →',
+    href: '/support/mental-health/resources/daily-break',
   },
   {
     icon: 'support',
@@ -48,6 +50,7 @@ const STATIC_RECS: Rec[] = [
     title: "Build a \"two-text\" support list",
     body: "When support drops, you don't need a whole village — just two people you can reach without explaining the backstory. Add them once and we'll surface them on hard days.",
     action: 'Set this up →',
+    href: '/support/mental-health/tools/support-list',
   },
   {
     icon: 'calm',
@@ -55,6 +58,7 @@ const STATIC_RECS: Rec[] = [
     title: "A \"hard-day plan\" you wrote on a good day",
     body: 'When the bandwidth drops, decisions feel heavier. A 5-line plan from your better self — what to skip, what to lean on — does the deciding for you.',
     action: 'Draft mine →',
+    href: '/support/mental-health/tools/hard-day-plan',
   },
 ];
 
@@ -92,7 +96,9 @@ export function RecommendationsTab({ recs }: Props) {
               </div>
               <div className={styles.recTitle}>{r.title}</div>
               <div className={styles.recBody}>{r.body}</div>
-              <button className={styles.recAction}>{r.action}</button>
+              {r.href
+                ? <Link href={r.href} className={styles.recAction}>{r.action}</Link>
+                : <button className={styles.recAction}>{r.action}</button>}
             </div>
           ))}
         </div>
@@ -113,7 +119,9 @@ export function RecommendationsTab({ recs }: Props) {
               </div>
               <div className={styles.recTitle}>{r.title}</div>
               <div className={styles.recBody}>{r.body}</div>
-              <button className={styles.recAction}>{r.action}</button>
+              {r.href
+                ? <Link href={r.href} className={styles.recAction}>{r.action}</Link>
+                : <button className={styles.recAction}>{r.action}</button>}
             </div>
           ))}
         </div>
