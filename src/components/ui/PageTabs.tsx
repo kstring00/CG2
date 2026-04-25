@@ -1,7 +1,7 @@
 'use client';
 
-import { Children, KeyboardEvent, ReactNode, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Children, KeyboardEvent, ReactNode, Suspense, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export interface TabDef {
   key: string;
@@ -21,32 +21,27 @@ interface Props {
   children: ReactNode | ReactNode[];
 }
 
-export function PageTabs({ tabs, children }: Props) {
+// Inner component reads useSearchParams.
+// Next.js 15 requires a Suspense boundary around any component that calls
+// useSearchParams in a statically-generated page. The boundary is satisfied
+// here; useSearchParams does not actually suspend during SSR — it returns
+// empty params at build time, so the static HTML always shows tab[0].
+// Tab selection from the URL happens reactively after client hydration.
+function PageTabsImpl({ tabs, children }: Props) {
+  const searchParams = useSearchParams();
   const router = useRouter();
   const panels = Children.toArray(children);
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  // Stable ref so the popstate listener never needs to be re-registered
-  const tabsRef = useRef(tabs);
 
-  // Default to first tab — safe to render on the server / during hydration
-  const [activeKey, setActiveKey] = useState<string>(tabs[0].key);
-
-  // Sync from URL on mount and on browser back/forward
-  useEffect(() => {
-    function sync() {
-      const t = new URLSearchParams(window.location.search).get('tab');
-      setActiveKey(tabsRef.current.find(({ key }) => key === t)?.key ?? tabsRef.current[0].key);
-    }
-    sync();
-    window.addEventListener('popstate', sync);
-    return () => window.removeEventListener('popstate', sync);
-  }, []);
+  // Derive active tab from URL — no useState needed, searchParams is reactive.
+  // Falls back to the first tab for missing or unrecognised values.
+  const rawTab = searchParams.get('tab');
+  const activeKey = tabs.find(({ key }) => key === rawTab)?.key ?? tabs[0].key;
 
   function activate(key: string) {
-    setActiveKey(key);
-    const url = new URL(window.location.href);
-    url.searchParams.set('tab', key);
-    router.replace(url.pathname + url.search, { scroll: false });
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', key);
+    router.replace(`?${params.toString()}`, { scroll: false });
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>, idx: number) {
@@ -74,8 +69,7 @@ export function PageTabs({ tabs, children }: Props) {
 
   return (
     <div>
-      {/* ── Tab bar ─────────────────────────────────────────────────────���─ */}
-      {/* overflow-x-auto + scrollbar hiding = horizontal scroll on mobile  */}
+      {/* ── Tab bar ──────────────────────────────────────────────────────── */}
       <div
         role="tablist"
         aria-label="Page sections"
@@ -111,7 +105,7 @@ export function PageTabs({ tabs, children }: Props) {
         })}
       </div>
 
-      {/* ── Tab panels ──────────────────────────────────────────────────── */}
+      {/* ── Tab panels ───────────────────────────────────────────────────── */}
       {tabs.map((tab, idx) => {
         const isActive = tab.key === activeKey;
         const panel = panels[idx];
@@ -132,7 +126,7 @@ export function PageTabs({ tabs, children }: Props) {
         }
 
         // Text/accordion tabs: always in DOM, toggled with the HTML `hidden` attribute.
-        // This preserves expanded-accordion state when the user switches away and returns.
+        // This preserves expanded-accordion and checkbox state across tab switches.
         return (
           <div
             key={tab.key}
@@ -147,5 +141,13 @@ export function PageTabs({ tabs, children }: Props) {
         );
       })}
     </div>
+  );
+}
+
+export function PageTabs(props: Props) {
+  return (
+    <Suspense>
+      <PageTabsImpl {...props} />
+    </Suspense>
   );
 }
