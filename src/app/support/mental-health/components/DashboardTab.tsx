@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { Inputs, HistoryDay, Driver } from './RiskEngine';
-import { riskState, wellnessFromRisk, computeRiskScore } from './RiskEngine';
+import { riskState } from './RiskEngine';
 import type { Rec, Insight } from './RecommendationsEngine';
 import { SliderPanel } from './SliderPanel';
 import { TrendChart } from './TrendChart';
@@ -35,12 +35,15 @@ function useAnimatedNumber(target: number): number {
   return value;
 }
 
-function getDayGreeting(): string {
+function getDayGreeting(streak: number): string {
   const now = new Date();
   const day = now.toLocaleDateString('en-US', { weekday: 'long' });
   const hour = now.getHours();
   const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-  return `${day} ${timeOfDay} · You've checked in 5 of the last 7 days`;
+  if (streak > 0) {
+    return `${day} ${timeOfDay} · ${streak}-day check-in streak`;
+  }
+  return `${day} ${timeOfDay} · Pull a slider or take a 1-minute check-in`;
 }
 
 const ICON_SVGS: Record<string, React.ReactNode> = {
@@ -77,6 +80,7 @@ const REC_ICON_CLASS: Record<string, string> = {
 interface Props {
   userName: string;
   isReturning: boolean;
+  streak: number;
   inputs: Inputs;
   history: HistoryDay[];
   risk: number;
@@ -87,7 +91,6 @@ interface Props {
   insights: Insight[];
   range: number;
   metric: string;
-  darkMode: boolean;
   onInputChange: (key: keyof Inputs, value: number) => void;
   onRangeChange: (r: number) => void;
   onMetricChange: (m: string) => void;
@@ -97,6 +100,7 @@ interface Props {
 export function DashboardTab({
   userName,
   isReturning,
+  streak,
   inputs,
   history,
   risk,
@@ -107,7 +111,6 @@ export function DashboardTab({
   insights,
   range,
   metric,
-  darkMode,
   onInputChange,
   onRangeChange,
   onMetricChange,
@@ -130,7 +133,7 @@ export function DashboardTab({
 
   const METRICS = ['overall', 'stress', 'sleep', 'anxiety', 'support', 'energy'];
   const METRIC_LABELS: Record<string, string> = {
-    overall: 'Overall wellness',
+    overall: 'Overall',
     stress: 'Stress',
     sleep: 'Sleep',
     anxiety: 'Anxiety',
@@ -147,10 +150,10 @@ export function DashboardTab({
               ? <>{isReturning ? 'Welcome back, ' : 'Welcome, '}<em>{userName}</em>.</>
               : (isReturning ? 'Welcome back.' : 'Welcome.')}
           </h1>
-          <p>{getDayGreeting()}</p>
+          <p>{getDayGreeting(streak)}</p>
         </div>
         <div className={styles.headerActions}>
-          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => onNavigate('support')}>
+          <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => onNavigate('calming')}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
             </svg>
@@ -162,15 +165,15 @@ export function DashboardTab({
         </div>
       </header>
 
-      {/* Hero grid */}
-      <div className={styles.heroGrid}>
-        <div className={styles.heroCard}>
+      {/* Compact hero — score + sliders side by side, chart moved below the fold */}
+      <div className={styles.dashGrid}>
+        <div className={styles.heroCardCompact}>
           <div className={styles.heroLabel}>
             <span className={styles.liveDot} />
             Caregiver wellness · Live
           </div>
           <div className={styles.heroScoreRow}>
-            <div className={styles.heroScore} style={{ color: heroScoreColor }}>
+            <div className={styles.heroScoreCompact} style={{ color: heroScoreColor }}>
               {animatedWellness}
             </div>
             <div className={styles.heroScoreSuffix}>/ 100</div>
@@ -198,84 +201,23 @@ export function DashboardTab({
           </div>
         </div>
 
-        <div className={styles.changedCard}>
-          <div className={styles.changedLabel}>What changed today</div>
-          <div className={styles.changedHeadline}>Your support score is the highest it's been in 9 days.</div>
-          <div className={styles.changedBody}>
-            You marked support at 7/10 this morning — up from 3 last Thursday. That's the single
-            biggest lever for the Watch zone you've been in. Notice what made today feel a little
-            less alone.
-          </div>
-          <div className={styles.changedMeta}>
-            <span className={styles.streakBadge}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/>
-              </svg>
-              5-day check-in streak
-            </span>
-            <span>·</span>
-            <span>Last update 2 minutes ago</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Mid grid: sliders + chart */}
-      <div className={styles.midGrid}>
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <div>
               <div className={styles.cardTitle}>How are you right now?</div>
-              <div className={styles.cardSubtitle}>Slide to update — your score moves with you</div>
+              <div className={styles.cardSubtitle}>Pull a slider — your score moves with you, and saves automatically</div>
             </div>
           </div>
           <SliderPanel inputs={inputs} onChange={onInputChange} />
         </div>
-
-        <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div>
-              <div className={styles.cardTitle}>Wellness over time</div>
-              <div className={styles.cardSubtitle}>Green is steady, gold is watch, soft red is at-risk</div>
-            </div>
-            <div className={styles.rangeTabs}>
-              {[7, 30].map((r) => (
-                <button
-                  key={r}
-                  className={`${styles.rangeTab} ${range === r ? styles.rangeTabActive : ''}`}
-                  onClick={() => onRangeChange(r)}
-                >
-                  {r} days
-                </button>
-              ))}
-            </div>
-          </div>
-          <TrendChart
-            history={history}
-            range={range}
-            metric={metric}
-            darkMode={darkMode}
-            maxTicksLimit={range === 7 ? 7 : 8}
-          />
-          <div className={styles.chartToggles}>
-            {METRICS.map((m) => (
-              <button
-                key={m}
-                className={`${styles.togglePill} ${metric === m ? styles.togglePillActive : ''}`}
-                onClick={() => onMetricChange(m)}
-              >
-                {METRIC_LABELS[m]}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Recommendations */}
+      {/* Recommendations — bumped up so they're the first thing after the hero */}
       <div className={`${styles.card} ${styles.sectionSpacer}`}>
         <div className={styles.cardHeader}>
           <div>
             <div className={styles.cardTitle}>For you, right now</div>
-            <div className={styles.cardSubtitle}>Updates as your inputs change · Based on what's driving your score today</div>
+            <div className={styles.cardSubtitle}>Updates as your inputs change · Based on what&apos;s driving your score today</div>
           </div>
           <span className={styles.heroLabel} style={{ marginBottom: 0 }}>
             <span className={styles.liveDot} />
@@ -299,67 +241,85 @@ export function DashboardTab({
         </div>
       </div>
 
-      {/* Calming tools */}
+      {/* Trend — collapsed to a tighter card; a button reveals the deeper Trends tab */}
       <div className={`${styles.card} ${styles.sectionSpacer}`}>
         <div className={styles.cardHeader}>
           <div>
-            <div className={styles.cardTitle}>Calming tools</div>
-            <div className={styles.cardSubtitle}>Two minutes or less · Use one before the next hard moment</div>
+            <div className={styles.cardTitle}>Wellness over time</div>
+            <div className={styles.cardSubtitle}>Last {range} days · Tap a metric to overlay</div>
+          </div>
+          <div className={styles.cardHeaderRight}>
+            <div className={styles.rangeTabs}>
+              {[7, 30].map((r) => (
+                <button
+                  key={r}
+                  className={`${styles.rangeTab} ${range === r ? styles.rangeTabActive : ''}`}
+                  onClick={() => onRangeChange(r)}
+                >
+                  {r}d
+                </button>
+              ))}
+            </div>
+            <button
+              className={styles.miniLink}
+              onClick={() => onNavigate('trends')}
+            >
+              Open trends →
+            </button>
           </div>
         </div>
-        <div className={styles.quickActionsGrid}>
-          <Link href="/support/mental-health/tools/breath-reset" className={styles.quickAction}>
-            <div className={styles.qaIcon}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
-            </div>
-            <div className={styles.qaTitle}>3-minute breath reset</div>
-            <div className={styles.qaDesc}>Box breathing to drop your shoulders before the evening routine.</div>
-          </Link>
-          <Link href="/support/caregiver?tab=tools" className={styles.quickAction}>
-            <div className={`${styles.qaIcon} ${styles.qaIconBlue}`}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 12h3l3-9 6 18 3-9h3"/></svg>
-            </div>
-            <div className={styles.qaTitle}>5-4-3-2-1 grounding</div>
-            <div className={styles.qaDesc}>Bring yourself back when the day feels too loud.</div>
-          </Link>
-          <Link href="/support/mental-health/tools/one-line-journal" className={styles.quickAction}>
-            <div className={`${styles.qaIcon} ${styles.qaIconGold}`}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </div>
-            <div className={styles.qaTitle}>One-line journal</div>
-            <div className={styles.qaDesc}>A single sentence about today. That's enough.</div>
-          </Link>
-          <Link href="/support/mental-health/tools/ask-for-help" className={styles.quickAction}>
-            <div className={`${styles.qaIcon} ${styles.qaIconBurgundy}`}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-            </div>
-            <div className={styles.qaTitle}>Ask for help</div>
-            <div className={styles.qaDesc}>Pre-written texts for when reaching out feels hard.</div>
-          </Link>
+        <div className={styles.chartCompact}>
+          <TrendChart
+            history={history}
+            range={range}
+            metric={metric}
+            maxTicksLimit={range === 7 ? 7 : 8}
+          />
+        </div>
+        <div className={styles.chartToggles}>
+          {METRICS.map((m) => (
+            <button
+              key={m}
+              className={`${styles.togglePill} ${metric === m ? styles.togglePillActive : ''}`}
+              onClick={() => onMetricChange(m)}
+            >
+              {METRIC_LABELS[m]}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Insights */}
+      {/* Patterns — improved presentation, grouped */}
       <div className={`${styles.card} ${styles.sectionSpacer}`}>
         <div className={styles.cardHeader}>
           <div>
             <div className={styles.cardTitle}>Patterns worth knowing</div>
-            <div className={styles.cardSubtitle}>From your last 30 days · Not a diagnosis — just what we've noticed</div>
+            <div className={styles.cardSubtitle}>From your last 30 days · Not a diagnosis — just what we&apos;ve noticed</div>
           </div>
         </div>
-        <div className={styles.insightList}>
-          {insights.map((ins, i) => (
-            <div
-              key={i}
-              className={`${styles.insight} ${ins.type === 'warning' ? styles.insightWarning : ins.type === 'alert' ? styles.insightAlert : ''}`}
-            >
-              <div className={styles.insightBullet} />
-              <div
-                className={styles.insightText}
-                dangerouslySetInnerHTML={{ __html: ins.text }}
-              />
+        <div className={styles.patternGrid}>
+          {insights.length === 0 && (
+            <div className={styles.patternEmpty}>
+              Patterns appear here after a few days of check-ins. Pull a slider, do a quick check-in, and come back tomorrow.
             </div>
-          ))}
+          )}
+          {insights.map((ins, i) => {
+            const tone = ins.type === 'alert' ? 'alert' : ins.type === 'warning' ? 'warning' : 'good';
+            return (
+              <div
+                key={i}
+                className={`${styles.patternCard} ${styles[`patternCard_${tone}`]}`}
+              >
+                <span className={styles.patternBadge}>
+                  {tone === 'alert' ? 'Heads up' : tone === 'warning' ? 'Watch this' : 'Good to know'}
+                </span>
+                <div
+                  className={styles.patternText}
+                  dangerouslySetInnerHTML={{ __html: ins.text }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

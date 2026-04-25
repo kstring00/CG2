@@ -20,7 +20,7 @@ import styles from '../mental-health.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
-const LIGHT = {
+const PALETTE = {
   ink: '#2A2520',
   inkMuted: '#897E72',
   lineSoft: '#EFE7D6',
@@ -29,17 +29,6 @@ const LIGHT = {
   stableBg: '#E4EBDB',
   watchBg: '#F2E6C2',
   riskBg: '#ECD2CE',
-};
-
-const DARK = {
-  ink: '#F0E9DC',
-  inkMuted: '#94897A',
-  lineSoft: '#2D2620',
-  sage: '#9CB395',
-  paper: '#25201B',
-  stableBg: '#2A372A',
-  watchBg: '#3A3120',
-  riskBg: '#3A2424',
 };
 
 function hexToRgba(hex: string, alpha: number): string {
@@ -53,7 +42,7 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function createZonesPlugin(c: typeof LIGHT): Plugin<'line'> {
+function createZonesPlugin(c: typeof PALETTE): Plugin<'line'> {
   return {
     id: 'zones',
     beforeDraw(chart) {
@@ -128,13 +117,12 @@ interface Props {
   history: HistoryDay[];
   range: number;
   metric: string;
-  darkMode: boolean;
   heightClass?: string;
   maxTicksLimit?: number;
 }
 
-export function TrendChart({ history, range, metric, darkMode, heightClass, maxTicksLimit }: Props) {
-  const c = darkMode ? DARK : LIGHT;
+export function TrendChart({ history, range, metric, heightClass, maxTicksLimit }: Props) {
+  const c = PALETTE;
 
   const zonesPlugin = useMemo(() => createZonesPlugin(c), [c]);
 
