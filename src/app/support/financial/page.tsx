@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import { PageTabs } from '@/components/ui/PageTabs';
 
 /* ─── data ─────────────────────────────────────────────────── */
 
@@ -278,22 +279,25 @@ const preCallChecklist = [
   'Your diagnosis documentation (DSM-5 code: F84.0)',
 ];
 
+/* ─── tabs ──────────────────────────────────────────────────── */
+
+const TABS = [
+  { key: 'insurance',          label: 'Insurance'           },
+  { key: 'financial-assistance', label: 'Financial assistance' },
+  { key: 'income-and-taxes',   label: 'Income & taxes'      },
+];
+
 /* ─── component ────────────────────────────────────────────── */
 
 export default function FinancialPage() {
   const [openInsurance, setOpenInsurance] = useState<number | null>(0);
   const [openAssistance, setOpenAssistance] = useState(false);
   const [openTax, setOpenTax] = useState(false);
-  const [openChecklist, setOpenChecklist] = useState(false);
 
   return (
     <div className="page-shell">
 
-      {/* ══════════════════════════════════════════
-          SECTION 1 — SEEN
-          "Nobody talks about the money."
-      ══════════════════════════════════════════ */}
-
+      {/* Page header — always visible above the tabs */}
       <header className="page-header">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
           <DollarSign className="h-3.5 w-3.5" /> Financial Stress Resources
@@ -308,287 +312,262 @@ export default function FinancialPage() {
         </p>
       </header>
 
-      {/* Cost reality card */}
-      <div className="rounded-3xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 sm:p-8">
-        <div className="flex gap-4">
-          <DollarSign className="mt-1 h-6 w-6 shrink-0 text-amber-500" />
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500 mb-2">The reality</p>
-            <p className="text-2xl font-bold text-brand-muted-900 leading-tight">
-              $40,000 – $60,000 per year
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted-700">
-              That is what ABA therapy costs without insurance coverage — for a child receiving a typical 20–40 hours
-              of therapy per week. Most families do not learn this number before starting. Most families also do not
-              know how much of it they can recover through insurance if they know how to fight for it.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-brand-muted-700">
-              The insurance section below is the most important page in this guide. If your child has a commercial
-              insurance plan in Texas, you very likely have more coverage than you think.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageTabs tabs={TABS}>
 
-      {/* ══════════════════════════════════════════
-          SECTION 2 — GROUNDED
-          Insurance navigation — most prominent section
-      ══════════════════════════════════════════ */}
-
-      <div className="flex items-center gap-3 pt-2">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
-          Insurance navigation
-        </span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
-
-      {/* Insurance accordion — most prominent section */}
-      <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Shield className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-bold text-brand-muted-900">Insurance — where to start</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
-          Insurance is confusing by design. These five sections break down exactly what you need to know —
-          from what Texas law requires, to what to do when you get a denial. Open each one.
-        </p>
-        <div className="space-y-3">
-          {insuranceSections.map((section, i) => {
-            const c = sectionColorMap[section.color];
-            const isOpen = openInsurance === i;
-            return (
-              <div
-                key={section.id}
-                className={`rounded-2xl border-2 transition-all ${isOpen ? `${c.border} ${c.bg}` : 'border-surface-border bg-surface-muted'}`}
-              >
-                <button
-                  className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
-                  onClick={() => setOpenInsurance(isOpen ? null : i)}
-                >
-                  <div className="flex items-center gap-3">
-                    <section.icon className={`h-4 w-4 shrink-0 ${isOpen ? c.icon : 'text-brand-muted-400'}`} />
-                    <div>
-                      <span className="text-sm font-semibold text-brand-muted-900">{section.title}</span>
-                      <span className="ml-2 text-xs text-brand-muted-500">{section.subtitle}</span>
-                    </div>
-                  </div>
-                  {isOpen
-                    ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                    : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-                </button>
-                {isOpen && (
-                  <div className="px-5 pb-6">
-                    {section.content}
-                  </div>
-                )}
+        {/* ── Tab 1: Insurance ─────────────────────────────────────────── */}
+        <>
+          {/* Cost reality card */}
+          <div className="rounded-3xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 sm:p-8">
+            <div className="flex gap-4">
+              <DollarSign className="mt-1 h-6 w-6 shrink-0 text-amber-500" />
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500 mb-2">The reality</p>
+                <p className="text-2xl font-bold text-brand-muted-900 leading-tight">
+                  $40,000 – $60,000 per year
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-brand-muted-700">
+                  That is what ABA therapy costs without insurance coverage — for a child receiving a typical 20–40 hours
+                  of therapy per week. Most families do not learn this number before starting. Most families also do not
+                  know how much of it they can recover through insurance if they know how to fight for it.
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-brand-muted-700">
+                  The insurance section below is the most important page in this guide. If your child has a commercial
+                  insurance plan in Texas, you very likely have more coverage than you think.
+                </p>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          </div>
 
-        {/* Ask your care coordinator CTA */}
-        <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5">
-          <div className="flex gap-3">
-            <Phone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-bold text-brand-muted-900">Ask your Texas ABA Centers care coordinator</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">
-                Our care coordinators have navigated hundreds of insurance situations. They can help you read
-                your EOB, draft appeal letters, arrange peer-to-peer reviews, and connect you with benefits
-                counselors. You do not have to do this alone — that is specifically part of what they are here for.
-              </p>
+          {/* Insurance accordion */}
+          <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold text-brand-muted-900">Insurance — where to start</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
+              Insurance is confusing by design. These five sections break down exactly what you need to know —
+              from what Texas law requires, to what to do when you get a denial. Open each one.
+            </p>
+            <div className="space-y-3">
+              {insuranceSections.map((section, i) => {
+                const c = sectionColorMap[section.color];
+                const isOpen = openInsurance === i;
+                return (
+                  <div
+                    key={section.id}
+                    className={`rounded-2xl border-2 transition-all ${isOpen ? `${c.border} ${c.bg}` : 'border-surface-border bg-surface-muted'}`}
+                  >
+                    <button
+                      className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                      onClick={() => setOpenInsurance(isOpen ? null : i)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <section.icon className={`h-4 w-4 shrink-0 ${isOpen ? c.icon : 'text-brand-muted-400'}`} />
+                        <div>
+                          <span className="text-sm font-semibold text-brand-muted-900">{section.title}</span>
+                          <span className="ml-2 text-xs text-brand-muted-500">{section.subtitle}</span>
+                        </div>
+                      </div>
+                      {isOpen
+                        ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                        : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                    </button>
+                    {isOpen && (
+                      <div className="px-5 pb-6">
+                        {section.content}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Care coordinator CTA */}
+            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex gap-3">
+                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+                <div>
+                  <p className="text-sm font-bold text-brand-muted-900">Ask your Texas ABA Centers care coordinator</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">
+                    Our care coordinators have navigated hundreds of insurance situations. They can help you read
+                    your EOB, draft appeal letters, arrange peer-to-peer reviews, and connect you with benefits
+                    counselors. You do not have to do this alone — that is specifically part of what they are here for.
+                  </p>
+                  <Link
+                    href="/support/connect"
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                  >
+                    Contact your care coordinator <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Pre-call checklist — always expanded (accordion removed per plan) */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">
+                Before your next insurance call — have these ready
+              </h2>
+            </div>
+            <p className="text-sm text-brand-muted-500 mb-4">
+              Insurance calls go much better when you walk in prepared. This is everything you need.
+            </p>
+            <ul className="space-y-2">
+              {preCallChecklist.map((item, i) => (
+                <li key={i} className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-muted px-4 py-2.5">
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                  <span className="text-sm text-brand-muted-700">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </>
+
+        {/* ── Tab 2: Financial assistance ──────────────────────────────── */}
+        <>
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <button
+              className="flex w-full items-center justify-between gap-3 text-left"
+              onClick={() => setOpenAssistance(!openAssistance)}
+            >
+              <div className="flex items-center gap-2">
+                <Shield className="h-5 w-5 text-brand-plum-600" />
+                <h2 className="text-lg font-semibold text-brand-muted-900">Texas financial assistance programs</h2>
+              </div>
+              {openAssistance
+                ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+            </button>
+            <p className="mt-1 text-sm text-brand-muted-500">Waiver programs, emergency funds, and grants available to Texas families</p>
+            {openAssistance && (
+              <div className="mt-5 space-y-3">
+                {assistancePrograms.map((program, i) => (
+                  <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
+                    <div className="mb-2">
+                      <span className="rounded-lg border border-brand-plum-200 bg-brand-plum-50 px-2.5 py-0.5 text-xs font-semibold text-brand-plum-700">
+                        {program.tag}
+                      </span>
+                    </div>
+                    <h3 className="text-sm font-semibold text-brand-muted-900">{program.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{program.body}</p>
+                    <a
+                      href={program.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                    >
+                      Learn more <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                ))}
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-xs font-bold text-amber-800 mb-1">Important: apply for waivers now</p>
+                  <p className="text-sm text-amber-700 leading-relaxed">
+                    Texas Medicaid waiver programs (HCS, CLASS, MDCP) have waiting lists that can span years.
+                    Apply as soon as your child is diagnosed — even if you don&apos;t think you need it yet. Your
+                    position on the wait list is determined by application date, not current need.
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
+        </>
+
+        {/* ── Tab 3: Income & taxes ─────────────────────────────────────── */}
+        <>
+          {/* Lost income & FMLA */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <FileText className="h-5 w-5 text-sky-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">Lost income &amp; FMLA rights</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              Many parents of children in ABA therapy have to reduce their work hours — and many do not know
+              their legal protections when doing so.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { title: 'FMLA protects your job', body: 'If your employer has 50+ employees and you have worked there for 12+ months, the Family and Medical Leave Act allows up to 12 weeks of unpaid, job-protected leave per year to care for a child with a serious health condition. Autism + ABA therapy qualifies.' },
+                { title: 'Intermittent FMLA', body: 'You can use FMLA leave in small increments — hours or days — not just weeks at a time. This is critical for parents who need to attend therapy sessions or manage crisis situations without using all their PTO.' },
+                { title: 'How to document medical necessity', body: 'Your BCBA or physician completes an FMLA certification form (Form WH-380-F). This form documents that your child\'s condition requires your care and that ABA therapy is an ongoing medical treatment.' },
+                { title: 'ADA workplace accommodations', body: 'Even if you don\'t qualify for FMLA, the ADA may require your employer to provide reasonable accommodations — like flexible scheduling or remote work — to support a caregiver. Document your request in writing.' },
+              ].map((item, i) => (
+                <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
+                  <p className="text-sm font-semibold text-brand-muted-900">{item.title}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Tax deductions accordion */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <button
+              className="flex w-full items-center justify-between gap-3 text-left"
+              onClick={() => setOpenTax(!openTax)}
+            >
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-emerald-600" />
+                <h2 className="text-lg font-semibold text-brand-muted-900">Tax deductions for special needs families</h2>
+              </div>
+              {openTax
+                ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+            </button>
+            <p className="mt-1 text-sm text-brand-muted-500">
+              These deductions exist. Most families never take them because they don&apos;t know about them.
+            </p>
+            {openTax && (
+              <div className="mt-5 space-y-3">
+                {taxDeductions.map((row, i) => (
+                  <div key={i} className="rounded-xl border border-surface-border bg-surface-muted p-4">
+                    <p className="text-sm font-semibold text-brand-muted-900">{row.item}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{row.detail}</p>
+                  </div>
+                ))}
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                  <p className="text-xs font-bold text-emerald-800 mb-1">Use a tax professional</p>
+                  <p className="text-sm text-emerald-700 leading-relaxed">
+                    Special needs family tax situations are complex. A CPA or enrolled agent who understands disability-related deductions can often save families thousands of dollars. Ask your care coordinator if they know local resources.
+                  </p>
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* Closing */}
+          <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-emerald-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
+              <Shield className="h-6 w-6 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold text-brand-muted-900">
+              You are allowed to fight for coverage. That is what it is there for.
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
+              Insurance companies count on families not knowing their rights or not having the energy to appeal.
+              You now have both. Your care coordinator is here to help you use them.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               <Link
                 href="/support/connect"
-                className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
               >
-                Contact your care coordinator <ArrowRight className="h-3.5 w-3.5" />
+                Talk to your care coordinator <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/support/couples"
+                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
+              >
+                Couples &amp; relationship support
               </Link>
             </div>
           </div>
-        </div>
-      </section>
+        </>
 
-      {/* ══════════════════════════════════════════
-          Pre-call checklist — practical tool
-      ══════════════════════════════════════════ */}
-
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <button
-          className="flex w-full items-center justify-between gap-3 text-left"
-          onClick={() => setOpenChecklist(!openChecklist)}
-        >
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-            <h2 className="text-lg font-semibold text-brand-muted-900">
-              Before your next insurance call — have these ready
-            </h2>
-          </div>
-          {openChecklist
-            ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-            : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-        </button>
-        <p className="mt-1 text-sm text-brand-muted-500">
-          Insurance calls go much better when you walk in prepared. This is everything you need.
-        </p>
-        {openChecklist && (
-          <ul className="mt-4 space-y-2">
-            {preCallChecklist.map((item, i) => (
-              <li key={i} className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-muted px-4 py-2.5">
-                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                <span className="text-sm text-brand-muted-700">{item}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      {/* ══════════════════════════════════════════
-          Financial assistance programs
-      ══════════════════════════════════════════ */}
-
-      <div className="flex items-center gap-3 pt-2">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
-          Financial assistance
-        </span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
-
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <button
-          className="flex w-full items-center justify-between gap-3 text-left"
-          onClick={() => setOpenAssistance(!openAssistance)}
-        >
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-brand-plum-600" />
-            <h2 className="text-lg font-semibold text-brand-muted-900">Texas financial assistance programs</h2>
-          </div>
-          {openAssistance
-            ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-            : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-        </button>
-        <p className="mt-1 text-sm text-brand-muted-500">Waiver programs, emergency funds, and grants available to Texas families</p>
-        {openAssistance && (
-          <div className="mt-5 space-y-3">
-            {assistancePrograms.map((program, i) => (
-              <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                <div className="mb-2">
-                  <span className="rounded-lg border border-brand-plum-200 bg-brand-plum-50 px-2.5 py-0.5 text-xs font-semibold text-brand-plum-700">
-                    {program.tag}
-                  </span>
-                </div>
-                <h3 className="text-sm font-semibold text-brand-muted-900">{program.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{program.body}</p>
-                <a
-                  href={program.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                >
-                  Learn more <ExternalLink className="h-3 w-3" />
-                </a>
-              </div>
-            ))}
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-              <p className="text-xs font-bold text-amber-800 mb-1">Important: apply for waivers now</p>
-              <p className="text-sm text-amber-700 leading-relaxed">
-                Texas Medicaid waiver programs (HCS, CLASS, MDCP) have waiting lists that can span years.
-                Apply as soon as your child is diagnosed — even if you don&apos;t think you need it yet. Your
-                position on the wait list is determined by application date, not current need.
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Lost income / FMLA */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <FileText className="h-5 w-5 text-sky-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Lost income &amp; FMLA rights</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          Many parents of children in ABA therapy have to reduce their work hours — and many do not know
-          their legal protections when doing so.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            { title: 'FMLA protects your job', body: 'If your employer has 50+ employees and you have worked there for 12+ months, the Family and Medical Leave Act allows up to 12 weeks of unpaid, job-protected leave per year to care for a child with a serious health condition. Autism + ABA therapy qualifies.' },
-            { title: 'Intermittent FMLA', body: 'You can use FMLA leave in small increments — hours or days — not just weeks at a time. This is critical for parents who need to attend therapy sessions or manage crisis situations without using all their PTO.' },
-            { title: 'How to document medical necessity', body: 'Your BCBA or physician completes an FMLA certification form (Form WH-380-F). This form documents that your child\'s condition requires your care and that ABA therapy is an ongoing medical treatment.' },
-            { title: 'ADA workplace accommodations', body: 'Even if you don\'t qualify for FMLA, the ADA may require your employer to provide reasonable accommodations — like flexible scheduling or remote work — to support a caregiver. Document your request in writing.' },
-          ].map((item, i) => (
-            <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-              <p className="text-sm font-semibold text-brand-muted-900">{item.title}</p>
-              <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">{item.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Tax deductions */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <button
-          className="flex w-full items-center justify-between gap-3 text-left"
-          onClick={() => setOpenTax(!openTax)}
-        >
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-emerald-600" />
-            <h2 className="text-lg font-semibold text-brand-muted-900">Tax deductions for special needs families</h2>
-          </div>
-          {openTax
-            ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-            : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-        </button>
-        <p className="mt-1 text-sm text-brand-muted-500">
-          These deductions exist. Most families never take them because they don&apos;t know about them.
-        </p>
-        {openTax && (
-          <div className="mt-5 space-y-3">
-            {taxDeductions.map((row, i) => (
-              <div key={i} className="rounded-xl border border-surface-border bg-surface-muted p-4">
-                <p className="text-sm font-semibold text-brand-muted-900">{row.item}</p>
-                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{row.detail}</p>
-              </div>
-            ))}
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-xs font-bold text-emerald-800 mb-1">Use a tax professional</p>
-              <p className="text-sm text-emerald-700 leading-relaxed">
-                Special needs family tax situations are complex. A CPA or enrolled agent who understands disability-related deductions can often save families thousands of dollars. Ask your care coordinator if they know local resources.
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Closing */}
-      <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-emerald-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
-          <Shield className="h-6 w-6 text-primary" />
-        </div>
-        <h2 className="text-xl font-bold text-brand-muted-900">
-          You are allowed to fight for coverage. That is what it is there for.
-        </h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
-          Insurance companies count on families not knowing their rights or not having the energy to appeal.
-          You now have both. Your care coordinator is here to help you use them.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/support/connect"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-          >
-            Talk to your care coordinator <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/support/couples"
-            className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
-          >
-            Couples &amp; relationship support
-          </Link>
-        </div>
-      </div>
+      </PageTabs>
 
     </div>
   );
