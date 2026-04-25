@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import BreathingOrb from '@/components/BreathingOrb';
+import { PageTabs } from '@/components/ui/PageTabs';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -185,11 +186,8 @@ const hopePillars = [
     title: 'The hard seasons have a name — and an end.',
     body: 'Caregiver burnout, grief, isolation — these are documented, understood experiences. They are not permanent states. With support, most parents report finding equilibrium, even joy.',
   },
-  {
-    icon: Heart,
-    title: 'You are building something that lasts.',
-    body: 'Every therapy session, every routine you fight for, every hard conversation you navigate — you are laying the foundation for your child\'s independence. That work compounds.',
-  },
+  // NOTE: 4th pillar ("You are building something that lasts.") removed —
+  // duplicate of the closing headline below.
 ];
 
 const colorMap: Record<string, string> = {
@@ -211,6 +209,15 @@ const resourceColorMap: Record<string, string> = {
   sky: 'text-sky-600 bg-sky-50 border-sky-200',
   amber: 'text-amber-600 bg-amber-50 border-amber-200',
 };
+
+/* ─── tabs ──────────────────────────────────────────────────── */
+
+const TABS = [
+  { key: 'right-now',     label: 'Right now',     lazy: true  },
+  { key: 'burnout-check', label: 'Burnout check',  lazy: true  },
+  { key: 'tools',         label: 'Tools'                       },
+  { key: 'get-help',      label: 'Get help'                    },
+];
 
 /* ─── component ────────────────────────────────────────────── */
 
@@ -239,12 +246,7 @@ export default function CaregiverSupportPage() {
   return (
     <div className="page-shell">
 
-      {/* ══════════════════════════════════════════
-          SECTION 1 — SEEN
-          "We know what this is like."
-      ══════════════════════════════════════════ */}
-
-      {/* Hero header */}
+      {/* Page header — always visible above the tabs */}
       <header className="page-header">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1.5 text-xs font-semibold text-brand-plum-700">
           <HeartHandshake className="h-3.5 w-3.5" /> Your mental health
@@ -257,362 +259,357 @@ export default function CaregiverSupportPage() {
         </p>
       </header>
 
-      {/* Affirmation card */}
-      <div className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-6 sm:p-8">
-        <div className="flex gap-4">
-          <Heart className="mt-1 h-6 w-6 shrink-0 text-brand-plum-400" />
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-400 mb-2">For you, right now</p>
-            <p className="text-lg font-medium leading-relaxed text-brand-plum-900 italic">
-              &ldquo;{affirmations[affirmIdx]}&rdquo;
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageTabs tabs={TABS}>
 
-      {/* BREATHING TOOL — moved to top so it’s immediately accessible */}
-      <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Leaf className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Need to breathe right now?</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          Before anything else — if today is hard, start here. 4-7-8 breathing calms your nervous system in under 2 minutes.
-        </p>
-        <BreathingOrb />
-        <p className="mt-4 text-xs text-brand-muted-500 text-center">Inhale 4 counts · Hold 7 · Exhale 8 · Repeat 4 times</p>
-      </section>
-
-      {/* The honest truth block */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <h2 className="text-xl font-bold text-brand-muted-900">What nobody tells you about this journey</h2>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          {[
-            { icon: Moon, text: 'Loving your child deeply and feeling completely depleted by caregiving are not contradictions. Both are true.' },
-            { icon: Wind, text: 'Grief is a normal part of this — grief for the path you expected, and that doesn\'t mean you\'ve given up hope.' },
-            { icon: Brain, text: 'Caregiver burnout is a clinical reality. It is not weakness. It is what happens when you give more than you receive for too long.' },
-            { icon: Shield, text: 'You are allowed to have needs. You are allowed to ask for help. These are not signs you\'re failing — they\'re signs you\'re human.' },
-          ].map(({ icon: Icon, text }, i) => (
-            <div key={i} className="flex gap-3 rounded-2xl border border-surface-border bg-surface-muted p-4">
-              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-brand-plum-500" />
-              <p className="text-sm leading-relaxed text-brand-muted-700">{text}</p>
+        {/* ── Tab 1: Right now ─────────────────────────────────────────── */}
+        <>
+          {/* Affirmation card */}
+          <div className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-6 sm:p-8">
+            <div className="flex gap-4">
+              <Heart className="mt-1 h-6 w-6 shrink-0 text-brand-plum-400" />
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-400 mb-2">For you, right now</p>
+                <p className="text-lg font-medium leading-relaxed text-brand-plum-900 italic">
+                  &ldquo;{affirmations[affirmIdx]}&rdquo;
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      {/* Burnout quiz */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Zap className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Are you running on empty?</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          Check everything that feels true right now. No right or wrong answers.
-        </p>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {burnoutSigns.map((item, i) => {
-            const checked = quizChecked.has(i);
-            return (
-              <li key={item.label}>
-                <button
-                  onClick={() => toggleQuiz(i)}
-                  className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
-                    checked
-                      ? 'border-brand-plum-300 bg-brand-plum-50'
-                      : 'border-surface-border bg-surface-muted hover:border-brand-plum-200'
-                  }`}
-                >
-                  <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all ${
-                    checked ? 'border-brand-plum-500 bg-brand-plum-500' : 'border-brand-muted-300 bg-white'
-                  }`}>
-                    {checked && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
-                  </div>
-                  <item.icon className="h-4 w-4 shrink-0 text-brand-plum-400" />
-                  <span className="text-sm text-brand-muted-700">{item.label}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Quiz result */}
-        {quizCount > 0 && (
-          <div className={`mt-5 rounded-2xl border p-5 ${
-            quizResult?.level === 'high' ? 'border-rose-200 bg-rose-50' :
-            quizResult?.level === 'mid' ? 'border-amber-200 bg-amber-50' :
-            'border-brand-plum-200 bg-brand-plum-50'
-          }`}>
+          {/* Breathing tool */}
+          <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 shadow-card">
             <div className="flex items-center gap-2 mb-2">
-              <span className={`text-xs font-bold uppercase tracking-wide ${
-                quizResult?.level === 'high' ? 'text-rose-600' :
-                quizResult?.level === 'mid' ? 'text-amber-700' :
-                'text-brand-plum-700'
-              }`}>{quizCount} of 8 · {quizResult?.label}</span>
+              <Leaf className="h-5 w-5 text-emerald-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">Need to breathe right now?</h2>
             </div>
-            <p className={`text-sm leading-relaxed ${
-              quizResult?.level === 'high' ? 'text-rose-800' :
-              quizResult?.level === 'mid' ? 'text-amber-800' :
-              'text-brand-plum-800'
-            }`}>{quizResult?.msg}</p>
-            {quizResult?.level === 'high' && (
-              <a href="tel:988" className="mt-3 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">
-                <Phone className="h-3.5 w-3.5" /> Call or text 988
-              </a>
-            )}
-          </div>
-        )}
-      </section>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              Before anything else — if today is hard, start here. 4-7-8 breathing calms your nervous system in under 2 minutes.
+            </p>
+            <BreathingOrb />
+            <p className="mt-4 text-xs text-brand-muted-500 text-center">Inhale 4 counts · Hold 7 · Exhale 8 · Repeat 4 times</p>
+          </section>
 
-      {/* ══════════════════════════════════════════
-          SECTION 2 — GROUNDED
-          "Here's what to do right now."
-      ══════════════════════════════════════════ */}
-
-      <div className="flex items-center gap-3 pt-2">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">Right now</span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
-
-      {/* Quick grounding tools — accordion (breathing already shown above, skip it here) */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Leaf className="h-5 w-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">More tools for hard moments</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          Open one and try it before you keep scrolling.
-        </p>
-        <div className="space-y-3">
-          {quickTools.filter(t => !t.isOrb).map((tool, i) => (
-            <div
-              key={tool.title}
-              className={`rounded-2xl border transition-all ${openTool === i ? colorMap[tool.color] : 'border-surface-border bg-surface-muted'}`}
-            >
-              <button
-                className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
-                onClick={() => setOpenTool(openTool === i ? null : i)}
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tagColorMap[tool.color]}`}>
-                    {tool.tag}
-                  </span>
-                  <span className="text-sm font-semibold text-brand-muted-900">{tool.title}</span>
+          {/* The honest truth block */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <h2 className="text-xl font-bold text-brand-muted-900">What nobody tells you about this journey</h2>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              {[
+                { icon: Moon, text: 'Loving your child deeply and feeling completely depleted by caregiving are not contradictions. Both are true.' },
+                { icon: Wind, text: 'Grief is a normal part of this — grief for the path you expected, and that doesn\'t mean you\'ve given up hope.' },
+                { icon: Brain, text: 'Caregiver burnout is a clinical reality. It is not weakness. It is what happens when you give more than you receive for too long.' },
+                { icon: Shield, text: 'You are allowed to have needs. You are allowed to ask for help. These are not signs you\'re failing — they\'re signs you\'re human.' },
+              ].map(({ icon: Icon, text }, i) => (
+                <div key={i} className="flex gap-3 rounded-2xl border border-surface-border bg-surface-muted p-4">
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-brand-plum-500" />
+                  <p className="text-sm leading-relaxed text-brand-muted-700">{text}</p>
                 </div>
-                {openTool === i
-                  ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                  : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-              </button>
-              {openTool === i && (
-                <div className="px-5 pb-5">
-                  <ol className="space-y-2">
-                    {tool.steps.map((step, j) => (
-                      <li key={j} className="flex gap-3 text-sm text-brand-muted-700">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white border border-surface-border text-[11px] font-bold text-brand-muted-400">
-                          {j + 1}
-                        </span>
-                        <span className="leading-relaxed">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                  {tool.note && (
-                    <p className="mt-4 text-xs leading-relaxed text-brand-muted-500 italic border-t border-surface-border pt-3">
-                      {tool.note}
-                    </p>
+              ))}
+            </div>
+          </section>
+        </>
+
+        {/* ── Tab 2: Burnout check ─────────────────────────────────────── */}
+        <>
+          {/* Framing one-liner — distinguishes chronic from acute check */}
+          <p className="text-sm text-brand-muted-500 italic">
+            This checks how you&apos;ve been doing over the past few weeks — chronic patterns, not just today.
+          </p>
+
+          {/* Burnout quiz */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="h-5 w-5 text-brand-plum-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">Are you running on empty?</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              Check everything that feels true right now. No right or wrong answers.
+            </p>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {burnoutSigns.map((item, i) => {
+                const checked = quizChecked.has(i);
+                return (
+                  <li key={item.label}>
+                    <button
+                      onClick={() => toggleQuiz(i)}
+                      className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
+                        checked
+                          ? 'border-brand-plum-300 bg-brand-plum-50'
+                          : 'border-surface-border bg-surface-muted hover:border-brand-plum-200'
+                      }`}
+                    >
+                      <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-all ${
+                        checked ? 'border-brand-plum-500 bg-brand-plum-500' : 'border-brand-muted-300 bg-white'
+                      }`}>
+                        {checked && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
+                      </div>
+                      <item.icon className="h-4 w-4 shrink-0 text-brand-plum-400" />
+                      <span className="text-sm text-brand-muted-700">{item.label}</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {quizCount > 0 && (
+              <div className={`mt-5 rounded-2xl border p-5 ${
+                quizResult?.level === 'high' ? 'border-rose-200 bg-rose-50' :
+                quizResult?.level === 'mid' ? 'border-amber-200 bg-amber-50' :
+                'border-brand-plum-200 bg-brand-plum-50'
+              }`}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className={`text-xs font-bold uppercase tracking-wide ${
+                    quizResult?.level === 'high' ? 'text-rose-600' :
+                    quizResult?.level === 'mid' ? 'text-amber-700' :
+                    'text-brand-plum-700'
+                  }`}>{quizCount} of 8 · {quizResult?.label}</span>
+                </div>
+                <p className={`text-sm leading-relaxed ${
+                  quizResult?.level === 'high' ? 'text-rose-800' :
+                  quizResult?.level === 'mid' ? 'text-amber-800' :
+                  'text-brand-plum-800'
+                }`}>{quizResult?.msg}</p>
+                {quizResult?.level === 'high' && (
+                  <a href="tel:988" className="mt-3 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">
+                    <Phone className="h-3.5 w-3.5" /> Call or text 988
+                  </a>
+                )}
+              </div>
+            )}
+          </section>
+        </>
+
+        {/* ── Tab 3: Tools ─────────────────────────────────────────────── */}
+        <>
+          {/* Grounding tools accordion */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Leaf className="h-5 w-5 text-emerald-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">More tools for hard moments</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              Open one and try it before you keep scrolling.
+            </p>
+            <div className="space-y-3">
+              {quickTools.filter(t => !t.isOrb).map((tool, i) => (
+                <div
+                  key={tool.title}
+                  className={`rounded-2xl border transition-all ${openTool === i ? colorMap[tool.color] : 'border-surface-border bg-surface-muted'}`}
+                >
+                  <button
+                    className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                    onClick={() => setOpenTool(openTool === i ? null : i)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tagColorMap[tool.color]}`}>
+                        {tool.tag}
+                      </span>
+                      <span className="text-sm font-semibold text-brand-muted-900">{tool.title}</span>
+                    </div>
+                    {openTool === i
+                      ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                      : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                  </button>
+                  {openTool === i && (
+                    <div className="px-5 pb-5">
+                      <ol className="space-y-2">
+                        {tool.steps.map((step, j) => (
+                          <li key={j} className="flex gap-3 text-sm text-brand-muted-700">
+                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white border border-surface-border text-[11px] font-bold text-brand-muted-400">
+                              {j + 1}
+                            </span>
+                            <span className="leading-relaxed">{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                      {tool.note && (
+                        <p className="mt-4 text-xs leading-relaxed text-brand-muted-500 italic border-t border-surface-border pt-3">
+                          {tool.note}
+                        </p>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      {/* ══════════════════════════════════════════
-          SECTION 3 — HOPEFUL
-          "Here's what tomorrow can look like."
-      ══════════════════════════════════════════ */}
-
-      <div className="flex items-center gap-3 pt-2">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">Looking ahead</span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
-
-      {/* Hope pillars */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Sun className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">What the other side of this looks like</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
-          This is hard right now. That is real. And it will not always feel this way. Here is what we know from families who have walked this path.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {hopePillars.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="rounded-2xl border border-surface-border bg-surface-muted p-5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white border border-surface-border">
-                  <Icon className="h-4 w-4 text-brand-plum-500" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-brand-muted-900">{title}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">{body}</p>
-                </div>
-              </div>
+          {/* Hope pillars — first 3 only; 4th ("You are building something that lasts.")
+              removed because it duplicates the closing headline in the Get help tab. */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Sun className="h-5 w-5 text-amber-500" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">What the other side of this looks like</h2>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Therapist referral steps */}
-      <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Calendar className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">How to find a therapist — for you</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
-          You spend every day advocating for your child&apos;s care. This is how you advocate for your own. It does not have to be complicated.
-        </p>
-        <div className="space-y-5">
-          {[
-            {
-              n: '1',
-              title: 'Give yourself permission',
-              desc: 'You are not taking time away from your child by taking care of yourself. You are protecting your ability to show up for them. That distinction matters.',
-            },
-            {
-              n: '2',
-              title: 'Check your coverage',
-              desc: 'Private insurance: call the number on the back of your card and ask about "outpatient behavioral health" — most have $0–$30 copays. On Medicaid or CHIP? Search "behavioral health" on your Texas Medicaid portal (tmhp.com) or ask your care coordinator — they can help you find covered providers directly.',
-            },
-            {
-              n: '3',
-              title: 'Search with intention',
-              desc: 'On Psychology Today, filter by insurance, zip code, and specialty. Search "caregiver stress," "family therapy," or "parents of children with special needs."',
-            },
-            {
-              n: '4',
-              title: 'Ask your care coordinator',
-              desc: 'Texas ABA Centers care coordinators can help connect you to local therapist referrals. You do not have to search alone — that is part of why we are here.',
-            },
-          ].map((step) => (
-            <div key={step.n} className="flex gap-4">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-                {step.n}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-brand-muted-900">{step.title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <a
-          href="https://www.psychologytoday.com/us/therapists"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-        >
-          Find a therapist near you <ArrowUpRight className="h-4 w-4" />
-        </a>
-      </section>
-
-      {/* Deep resource library — accordion by category */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <BookOpen className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Full resource library</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          Vetted resources specifically for caregivers of children with autism — not generic wellness content. Real tools, real communities, real support.
-        </p>
-        <div className="space-y-3">
-          {deepResources.map((cat, i) => (
-            <div key={cat.category} className={`rounded-2xl border transition-all ${openCategory === i ? `border-2 ${resourceColorMap[cat.color].split(' ').slice(1).join(' ')}` : 'border-surface-border bg-surface-muted'}`}>
-              <button
-                className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
-                onClick={() => setOpenCategory(openCategory === i ? null : i)}
-              >
-                <div className="flex items-center gap-3">
-                  <cat.icon className={`h-4 w-4 shrink-0 ${resourceColorMap[cat.color].split(' ')[0]}`} />
-                  <span className="text-sm font-semibold text-brand-muted-900">{cat.category}</span>
-                  <span className="rounded-full bg-surface-border px-2 py-0.5 text-[10px] font-semibold text-brand-muted-500">{cat.items.length}</span>
-                </div>
-                {openCategory === i
-                  ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                  : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                }
-              </button>
-              {openCategory === i && (
-                <div className="px-5 pb-5 space-y-3">
-                  {cat.items.map((item) => (
-                    <div key={item.title} className="rounded-xl border border-surface-border bg-white p-4">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted-400">{item.source}</p>
-                      <h3 className="mt-1 text-sm font-semibold text-brand-muted-900">{item.title}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{item.description}</p>
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                      >
-                        Visit resource <ArrowUpRight className="h-3 w-3" />
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════
-          CLOSING — hope + quiet crisis line
-      ══════════════════════════════════════════ */}
-
-      {/* Closing affirmation */}
-      <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-brand-plum-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
-          <Heart className="h-6 w-6 text-accent" />
-        </div>
-        <h2 className="text-xl font-bold text-brand-muted-900">
-          You are building something that lasts.
-        </h2>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
-          Every hard day you push through, every session you show up for, every moment you choose to keep going — it compounds. Your child&apos;s story is not written yet. Neither is yours.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/support/next-steps"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-          >
-            Get guided next steps <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/support/connect"
-            className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
-          >
-            <Users className="h-4 w-4" /> Connect with other families
-          </Link>
-        </div>
-      </div>
-
-      {/* Quiet crisis line — present but not alarming */}
-      <div className="rounded-2xl border border-surface-border bg-surface-muted px-5 py-4">
-        <div className="flex items-start gap-3">
-          <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-muted-400" />
-          <div>
-            <p className="text-xs font-semibold text-brand-muted-500 uppercase tracking-wide mb-1">If you need immediate support</p>
-            <p className="text-sm text-brand-muted-600 leading-relaxed">
-              <a href="tel:988" className="font-semibold text-brand-muted-800 hover:underline">988</a> Suicide &amp; Crisis Lifeline — call or text, 24/7 &nbsp;·&nbsp;
-              Crisis Text Line: text <span className="font-semibold text-brand-muted-800">HOME</span> to <span className="font-semibold text-brand-muted-800">741741</span> &nbsp;·&nbsp;
-              <a href="tel:18009506264" className="font-semibold text-brand-muted-800 hover:underline">1-800-950-NAMI</a> (Mon–Fri 10am–10pm)
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
+              This is hard right now. That is real. And it will not always feel this way. Here is what we know from families who have walked this path.
             </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {hopePillars.map(({ icon: Icon, title, body }) => (
+                <div key={title} className="rounded-2xl border border-surface-border bg-surface-muted p-5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white border border-surface-border">
+                      <Icon className="h-4 w-4 text-brand-plum-500" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-brand-muted-900">{title}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">{body}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
+
+        {/* ── Tab 4: Get help ──────────────────────────────────────────── */}
+        <>
+          {/* Therapist finder steps */}
+          <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">How to find a therapist — for you</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
+              You spend every day advocating for your child&apos;s care. This is how you advocate for your own. It does not have to be complicated.
+            </p>
+            <div className="space-y-5">
+              {[
+                {
+                  n: '1',
+                  title: 'Give yourself permission',
+                  desc: 'You are not taking time away from your child by taking care of yourself. You are protecting your ability to show up for them. That distinction matters.',
+                },
+                {
+                  n: '2',
+                  title: 'Check your coverage',
+                  desc: 'Private insurance: call the number on the back of your card and ask about "outpatient behavioral health" — most have $0–$30 copays. On Medicaid or CHIP? Search "behavioral health" on your Texas Medicaid portal (tmhp.com) or ask your care coordinator — they can help you find covered providers directly.',
+                },
+                {
+                  n: '3',
+                  title: 'Search with intention',
+                  desc: 'On Psychology Today, filter by insurance, zip code, and specialty. Search "caregiver stress," "family therapy," or "parents of children with special needs."',
+                },
+                {
+                  n: '4',
+                  title: 'Ask your care coordinator',
+                  desc: 'Texas ABA Centers care coordinators can help connect you to local therapist referrals. You do not have to search alone — that is part of why we are here.',
+                },
+              ].map((step) => (
+                <div key={step.n} className="flex gap-4">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                    {step.n}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-brand-muted-900">{step.title}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <a
+              href="https://www.psychologytoday.com/us/therapists"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+            >
+              Find a therapist near you <ArrowUpRight className="h-4 w-4" />
+            </a>
+          </section>
+
+          {/* Resource library */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">Full resource library</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              Vetted resources specifically for caregivers of children with autism — not generic wellness content. Real tools, real communities, real support.
+            </p>
+            <div className="space-y-3">
+              {deepResources.map((cat, i) => (
+                <div key={cat.category} className={`rounded-2xl border transition-all ${openCategory === i ? `border-2 ${resourceColorMap[cat.color].split(' ').slice(1).join(' ')}` : 'border-surface-border bg-surface-muted'}`}>
+                  <button
+                    className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                    onClick={() => setOpenCategory(openCategory === i ? null : i)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <cat.icon className={`h-4 w-4 shrink-0 ${resourceColorMap[cat.color].split(' ')[0]}`} />
+                      <span className="text-sm font-semibold text-brand-muted-900">{cat.category}</span>
+                      <span className="rounded-full bg-surface-border px-2 py-0.5 text-[10px] font-semibold text-brand-muted-500">{cat.items.length}</span>
+                    </div>
+                    {openCategory === i
+                      ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                      : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                    }
+                  </button>
+                  {openCategory === i && (
+                    <div className="px-5 pb-5 space-y-3">
+                      {cat.items.map((item) => (
+                        <div key={item.title} className="rounded-xl border border-surface-border bg-white p-4">
+                          <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted-400">{item.source}</p>
+                          <h3 className="mt-1 text-sm font-semibold text-brand-muted-900">{item.title}</h3>
+                          <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{item.description}</p>
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                          >
+                            Visit resource <ArrowUpRight className="h-3 w-3" />
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Closing */}
+          <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-brand-plum-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
+              <Heart className="h-6 w-6 text-accent" />
+            </div>
+            <h2 className="text-xl font-bold text-brand-muted-900">
+              You are building something that lasts.
+            </h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
+              Every hard day you push through, every session you show up for, every moment you choose to keep going — it compounds. Your child&apos;s story is not written yet. Neither is yours.
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/support/next-steps"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+              >
+                Get guided next steps <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/support/connect"
+                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
+              >
+                <Users className="h-4 w-4" /> Connect with other families
+              </Link>
+            </div>
           </div>
-        </div>
-      </div>
+
+          {/* Crisis line */}
+          <div className="rounded-2xl border border-surface-border bg-surface-muted px-5 py-4">
+            <div className="flex items-start gap-3">
+              <Phone className="mt-0.5 h-4 w-4 shrink-0 text-brand-muted-400" />
+              <div>
+                <p className="text-xs font-semibold text-brand-muted-500 uppercase tracking-wide mb-1">If you need immediate support</p>
+                <p className="text-sm text-brand-muted-600 leading-relaxed">
+                  <a href="tel:988" className="font-semibold text-brand-muted-800 hover:underline">988</a> Suicide &amp; Crisis Lifeline — call or text, 24/7 &nbsp;·&nbsp;
+                  Crisis Text Line: text <span className="font-semibold text-brand-muted-800">HOME</span> to <span className="font-semibold text-brand-muted-800">741741</span> &nbsp;·&nbsp;
+                  <a href="tel:18009506264" className="font-semibold text-brand-muted-800 hover:underline">1-800-950-NAMI</a> (Mon–Fri 10am–10pm)
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+
+      </PageTabs>
 
     </div>
   );
