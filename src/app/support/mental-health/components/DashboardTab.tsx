@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { Inputs, HistoryDay, Driver } from './RiskEngine';
 import { riskState, wellnessFromRisk, computeRiskScore } from './RiskEngine';
@@ -91,7 +92,6 @@ interface Props {
   onRangeChange: (r: number) => void;
   onMetricChange: (m: string) => void;
   onNavigate: (tab: string) => void;
-  onOpenTool: (name: string) => void;
 }
 
 export function DashboardTab({
@@ -112,7 +112,6 @@ export function DashboardTab({
   onRangeChange,
   onMetricChange,
   onNavigate,
-  onOpenTool,
 }: Props) {
   const animatedWellness = useAnimatedNumber(wellness);
   const rs = riskState(risk);
@@ -292,7 +291,9 @@ export function DashboardTab({
               </div>
               <div className={styles.recTitle}>{r.title}</div>
               <div className={styles.recBody}>{r.body}</div>
-              <button className={styles.recAction}>{r.action}</button>
+              {r.href
+                ? <Link href={r.href} className={styles.recAction}>{r.action}</Link>
+                : <button className={styles.recAction}>{r.action}</button>}
             </div>
           ))}
         </div>
@@ -307,34 +308,34 @@ export function DashboardTab({
           </div>
         </div>
         <div className={styles.quickActionsGrid}>
-          <button className={styles.quickAction} onClick={() => onOpenTool('breathing')}>
+          <Link href="/support/mental-health/tools/breath-reset" className={styles.quickAction}>
             <div className={styles.qaIcon}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
             </div>
             <div className={styles.qaTitle}>3-minute breath reset</div>
             <div className={styles.qaDesc}>Box breathing to drop your shoulders before the evening routine.</div>
-          </button>
-          <button className={styles.quickAction} onClick={() => onOpenTool('grounding')}>
+          </Link>
+          <Link href="/support/caregiver?tab=tools" className={styles.quickAction}>
             <div className={`${styles.qaIcon} ${styles.qaIconBlue}`}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 12h3l3-9 6 18 3-9h3"/></svg>
             </div>
             <div className={styles.qaTitle}>5-4-3-2-1 grounding</div>
             <div className={styles.qaDesc}>Bring yourself back when the day feels too loud.</div>
-          </button>
-          <button className={styles.quickAction} onClick={() => onOpenTool('journal')}>
+          </Link>
+          <Link href="/support/mental-health/tools/one-line-journal" className={styles.quickAction}>
             <div className={`${styles.qaIcon} ${styles.qaIconGold}`}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             </div>
             <div className={styles.qaTitle}>One-line journal</div>
             <div className={styles.qaDesc}>A single sentence about today. That's enough.</div>
-          </button>
-          <button className={styles.quickAction} onClick={() => onOpenTool('ask')}>
+          </Link>
+          <Link href="/support/mental-health/tools/ask-for-help" className={styles.quickAction}>
             <div className={`${styles.qaIcon} ${styles.qaIconBurgundy}`}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
             </div>
             <div className={styles.qaTitle}>Ask for help</div>
             <div className={styles.qaDesc}>Pre-written texts for when reaching out feels hard.</div>
-          </button>
+          </Link>
         </div>
       </div>
 
