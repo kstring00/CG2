@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   User,
   HelpCircle,
+  Activity,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -50,6 +51,7 @@ const navGroups = [
     label: 'Support for You',
     items: [
       { href: '/support/caregiver', label: 'Your Mental Health', icon: HeartHandshake, highlight: true },
+      { href: '/support/mental-health', label: 'Mental Health Command Center', icon: Activity },
       { href: '/support/caregiver/identity', label: 'Caregiver Identity', icon: User },
       { href: '/support/sleep', label: 'Sleep & Rest', icon: Moon },
       { href: '/support/couples', label: 'Couples Support', icon: Heart },
