@@ -75,6 +75,7 @@ const REC_ICON_CLASS: Record<string, string> = {
 
 interface Props {
   userName: string;
+  isReturning: boolean;
   inputs: Inputs;
   history: HistoryDay[];
   risk: number;
@@ -95,6 +96,7 @@ interface Props {
 
 export function DashboardTab({
   userName,
+  isReturning,
   inputs,
   history,
   risk,
@@ -141,7 +143,7 @@ export function DashboardTab({
     <div>
       <header className={styles.pageHeader}>
         <div className={styles.greeting}>
-          <h1>Welcome back, <em>{userName}</em>.</h1>
+          <h1>{isReturning ? 'Welcome back, ' : 'Welcome, '}<em>{userName}</em>.</h1>
           <p>{getDayGreeting()}</p>
         </div>
         <div className={styles.headerActions}>

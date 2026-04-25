@@ -141,6 +141,8 @@ export default function MentalHealthCommandCenter() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  // true only if cg-onboarded was already '1' at page load — not set during this session
+  const [wasOnboarded, setWasOnboarded] = useState(false);
 
   // Initialize from localStorage on mount
   useEffect(() => {
@@ -148,6 +150,7 @@ export default function MentalHealthCommandCenter() {
     const savedName = lsGet('cg-name') ?? 'Maria';
     const savedTheme = lsGet('cg-theme') ?? 'light';
 
+    setWasOnboarded(onboarded);
     if (!onboarded) setShowOnboarding(true);
     dispatch({ type: 'SET_USER_NAME', name: savedName });
     if (savedTheme === 'dark') dispatch({ type: 'TOGGLE_DARK_MODE' });
@@ -171,6 +174,9 @@ export default function MentalHealthCommandCenter() {
   const explainText = useMemo(() => buildExplain(risk, drivers), [risk, drivers]);
   const recs = useMemo(() => generateRecs(state.inputs, risk, drivers), [state.inputs, risk, drivers]);
   const insights = useMemo(() => generateInsights(state.history), [state.history]);
+
+  // "back" only on a return session — not during the visit they first onboarded
+  const isReturning = ready && wasOnboarded;
 
   const handleInputChange = useCallback((key: keyof Inputs, value: number) => {
     dispatch({ type: 'SET_INPUT', key, value });
@@ -254,10 +260,13 @@ export default function MentalHealthCommandCenter() {
         })}
       </div>
 
-      {/* Tab content */}
-      {activeTab === 'dashboard' && (
+      {/* Tab content — gated on ready so localStorage is checked before any tab renders */}
+      {!ready && <div className={styles.loadingState}>Loading…</div>}
+
+      {ready && activeTab === 'dashboard' && (
         <DashboardTab
           userName={state.userName}
+          isReturning={isReturning}
           inputs={state.inputs}
           history={state.history}
           risk={risk}
@@ -277,7 +286,7 @@ export default function MentalHealthCommandCenter() {
         />
       )}
 
-      {activeTab === 'checkin' && (
+      {ready && activeTab === 'checkin' && (
         <CheckInTab
           inputs={state.inputs}
           onInputChange={handleInputChange}
@@ -285,7 +294,7 @@ export default function MentalHealthCommandCenter() {
         />
       )}
 
-      {activeTab === 'trends' && (
+      {ready && activeTab === 'trends' && (
         <TrendsTab
           history={state.history}
           range={state.range2}
@@ -297,11 +306,11 @@ export default function MentalHealthCommandCenter() {
         />
       )}
 
-      {activeTab === 'recs' && <RecommendationsTab recs={recs} />}
+      {ready && activeTab === 'recs' && <RecommendationsTab recs={recs} />}
 
-      {activeTab === 'support' && <SupportTab onOpenTool={openTool} />}
+      {ready && activeTab === 'support' && <SupportTab onOpenTool={openTool} />}
 
-      {activeTab === 'urgent' && <UrgentTab />}
+      {ready && activeTab === 'urgent' && <UrgentTab />}
 
       {/* Toast */}
       {toast && <div className={styles.toast}>{toast}</div>}
