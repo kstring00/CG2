@@ -14,6 +14,7 @@ import {
   Sun,
   Compass,
 } from 'lucide-react';
+import { PageTabs } from '@/components/ui/PageTabs';
 
 /* ─── data ─────────────────────────────────────────────────── */
 
@@ -149,6 +150,14 @@ const tagColorMap: Record<string, string> = {
   amber: 'bg-amber-100 text-amber-700',
 };
 
+/* ─── tabs ──────────────────────────────────────────────────── */
+
+const TABS = [
+  { key: 'what-happened',    label: 'What happened',    lazy: true },
+  { key: 'reclaim-yourself', label: 'Reclaim yourself'             },
+  { key: 'ask-for-support',  label: 'Ask for support'              },
+];
+
 /* ─── component ────────────────────────────────────────────── */
 
 export default function CaregiverIdentityPage() {
@@ -164,12 +173,7 @@ export default function CaregiverIdentityPage() {
   return (
     <div className="page-shell">
 
-      {/* ══════════════════════════════════════════
-          SECTION 1 — SEEN
-          "We know what happened to you."
-      ══════════════════════════════════════════ */}
-
-      {/* Hero header */}
+      {/* Page header — always visible above the tabs */}
       <header className="page-header">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1.5 text-xs font-semibold text-brand-plum-700">
           <User className="h-3.5 w-3.5" /> Your identity — not just your role
@@ -184,317 +188,304 @@ export default function CaregiverIdentityPage() {
         </p>
       </header>
 
-      {/* The honest opening */}
-      <div className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-6 sm:p-8">
-        <div className="flex gap-4">
-          <Heart className="mt-1 h-6 w-6 shrink-0 text-brand-plum-400" />
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-400 mb-2">
-              The thing nobody says out loud
-            </p>
-            <p className="text-base leading-relaxed text-brand-plum-900">
-              Caregiving for a child with complex needs is an act of profound love. It is also, over
-              time, one of the most quietly identity-eroding experiences a person can go through.
-              You didn&apos;t lose yourself because you failed. You lost yourself because you
-              showed up — fully, relentlessly — for someone else. That distinction matters.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageTabs tabs={TABS}>
 
-      {/* Checklist — things you used to do / be */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <CheckCircle2 className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Things you used to do — or be</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          Check the ones that feel like they belong to a different version of you. This is not a
-          grief exercise — it&apos;s a recognition exercise. These things still exist inside you.
-          They just got quiet.
-        </p>
-        <ul className="space-y-2">
-          {identityItems.map((item, i) => (
-            <li key={item.label}>
-              <button
-                className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
-                  checked[i]
-                    ? 'border-brand-plum-200 bg-brand-plum-50'
-                    : 'border-surface-border bg-surface-muted hover:border-brand-plum-200'
-                }`}
-                onClick={() => toggle(i)}
-              >
-                <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
-                  checked[i]
-                    ? 'border-brand-plum-500 bg-brand-plum-500'
-                    : 'border-brand-muted-300 bg-white'
-                }`}>
-                  {checked[i] && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
-                </div>
-                <span className={`text-sm leading-relaxed transition-colors ${
-                  checked[i] ? 'text-brand-plum-800 font-medium' : 'text-brand-muted-700'
-                }`}>
-                  {item.label}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        {checkedCount > 0 && (
-          <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
-            <p className="text-sm font-semibold text-brand-plum-800">
-              You checked {checkedCount}. That&apos;s not loss — that&apos;s information.
-            </p>
-            <p className="mt-1 text-sm leading-relaxed text-brand-plum-700">
-              Every item you recognized is a thread that still connects you to who you are.
-              This page is about pulling on those threads — gently, without guilt.
-            </p>
-          </div>
-        )}
-      </section>
-
-      {/* The shrinking self */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Compass className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">The shrinking self — how it happens</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          No one wakes up one day and decides to stop being a person. It happens incrementally —
-          in the slow accumulation of choosing someone else&apos;s needs first, every day, for years.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {shrinkingSignals.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="flex gap-3 rounded-2xl border border-surface-border bg-surface-muted p-4">
-              <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white border border-surface-border">
-                <Icon className="h-4 w-4 text-brand-plum-500" />
-              </div>
+        {/* ── Tab 1: What happened (lazy — interactive checklist) ──────── */}
+        <>
+          {/* Opening honest card */}
+          <div className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-6 sm:p-8">
+            <div className="flex gap-4">
+              <Heart className="mt-1 h-6 w-6 shrink-0 text-brand-plum-400" />
               <div>
-                <p className="text-sm font-semibold text-brand-muted-900">{title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{desc}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-400 mb-2">
+                  The thing nobody says out loud
+                </p>
+                <p className="text-base leading-relaxed text-brand-plum-900">
+                  Caregiving for a child with complex needs is an act of profound love. It is also, over
+                  time, one of the most quietly identity-eroding experiences a person can go through.
+                  You didn&apos;t lose yourself because you failed. You lost yourself because you
+                  showed up — fully, relentlessly — for someone else. That distinction matters.
+                </p>
               </div>
             </div>
-          ))}
-        </div>
-        <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
-          <p className="text-sm leading-relaxed text-brand-plum-800">
-            <span className="font-semibold">None of this makes you a bad parent.</span>{' '}
-            It makes you a human being who gave everything they had and forgot to keep a little
-            for themselves. That is fixable — but only if you first recognize what happened.
-          </p>
-        </div>
-      </section>
+          </div>
 
-      {/* ══════════════════════════════════════════
-          SECTION 2 — GROUNDED
-          "Here's permission and practical tools."
-      ══════════════════════════════════════════ */}
-
-      <div className="flex items-center gap-3 pt-2">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
-          Permission
-        </span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
-
-      {/* Permission section */}
-      <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Sun className="h-5 w-5 text-amber-500" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">
-            Explicit permission — for things you shouldn&apos;t need permission for
-          </h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
-          Shame has a way of making ordinary human needs feel like requests that require approval.
-          Consider this your approval — even though you never needed it.
-        </p>
-        <div className="space-y-3">
-          {[
-            'You are allowed to want things. Not just need things — want them. Preferences are not indulgences.',
-            'You are allowed to have a life that is not entirely organized around your child\'s therapy schedule.',
-            'You are allowed to be interesting to yourself — to pursue something because it fascinates you, not because it makes you a better parent.',
-            'You are allowed to grieve the version of your life you expected without being ungrateful for the one you have.',
-            'You are allowed to be bored, restless, frustrated, or unfulfilled — and to take those feelings seriously.',
-            'You are allowed to rest without earning it first.',
-          ].map((item, i) => (
-            <div key={i} className="flex items-start gap-3 rounded-2xl border border-surface-border bg-surface-muted px-4 py-3">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-              <p className="text-sm leading-relaxed text-brand-muted-700">{item}</p>
+          {/* Things you used to do — interactive checklist */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 className="h-5 w-5 text-brand-plum-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">Things you used to do — or be</h2>
             </div>
-          ))}
-        </div>
-      </section>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              Check the ones that feel like they belong to a different version of you. This is not a
+              grief exercise — it&apos;s a recognition exercise. These things still exist inside you.
+              They just got quiet.
+            </p>
+            <ul className="space-y-2">
+              {identityItems.map((item, i) => (
+                <li key={item.label}>
+                  <button
+                    className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-all ${
+                      checked[i]
+                        ? 'border-brand-plum-200 bg-brand-plum-50'
+                        : 'border-surface-border bg-surface-muted hover:border-brand-plum-200'
+                    }`}
+                    onClick={() => toggle(i)}
+                  >
+                    <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-all ${
+                      checked[i]
+                        ? 'border-brand-plum-500 bg-brand-plum-500'
+                        : 'border-brand-muted-300 bg-white'
+                    }`}>
+                      {checked[i] && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
+                    </div>
+                    <span className={`text-sm leading-relaxed transition-colors ${
+                      checked[i] ? 'text-brand-plum-800 font-medium' : 'text-brand-muted-700'
+                    }`}>
+                      {item.label}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {checkedCount > 0 && (
+              <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
+                <p className="text-sm font-semibold text-brand-plum-800">
+                  You checked {checkedCount}. That&apos;s not loss — that&apos;s information.
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-brand-plum-700">
+                  Every item you recognized is a thread that still connects you to who you are.
+                  This page is about pulling on those threads — gently, without guilt.
+                </p>
+              </div>
+            )}
+          </section>
 
-      {/* Selfish vs self-preserving */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Heart className="h-5 w-5 text-accent" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">
-            &ldquo;Selfish&rdquo; vs. &ldquo;self-preserving&rdquo; — with actual examples
-          </h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          These words have been collapsed into the same meaning in caregiving culture. They are not
-          the same thing. The distinction is not semantic — it changes how you treat yourself
-          every day.
-        </p>
-        <div className="space-y-3">
-          {selfishVsSelfPreserving.map((item, i) => (
-            <div
-              key={i}
-              className={`flex items-start gap-3 rounded-2xl border px-4 py-3 ${
-                item.color === 'rose'
-                  ? 'border-rose-200 bg-rose-50'
-                  : 'border-emerald-200 bg-emerald-50'
-              }`}
-            >
-              <span className={`mt-0.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold shrink-0 ${
-                item.color === 'rose'
-                  ? 'bg-rose-200 text-rose-800'
-                  : 'bg-emerald-200 text-emerald-800'
-              }`}>
-                {item.label}
-              </span>
-              <p className={`text-sm leading-relaxed ${
-                item.color === 'rose' ? 'text-rose-800' : 'text-emerald-800'
-              }`}>
-                {item.example}
+          {/* The shrinking self */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Compass className="h-5 w-5 text-brand-plum-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">The shrinking self — how it happens</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              No one wakes up one day and decides to stop being a person. It happens incrementally —
+              in the slow accumulation of choosing someone else&apos;s needs first, every day, for years.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {shrinkingSignals.map(({ icon: Icon, title, desc }) => (
+                <div key={title} className="flex gap-3 rounded-2xl border border-surface-border bg-surface-muted p-4">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white border border-surface-border">
+                    <Icon className="h-4 w-4 text-brand-plum-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-brand-muted-900">{title}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
+              <p className="text-sm leading-relaxed text-brand-plum-800">
+                <span className="font-semibold">None of this makes you a bad parent.</span>{' '}
+                It makes you a human being who gave everything they had and forgot to keep a little
+                for themselves. That is fixable — but only if you first recognize what happened.
               </p>
             </div>
-          ))}
-        </div>
-        <p className="mt-5 text-sm leading-relaxed text-brand-muted-600 italic border-t border-surface-border pt-4">
-          Notice that none of the &ldquo;self-preserving&rdquo; examples hurt your child.
-          They protect your capacity to keep showing up for them. That is not a loophole —
-          that is how sustainable caregiving works.
-        </p>
-      </section>
+          </section>
+        </>
 
-      {/* Micro-identity tools — accordion */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="h-5 w-5 text-brand-plum-600" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">Micro-identity tools — 5 minutes each</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          You don&apos;t need a retreat or a breakthrough. You need small, consistent moments of
-          contact with yourself. These practices take five minutes and ask nothing of anyone else.
-        </p>
-        <div className="space-y-3">
-          {microIdentityTools.map((tool, i) => (
-            <div
-              key={tool.title}
-              className={`rounded-2xl border transition-all ${
-                openTool === i ? colorMap[tool.color] : 'border-surface-border bg-surface-muted'
-              }`}
-            >
-              <button
-                className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
-                onClick={() => setOpenTool(openTool === i ? null : i)}
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tagColorMap[tool.color]}`}>
-                    5 min
+        {/* ── Tab 2: Reclaim yourself ──────────────────────────────────── */}
+        <>
+          {/* Explicit permission */}
+          <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Sun className="h-5 w-5 text-amber-500" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">
+                Explicit permission — for things you shouldn&apos;t need permission for
+              </h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
+              Shame has a way of making ordinary human needs feel like requests that require approval.
+              Consider this your approval — even though you never needed it.
+            </p>
+            <div className="space-y-3">
+              {[
+                'You are allowed to want things. Not just need things — want them. Preferences are not indulgences.',
+                'You are allowed to have a life that is not entirely organized around your child\'s therapy schedule.',
+                'You are allowed to be interesting to yourself — to pursue something because it fascinates you, not because it makes you a better parent.',
+                'You are allowed to grieve the version of your life you expected without being ungrateful for the one you have.',
+                'You are allowed to be bored, restless, frustrated, or unfulfilled — and to take those feelings seriously.',
+                'You are allowed to rest without earning it first.',
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-2xl border border-surface-border bg-surface-muted px-4 py-3">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                  <p className="text-sm leading-relaxed text-brand-muted-700">{item}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Selfish vs self-preserving */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Heart className="h-5 w-5 text-accent" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">
+                &ldquo;Selfish&rdquo; vs. &ldquo;self-preserving&rdquo; — with actual examples
+              </h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              These words have been collapsed into the same meaning in caregiving culture. They are not
+              the same thing. The distinction is not semantic — it changes how you treat yourself
+              every day.
+            </p>
+            <div className="space-y-3">
+              {selfishVsSelfPreserving.map((item, i) => (
+                <div
+                  key={i}
+                  className={`flex items-start gap-3 rounded-2xl border px-4 py-3 ${
+                    item.color === 'rose'
+                      ? 'border-rose-200 bg-rose-50'
+                      : 'border-emerald-200 bg-emerald-50'
+                  }`}
+                >
+                  <span className={`mt-0.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold shrink-0 ${
+                    item.color === 'rose'
+                      ? 'bg-rose-200 text-rose-800'
+                      : 'bg-emerald-200 text-emerald-800'
+                  }`}>
+                    {item.label}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <tool.icon className="h-4 w-4 text-brand-muted-500" />
-                    <span className="text-sm font-semibold text-brand-muted-900">{tool.title}</span>
-                  </div>
-                </div>
-                <ArrowRight className={`h-4 w-4 shrink-0 text-brand-muted-400 transition-transform ${openTool === i ? 'rotate-90' : ''}`} />
-              </button>
-              {openTool === i && (
-                <div className="px-5 pb-5">
-                  <p className="text-sm leading-relaxed text-brand-muted-700 mb-3 italic">
-                    {tool.prompt}
+                  <p className={`text-sm leading-relaxed ${
+                    item.color === 'rose' ? 'text-rose-800' : 'text-emerald-800'
+                  }`}>
+                    {item.example}
                   </p>
-                  <div className="rounded-xl border border-surface-border bg-white p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400 mb-1">Try this</p>
-                    <p className="text-sm leading-relaxed text-brand-muted-700">{tool.practice}</p>
-                  </div>
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+            <p className="mt-5 text-sm leading-relaxed text-brand-muted-600 italic border-t border-surface-border pt-4">
+              Notice that none of the &ldquo;self-preserving&rdquo; examples hurt your child.
+              They protect your capacity to keep showing up for them. That is not a loophole —
+              that is how sustainable caregiving works.
+            </p>
+          </section>
 
-      {/* How to tell your support system */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-        <div className="flex items-center gap-2 mb-2">
-          <BookOpen className="h-5 w-5 text-primary" />
-          <h2 className="text-lg font-semibold text-brand-muted-900">How to tell your partner what you need</h2>
-        </div>
-        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-          The hardest part of reclaiming your identity is often not finding the time — it&apos;s
-          asking for it. Here are specific scripts for specific situations. You don&apos;t have to
-          construct them from scratch when you&apos;re already depleted.
-        </p>
-        <div className="space-y-4">
-          {partnerScripts.map((item, i) => (
-            <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400 mb-2">
-                When: {item.need}
-              </p>
-              <p className="text-sm leading-relaxed text-brand-muted-800 italic">
-                {item.script}
-              </p>
+          {/* Micro-identity tools accordion */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-brand-plum-600" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">Micro-identity tools — 5 minutes each</h2>
             </div>
-          ))}
-        </div>
-        <p className="mt-5 text-sm leading-relaxed text-brand-muted-600 border-t border-surface-border pt-4">
-          These scripts are not manipulation. They are communication. A partner who understands
-          what you need can actually give it to you — which benefits everyone, including your child.
-        </p>
-      </section>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              You don&apos;t need a retreat or a breakthrough. You need small, consistent moments of
+              contact with yourself. These practices take five minutes and ask nothing of anyone else.
+            </p>
+            <div className="space-y-3">
+              {microIdentityTools.map((tool, i) => (
+                <div
+                  key={tool.title}
+                  className={`rounded-2xl border transition-all ${
+                    openTool === i ? colorMap[tool.color] : 'border-surface-border bg-surface-muted'
+                  }`}
+                >
+                  <button
+                    className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                    onClick={() => setOpenTool(openTool === i ? null : i)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${tagColorMap[tool.color]}`}>
+                        5 min
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <tool.icon className="h-4 w-4 text-brand-muted-500" />
+                        <span className="text-sm font-semibold text-brand-muted-900">{tool.title}</span>
+                      </div>
+                    </div>
+                    <ArrowRight className={`h-4 w-4 shrink-0 text-brand-muted-400 transition-transform ${openTool === i ? 'rotate-90' : ''}`} />
+                  </button>
+                  {openTool === i && (
+                    <div className="px-5 pb-5">
+                      <p className="text-sm leading-relaxed text-brand-muted-700 mb-3 italic">
+                        {tool.prompt}
+                      </p>
+                      <div className="rounded-xl border border-surface-border bg-white p-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400 mb-1">Try this</p>
+                        <p className="text-sm leading-relaxed text-brand-muted-700">{tool.practice}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        </>
 
-      {/* ══════════════════════════════════════════
-          SECTION 3 — HOPEFUL
-          "Here's who you still are."
-      ══════════════════════════════════════════ */}
+        {/* ── Tab 3: Ask for support ───────────────────────────────────── */}
+        <>
+          {/* Partner scripts */}
+          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+            <div className="flex items-center gap-2 mb-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold text-brand-muted-900">How to tell your partner what you need</h2>
+            </div>
+            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+              The hardest part of reclaiming your identity is often not finding the time — it&apos;s
+              asking for it. Here are specific scripts for specific situations. You don&apos;t have to
+              construct them from scratch when you&apos;re already depleted.
+            </p>
+            <div className="space-y-4">
+              {partnerScripts.map((item, i) => (
+                <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400 mb-2">
+                    When: {item.need}
+                  </p>
+                  <p className="text-sm leading-relaxed text-brand-muted-800 italic">
+                    {item.script}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-sm leading-relaxed text-brand-muted-600 border-t border-surface-border pt-4">
+              These scripts are not manipulation. They are communication. A partner who understands
+              what you need can actually give it to you — which benefits everyone, including your child.
+            </p>
+          </section>
 
-      <div className="flex items-center gap-3 pt-2">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
-          The truth
-        </span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
+          {/* Closing */}
+          <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-brand-plum-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
+              <Sun className="h-6 w-6 text-amber-400" />
+            </div>
+            <h2 className="text-xl font-bold text-brand-muted-900">
+              Your child needs a parent who exists — not just a parent who serves.
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-brand-muted-600">
+              The most sustainable thing you can do for your child&apos;s long-term wellbeing is to
+              remain a whole person. Not a perfected parent. Not a depleted martyr. A real person,
+              with a name and preferences and a life — who also happens to show up for their child
+              with everything they have.
+            </p>
+            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
+              You are not done becoming. Neither is your child. That&apos;s actually the same story.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/support/caregiver"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+              >
+                Caregiver support hub <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/support/connect"
+                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
+              >
+                <Heart className="h-4 w-4" /> Connect with other caregivers
+              </Link>
+            </div>
+          </div>
+        </>
 
-      {/* Closing */}
-      <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-brand-plum-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
-          <Sun className="h-6 w-6 text-amber-400" />
-        </div>
-        <h2 className="text-xl font-bold text-brand-muted-900">
-          Your child needs a parent who exists — not just a parent who serves.
-        </h2>
-        <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-brand-muted-600">
-          The most sustainable thing you can do for your child&apos;s long-term wellbeing is to
-          remain a whole person. Not a perfected parent. Not a depleted martyr. A real person,
-          with a name and preferences and a life — who also happens to show up for their child
-          with everything they have.
-        </p>
-        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
-          You are not done becoming. Neither is your child. That&apos;s actually the same story.
-        </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/support/caregiver"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-          >
-            Caregiver support hub <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/support/connect"
-            className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
-          >
-            <Heart className="h-4 w-4" /> Connect with other caregivers
-          </Link>
-        </div>
-      </div>
+      </PageTabs>
 
     </div>
   );
