@@ -9,15 +9,23 @@ interface Props {
 
 export function OnboardingModal({ onComplete }: Props) {
   const [screen, setScreen] = useState(1);
+  const [capturedName, setCapturedName] = useState('');
   const nameRef = useRef<HTMLInputElement>(null);
 
   function goTo(n: number) {
     setScreen(n);
   }
 
+  // Capture the name from the ref BEFORE screen 2 unmounts, then advance.
+  // Both the Continue button and the Enter key handler must go through this
+  // path — reading nameRef.current after setScreen(3) would find null.
+  function advanceToScreen3() {
+    setCapturedName(nameRef.current?.value.trim() ?? '');
+    setScreen(3);
+  }
+
   function finish() {
-    const name = nameRef.current?.value.trim() || '';
-    onComplete(name);
+    onComplete(capturedName);
   }
 
   return (
@@ -57,8 +65,9 @@ export function OnboardingModal({ onComplete }: Props) {
               ref={nameRef}
               className={styles.modalInput}
               placeholder="Your first name"
+              defaultValue={capturedName}
               autoFocus
-              onKeyDown={(e) => e.key === 'Enter' && goTo(3)}
+              onKeyDown={(e) => e.key === 'Enter' && advanceToScreen3()}
             />
             <button className={styles.modalSkip} onClick={() => onComplete('')}>
               Skip for now
@@ -67,7 +76,7 @@ export function OnboardingModal({ onComplete }: Props) {
               <button className={`${styles.btn} ${styles.btnGhost}`} onClick={() => goTo(1)}>
                 ← Back
               </button>
-              <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => goTo(3)}>
+              <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={advanceToScreen3}>
                 Continue →
               </button>
             </div>
