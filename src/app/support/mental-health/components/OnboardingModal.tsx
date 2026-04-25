@@ -16,7 +16,7 @@ export function OnboardingModal({ onComplete }: Props) {
   }
 
   function finish() {
-    const name = nameRef.current?.value.trim() || 'friend';
+    const name = nameRef.current?.value.trim() || '';
     onComplete(name);
   }
 
@@ -51,16 +51,18 @@ export function OnboardingModal({ onComplete }: Props) {
 
         {screen === 2 && (
           <div>
-            <h2>What should we <em>call you?</em></h2>
-            <p>Just a first name is plenty. This stays private to you.</p>
+            <h2>Want to make this <em>feel like yours?</em></h2>
+            <p>Add your first name if you'd like. Totally optional — this stays on your device only.</p>
             <input
               ref={nameRef}
               className={styles.modalInput}
               placeholder="Your first name"
-              defaultValue="Maria"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && goTo(3)}
             />
+            <button className={styles.modalSkip} onClick={() => onComplete('')}>
+              Skip for now
+            </button>
             <div className={styles.modalActions}>
               <button className={`${styles.btn} ${styles.btnGhost}`} onClick={() => goTo(1)}>
                 ← Back
