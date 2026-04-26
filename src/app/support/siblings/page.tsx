@@ -14,8 +14,18 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import { StickyToc, type TocItem } from '@/components/ui/StickyToc';
 
 /* ─── data ─────────────────────────────────────────────────── */
+
+const SIBLINGS_TOC: TocItem[] = [
+  { num: '01', id: 'age-by-age',         label: 'What siblings need at each stage' },
+  { num: '02', id: 'signs-struggling',   label: 'Signs a sibling is struggling' },
+  { num: '03', id: 'guilt',              label: 'The guilt — and naming it' },
+  { num: '04', id: 'one-on-one',         label: 'Dedicated 1:1 time' },
+  { num: '05', id: 'books',              label: 'Books and resources' },
+  { num: '06', id: 'teachers',           label: 'Teachers and counselors' },
+];
 
 const ageGroups = [
   {
@@ -268,6 +278,10 @@ export default function SiblingsPage() {
         </p>
       </header>
 
+      <div className="lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+        <StickyToc items={SIBLINGS_TOC} />
+        <div className="space-y-8 md:space-y-10">
+
       {/* The honest opening */}
       <div className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-6 sm:p-8">
         <div className="flex gap-4">
@@ -301,7 +315,7 @@ export default function SiblingsPage() {
       </div>
 
       {/* Age-by-age accordion */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="age-by-age" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Star className="h-5 w-5 text-brand-plum-600" />
           <h2 className="text-lg font-semibold text-brand-muted-900">What siblings need — at each stage</h2>
@@ -375,7 +389,7 @@ export default function SiblingsPage() {
       </section>
 
       {/* Signs a sibling is struggling */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="signs-struggling" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <AlertCircle className="h-5 w-5 text-amber-500" />
           <h2 className="text-lg font-semibold text-brand-muted-900">Signs a sibling is struggling</h2>
@@ -407,7 +421,7 @@ export default function SiblingsPage() {
       </section>
 
       {/* The guilt siblings feel */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="guilt" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Heart className="h-5 w-5 text-brand-plum-600" />
           <h2 className="text-lg font-semibold text-brand-muted-900">The guilt siblings feel — and how to name it with them</h2>
@@ -442,7 +456,7 @@ export default function SiblingsPage() {
       </section>
 
       {/* 1:1 time */}
-      <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
+      <section id="one-on-one" className="scroll-mt-24 rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Smile className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-brand-muted-900">Dedicated 1:1 time — what actually works</h2>
@@ -480,7 +494,7 @@ export default function SiblingsPage() {
       </section>
 
       {/* Books */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="books" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <BookOpen className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-brand-muted-900">Books and resources for siblings</h2>
@@ -508,7 +522,7 @@ export default function SiblingsPage() {
       </section>
 
       {/* Talking to teachers */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="teachers" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold text-brand-muted-900">Talking to teachers and school counselors</h2>
@@ -607,6 +621,9 @@ export default function SiblingsPage() {
           >
             <Users className="h-4 w-4" /> Connect with other families
           </Link>
+        </div>
+      </div>
+
         </div>
       </div>
 
