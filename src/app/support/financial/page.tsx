@@ -174,6 +174,10 @@ function SectionBody({ id }: { id: string }) {
       return <TaxesBody />;
     case 'adulthood':
       return <AdulthoodBody />;
+    case 'scripts':
+      return <ScriptsBody />;
+    case 'navigators':
+      return <NavigatorsBody />;
     default:
       return null;
   }
@@ -1024,6 +1028,323 @@ function AdulthoodBody() {
         start at 14 — and the families with the smoothest cliffs are usually the ones who started
         earlier, treating the post-school years as the actual goal of all the planning instead of as
         an afterthought.
+      </p>
+    </div>
+  );
+}
+
+/* ── 07 · Scripts & templates ─────────────────────────────── */
+
+function ScriptsBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Five copy-pasteable starting points for the conversations and letters this guide keeps
+        pointing you toward. Tap any item to expand it. None of these is a contract — adapt the
+        language to your voice and your situation.
+      </p>
+
+      <details className={styles.scriptDetails}>
+        <summary>Insurance appeal letter — outline you can adapt</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            <strong>Header.</strong> Your name and address · today&apos;s date · the insurer&apos;s appeal
+            address (on the denial letter) · subject line: <em>&ldquo;Formal Appeal of Denial — [Member
+            name], Member ID [number], Claim/Auth #[number].&rdquo;</em>
+          </p>
+          <div className={styles.scriptBlock}>
+            To Whom It May Concern,
+            <br /><br />
+            I am writing to formally appeal the denial of [<span className={styles.kbd}>service</span>]
+            for my [<span className={styles.kbd}>relationship</span>], [<span className={styles.kbd}>name</span>],
+            Member ID [<span className={styles.kbd}>number</span>], dated [<span className={styles.kbd}>date</span>],
+            reference [<span className={styles.kbd}>denial reference</span>].
+            <br /><br />
+            The denial cited [<span className={styles.kbd}>reason as written on the denial</span>].
+            I am providing the following documentation in support of this appeal:
+            (1) a Letter of Medical Necessity from [<span className={styles.kbd}>provider</span>],
+            (2) clinical notes from the most recent [<span className={styles.kbd}>n</span>] sessions,
+            (3) the most recent diagnostic evaluation, and
+            (4) the relevant clinical guideline supporting medical necessity.
+            <br /><br />
+            The medical necessity criteria are met: [<span className={styles.kbd}>cite the criteria
+            from the LMN, in plain language</span>]. The denial does not address these
+            documented needs. I respectfully request that the denial be overturned and the service
+            authorized for [<span className={styles.kbd}>duration / frequency requested</span>].
+            <br /><br />
+            Please respond in writing within the timeframe required by my plan and applicable state
+            law. If the internal appeal is denied, I intend to pursue external review.
+            <br /><br />
+            Sincerely,
+            <br />
+            [<span className={styles.kbd}>Your name</span>]
+            <br />
+            [<span className={styles.kbd}>Phone, email</span>]
+          </div>
+          <p>
+            Send the appeal by both fax and certified mail; keep proof of delivery. The 180-day
+            deadline starts on the denial date — don&apos;t wait.
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>Letter of Medical Necessity — request to your provider</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            Send this as a portal message or short email. Most clinicians keep an LMN template and
+            can fill it in within the week.
+          </p>
+          <div className={styles.scriptBlock}>
+            Subject: LMN request for [<span className={styles.kbd}>child&apos;s name</span>] — [<span className={styles.kbd}>service</span>]
+            <br /><br />
+            Hi Dr. [<span className={styles.kbd}>name</span>],
+            <br /><br />
+            I&apos;m requesting a Letter of Medical Necessity for [<span className={styles.kbd}>child&apos;s
+            name</span>] in support of [<span className={styles.kbd}>specific service / equipment /
+            therapy</span>]. The insurer ([<span className={styles.kbd}>company</span>]) is asking
+            for documentation that includes:
+            <br /><br />
+            • Diagnosis with ICD-10 code(s)
+            <br />
+            • Medical necessity rationale tied to the diagnosis
+            <br />
+            • Frequency and duration of the recommended service
+            <br />
+            • Expected functional outcomes
+            <br />
+            • Why alternatives (lower-intensity or different services) are insufficient
+            <br /><br />
+            Could you fax / portal-submit the LMN to [<span className={styles.kbd}>insurer fax /
+            portal</span>] and copy us at [<span className={styles.kbd}>your email</span>]? I&apos;m happy
+            to pick it up if that&apos;s easier.
+            <br /><br />
+            Thank you — I know writing these takes time outside the appointment.
+            <br /><br />
+            [<span className={styles.kbd}>Your name</span>]
+          </div>
+          <p>
+            Same template works for tax purposes — for special diets, special schools, tutoring,
+            travel, or home modifications you intend to deduct (see §05).
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>School district request for evaluation under IDEA / Section 504</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            Send by email <em>and</em> hand-deliver / certified mail to the special education
+            director at the district level (not just the campus). The 60-calendar-day timeline for
+            evaluation in most states starts the day the district receives the written request.
+          </p>
+          <div className={styles.scriptBlock}>
+            [<span className={styles.kbd}>Date</span>]
+            <br /><br />
+            [<span className={styles.kbd}>Special Education Director name, title, district
+            address</span>]
+            <br /><br />
+            Re: Request for full and individual initial evaluation under IDEA and Section 504 —
+            [<span className={styles.kbd}>student name, DOB, campus, grade, student ID</span>]
+            <br /><br />
+            Dear [<span className={styles.kbd}>name</span>],
+            <br /><br />
+            I am the parent / legal guardian of [<span className={styles.kbd}>student name</span>]. I
+            am formally requesting a comprehensive evaluation under IDEA and Section 504 to
+            determine eligibility for special education and related services.
+            <br /><br />
+            I am requesting evaluation in the following areas: [<span className={styles.kbd}>academic
+            achievement, cognitive, behavioral, speech-language, occupational therapy, autism
+            evaluation, assistive technology, transition — list whatever applies</span>].
+            <br /><br />
+            My specific concerns include: [<span className={styles.kbd}>list 3–5 concrete
+            observations — academic, behavioral, social, sensory, communication. Be specific:
+            &ldquo;skips assignments,&rdquo; &ldquo;hides under desk during loud activities,&rdquo;
+            &ldquo;eats only 4 foods.&rdquo;</span>]
+            <br /><br />
+            Please confirm receipt of this request in writing and provide the timeline for the
+            evaluation plan and consent forms. I understand the district has 15 school days to
+            respond with a written notice and consent form, after which the 60-calendar-day
+            evaluation window begins.
+            <br /><br />
+            Thank you,
+            <br />
+            [<span className={styles.kbd}>Parent name, phone, email</span>]
+          </div>
+          <p>
+            Two notes that change outcomes: (1) request evaluation in <em>all</em> areas of
+            suspected disability, even ones you&apos;re not sure about — the district can decline to test
+            in an area, but they must justify in writing; (2) keep a copy of every email you send
+            and reply you receive — paper trails are the single biggest advantage parents have at IEP
+            meetings.
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>Employer FMLA conversation — opener for HR</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            FMLA covers a parent&apos;s care of a child with a serious health condition. For most autism
+            families, the version that helps most is intermittent FMLA — protecting time off in
+            small chunks across the year for therapy, evaluations, school meetings, and acute
+            episodes.
+          </p>
+          <div className={styles.scriptBlock}>
+            Hi [<span className={styles.kbd}>HR contact</span>],
+            <br /><br />
+            I&apos;d like to talk about taking FMLA leave to manage my child&apos;s medical needs. I&apos;m
+            requesting [<span className={styles.kbd}>intermittent FMLA / a reduced schedule / a
+            continuous block of [duration]</span>] for [<span className={styles.kbd}>child&apos;s
+            name</span>], who has [<span className={styles.kbd}>diagnosis or qualifying
+            condition</span>].
+            <br /><br />
+            FMLA covers a parent&apos;s care of a child with a serious health condition. The clinician
+            will provide the WH-380-F certification form. The leave I&apos;m anticipating is for
+            [<span className={styles.kbd}>therapy appointments, evaluations, school meetings,
+            hospital admissions, recovery time, episodes of acute behavioral need</span>].
+            <br /><br />
+            Could we walk through the next steps — paperwork, timing, what your HR process needs from
+            me, and whether benefits or accruals are affected — and put a follow-up on the calendar?
+            <br /><br />
+            Thank you,
+            <br />
+            [<span className={styles.kbd}>Your name</span>]
+          </div>
+          <p>
+            FMLA is unpaid by federal default, but many employers run paid leave or short-term
+            disability concurrent. Ask whether your company has a separate paid family leave
+            policy — some states (CA, NY, NJ, MA, WA, CT, OR, CO, RI, DC, and others [verify list])
+            have state-funded paid family leave that can stack with FMLA.
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>Asking family for help with money — script for the hard conversation</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            This is the hardest one to say out loud. The version that lands well is honest, specific,
+            and gives the other person a way to say no without it being a wound.
+          </p>
+          <div className={styles.scriptBlock}>
+            I want to be honest about something. The therapy and equipment costs for
+            [<span className={styles.kbd}>child&apos;s name</span>] are running about
+            [<span className={styles.kbd}>amount</span>] above what insurance covers, and we&apos;re
+            stretched. I&apos;m not asking you to fix it — I just need you to know what we&apos;re carrying.
+            <br /><br />
+            If you do have the means and the inclination to help, the things that would make the
+            biggest difference are: [<span className={styles.kbd}>contributing to
+            [name]&apos;s ABLE account / paying a specific therapy bill / a one-time gift toward
+            [equipment] / regular small contributions / a 529 transfer</span>]. We can talk through
+            any of those.
+            <br /><br />
+            And if you can&apos;t — that&apos;s okay. Telling you is part of what makes this feel manageable.
+            We can talk about it whenever you&apos;d like.
+          </div>
+          <p>
+            Two structural pointers worth knowing before this conversation: gifts into an ABLE
+            account up to the annual cap don&apos;t affect SSI eligibility (see §03); larger gifts or
+            bequests should flow through a Special Needs Trust to avoid disqualifying benefits (see
+            §06). Ask the giver to route the help through one of those vehicles rather than handing
+            cash to the disabled adult directly.
+          </p>
+        </div>
+      </details>
+    </div>
+  );
+}
+
+/* ── 08 · Get help navigating this ────────────────────────── */
+
+function NavigatorsBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        You will not navigate all of this on your own — and you shouldn&apos;t. Three free, federally- or
+        community-funded resources do nothing all day except help families like yours sort through
+        exactly the territory in this guide. They&apos;re under-used because they&apos;re under-publicized,
+        not because they&apos;re hard to access.
+      </p>
+
+      <div className={styles.cardList}>
+        <div className={styles.resCard}>
+          <h4>211 — community services and benefits navigation</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Cost</strong> Free</span>
+            <span><strong>Coverage</strong> Nationwide, U.S.</span>
+            <span><strong>Hours</strong> 24/7 in most regions</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              211 is the universal U.S. number for community services and benefits. Trained
+              specialists know which local agencies handle what, which programs have funding right
+              now, and which application windows are open. Use it for emergency rent / utility / food
+              assistance, finding waiver intake offices, locating respite providers, identifying
+              local grants, or just sorting through which acronyms apply to your situation. Bilingual
+              support in most regions.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> Dial <span className={styles.kbd}>211</span> from any U.S.
+            phone, or visit <span className={styles.kbd}>211.org</span>. Text and web chat available
+            in many regions.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Family-to-Family Health Information Center (F2F HIC)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Cost</strong> Free</span>
+            <span><strong>Coverage</strong> One in every U.S. state and territory</span>
+            <span><strong>Best for</strong> Insurance, Medicaid, ABLE, transition planning</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Federally-funded centers staffed by parents of children with disabilities. Every state
+              has one. They specialize in exactly the territory this guide covers — insurance
+              navigation, Medicaid waivers, ABLE, adulthood transition — and will walk you through
+              your specific situation by phone, email, or video. Because the staff are caregivers
+              themselves, they&apos;re often the only resource that <em>genuinely gets it</em> the first
+              time you call.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> Find your state&apos;s F2F HIC at{' '}
+            <span className={styles.kbd}>familyvoices.org/affiliates</span>. Most operate by phone,
+            email, and Zoom; intake replies usually within a few business days.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Parent Training and Information Center (PTI)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Cost</strong> Free</span>
+            <span><strong>Coverage</strong> Every state has at least one PTI</span>
+            <span><strong>Best for</strong> IEPs, IDEA, special education advocacy</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Federally-funded centers focused on special education and IDEA navigation — the
+              school-side counterpart to F2F HIC&apos;s medical-side coverage. PTIs train parents in IEP
+              advocacy, evaluation rights, due process, dispute resolution, and transition planning.
+              Free, confidential, parent-led. Larger states have several regional centers; some have
+              specialized centers for underserved communities.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> Find your state&apos;s PTI at{' '}
+            <span className={styles.kbd}>parentcenterhub.org/find-your-center</span>. Most offer
+            free workshops, IEP review, and one-on-one parent consultations.
+          </div>
+        </div>
+      </div>
+
+      <p style={{ marginTop: 28 }}>
+        One more thing worth saying out loud: the people staffing these resources are not gatekeepers.
+        They are advocates. If a call ends without an answer, ask the next question. If a program
+        says no, ask <em>which other program would say yes</em>. The system rewards persistence
+        partly because it punishes everyone who can&apos;t afford it.
       </p>
     </div>
   );
