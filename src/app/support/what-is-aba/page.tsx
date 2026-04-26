@@ -15,8 +15,19 @@ import {
   Lightbulb,
   Users,
 } from 'lucide-react';
+import { StickyToc, type TocItem } from '@/components/ui/StickyToc';
 
 /* ─── data ─────────────────────────────────────────────────── */
+
+const ABA_TOC: TocItem[] = [
+  { num: '01', id: 'study',       label: 'What BCBAs actually study' },
+  { num: '02', id: 'experience',  label: 'What your child is experiencing' },
+  { num: '03', id: 'myths',       label: 'Myths vs reality' },
+  { num: '04', id: 'green-flags', label: 'How to know therapy is going well' },
+  { num: '05', id: 'questions',   label: 'Questions you can ask' },
+  { num: '06', id: 'outcomes',    label: 'Parent involvement and outcomes' },
+  { num: '07', id: 'glossary',    label: '10 ABA terms in plain English' },
+];
 
 const myths = [
   {
@@ -126,8 +137,12 @@ export default function WhatIsABAPage() {
         </p>
       </header>
 
+      <div className="lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+        <StickyToc items={ABA_TOC} />
+        <div className="space-y-8 md:space-y-10">
+
       {/* The honest definition */}
-      <section className="rounded-3xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-white p-6 sm:p-8">
+      <section id="study" className="scroll-mt-24 rounded-3xl border-2 border-sky-200 bg-gradient-to-br from-sky-50 to-white p-6 sm:p-8">
         <div className="flex gap-4">
           <Brain className="mt-1 h-6 w-6 shrink-0 text-sky-500" />
           <div>
@@ -162,7 +177,7 @@ export default function WhatIsABAPage() {
         <div className="h-px flex-1 bg-surface-border" />
       </div>
 
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="experience" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-4">
           <Lightbulb className="h-5 w-5 text-amber-500" />
           <h2 className="text-lg font-semibold text-brand-muted-900">What your child is actually experiencing</h2>
@@ -243,7 +258,7 @@ export default function WhatIsABAPage() {
       </div>
 
       {/* Myths accordion */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="myths" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <HelpCircle className="h-5 w-5 text-brand-plum-600" />
           <h2 className="text-lg font-semibold text-brand-muted-900">What you may have heard — and what is actually true</h2>
@@ -292,7 +307,7 @@ export default function WhatIsABAPage() {
       </section>
 
       {/* Green flags + things to bring to BCBA */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="green-flags" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <CheckCircle2 className="h-5 w-5 text-emerald-600" />
           <h2 className="text-lg font-semibold text-brand-muted-900">How to know if therapy is going well</h2>
@@ -328,7 +343,7 @@ export default function WhatIsABAPage() {
       </section>
 
       {/* Questions parents are allowed to ask */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="questions" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <button
           className="flex w-full items-center justify-between gap-3 text-left"
           onClick={() => setOpenQuestions(!openQuestions)}
@@ -359,7 +374,7 @@ export default function WhatIsABAPage() {
       </section>
 
       {/* Parent involvement research */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="outcomes" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <div className="flex items-center gap-2 mb-2">
           <Users className="h-5 w-5 text-sky-600" />
           <h2 className="text-lg font-semibold text-brand-muted-900">Parent involvement and outcomes — what the research shows</h2>
@@ -399,7 +414,7 @@ export default function WhatIsABAPage() {
       </div>
 
       {/* Glossary — inline, collapsible */}
-      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+      <section id="glossary" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
         <button
           className="flex w-full items-center justify-between gap-3 text-left"
           onClick={() => setOpenGlossary(!openGlossary)}
@@ -456,6 +471,9 @@ export default function WhatIsABAPage() {
           >
             <Lightbulb className="h-4 w-4" /> Support for you
           </Link>
+        </div>
+      </div>
+
         </div>
       </div>
 
