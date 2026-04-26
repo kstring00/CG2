@@ -7,6 +7,7 @@ import {
   User,
   CloudRain,
   ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 import styles from '../mental-health.module.css';
 import { IdentityTopic } from './topics/IdentityTopic';
@@ -20,47 +21,76 @@ interface TopicMeta {
   key: TopicKey;
   title: string;
   blurb: string;
+  inside: string[];
   icon: React.ReactNode;
-  accent: 'sage' | 'blue' | 'gold' | 'burgundy';
+  iconBig: React.ReactNode;
+  /** CSS class accent — drives top border + badge tint */
+  accent: 'Sleep' | 'Couples' | 'Hard';
 }
 
-const TOPICS: TopicMeta[] = [
-  {
-    key: 'identity',
-    title: 'Caregiver identity',
-    blurb: "Who you are, separate from who you take care of. Reclaiming the parts of yourself that didn't disappear — they got buried.",
-    icon: <User size={18} />,
-    accent: 'sage',
-  },
+// Caregiver identity is the lead/featured topic (full-width hero card).
+const LEAD: TopicMeta = {
+  key: 'identity',
+  title: 'Caregiver identity',
+  blurb:
+    "Who you are, separate from who you take care of. Most caregivers describe a slow erosion of self — interests, friendships, hobbies that quietly stopped. You did not choose to disappear; the need was urgent and your time was finite. Identity care is not selfish, it's the foundation for everything you give. The version of you that existed before isn't gone — she got buried.",
+  inside: [
+    'A 9-item checklist of what you used to do without thinking',
+    'Five reclaim prompts that save as you type',
+    'Honest framing: which things you can let go of, which need tending now',
+  ],
+  icon: <User size={20} />,
+  iconBig: <User size={42} strokeWidth={1.4} />,
+  // Lead card uses sage by default; no accent class needed
+  accent: 'Sleep', // unused for the lead card
+};
+
+const ROW: TopicMeta[] = [
   {
     key: 'sleep',
     title: 'Sleep & rest',
-    blurb: "Sleep is the lever that resets every other lever. Practical ways to protect it when nights are unpredictable.",
+    blurb:
+      "Sleep is the lever that resets every other lever. It's also the first thing caregivers lose, and the last thing they think to protect. You can't regulate your child's nervous system from a deregulated body — tonight's priority is rest, not productivity.",
+    inside: [
+      'A 7-question sleep quiz with a tone-coded result',
+      'A 30-minute wind-down sequence you can run any night',
+      'The myths most caregivers were told about sleep, debunked',
+    ],
     icon: <Moon size={18} />,
-    accent: 'blue',
+    iconBig: <Moon size={26} strokeWidth={1.5} />,
+    accent: 'Sleep',
   },
   {
     key: 'couples',
     title: 'Couples & partners',
-    blurb: 'When the caregiving load lands unevenly. Scripts and check-ins for keeping the partnership intact.',
+    blurb:
+      "When the caregiving load lands unevenly. Resentment is a signal, not a character flaw — it usually means a need has gone unspoken too long. The partnership is its own caregiving relationship, and it deserves tending too.",
+    inside: [
+      'The four quiet breaking points couples don\'t name out loud',
+      'A weekly 10-minute check-in template that saves your answers',
+      'Three scripts for the conversations you keep avoiding',
+    ],
     icon: <HeartHandshake size={18} />,
-    accent: 'burgundy',
+    iconBig: <HeartHandshake size={26} strokeWidth={1.5} />,
+    accent: 'Couples',
   },
   {
     key: 'hard-days',
     title: 'Hard days & meltdowns',
-    blurb: "When the day collapses. A short script for what to drop, what to keep, and who to text.",
+    blurb:
+      "When the day collapses. On hard days, decisions feel heavier, and a five-line plan from your better self does the deciding for you. What gets dropped, what stays, and one person you'll text — decided ahead of time.",
+    inside: [
+      'A "this felt true today" picker with personalized responses',
+      'A 4-step hard-day script you can rehearse on a good day',
+      'A direct line into the calming tools when you need them',
+    ],
     icon: <CloudRain size={18} />,
-    accent: 'burgundy',
+    iconBig: <CloudRain size={26} strokeWidth={1.5} />,
+    accent: 'Hard',
   },
 ];
 
-const ACCENT_CLASS: Record<TopicMeta['accent'], string> = {
-  sage: styles.qaIcon,
-  blue: `${styles.qaIcon} ${styles.qaIconBlue}`,
-  gold: `${styles.qaIcon} ${styles.qaIconGold}`,
-  burgundy: `${styles.qaIcon} ${styles.qaIconBurgundy}`,
-};
+const ALL_TOPICS: TopicMeta[] = [LEAD, ...ROW];
 
 interface Props {
   onNavigate: (tab: string) => void;
@@ -72,14 +102,14 @@ export function TopicsTab({ onNavigate, initialTopic = null, onTopicConsumed }: 
   const [active, setActive] = useState<TopicKey | null>(initialTopic);
 
   useEffect(() => {
-    if (initialTopic && TOPICS.some((t) => t.key === initialTopic)) {
+    if (initialTopic && ALL_TOPICS.some((t) => t.key === initialTopic)) {
       setActive(initialTopic);
       onTopicConsumed?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialTopic]);
 
-  const topic = active ? TOPICS.find((t) => t.key === active) ?? null : null;
+  const topic = active ? ALL_TOPICS.find((t) => t.key === active) ?? null : null;
 
   if (topic) {
     return (
@@ -103,22 +133,57 @@ export function TopicsTab({ onNavigate, initialTopic = null, onTopicConsumed }: 
 
   return (
     <div>
-      <header className={styles.pageHeader}>
-        <div className={styles.greeting}>
-          <h1>All <em>topics</em>, in one place</h1>
-          <p>
-            Everything related to your wellbeing, gathered here. Tap a topic to read it inline — no leaving
-            the center, no losing your place.
-          </p>
-        </div>
+      <header className={styles.editorialHero}>
+        <span className={styles.editorialChip}>Inside the Center</span>
+        <h1 className={styles.editorialTitle}>
+          Topics worth <em>sitting with</em>.
+        </h1>
+        <p className={styles.editorialSubtitle}>
+          Four guides written for the parts of caregiving nobody hands you a manual for. Tap any
+          one to read it inline — no leaving the center, no losing your place.
+        </p>
       </header>
-      <div className={styles.topicsGrid}>
-        {TOPICS.map((t) => (
-          <button key={t.key} className={styles.toolCard} onClick={() => setActive(t.key)}>
-            <div className={ACCENT_CLASS[t.accent]}>{t.icon}</div>
-            <div className={styles.toolCardTitle}>{t.title}</div>
-            <p className={styles.toolCardBody}>{t.blurb}</p>
-            <span className={styles.toolCardMeta}>Tap to open inline</span>
+
+      {/* Featured lead card — Caregiver identity */}
+      <button className={styles.leadCard} onClick={() => setActive(LEAD.key)}>
+        <div className={styles.leadCardLeft}>
+          <span className={styles.leadKicker}>Featured · Start here</span>
+          <div className={styles.leadIconBig}>{LEAD.iconBig}</div>
+        </div>
+        <div className={styles.leadCardRight}>
+          <h2 className={styles.leadCardTitle}>{LEAD.title}</h2>
+          <p className={styles.leadCardBody}>{LEAD.blurb}</p>
+          <ul className={styles.leadCardInside}>
+            {LEAD.inside.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+          <span className={styles.readGuideLink}>
+            Read this guide <ArrowRight size={14} />
+          </span>
+        </div>
+      </button>
+
+      {/* 3-up row */}
+      <div className={styles.editorialGrid}>
+        {ROW.map((t) => (
+          <button
+            key={t.key}
+            className={`${styles.editorialCard} ${styles[`accent${t.accent}`]}`}
+            onClick={() => setActive(t.key)}
+          >
+            <div className={styles.editorialIconBadge}>{t.iconBig}</div>
+            <h3 className={styles.editorialCardTitle}>{t.title}</h3>
+            <p className={styles.editorialCardBody}>{t.blurb}</p>
+            <span className={styles.editorialInsideLabel}>What&apos;s inside</span>
+            <ul className={styles.editorialInsideList}>
+              {t.inside.map((item, i) => (
+                <li key={i}>{item}</li>
+              ))}
+            </ul>
+            <span className={styles.readGuideLink}>
+              Read this guide <ArrowRight size={14} />
+            </span>
           </button>
         ))}
       </div>
