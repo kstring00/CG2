@@ -242,14 +242,14 @@ export function DashboardTab({
         </div>
       </div>
 
-      {/* Trend — collapsed to a tighter card; a button reveals the deeper Trends tab */}
-      <div className={`${styles.card} ${styles.sectionSpacer}`}>
-        <div className={styles.cardHeader}>
+      {/* Trend — collapsed to a tighter card; metric segmented control sits in the header */}
+      <div className={`${styles.card} ${styles.sectionSpacer} ${styles.chartCard}`}>
+        <div className={styles.chartCardTop}>
           <div>
             <div className={styles.cardTitle}>Wellness over time</div>
-            <div className={styles.cardSubtitle}>Last {range} days · Tap a metric to overlay</div>
+            <div className={styles.cardSubtitle}>Last {range} days · Pick a metric to overlay</div>
           </div>
-          <div className={styles.cardHeaderRight}>
+          <div className={styles.chartCardActions}>
             <div className={styles.rangeTabs}>
               {[7, 30].map((r) => (
                 <button
@@ -269,6 +269,21 @@ export function DashboardTab({
             </button>
           </div>
         </div>
+
+        <div className={styles.metricSegments} role="tablist" aria-label="Choose metric">
+          {METRICS.map((m) => (
+            <button
+              key={m}
+              role="tab"
+              aria-selected={metric === m}
+              className={`${styles.metricSegment} ${metric === m ? styles.metricSegmentActive : ''}`}
+              onClick={() => onMetricChange(m)}
+            >
+              {METRIC_LABELS[m]}
+            </button>
+          ))}
+        </div>
+
         <div className={styles.chartCompact}>
           <TrendChart
             history={history}
@@ -276,17 +291,6 @@ export function DashboardTab({
             metric={metric}
             maxTicksLimit={range === 7 ? 7 : 8}
           />
-        </div>
-        <div className={styles.chartToggles}>
-          {METRICS.map((m) => (
-            <button
-              key={m}
-              className={`${styles.togglePill} ${metric === m ? styles.togglePillActive : ''}`}
-              onClick={() => onMetricChange(m)}
-            >
-              {METRIC_LABELS[m]}
-            </button>
-          ))}
         </div>
       </div>
 

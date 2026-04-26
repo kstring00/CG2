@@ -5,8 +5,6 @@ import {
   Moon,
   HeartHandshake,
   User,
-  Users,
-  DollarSign,
   CloudRain,
   ArrowLeft,
 } from 'lucide-react';
@@ -15,10 +13,8 @@ import { IdentityTopic } from './topics/IdentityTopic';
 import { SleepTopic } from './topics/SleepTopic';
 import { CouplesTopic } from './topics/CouplesTopic';
 import { HardDaysTopic } from './topics/HardDaysTopic';
-import { FinancialTopic } from './topics/FinancialTopic';
-import { SiblingsTopic } from './topics/SiblingsTopic';
 
-type TopicKey = 'identity' | 'sleep' | 'couples' | 'hard-days' | 'financial' | 'siblings';
+type TopicKey = 'identity' | 'sleep' | 'couples' | 'hard-days';
 
 interface TopicMeta {
   key: TopicKey;
@@ -56,20 +52,6 @@ const TOPICS: TopicMeta[] = [
     blurb: "When the day collapses. A short script for what to drop, what to keep, and who to text.",
     icon: <CloudRain size={18} />,
     accent: 'burgundy',
-  },
-  {
-    key: 'financial',
-    title: 'Financial pressure',
-    blurb: "Money stress is mental health stress. Practical paths through insurance, Medicaid waivers, and respite funding.",
-    icon: <DollarSign size={18} />,
-    accent: 'gold',
-  },
-  {
-    key: 'siblings',
-    title: 'Siblings',
-    blurb: 'How brothers and sisters of the autistic child are doing — and how to make room for them too.',
-    icon: <Users size={18} />,
-    accent: 'sage',
   },
 ];
 
@@ -115,8 +97,6 @@ export function TopicsTab({ onNavigate, initialTopic = null, onTopicConsumed }: 
         {topic.key === 'sleep' && <SleepTopic />}
         {topic.key === 'couples' && <CouplesTopic />}
         {topic.key === 'hard-days' && <HardDaysTopic onOpenCalming={() => onNavigate('calming')} />}
-        {topic.key === 'financial' && <FinancialTopic />}
-        {topic.key === 'siblings' && <SiblingsTopic />}
       </div>
     );
   }
@@ -132,7 +112,7 @@ export function TopicsTab({ onNavigate, initialTopic = null, onTopicConsumed }: 
           </p>
         </div>
       </header>
-      <div className={styles.toolsGrid}>
+      <div className={styles.topicsGrid}>
         {TOPICS.map((t) => (
           <button key={t.key} className={styles.toolCard} onClick={() => setActive(t.key)}>
             <div className={ACCENT_CLASS[t.accent]}>{t.icon}</div>

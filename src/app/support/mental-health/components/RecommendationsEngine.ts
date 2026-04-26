@@ -12,7 +12,7 @@ import type { Inputs, HistoryDay, Driver } from './RiskEngine';
 export type RecAction =
   | { kind: 'tab'; tab: 'dashboard' | 'checkin' | 'calming' | 'trends' | 'topics' | 'urgent' }
   | { kind: 'tool'; tool: 'breath' | 'grounding' | 'journal' | 'ask' | 'body' | 'floor' | 'hard-day' | 'one-thing' }
-  | { kind: 'topic'; topic: 'identity' | 'sleep' | 'couples' | 'hard-days' | 'financial' | 'siblings' }
+  | { kind: 'topic'; topic: 'identity' | 'sleep' | 'couples' | 'hard-days' }
   | { kind: 'href'; href: string };
 
 export interface Rec {

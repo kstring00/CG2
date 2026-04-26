@@ -23,12 +23,10 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, 
 const PALETTE = {
   ink: '#2A2520',
   inkMuted: '#897E72',
+  inkFaint: '#B8AE9F',
   lineSoft: '#EFE7D6',
   sage: '#6B8068',
   paper: '#FBF7EF',
-  stableBg: '#E4EBDB',
-  watchBg: '#F2E6C2',
-  riskBg: '#ECD2CE',
 };
 
 function hexToRgba(hex: string, alpha: number): string {
@@ -42,9 +40,9 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function createZonesPlugin(c: typeof PALETTE): Plugin<'line'> {
+function createGridlinesPlugin(c: typeof PALETTE): Plugin<'line'> {
   return {
-    id: 'zones',
+    id: 'softGridlines',
     beforeDraw(chart) {
       const { ctx, chartArea, scales } = chart;
       if (!chartArea) return;
@@ -52,23 +50,16 @@ function createZonesPlugin(c: typeof PALETTE): Plugin<'line'> {
       if (!yScale) return;
 
       ctx.save();
-      ctx.globalAlpha = 0.35;
-
-      ctx.fillStyle = c.stableBg;
-      const yTop = yScale.getPixelForValue(100);
-      const yStableEnd = yScale.getPixelForValue(67);
-      ctx.fillRect(chartArea.left, yTop, chartArea.right - chartArea.left, yStableEnd - yTop);
-
-      ctx.fillStyle = c.watchBg;
-      const yWatch = yScale.getPixelForValue(67);
-      const yWatchEnd = yScale.getPixelForValue(34);
-      ctx.fillRect(chartArea.left, yWatch, chartArea.right - chartArea.left, yWatchEnd - yWatch);
-
-      ctx.fillStyle = c.riskBg;
-      const yRisk = yScale.getPixelForValue(34);
-      const yRiskEnd = yScale.getPixelForValue(0);
-      ctx.fillRect(chartArea.left, yRisk, chartArea.right - chartArea.left, yRiskEnd - yRisk);
-
+      ctx.strokeStyle = c.lineSoft;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 5]);
+      [25, 50, 75].forEach((value) => {
+        const y = yScale.getPixelForValue(value);
+        ctx.beginPath();
+        ctx.moveTo(chartArea.left, y);
+        ctx.lineTo(chartArea.right, y);
+        ctx.stroke();
+      });
       ctx.restore();
     },
   };
@@ -124,7 +115,7 @@ interface Props {
 export function TrendChart({ history, range, metric, heightClass, maxTicksLimit }: Props) {
   const c = PALETTE;
 
-  const zonesPlugin = useMemo(() => createZonesPlugin(c), [c]);
+  const gridlinesPlugin = useMemo(() => createGridlinesPlugin(c), [c]);
 
   const { labels, values, label } = useMemo(
     () => getChartValues(history, range, metric),
@@ -155,6 +146,10 @@ export function TrendChart({ history, range, metric, heightClass, maxTicksLimit 
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 600, easing: 'easeOutQuart' },
+    layout: {
+      // Breathing room around the plot — pushes axis labels away from card edges
+      padding: { top: 14, right: 8, bottom: 12, left: 4 },
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -177,20 +172,23 @@ export function TrendChart({ history, range, metric, heightClass, maxTicksLimit 
         max: 100,
         border: { display: false },
         ticks: {
-          color: c.inkMuted,
-          font: { family: 'Inter Tight, sans-serif', size: 11 },
+          color: c.inkFaint,
+          font: { family: 'Inter Tight, sans-serif', size: 10, weight: 400 },
           stepSize: 25,
+          padding: 8,
         },
-        grid: { color: c.lineSoft },
+        // Native grid hidden — we draw cleaner dashed lines via the plugin
+        grid: { display: false },
       },
       x: {
         border: { display: false },
         ticks: {
-          color: c.inkMuted,
-          font: { family: 'Inter Tight, sans-serif', size: 11 },
+          color: c.inkFaint,
+          font: { family: 'Inter Tight, sans-serif', size: 10, weight: 400 },
           maxRotation: 0,
           autoSkip: true,
           maxTicksLimit: maxTicksLimit ?? (range === 7 ? 7 : 8),
+          padding: 8,
         },
         grid: { display: false },
       },
@@ -201,7 +199,7 @@ export function TrendChart({ history, range, metric, heightClass, maxTicksLimit 
 
   return (
     <div className={wrapClass}>
-      <Line data={data} options={options} plugins={[zonesPlugin]} />
+      <Line data={data} options={options} plugins={[gridlinesPlugin]} />
     </div>
   );
 }

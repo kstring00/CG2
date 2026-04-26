@@ -34,24 +34,41 @@ export function TrendsTab({ history, range, metric, insights, onRangeChange, onM
         </div>
       </header>
 
-      <div className={`${styles.card} ${styles.cardPadLg}`}>
-        <div className={styles.cardHeader}>
+      <div className={`${styles.card} ${styles.cardPadLg} ${styles.chartCard}`}>
+        <div className={styles.chartCardTop}>
           <div>
             <div className={styles.cardTitle}>{range}-day wellness</div>
-            <div className={styles.cardSubtitle}>Background bands show your risk zone over time</div>
+            <div className={styles.cardSubtitle}>Pick a metric to overlay · Tap a date to see the score</div>
           </div>
-          <div className={styles.rangeTabs}>
-            {[7, 30].map((r) => (
-              <button
-                key={r}
-                className={`${styles.rangeTab} ${range === r ? styles.rangeTabActive : ''}`}
-                onClick={() => onRangeChange(r)}
-              >
-                {r === 7 ? '7d' : '30d'}
-              </button>
-            ))}
+          <div className={styles.chartCardActions}>
+            <div className={styles.rangeTabs}>
+              {[7, 30].map((r) => (
+                <button
+                  key={r}
+                  className={`${styles.rangeTab} ${range === r ? styles.rangeTabActive : ''}`}
+                  onClick={() => onRangeChange(r)}
+                >
+                  {r === 7 ? '7d' : '30d'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
+
+        <div className={styles.metricSegments} role="tablist" aria-label="Choose metric">
+          {METRICS.map((m) => (
+            <button
+              key={m}
+              role="tab"
+              aria-selected={metric === m}
+              className={`${styles.metricSegment} ${metric === m ? styles.metricSegmentActive : ''}`}
+              onClick={() => onMetricChange(m)}
+            >
+              {METRIC_LABELS[m]}
+            </button>
+          ))}
+        </div>
+
         <TrendChart
           history={history}
           range={range}
@@ -59,17 +76,6 @@ export function TrendsTab({ history, range, metric, insights, onRangeChange, onM
           heightClass={styles.chartWrapLg}
           maxTicksLimit={range === 7 ? 7 : 8}
         />
-        <div className={styles.chartToggles}>
-          {METRICS.map((m) => (
-            <button
-              key={m}
-              className={`${styles.togglePill} ${metric === m ? styles.togglePillActive : ''}`}
-              onClick={() => onMetricChange(m)}
-            >
-              {METRIC_LABELS[m]}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className={`${styles.card} ${styles.sectionSpacer}`}>

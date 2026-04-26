@@ -369,21 +369,60 @@
 /* ============ CHART ============ */
 .chartWrap { position: relative; height: 280px; margin-top: 8px; }
 .chartWrapLg { height: 360px; }
-.chartToggles { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-.togglePill {
-  padding: 5px 12px;
-  border-radius: 999px;
+
+/* Chart card layout — title/range row on top, segmented metric control beneath */
+.chartCard { padding: 22px 24px 24px; }
+.chartCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.chartCardActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Segmented metric control — sits above the plot, never inside it */
+.metricSegments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 18px;
+}
+.metricSegment {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 7px 12px;
   font-size: 12px;
   font-weight: 500;
-  border: 1px solid var(--line);
+  letter-spacing: 0.01em;
   color: var(--ink-muted);
-  background: var(--paper);
-  transition: all 0.18s ease;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
   cursor: pointer;
   font-family: var(--font-body);
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+  white-space: nowrap;
+  text-align: center;
 }
-.togglePillActive { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-.togglePill:not(.togglePillActive):hover { color: var(--ink); border-color: var(--ink-faint); }
+.metricSegment:hover { color: var(--ink); }
+.metricSegmentActive {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+.metricSegmentActive:hover { color: var(--paper); }
+
 .rangeTabs {
   display: flex;
   background: var(--cream);
@@ -942,8 +981,8 @@
 /* Compact chart wrapper used on the dashboard (Trends tab keeps the bigger one) */
 .chartCompact {
   position: relative;
-  height: 184px;
-  margin-top: 2px;
+  height: 220px;
+  margin-top: 4px;
 }
 
 /* Card-header-right grouping for range tabs + open-trends link */
@@ -1023,6 +1062,17 @@
   color: var(--burgundy);
   background: var(--burgundy-tint);
   border-color: var(--burgundy-soft);
+}
+
+/* ============ TOPICS — 2x2 grid on desktop ============ */
+.topicsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media (max-width: 720px) {
+  .topicsGrid { grid-template-columns: 1fr; }
 }
 
 /* ============ CALMING TOOLS — grid + cards ============ */
