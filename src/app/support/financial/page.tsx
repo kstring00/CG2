@@ -166,6 +166,10 @@ function SectionBody({ id }: { id: string }) {
       return <InsuranceBody />;
     case 'medicaid':
       return <MedicaidBody />;
+    case 'able':
+      return <AbleBody />;
+    case 'respite':
+      return <RespiteBody />;
     default:
       return null;
   }
@@ -430,6 +434,290 @@ function MedicaidBody() {
           level (varies by state) and includes behavioral health.
         </li>
       </ul>
+    </div>
+  );
+}
+
+/* ── 03 · ABLE accounts ───────────────────────────────────── */
+
+function AbleBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        An <strong>ABLE account</strong> (Achieving a Better Life Experience) is a tax-advantaged
+        savings account specifically for people with disabilities. The reason it exists: before ABLE,
+        a person on SSI or Medicaid lost benefits the moment their savings crossed $2,000. That cap
+        meant disabled adults — and the families saving for them — were structurally prevented from
+        building any financial cushion at all.
+      </p>
+      <p>
+        ABLE accounts let the beneficiary save real money <em>without</em> losing means-tested
+        benefits. Up to $100,000 in an ABLE balance is excluded from the SSI $2,000 asset test,
+        and ABLE balances are excluded from Medicaid asset tests in nearly every state. For autism
+        families this is the single most important account type to know about, and one of the most
+        chronically under-used.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Why it <em>matters</em>
+      </h3>
+      <ul>
+        <li>
+          <strong>Save without disqualifying benefits.</strong> The ABLE balance does not count
+          against SSI&apos;s $2,000 asset cap (up to the $100,000 exclusion) and is fully excluded from
+          Medicaid asset tests in most states.
+        </li>
+        <li>
+          <strong>Family and friends can contribute.</strong> Anyone can deposit into the
+          beneficiary&apos;s ABLE account — grandparents, aunts, employers — up to the annual contribution
+          limit per beneficiary (not per contributor).
+        </li>
+        <li>
+          <strong>Tax-free growth, tax-free qualified withdrawals.</strong> Same federal tax
+          treatment as a 529 college savings plan, but for disability-related expenses.
+        </li>
+        <li>
+          <strong>Eligibility is the disability, not the diagnosis date.</strong> The disability
+          must have begun before age 26. (The ABLE Age Adjustment Act raises this to age 46
+          starting in 2026 [verify effective date]; if your child&apos;s diagnosis came later, this
+          change matters.)
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        Limits and <em>rules to know</em>
+      </h3>
+      <ul>
+        <li>
+          <strong>Annual contribution cap.</strong> The federal limit is tied to the gift-tax annual
+          exclusion — currently $18,000 / year per beneficiary [verify for current tax year]. This
+          is the total across all contributors combined.
+        </li>
+        <li>
+          <strong>ABLE-to-Work.</strong> If the beneficiary works and is not enrolled in an employer
+          retirement plan, an additional contribution is allowed up to the lesser of (a) their
+          annual gross earnings or (b) the federal poverty line for a one-person household
+          (~$15,060 for 2024 [verify]). This stacks on top of the $18,000 base.
+        </li>
+        <li>
+          <strong>Total balance cap.</strong> Each state sets its own ceiling — Texas&apos; cap is in the
+          $500K range [verify exact figure]. Most state caps fall between $300K and $550K. Hitting
+          the cap is a good problem most families never face.
+        </li>
+        <li>
+          <strong>Qualified Disability Expenses (QDEs) — what you can spend it on.</strong>{' '}
+          Deliberately broad. Housing, transportation, education, employment training, assistive
+          tech, health and wellness expenses not covered by other sources, financial management
+          fees, legal fees, basic living expenses, even funeral expenses. The IRS standard is that
+          the expense relate to the disability and improve quality of life.
+        </li>
+        <li>
+          <strong>Non-qualified withdrawals.</strong> If money is spent on a non-QDE, the earnings
+          portion is subject to federal income tax plus a 10% penalty, and the withdrawal can count
+          against SSI / Medicaid eligibility. Track receipts.
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        How to <em>open one</em>
+      </h3>
+      <ol className={styles.stepList}>
+        <li>
+          <strong>Pick a state plan.</strong> You do not have to use your home state&apos;s plan. Compare
+          plans on annual fees, investment options, debit-card access, and minimum contribution at{' '}
+          <span className={styles.kbd}>ablenrc.org</span> (the ABLE National Resource Center
+          comparison tool). Texans default to the Texas ABLE plan; other strong national options
+          include Ohio STABLE and Oregon ABLE for State [verify].
+        </li>
+        <li>
+          <strong>Gather your documents.</strong> Beneficiary&apos;s Social Security number, date of
+          birth, and disability documentation (an SSI/SSDI award letter is the simplest; a signed
+          physician diagnosis listing the eligible condition also works). The account opener (you,
+          if your child is a minor) provides their own SSN and bank routing information.
+        </li>
+        <li>
+          <strong>Open online.</strong> Most state plans have a 15–30 minute online application.
+          Designate yourself as the Authorized Legal Representative if your child is a minor. Set
+          up automatic monthly contributions even at $25/month — small consistent transfers compound
+          and build the habit before larger contributions become possible.
+        </li>
+      </ol>
+      <p>
+        One more pointer: families often pair an ABLE account with a Special Needs Trust (SNT). They
+        do different jobs — see §06 for when you need both.
+      </p>
+    </div>
+  );
+}
+
+/* ── 04 · Respite & emergency funds ───────────────────────── */
+
+function RespiteBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Respite funding and emergency grants exist for autism families, but the programs are
+        scattered, lightly publicized, and — for most of them — application-driven rather than
+        automatic. The list below is the working short list. None of these is going to fix
+        everything; together they can take a real bite out of a hard month.
+      </p>
+      <p>
+        A note on style: the &ldquo;typical award&rdquo; ranges below are directional. Individual
+        program awards vary year-to-year and by demand; verify the current cycle&apos;s specifics on each
+        program&apos;s site before counting on a number.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Six <em>funding sources</em> worth applying to
+      </h3>
+      <div className={styles.cardList}>
+        <div className={styles.resCard}>
+          <h4>Take Time Texas (state respite voucher)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Per-family respite hours; voucher-based</span>
+            <span><strong>Best for</strong> Families needing scheduled regular breaks</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Texas&apos;s Lifespan Respite program offering subsidized respite vouchers families can
+              redeem with approved providers. Annual allocation per family varies by funding cycle
+              [verify]. Apply through{' '}
+              <span className={styles.kbd}>taketimetexas.org</span> — registration is the gating
+              step; vouchers are released as funding allows.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> taketimetexas.org · also reachable via your Aging and
+            Disability Resource Center (ADRC).
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Autism Cares Today</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> $100 – $5,000 [verify range]</span>
+            <span><strong>Best for</strong> Specific therapy, medical, or equipment needs</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Quarterly grants for autism-related therapy, medical needs, biomedical treatments,
+              equipment, and safety items. Application opens four times a year; awards are
+              competitive but turnaround is faster than most government programs.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> autismcarestoday.com · review eligibility and current cycle
+            dates before drafting an application.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>UnitedHealthcare Children&apos;s Foundation</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Up to $5,000 [verify]</span>
+            <span><strong>Best for</strong> Medical bills, specialized equipment insurance won&apos;t cover</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Grants for medical expenses, equipment, and therapies not fully covered by insurance —
+              not autism-specific, but autism families regularly qualify. You do <em>not</em> need
+              UnitedHealthcare insurance to apply. Income guidelines apply.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> uhccf.org · application is online, decisions typically
+            within a few weeks [verify].
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>ACT Today (Autism Care and Treatment Today)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> $100 – $5,000 [verify range]</span>
+            <span><strong>Best for</strong> Bridge funding for therapy when waivers are pending</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Grants specifically for autism treatment, equipment, and care. Particularly helpful for
+              families on long Medicaid waiver waitlists who need to fund therapy in the meantime.
+              Quarterly application cycle.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> act-today.org · check current application window before
+            preparing materials.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>MyGOAL Inc.</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Multi-thousand range, varies by program [verify]</span>
+            <span><strong>Best for</strong> Filling gaps in covered therapy and intervention</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Funds autism services, therapies, and adaptive technology. Programs include grant
+              awards and direct service support. Smaller foundation, less competitive than the big
+              names — worth applying to even if other applications are pending.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> mygoalautism.org.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Local family support funds</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Varies — typically a few hundred to a few thousand</span>
+            <span><strong>Best for</strong> Immediate crisis (utilities, rent, food)</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              County MHMR centers, local United Way chapters, faith-community emergency funds, and
+              school-district family liaison budgets all carry discretionary money for families in
+              acute need. These are application-light and decision-fast — designed to be deployed in
+              days, not months.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> 211 (covered below) is the fastest single front door to all
+            of these.
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.callout}>
+        <span className={styles.calloutLabel}>In the next 24 hours</span>
+        <p className={styles.calloutTitle}>
+          Three calls that put real money or real help on the table fast.
+        </p>
+        <div className={styles.calloutBody}>
+          <p>
+            <strong>1 · Dial 211.</strong> Free, confidential, available 24/7 across the U.S. The
+            United Way&apos;s 211 line connects callers with emergency rent / utility / food assistance,
+            local respite funds, and crisis childcare. The intake person also knows about local
+            grants you won&apos;t find online. If today is the day money is making caregiving feel
+            impossible, this is the first call.
+          </p>
+          <p>
+            <strong>2 · Your county MHMR (or LIDDA).</strong> Most county mental-health and
+            developmental-disability authorities have small discretionary &ldquo;family support&rdquo;
+            funds for crisis use. They can also flag your child for waiver-list priority if the
+            situation warrants. Find yours by searching{' '}
+            <span className={styles.kbd}>[your county] MHMR</span> or{' '}
+            <span className={styles.kbd}>[your county] IDD authority</span>.
+          </p>
+          <p>
+            <strong>3 · Your school district&apos;s family liaison or special-education coordinator.</strong>{' '}
+            Districts maintain modest discretionary funds for families in crisis — particularly
+            around school supplies, food, transportation, and safety equipment. They also know which
+            community partners can move fastest. Call the district office and ask for the family
+            liaison or McKinney-Vento coordinator.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
