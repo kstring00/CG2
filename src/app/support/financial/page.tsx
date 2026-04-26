@@ -1,574 +1,1351 @@
-'use client';
-
-import Link from 'next/link';
-import { useState } from 'react';
+import type { Metadata } from 'next';
+import { Fraunces, Inter_Tight } from 'next/font/google';
 import {
-  DollarSign,
   Shield,
-  FileText,
+  HeartPulse,
+  PiggyBank,
+  HandCoins,
+  Receipt,
+  Compass,
+  ScrollText,
   Phone,
-  CheckCircle2,
-  AlertCircle,
-  ArrowRight,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
-import { PageTabs } from '@/components/ui/PageTabs';
+import styles from './financial.module.css';
 
-/* ─── data ─────────────────────────────────────────────────── */
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
-const insuranceSections = [
-  {
-    id: 'texas-mandate',
-    title: 'Texas insurance mandate',
-    subtitle: 'What the law actually requires',
-    icon: Shield,
-    color: 'sky',
-    content: (
-      <>
-        <p className="text-sm leading-relaxed text-brand-muted-700 mb-4">
-          Texas Senate Bill 1186 (and subsequent updates) requires most Texas health insurance plans to cover
-          autism spectrum disorder diagnosis and treatment — including ABA therapy — without arbitrary dollar or
-          visit limits. This applies to fully-insured plans regulated by the Texas Department of Insurance.
-        </p>
-        <div className="space-y-3">
-          {[
-            { label: 'Covered', items: ['ABA therapy delivered by or supervised by a licensed behavior analyst', 'Psychological testing and evaluation', 'Speech therapy, occupational therapy, and physical therapy related to autism', 'Psychiatric treatment'] },
-            { label: 'Important exceptions', items: ['Self-funded (ERISA) employer plans are regulated federally, not by Texas — they may have different rules', 'Medicaid follows separate rules (see the Medicaid section below)', 'Always confirm your specific plan covers "autism spectrum disorder" on your Summary of Benefits'] },
-          ].map((block, i) => (
-            <div key={i} className={`rounded-xl border p-4 ${i === 0 ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
-              <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${i === 0 ? 'text-emerald-700' : 'text-amber-700'}`}>{block.label}</p>
-              <ul className="space-y-1.5">
-                {block.items.map((item, j) => (
-                  <li key={j} className="flex items-start gap-2 text-sm text-brand-muted-700">
-                    <CheckCircle2 className={`mt-0.5 h-3.5 w-3.5 shrink-0 ${i === 0 ? 'text-emerald-500' : 'text-amber-500'}`} />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <p className="mt-4 text-xs text-brand-muted-500">
-          Source:{' '}
-          <a href="https://www.tdi.texas.gov/pubs/consumer/cb066.pdf" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
-            Texas Department of Insurance — Autism Coverage
-          </a>
-        </p>
-      </>
-    ),
-  },
-  {
-    id: 'eob',
-    title: 'How to read your EOB',
-    subtitle: 'Explanation of Benefits — decoded',
-    icon: FileText,
-    color: 'violet',
-    content: (
-      <>
-        <p className="text-sm leading-relaxed text-brand-muted-700 mb-4">
-          Your EOB is not a bill. It is a record of what your insurance company processed. Most parents find
-          it confusing — here is what each column actually means.
-        </p>
-        <div className="space-y-3">
-          {[
-            { term: 'Billed amount', def: 'What the provider charged. This is almost never what you actually owe.' },
-            { term: 'Allowed amount', def: 'What your insurance has negotiated as the maximum payable rate for that service. The billed amount beyond this is written off.' },
-            { term: 'Plan paid', def: 'What your insurance company actually paid the provider directly.' },
-            { term: 'Your responsibility', def: 'What you owe. This is made up of your deductible, copay, and coinsurance. THIS is the number that matters.' },
-            { term: 'Denial code / remark code', def: 'If the claim was denied or adjusted, there will be a code here. Look this code up — it tells you exactly why and what you can do about it.' },
-          ].map((row, i) => (
-            <div key={i} className="rounded-xl border border-surface-border bg-surface-muted p-3.5">
-              <p className="text-xs font-bold text-brand-muted-900">{row.term}</p>
-              <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{row.def}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 rounded-xl border border-brand-plum-200 bg-brand-plum-50 p-3.5">
-          <p className="text-xs font-bold text-brand-plum-800 mb-1">If a claim looks wrong:</p>
-          <p className="text-sm text-brand-plum-700">Call the member services number on your insurance card. Say: &ldquo;I have a question about claim number [X] on my EOB dated [date]. The allowed amount seems incorrect for CPT code [code].&rdquo; Write down the rep&apos;s name and the date of your call.</p>
-        </div>
-      </>
-    ),
-  },
-  {
-    id: 'denial',
-    title: 'How to fight a denial',
-    subtitle: 'Step-by-step appeals process',
-    icon: AlertCircle,
-    color: 'rose',
-    content: (
-      <>
-        <p className="text-sm leading-relaxed text-brand-muted-700 mb-4">
-          Insurance denials for ABA therapy are common — and they are frequently overturned on appeal. Do not
-          accept a denial as the final answer. The appeals process exists precisely for this situation.
-        </p>
-        <div className="space-y-3">
-          {[
-            { n: '1', title: 'Request the denial in writing', body: 'You have the right to a written explanation of any denied claim, including the specific medical criteria used to make the decision. Call and ask for this.' },
-            { n: '2', title: 'File an internal appeal', body: 'Most plans require you to exhaust internal appeals before escalating. Write a letter that includes: your child\'s diagnosis, the specific service denied, the date of denial, and a statement that the service is medically necessary. Attach supporting documentation from your BCBA and physician.' },
-            { n: '3', title: 'Request a peer-to-peer review', body: 'Ask your BCBA or physician to speak directly with the insurance company\'s medical reviewer. Many denials are reversed at this stage. This is free and takes one phone call to arrange — your BCBA has likely done this before.' },
-            { n: '4', title: 'File an external review', body: 'If your internal appeal is denied, you have the right to request an independent external review through the Texas Department of Insurance. An independent reviewer decides whether the denial was appropriate. External reviews are overturned in favor of patients at significant rates.' },
-            { n: '5', title: 'File a complaint with TDI', body: 'If you believe your insurer is violating Texas autism coverage law, file a complaint at tdi.texas.gov. The Texas Department of Insurance investigates insurance company practices.' },
-          ].map((step, i) => (
-            <div key={i} className="flex gap-4 rounded-xl border border-surface-border bg-surface-muted p-4">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white">
-                {step.n}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-brand-muted-900">{step.title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{step.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3.5">
-          <p className="text-xs font-bold text-rose-700 mb-1">Sample appeal language</p>
-          <p className="text-sm italic text-rose-700 leading-relaxed">
-            &ldquo;This denial is being appealed on the basis that [service] is medically necessary for the treatment of Autism Spectrum Disorder, which is a covered condition under Texas SB 1186. Attached is documentation from [BCBA name] supporting medical necessity. I am requesting immediate reconsideration.&rdquo;
-          </p>
-        </div>
-      </>
-    ),
-  },
-  {
-    id: 'prior-auth',
-    title: 'Prior authorization',
-    subtitle: 'What it is, how to get it, what to do when denied',
-    icon: FileText,
-    color: 'amber',
-    content: (
-      <>
-        <p className="text-sm leading-relaxed text-brand-muted-700 mb-4">
-          Prior authorization (PA) means your insurance company must approve ABA therapy before it will cover
-          the cost. This is one of the most frustrating parts of the ABA journey — here is how to navigate it.
-        </p>
-        <div className="space-y-3">
-          {[
-            { title: 'What a PA requires', body: 'A written request from your BCBA or treating physician documenting the autism diagnosis (with DSM-5 code F84.0), the specific services requested (typically ABA, CPT codes 97153–97158), hours requested per week, and a statement of medical necessity. Texas ABA Centers handles this for our clients.' },
-            { title: 'How long it takes', body: 'Standard PA: up to 15 business days. Urgent PA: 72 hours. If your child\'s therapy is about to start, request an urgent PA and explain that delay would disrupt ongoing treatment.' },
-            { title: 'When a PA is denied', body: 'Request the specific reason in writing. The most common reasons are "not medically necessary" (appeal with updated documentation) or "frequency/duration not supported" (have your BCBA write a letter justifying the hours). Then follow the denial appeal process above.' },
-            { title: 'Continuity of care', body: 'If your insurance plan changes mid-treatment, Texas law protects continuity of care. You can often continue with your current provider during a transition period — ask your new insurer about continuity of care provisions.' },
-          ].map((item, i) => (
-            <div key={i} className="rounded-xl border border-surface-border bg-surface-muted p-4">
-              <p className="text-sm font-semibold text-brand-muted-900">{item.title}</p>
-              <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{item.body}</p>
-            </div>
-          ))}
-        </div>
-      </>
-    ),
-  },
-  {
-    id: 'medicaid',
-    title: 'Medicaid & CHIP in Texas',
-    subtitle: 'Eligibility, application, and ABA coverage',
-    icon: Shield,
-    color: 'emerald',
-    content: (
-      <>
-        <p className="text-sm leading-relaxed text-brand-muted-700 mb-4">
-          Texas Medicaid (through STAR and STAR Kids programs) covers ABA therapy for children with autism.
-          If your family qualifies based on income, Medicaid can cover ABA with little or no out-of-pocket cost.
-        </p>
-        <div className="space-y-3">
-          {[
-            { title: 'Medicaid eligibility', body: 'Based on household income and family size. As of 2024, a family of 4 with income up to roughly $36,000/year may qualify. Use the screening tool at yourtexasbenefits.com to check eligibility — it takes about 10 minutes.' },
-            { title: 'CHIP (Children\'s Health Insurance Program)', body: 'For children in families that earn too much for Medicaid but cannot afford private insurance. CHIP covers ABA therapy for children diagnosed with autism. Monthly premiums are income-based, starting at $50/month per family.' },
-            { title: 'How to apply', body: 'Apply at yourtexasbenefits.com or call 2-1-1 (Texas Health and Human Services). You will need: proof of income, Social Security numbers for all family members, and documentation of your child\'s autism diagnosis. Texas ABA Centers care coordinators can assist with this process.' },
-            { title: 'What Medicaid covers for ABA', body: 'HHSC-contracted ABA providers are covered at no cost to you. This includes initial assessment, individual therapy (CPT 97153), group therapy (97154), and caregiver training (97156). Prior authorization is still required, but the process is managed by your provider.' },
-          ].map((item, i) => (
-            <div key={i} className="rounded-xl border border-surface-border bg-surface-muted p-4">
-              <p className="text-sm font-semibold text-brand-muted-900">{item.title}</p>
-              <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{item.body}</p>
-            </div>
-          ))}
-        </div>
-        <a
-          href="https://www.yourtexasbenefits.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
-        >
-          Check Medicaid eligibility <ExternalLink className="h-3.5 w-3.5" />
-        </a>
-      </>
-    ),
-  },
-];
+const interTight = Inter_Tight({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-body',
+  display: 'swap',
+});
 
-const sectionColorMap: Record<string, { border: string; bg: string; icon: string; badge: string }> = {
-  sky:     { border: 'border-sky-200',     bg: 'bg-sky-50',     icon: 'text-sky-600',     badge: 'bg-sky-100 text-sky-700 border-sky-200' },
-  violet:  { border: 'border-violet-200',  bg: 'bg-violet-50',  icon: 'text-violet-600',  badge: 'bg-violet-100 text-violet-700 border-violet-200' },
-  rose:    { border: 'border-rose-200',    bg: 'bg-rose-50',    icon: 'text-rose-600',    badge: 'bg-rose-100 text-rose-700 border-rose-200' },
-  amber:   { border: 'border-amber-200',   bg: 'bg-amber-50',   icon: 'text-amber-600',   badge: 'bg-amber-100 text-amber-700 border-amber-200' },
-  emerald: { border: 'border-emerald-200', bg: 'bg-emerald-50', icon: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200' },
+export const metadata: Metadata = {
+  title: 'Financial pressure is mental health · Common Ground',
+  description:
+    'A working guide to therapy coverage, Medicaid waivers, ABLE accounts, respite funding, tax breaks, and adulthood planning for autism families.',
 };
 
-const assistancePrograms = [
+interface SectionMeta {
+  num: string;
+  id: string;
+  title: React.ReactNode;
+  short: string;
+  icon: React.ReactNode;
+}
+
+const SECTIONS: SectionMeta[] = [
   {
-    title: 'HCS Waiver — Home and Community-based Services',
-    body: 'Provides funding for residential support, day programs, and related services for people with intellectual disabilities including autism. There is a wait list — apply now even if you don\'t need it yet.',
-    url: 'https://hhs.texas.gov/programs/home-community-based-services-hcs',
-    tag: 'Texas waiver program',
+    num: '01',
+    id: 'insurance',
+    title: <>Insurance &amp; <em>coverage</em></>,
+    short: 'Insurance & coverage',
+    icon: <Shield size={16} />,
   },
   {
-    title: 'MDCP Waiver — Medically Dependent Children Program',
-    body: 'For children with complex medical needs who would otherwise require nursing facility care. Covers respite, day activity programs, and certain therapies.',
-    url: 'https://hhs.texas.gov/programs/medically-dependent-children-program-mdcp',
-    tag: 'Texas waiver program',
+    num: '02',
+    id: 'medicaid',
+    title: <>Medicaid &amp; <em>waivers</em></>,
+    short: 'Medicaid & waivers',
+    icon: <HeartPulse size={16} />,
   },
   {
-    title: 'CLASS Waiver — Community Living Assistance and Support Services',
-    body: 'For individuals with related conditions (including autism) who need support to live independently or with their family. Covers habilitation, respite, and supported employment.',
-    url: 'https://hhs.texas.gov/programs/community-living-assistance-support-services-class',
-    tag: 'Texas waiver program',
+    num: '03',
+    id: 'able',
+    title: <><em>ABLE</em> accounts</>,
+    short: 'ABLE accounts',
+    icon: <PiggyBank size={16} />,
   },
   {
-    title: 'The Arc of Texas — Emergency Assistance Fund',
-    body: 'One-time emergency financial assistance for families in crisis. Cover immediate needs like utilities, food, or therapy gaps while insurance issues are resolved.',
-    url: 'https://thearcoftexas.org',
-    tag: 'Emergency assistance',
+    num: '04',
+    id: 'respite',
+    title: <>Respite &amp; <em>emergency</em> funds</>,
+    short: 'Respite & emergency funds',
+    icon: <HandCoins size={16} />,
   },
   {
-    title: 'Autism Speaks — Family Services Grants',
-    body: 'Provides grants to families who need help paying for services and supports not covered by insurance or government programs. Applications reviewed on a rolling basis.',
-    url: 'https://www.autismspeaks.org/family-services-grants',
-    tag: 'Grant program',
+    num: '05',
+    id: 'taxes',
+    title: <>Tax credits &amp; <em>deductions</em></>,
+    short: 'Tax credits & deductions',
+    icon: <Receipt size={16} />,
   },
   {
-    title: 'SHIP — Special Kids Network of Texas',
-    body: 'A free information and referral network for families of children with special health care needs. Connects families to local financial assistance, services, and support programs across Texas.',
-    url: 'https://www.texaschildrens.org/departments/special-kids-network',
-    tag: 'Texas referral network',
+    num: '06',
+    id: 'adulthood',
+    title: <>Planning for <em>adulthood</em></>,
+    short: 'Planning for adulthood',
+    icon: <Compass size={16} />,
+  },
+  {
+    num: '07',
+    id: 'scripts',
+    title: <>Scripts &amp; <em>templates</em></>,
+    short: 'Scripts & templates',
+    icon: <ScrollText size={16} />,
+  },
+  {
+    num: '08',
+    id: 'navigators',
+    title: <>Get help <em>navigating this</em></>,
+    short: 'Get help navigating this',
+    icon: <Phone size={16} />,
   },
 ];
-
-const taxDeductions = [
-  {
-    item: 'ABA therapy costs',
-    detail: 'ABA therapy is deductible as a medical expense if it exceeds 7.5% of your adjusted gross income. This includes all out-of-pocket costs not reimbursed by insurance.',
-  },
-  {
-    item: 'Diagnosis and evaluation costs',
-    detail: 'Psychological evaluations, medical visits related to autism, and diagnostic testing are all deductible medical expenses.',
-  },
-  {
-    item: 'Transportation to therapy',
-    detail: 'Mileage driven to and from ABA therapy appointments is deductible at the IRS medical mileage rate (21 cents/mile for 2024). Keep a log.',
-  },
-  {
-    item: 'Special equipment and tools',
-    detail: 'Communication devices, sensory equipment, and other items prescribed or recommended by your BCBA for treatment purposes may be deductible.',
-  },
-  {
-    item: 'Dependent Care FSA',
-    detail: 'If your employer offers a Dependent Care FSA, you can contribute up to $5,000 pre-tax per year. ABA therapy does not qualify for DCFSA (that is for care while you work), but a Healthcare FSA or HSA can be used for ABA costs.',
-  },
-];
-
-const preCallChecklist = [
-  'Your insurance member ID number (front of insurance card)',
-  'The date(s) of service you\'re calling about',
-  'The CPT codes for the services — ask your provider for these (97153, 97155, 97156 are the most common ABA codes)',
-  'The claim number from your EOB, if you have one',
-  'The name of your child\'s BCBA and their NPI (National Provider Identifier) number',
-  'A pen and paper — or an open notes app',
-  'A quiet place where you can hold for up to 45 minutes',
-  'Your diagnosis documentation (DSM-5 code: F84.0)',
-];
-
-/* ─── tabs ──────────────────────────────────────────────────── */
-
-const TABS = [
-  { key: 'insurance',          label: 'Insurance'           },
-  { key: 'financial-assistance', label: 'Financial assistance' },
-  { key: 'income-and-taxes',   label: 'Income & taxes'      },
-];
-
-/* ─── component ────────────────────────────────────────────── */
 
 export default function FinancialPage() {
-  const [openInsurance, setOpenInsurance] = useState<number | null>(0);
-  const [openAssistance, setOpenAssistance] = useState(false);
-  const [openTax, setOpenTax] = useState(false);
-
   return (
-    <div className="page-shell">
-
-      {/* Page header — always visible above the tabs */}
-      <header className="page-header">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-          <DollarSign className="h-3.5 w-3.5" /> Financial Stress Resources
-        </div>
-        <h1 className="page-title text-3xl font-bold sm:text-4xl">
-          Nobody talks about the money. Let&apos;s talk about the money.
+    <div className={`${styles.root} ${fraunces.variable} ${interTight.variable}`}>
+      {/* ─── Hero ────────────────────────────────────────────── */}
+      <header className={styles.hero}>
+        <span className={styles.chip}>Inside Common Ground</span>
+        <h1 className={styles.heroTitle}>
+          Financial pressure is <em>mental health.</em>
         </h1>
-        <p className="page-description text-base leading-relaxed">
-          The financial burden on ABA families is real, large, and mostly invisible in public conversation.
-          This page gives you the specific information and tools to navigate it — starting with insurance,
-          where most families can recover the most.
+        <p className={styles.heroSubtitle}>
+          Money stress for autism families is its own kind of crisis — therapy costs that outpace
+          coverage, lost income from caregiving, the labyrinth of insurance and Medicaid, and a
+          horizon of adulthood planning nobody prepared you for. This is a working guide to the
+          programs, scripts, and decisions that can take some weight off.
         </p>
+        <div className={styles.heroMeta}>
+          <span className={styles.heroReviewed}>Last reviewed · April 2026</span>
+          <span className={styles.heroDisclaimer}>
+            Not financial advice — start here, then talk to a benefits counselor for your situation.
+          </span>
+        </div>
       </header>
 
-      <PageTabs tabs={TABS}>
+      {/* ─── Two-column reading shell ─────────────────────────── */}
+      <div className={styles.shell}>
+        {/* Sticky left TOC (desktop only) */}
+        <aside className={styles.toc} aria-label="On this page">
+          <p className={styles.tocLabel}>On this page</p>
+          <ul className={styles.tocList}>
+            {SECTIONS.map((s) => (
+              <li key={s.id}>
+                <a href={`#${s.id}`}>
+                  <span className={styles.tocNum}>{s.num}</span>
+                  <span>{s.short}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-        {/* ── Tab 1: Insurance ─────────────────────────────────────────── */}
-        <>
-          {/* Cost reality card */}
-          <div className="rounded-3xl border-2 border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 sm:p-8">
-            <div className="flex gap-4">
-              <DollarSign className="mt-1 h-6 w-6 shrink-0 text-amber-500" />
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-amber-500 mb-2">The reality</p>
-                <p className="text-2xl font-bold text-brand-muted-900 leading-tight">
-                  $40,000 – $60,000 per year
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-brand-muted-700">
-                  That is what ABA therapy costs without insurance coverage — for a child receiving a typical 20–40 hours
-                  of therapy per week. Most families do not learn this number before starting. Most families also do not
-                  know how much of it they can recover through insurance if they know how to fight for it.
-                </p>
-                <p className="mt-3 text-sm leading-relaxed text-brand-muted-700">
-                  The insurance section below is the most important page in this guide. If your child has a commercial
-                  insurance plan in Texas, you very likely have more coverage than you think.
-                </p>
+        {/* Reading column — explicit sections so each can carry its own body */}
+        <main className={styles.reading}>
+          {SECTIONS.map((s) => (
+            <section key={s.id} id={s.id} className={styles.section}>
+              <div className={styles.sectionHead}>
+                <span className={styles.sectionNum}>{s.num}</span>
+                <span className={styles.sectionIcon}>{s.icon}</span>
+                <h2 className={styles.sectionTitle}>{s.title}</h2>
               </div>
-            </div>
+              <SectionBody id={s.id} />
+            </section>
+          ))}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Section bodies ───────────────────────────────────────── */
+
+function SectionBody({ id }: { id: string }) {
+  switch (id) {
+    case 'insurance':
+      return <InsuranceBody />;
+    case 'medicaid':
+      return <MedicaidBody />;
+    case 'able':
+      return <AbleBody />;
+    case 'respite':
+      return <RespiteBody />;
+    case 'taxes':
+      return <TaxesBody />;
+    case 'adulthood':
+      return <AdulthoodBody />;
+    case 'scripts':
+      return <ScriptsBody />;
+    case 'navigators':
+      return <NavigatorsBody />;
+    default:
+      return null;
+  }
+}
+
+/* ── 01 · Insurance & coverage ────────────────────────────── */
+
+function InsuranceBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        When your child gets a treatment plan, the next conversation is almost always about money —
+        what&apos;s covered, what isn&apos;t, and how much of the work falls back on you. Most parents are
+        surprised at how much of this is advocacy, not paperwork. The two questions below are the
+        ones to ask first.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Getting <em>therapies covered</em>
+      </h3>
+      <p>
+        Coverage is unevenly applied across therapies, even within the same plan. A starting map:
+      </p>
+      <ul>
+        <li>
+          <strong>Applied Behavior Analysis (ABA).</strong> Most state-regulated plans must cover
+          ABA when medically necessary for autism — Texas has a mandate, and so do most states. The
+          gatekeeping language is <em>medically necessary</em>. Your provider&apos;s BCBA writes a Letter
+          of Medical Necessity (LMN) that frames the care to fit the criteria, and the LMN is what
+          most appeals turn on.
+        </li>
+        <li>
+          <strong>Speech therapy (ST).</strong> Usually covered, often with annual visit caps
+          (frequently in the 30–60 visit range, but plan-dependent). When the cap runs out, an
+          appeal with an updated LMN can extend it for the calendar year.
+        </li>
+        <li>
+          <strong>Occupational therapy (OT).</strong> Same pattern as speech — visit-cap-limited and
+          dependent on documented medical necessity. If sensory-integration goals are central, ask
+          the OT to document them explicitly in the LMN.
+        </li>
+        <li>
+          <strong>Behavioral health (counseling, family therapy).</strong> Federal mental health
+          parity laws require your plan to cover behavioral health at the same level as physical
+          health. If your plan offers $30 primary-care copays, behavioral health should match. Plans
+          that quietly violate parity can be reported to your state insurance commissioner.
+        </li>
+      </ul>
+      <p>
+        Two terms worth knowing before any phone call: <strong>Single Case Agreement (SCA)</strong>{' '}
+        — when no in-network provider can serve your child, insurance can treat an out-of-network
+        provider as in-network for billing — and <strong>Letter of Medical Necessity (LMN)</strong>{' '}
+        — the clinician&apos;s written justification for a service. Both come up below.
+      </p>
+
+      <div className={styles.callout}>
+        <span className={styles.calloutLabel}>Scripts for calling your insurer</span>
+        <p className={styles.calloutTitle}>
+          Three scripts to keep on a sticky note before you pick up the phone.
+        </p>
+        <div className={styles.calloutBody}>
+          <p>
+            <strong>1 · Requesting a Single Case Agreement</strong>
+          </p>
+          <div className={styles.scriptBlock}>
+            &ldquo;Hi, I&apos;m calling to request a Single Case Agreement. My child is a member, ID
+            number [<span className={styles.kbd}>member ID</span>]. The covered benefit is{' '}
+            [<span className={styles.kbd}>ABA / OT / ST</span>]. There is no in-network provider
+            within [<span className={styles.kbd}>distance / drive time</span>] available within
+            [<span className={styles.kbd}>time frame</span>]. The provider we&apos;ve identified is
+            [<span className={styles.kbd}>provider name and NPI</span>]. Can you start the SCA
+            review and tell me what documentation you need from them, and the typical turnaround?&rdquo;
           </div>
 
-          {/* Insurance accordion */}
-          <section className="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-bold text-brand-muted-900">Insurance — where to start</h2>
-            </div>
-            <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
-              Insurance is confusing by design. These five sections break down exactly what you need to know —
-              from what Texas law requires, to what to do when you get a denial. Open each one.
-            </p>
-            <div className="space-y-3">
-              {insuranceSections.map((section, i) => {
-                const c = sectionColorMap[section.color];
-                const isOpen = openInsurance === i;
-                return (
-                  <div
-                    key={section.id}
-                    className={`rounded-2xl border-2 transition-all ${isOpen ? `${c.border} ${c.bg}` : 'border-surface-border bg-surface-muted'}`}
-                  >
-                    <button
-                      className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
-                      onClick={() => setOpenInsurance(isOpen ? null : i)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <section.icon className={`h-4 w-4 shrink-0 ${isOpen ? c.icon : 'text-brand-muted-400'}`} />
-                        <div>
-                          <span className="text-sm font-semibold text-brand-muted-900">{section.title}</span>
-                          <span className="ml-2 text-xs text-brand-muted-500">{section.subtitle}</span>
-                        </div>
-                      </div>
-                      {isOpen
-                        ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                        : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-                    </button>
-                    {isOpen && (
-                      <div className="px-5 pb-6">
-                        {section.content}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Care coordinator CTA */}
-            <div className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-5">
-              <div className="flex gap-3">
-                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                <div>
-                  <p className="text-sm font-bold text-brand-muted-900">Ask your Texas ABA Centers care coordinator</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">
-                    Our care coordinators have navigated hundreds of insurance situations. They can help you read
-                    your EOB, draft appeal letters, arrange peer-to-peer reviews, and connect you with benefits
-                    counselors. You do not have to do this alone — that is specifically part of what they are here for.
-                  </p>
-                  <Link
-                    href="/support/connect"
-                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-                  >
-                    Contact your care coordinator <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Pre-call checklist — always expanded (accordion removed per plan) */}
-          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-              <h2 className="text-lg font-semibold text-brand-muted-900">
-                Before your next insurance call — have these ready
-              </h2>
-            </div>
-            <p className="text-sm text-brand-muted-500 mb-4">
-              Insurance calls go much better when you walk in prepared. This is everything you need.
-            </p>
-            <ul className="space-y-2">
-              {preCallChecklist.map((item, i) => (
-                <li key={i} className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-muted px-4 py-2.5">
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                  <span className="text-sm text-brand-muted-700">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </>
-
-        {/* ── Tab 2: Financial assistance ──────────────────────────────── */}
-        <>
-          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-            <button
-              className="flex w-full items-center justify-between gap-3 text-left"
-              onClick={() => setOpenAssistance(!openAssistance)}
-            >
-              <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-brand-plum-600" />
-                <h2 className="text-lg font-semibold text-brand-muted-900">Texas financial assistance programs</h2>
-              </div>
-              {openAssistance
-                ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-            </button>
-            <p className="mt-1 text-sm text-brand-muted-500">Waiver programs, emergency funds, and grants available to Texas families</p>
-            {openAssistance && (
-              <div className="mt-5 space-y-3">
-                {assistancePrograms.map((program, i) => (
-                  <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                    <div className="mb-2">
-                      <span className="rounded-lg border border-brand-plum-200 bg-brand-plum-50 px-2.5 py-0.5 text-xs font-semibold text-brand-plum-700">
-                        {program.tag}
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-semibold text-brand-muted-900">{program.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{program.body}</p>
-                    <a
-                      href={program.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                    >
-                      Learn more <ExternalLink className="h-3 w-3" />
-                    </a>
-                  </div>
-                ))}
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-xs font-bold text-amber-800 mb-1">Important: apply for waivers now</p>
-                  <p className="text-sm text-amber-700 leading-relaxed">
-                    Texas Medicaid waiver programs (HCS, CLASS, MDCP) have waiting lists that can span years.
-                    Apply as soon as your child is diagnosed — even if you don&apos;t think you need it yet. Your
-                    position on the wait list is determined by application date, not current need.
-                  </p>
-                </div>
-              </div>
-            )}
-          </section>
-        </>
-
-        {/* ── Tab 3: Income & taxes ─────────────────────────────────────── */}
-        <>
-          {/* Lost income & FMLA */}
-          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="h-5 w-5 text-sky-600" />
-              <h2 className="text-lg font-semibold text-brand-muted-900">Lost income &amp; FMLA rights</h2>
-            </div>
-            <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
-              Many parents of children in ABA therapy have to reduce their work hours — and many do not know
-              their legal protections when doing so.
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                { title: 'FMLA protects your job', body: 'If your employer has 50+ employees and you have worked there for 12+ months, the Family and Medical Leave Act allows up to 12 weeks of unpaid, job-protected leave per year to care for a child with a serious health condition. Autism + ABA therapy qualifies.' },
-                { title: 'Intermittent FMLA', body: 'You can use FMLA leave in small increments — hours or days — not just weeks at a time. This is critical for parents who need to attend therapy sessions or manage crisis situations without using all their PTO.' },
-                { title: 'How to document medical necessity', body: 'Your BCBA or physician completes an FMLA certification form (Form WH-380-F). This form documents that your child\'s condition requires your care and that ABA therapy is an ongoing medical treatment.' },
-                { title: 'ADA workplace accommodations', body: 'Even if you don\'t qualify for FMLA, the ADA may require your employer to provide reasonable accommodations — like flexible scheduling or remote work — to support a caregiver. Document your request in writing.' },
-              ].map((item, i) => (
-                <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                  <p className="text-sm font-semibold text-brand-muted-900">{item.title}</p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Tax deductions accordion */}
-          <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
-            <button
-              className="flex w-full items-center justify-between gap-3 text-left"
-              onClick={() => setOpenTax(!openTax)}
-            >
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-emerald-600" />
-                <h2 className="text-lg font-semibold text-brand-muted-900">Tax deductions for special needs families</h2>
-              </div>
-              {openTax
-                ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
-            </button>
-            <p className="mt-1 text-sm text-brand-muted-500">
-              These deductions exist. Most families never take them because they don&apos;t know about them.
-            </p>
-            {openTax && (
-              <div className="mt-5 space-y-3">
-                {taxDeductions.map((row, i) => (
-                  <div key={i} className="rounded-xl border border-surface-border bg-surface-muted p-4">
-                    <p className="text-sm font-semibold text-brand-muted-900">{row.item}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{row.detail}</p>
-                  </div>
-                ))}
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-                  <p className="text-xs font-bold text-emerald-800 mb-1">Use a tax professional</p>
-                  <p className="text-sm text-emerald-700 leading-relaxed">
-                    Special needs family tax situations are complex. A CPA or enrolled agent who understands disability-related deductions can often save families thousands of dollars. Ask your care coordinator if they know local resources.
-                  </p>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Closing */}
-          <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-emerald-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
-              <Shield className="h-6 w-6 text-primary" />
-            </div>
-            <h2 className="text-xl font-bold text-brand-muted-900">
-              You are allowed to fight for coverage. That is what it is there for.
-            </h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
-              Insurance companies count on families not knowing their rights or not having the energy to appeal.
-              You now have both. Your care coordinator is here to help you use them.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link
-                href="/support/connect"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-              >
-                Talk to your care coordinator <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/support/couples"
-                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
-              >
-                Couples &amp; relationship support
-              </Link>
-            </div>
+          <p>
+            <strong>2 · Appealing a denial</strong>
+          </p>
+          <div className={styles.scriptBlock}>
+            &ldquo;I&apos;m calling to appeal a denial. The claim or authorization number is
+            [<span className={styles.kbd}>number</span>], denied on
+            [<span className={styles.kbd}>date</span>]. The reason cited was
+            [<span className={styles.kbd}>reason</span>]. I&apos;m requesting in writing: the medical
+            necessity criteria the reviewer applied, and the clinical guideline used. I&apos;d like to
+            file the appeal in writing — please send the appeal form and confirm the submission
+            deadline.&rdquo;
           </div>
-        </>
+          <p>
+            About 40% of behavioral health denials are overturned on appeal. Insurers count on
+            families not appealing — don&apos;t give them that.
+          </p>
 
-      </PageTabs>
+          <p>
+            <strong>3 · Requesting a Letter of Medical Necessity from your provider</strong>
+          </p>
+          <div className={styles.scriptBlock}>
+            &ldquo;I&apos;m requesting a Letter of Medical Necessity for
+            [<span className={styles.kbd}>child&apos;s name</span>]. Insurance is asking for documentation
+            supporting [<span className={styles.kbd}>requested service</span>] — they specifically
+            want diagnosis, frequency, duration, and expected functional outcomes. Could you send the
+            LMN to [<span className={styles.kbd}>insurance fax / portal</span>] and copy us? If
+            easier, I can pick it up.&rdquo;
+          </div>
+          <p>
+            An LMN unlocks more than coverage decisions — it&apos;s also what makes some tax deductions
+            legitimate (more on that in §05).
+          </p>
+        </div>
+      </div>
 
+      <h3 className={styles.subhead}>
+        When private insurance <em>isn&apos;t enough</em>
+      </h3>
+      <ul>
+        <li>
+          <strong>Secondary coverage.</strong> A child can carry private insurance <em>and</em>{' '}
+          Medicaid simultaneously when the child qualifies via a waiver (see §02). Medicaid as
+          secondary picks up copays, deductibles, and services your private plan rejects. Many
+          families don&apos;t realize this stacking is allowed.
+        </li>
+        <li>
+          <strong>Marketplace plans (HealthCare.gov).</strong> If you&apos;ve lost employer coverage or
+          you&apos;re self-employed, marketplace plans must cover essential health benefits, including
+          pediatric services and behavioral health. Compare plans on out-of-network costs and
+          behavioral health specifically — not all metal tiers cover ABA equally.
+        </li>
+        <li>
+          <strong>COBRA gotchas.</strong> COBRA continues your employer plan, but you pay the full
+          premium plus a 2% admin fee — often four to six times your prior payroll deduction. The
+          60-day enrollment window after coverage loss is critical; missing it forfeits the option.
+          Before electing COBRA solely for therapy continuity, price-check the marketplace special
+          enrollment period (job loss triggers one) — equivalent coverage is often cheaper.
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+/* ── 02 · Medicaid & waivers ──────────────────────────────── */
+
+function MedicaidBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Medicaid waivers are the single most under-discovered tool for autism families. They aren&apos;t
+        well-publicized partly because the agencies that run them are perpetually overwhelmed and
+        partly because the eligibility rules are counter-intuitive. The most important fact first:
+        in most states, <strong>waiver eligibility is calculated using the child&apos;s income — not the
+        household&apos;s.</strong> Most kids have no income. So families well above the standard Medicaid
+        income threshold can still qualify their child for waiver benefits.
+      </p>
+      <p>
+        An <strong>HCBS waiver</strong> (Home and Community-Based Services) lets a state cover
+        Medicaid services for people who would otherwise need institutional care. For a child with
+        autism, that translates to therapy, attendant care, respite, behavioral support, sometimes
+        nutrition, transportation, or environmental modifications. Specifics vary by state and by
+        waiver — the section below is Texas-specific because the rest of this platform is
+        Texas-leaning. A generic block follows for everyone else.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Texas <em>waivers</em>
+      </h3>
+      <p>
+        Texas runs four waivers most relevant to autism families. The interest lists are long — for
+        most of them, years long — so the rule is simple: <strong>get on every list you might
+        qualify for today</strong>, even if you&apos;re not sure. Adding your child does not commit you to
+        anything. You can decline services later. The list moves slowly enough that there is no
+        penalty for being early; there is a real cost to being late.
+      </p>
+      <ul className={styles.waiverList}>
+        <li className={styles.waiverItem}>
+          <span className={styles.waiverName}>MDCP</span>
+          <span className={styles.waiverPlain}>
+            Medically Dependent Children Program. Covers medically-necessary services, attendant
+            care, and respite for kids whose medical complexity would otherwise require nursing-home
+            level care.
+          </span>
+          <div className={styles.waiverMeta}>
+            <span><strong>For</strong> Children with significant medical needs.</span>
+            <span><strong>Wait</strong> Months to about a year [verify].</span>
+          </div>
+        </li>
+        <li className={styles.waiverItem}>
+          <span className={styles.waiverName}>CLASS</span>
+          <span className={styles.waiverPlain}>
+            Community Living Assistance & Support Services. Habilitation, respite, adaptive aids,
+            nursing, and behavioral support for individuals with related conditions including
+            autism.
+          </span>
+          <div className={styles.waiverMeta}>
+            <span><strong>For</strong> Individuals with related conditions (autism qualifies).</span>
+            <span><strong>Wait</strong> Many years — often 5+ [verify].</span>
+          </div>
+        </li>
+        <li className={styles.waiverItem}>
+          <span className={styles.waiverName}>HCS</span>
+          <span className={styles.waiverPlain}>
+            Home & Community-based Services. Day habilitation, supported employment, residential
+            options, respite, and behavioral support for individuals with intellectual or
+            developmental disabilities.
+          </span>
+          <div className={styles.waiverMeta}>
+            <span><strong>For</strong> Individuals with IDD (autism qualifies).</span>
+            <span><strong>Wait</strong> 10+ years in most parts of Texas [verify].</span>
+          </div>
+        </li>
+        <li className={styles.waiverItem}>
+          <span className={styles.waiverName}>TxHmL</span>
+          <span className={styles.waiverPlain}>
+            Texas Home Living. A lighter support package than HCS — no residential component, but
+            similar habilitation, respite, and behavioral supports for those living at home.
+          </span>
+          <div className={styles.waiverMeta}>
+            <span><strong>For</strong> Individuals with IDD living at home.</span>
+            <span><strong>Wait</strong> Multi-year, similar to HCS [verify].</span>
+          </div>
+        </li>
+      </ul>
+      <p>
+        How to get on the lists: contact your Local Intellectual and Developmental Disability
+        Authority (LIDDA). Texas has 39 LIDDAs covering all counties — call yours and ask to be added
+        to interest lists for HCS, CLASS, TxHmL, and MDCP if applicable. The intake call usually
+        takes 30–60 minutes. Bring your child&apos;s diagnostic documentation and Medicaid number if you
+        have one.
+      </p>
+
+      <h3 className={styles.subhead}>
+        If you&apos;re <em>not in Texas</em>
+      </h3>
+      <p>
+        Every state runs its own slate of waivers under different names. The questions to ask are
+        the same:
+      </p>
+      <ul>
+        <li>
+          Search <span className={styles.kbd}>[your state] HCBS waiver autism</span> or{' '}
+          <span className={styles.kbd}>[your state] Medicaid waiver children developmental
+          disability</span>. Your state Medicaid agency will list the active waivers.
+        </li>
+        <li>
+          Your state&apos;s Department of Developmental Services (or its equivalent) usually maintains the
+          interest list and intake process.
+        </li>
+        <li>
+          Your state&apos;s <strong>Family-to-Family Health Information Center</strong> (covered in §08)
+          can tell you which waivers exist, who runs them, and walk you through the application. Free
+          service, every state has one.
+        </li>
+      </ul>
+      <p>
+        Two more federal programs worth knowing about regardless of state:
+      </p>
+      <ul>
+        <li>
+          <strong>Katie Beckett option (TEFRA).</strong> About a dozen states use this Medicaid
+          eligibility category, which lets a child with significant disabilities qualify for Medicaid
+          based on the child&apos;s assets only. Worth checking if your state participates.
+        </li>
+        <li>
+          <strong>Children&apos;s Health Insurance Program (CHIP).</strong> If you&apos;re between Medicaid and
+          marketplace, CHIP covers kids in households up to roughly 200–300% of the federal poverty
+          level (varies by state) and includes behavioral health.
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+/* ── 03 · ABLE accounts ───────────────────────────────────── */
+
+function AbleBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        An <strong>ABLE account</strong> (Achieving a Better Life Experience) is a tax-advantaged
+        savings account specifically for people with disabilities. The reason it exists: before ABLE,
+        a person on SSI or Medicaid lost benefits the moment their savings crossed $2,000. That cap
+        meant disabled adults — and the families saving for them — were structurally prevented from
+        building any financial cushion at all.
+      </p>
+      <p>
+        ABLE accounts let the beneficiary save real money <em>without</em> losing means-tested
+        benefits. Up to $100,000 in an ABLE balance is excluded from the SSI $2,000 asset test,
+        and ABLE balances are excluded from Medicaid asset tests in nearly every state. For autism
+        families this is the single most important account type to know about, and one of the most
+        chronically under-used.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Why it <em>matters</em>
+      </h3>
+      <ul>
+        <li>
+          <strong>Save without disqualifying benefits.</strong> The ABLE balance does not count
+          against SSI&apos;s $2,000 asset cap (up to the $100,000 exclusion) and is fully excluded from
+          Medicaid asset tests in most states.
+        </li>
+        <li>
+          <strong>Family and friends can contribute.</strong> Anyone can deposit into the
+          beneficiary&apos;s ABLE account — grandparents, aunts, employers — up to the annual contribution
+          limit per beneficiary (not per contributor).
+        </li>
+        <li>
+          <strong>Tax-free growth, tax-free qualified withdrawals.</strong> Same federal tax
+          treatment as a 529 college savings plan, but for disability-related expenses.
+        </li>
+        <li>
+          <strong>Eligibility is the disability, not the diagnosis date.</strong> The disability
+          must have begun before age 26. (The ABLE Age Adjustment Act raises this to age 46
+          starting in 2026 [verify effective date]; if your child&apos;s diagnosis came later, this
+          change matters.)
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        Limits and <em>rules to know</em>
+      </h3>
+      <ul>
+        <li>
+          <strong>Annual contribution cap.</strong> The federal limit is tied to the gift-tax annual
+          exclusion — currently $18,000 / year per beneficiary [verify for current tax year]. This
+          is the total across all contributors combined.
+        </li>
+        <li>
+          <strong>ABLE-to-Work.</strong> If the beneficiary works and is not enrolled in an employer
+          retirement plan, an additional contribution is allowed up to the lesser of (a) their
+          annual gross earnings or (b) the federal poverty line for a one-person household
+          (~$15,060 for 2024 [verify]). This stacks on top of the $18,000 base.
+        </li>
+        <li>
+          <strong>Total balance cap.</strong> Each state sets its own ceiling — Texas&apos; cap is in the
+          $500K range [verify exact figure]. Most state caps fall between $300K and $550K. Hitting
+          the cap is a good problem most families never face.
+        </li>
+        <li>
+          <strong>Qualified Disability Expenses (QDEs) — what you can spend it on.</strong>{' '}
+          Deliberately broad. Housing, transportation, education, employment training, assistive
+          tech, health and wellness expenses not covered by other sources, financial management
+          fees, legal fees, basic living expenses, even funeral expenses. The IRS standard is that
+          the expense relate to the disability and improve quality of life.
+        </li>
+        <li>
+          <strong>Non-qualified withdrawals.</strong> If money is spent on a non-QDE, the earnings
+          portion is subject to federal income tax plus a 10% penalty, and the withdrawal can count
+          against SSI / Medicaid eligibility. Track receipts.
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        How to <em>open one</em>
+      </h3>
+      <ol className={styles.stepList}>
+        <li>
+          <strong>Pick a state plan.</strong> You do not have to use your home state&apos;s plan. Compare
+          plans on annual fees, investment options, debit-card access, and minimum contribution at{' '}
+          <span className={styles.kbd}>ablenrc.org</span> (the ABLE National Resource Center
+          comparison tool). Texans default to the Texas ABLE plan; other strong national options
+          include Ohio STABLE and Oregon ABLE for State [verify].
+        </li>
+        <li>
+          <strong>Gather your documents.</strong> Beneficiary&apos;s Social Security number, date of
+          birth, and disability documentation (an SSI/SSDI award letter is the simplest; a signed
+          physician diagnosis listing the eligible condition also works). The account opener (you,
+          if your child is a minor) provides their own SSN and bank routing information.
+        </li>
+        <li>
+          <strong>Open online.</strong> Most state plans have a 15–30 minute online application.
+          Designate yourself as the Authorized Legal Representative if your child is a minor. Set
+          up automatic monthly contributions even at $25/month — small consistent transfers compound
+          and build the habit before larger contributions become possible.
+        </li>
+      </ol>
+      <p>
+        One more pointer: families often pair an ABLE account with a Special Needs Trust (SNT). They
+        do different jobs — see §06 for when you need both.
+      </p>
+    </div>
+  );
+}
+
+/* ── 04 · Respite & emergency funds ───────────────────────── */
+
+function RespiteBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Respite funding and emergency grants exist for autism families, but the programs are
+        scattered, lightly publicized, and — for most of them — application-driven rather than
+        automatic. The list below is the working short list. None of these is going to fix
+        everything; together they can take a real bite out of a hard month.
+      </p>
+      <p>
+        A note on style: the &ldquo;typical award&rdquo; ranges below are directional. Individual
+        program awards vary year-to-year and by demand; verify the current cycle&apos;s specifics on each
+        program&apos;s site before counting on a number.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Six <em>funding sources</em> worth applying to
+      </h3>
+      <div className={styles.cardList}>
+        <div className={styles.resCard}>
+          <h4>Take Time Texas (state respite voucher)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Per-family respite hours; voucher-based</span>
+            <span><strong>Best for</strong> Families needing scheduled regular breaks</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Texas&apos;s Lifespan Respite program offering subsidized respite vouchers families can
+              redeem with approved providers. Annual allocation per family varies by funding cycle
+              [verify]. Apply through{' '}
+              <span className={styles.kbd}>taketimetexas.org</span> — registration is the gating
+              step; vouchers are released as funding allows.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> taketimetexas.org · also reachable via your Aging and
+            Disability Resource Center (ADRC).
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Autism Cares Today</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> $100 – $5,000 [verify range]</span>
+            <span><strong>Best for</strong> Specific therapy, medical, or equipment needs</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Quarterly grants for autism-related therapy, medical needs, biomedical treatments,
+              equipment, and safety items. Application opens four times a year; awards are
+              competitive but turnaround is faster than most government programs.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> autismcarestoday.com · review eligibility and current cycle
+            dates before drafting an application.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>UnitedHealthcare Children&apos;s Foundation</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Up to $5,000 [verify]</span>
+            <span><strong>Best for</strong> Medical bills, specialized equipment insurance won&apos;t cover</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Grants for medical expenses, equipment, and therapies not fully covered by insurance —
+              not autism-specific, but autism families regularly qualify. You do <em>not</em> need
+              UnitedHealthcare insurance to apply. Income guidelines apply.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> uhccf.org · application is online, decisions typically
+            within a few weeks [verify].
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>ACT Today (Autism Care and Treatment Today)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> $100 – $5,000 [verify range]</span>
+            <span><strong>Best for</strong> Bridge funding for therapy when waivers are pending</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Grants specifically for autism treatment, equipment, and care. Particularly helpful for
+              families on long Medicaid waiver waitlists who need to fund therapy in the meantime.
+              Quarterly application cycle.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> act-today.org · check current application window before
+            preparing materials.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>MyGOAL Inc.</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Multi-thousand range, varies by program [verify]</span>
+            <span><strong>Best for</strong> Filling gaps in covered therapy and intervention</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Funds autism services, therapies, and adaptive technology. Programs include grant
+              awards and direct service support. Smaller foundation, less competitive than the big
+              names — worth applying to even if other applications are pending.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> mygoalautism.org.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Local family support funds</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Award</strong> Varies — typically a few hundred to a few thousand</span>
+            <span><strong>Best for</strong> Immediate crisis (utilities, rent, food)</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              County MHMR centers, local United Way chapters, faith-community emergency funds, and
+              school-district family liaison budgets all carry discretionary money for families in
+              acute need. These are application-light and decision-fast — designed to be deployed in
+              days, not months.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> 211 (covered below) is the fastest single front door to all
+            of these.
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.callout}>
+        <span className={styles.calloutLabel}>In the next 24 hours</span>
+        <p className={styles.calloutTitle}>
+          Three calls that put real money or real help on the table fast.
+        </p>
+        <div className={styles.calloutBody}>
+          <p>
+            <strong>1 · Dial 211.</strong> Free, confidential, available 24/7 across the U.S. The
+            United Way&apos;s 211 line connects callers with emergency rent / utility / food assistance,
+            local respite funds, and crisis childcare. The intake person also knows about local
+            grants you won&apos;t find online. If today is the day money is making caregiving feel
+            impossible, this is the first call.
+          </p>
+          <p>
+            <strong>2 · Your county MHMR (or LIDDA).</strong> Most county mental-health and
+            developmental-disability authorities have small discretionary &ldquo;family support&rdquo;
+            funds for crisis use. They can also flag your child for waiver-list priority if the
+            situation warrants. Find yours by searching{' '}
+            <span className={styles.kbd}>[your county] MHMR</span> or{' '}
+            <span className={styles.kbd}>[your county] IDD authority</span>.
+          </p>
+          <p>
+            <strong>3 · Your school district&apos;s family liaison or special-education coordinator.</strong>{' '}
+            Districts maintain modest discretionary funds for families in crisis — particularly
+            around school supplies, food, transportation, and safety equipment. They also know which
+            community partners can move fastest. Call the district office and ask for the family
+            liaison or McKinney-Vento coordinator.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── 05 · Tax credits & deductions ─────────────────────────── */
+
+function TaxesBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Taxes are one of the few places autism caregiving gets a structural break — and one of the
+        most under-claimed. The barrier is documentation: most of these benefits require either a
+        Letter of Medical Necessity from a physician (see §01) or itemizing on Schedule A.
+        Caregivers who use them well leave thousands on the floor every year by not. The list below
+        is a working starting set; specific numbers shift annually, so confirm each line against
+        the current tax year before filing.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Child &amp; Dependent Care <em>Credit</em>
+      </h3>
+      <p>
+        Federal credit for childcare or respite costs paid so you can work (or look for work). Up to
+        $3,000 in qualifying expenses for one dependent or $6,000 for two or more [verify for
+        current tax year]. The credit rate scales with income — between 20% and 35% of qualifying
+        expenses. For an autism family, the under-used part is that:
+      </p>
+      <ul>
+        <li>
+          <strong>Respite care counts</strong> if it lets you work. Day camps, in-home respite, and
+          some after-school programs all qualify.
+        </li>
+        <li>
+          <strong>Disabled dependents over age 13 still count</strong> if they cannot care for
+          themselves. The age-13 cutoff that applies to neurotypical children is waived.
+        </li>
+        <li>
+          You report the provider&apos;s name, address, and SSN/EIN on Form 2441. Keep receipts and a
+          short log of dates served.
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        Medical expense <em>deduction</em>
+      </h3>
+      <p>
+        If you itemize on Schedule A, medical expenses above 7.5% of your AGI are deductible. For
+        most autism families, this floor gets crossed easily — the surprise is how broadly the IRS
+        defines &ldquo;medical expense&rdquo; once a Letter of Medical Necessity backs the line item.
+        What counts:
+      </p>
+      <ul>
+        <li>
+          <strong>Therapies.</strong> ABA, OT, ST, behavioral therapy, counseling — including
+          out-of-pocket portions of insured care and the full cost of out-of-network or self-pay
+          providers.
+        </li>
+        <li>
+          <strong>Mileage to and from medical appointments.</strong> Track every drive at the
+          current IRS medical-mileage rate (21¢ per mile for 2024 [verify current year]). Over a
+          year of weekly therapy visits this adds up to real dollars.
+        </li>
+        <li>
+          <strong>Lodging during medical travel</strong> — up to $50 per night per person — when
+          care is delivered far from home (for example, a developmental evaluation at a regional
+          children&apos;s hospital).
+        </li>
+        <li>
+          <strong>Special diets when prescribed.</strong> The <em>incremental</em> cost above a
+          regular diet is deductible if a physician has prescribed the diet (gluten-free,
+          casein-free, ketogenic, etc.). Document with an LMN and keep receipts; the IRS will accept
+          a reasonable comparison-pricing method.
+        </li>
+        <li>
+          <strong>Conferences and seminars on the medical condition.</strong> Registration and
+          travel costs to attend conferences specifically about your child&apos;s diagnosis are
+          deductible — meals are not.
+        </li>
+        <li>
+          <strong>Special schools and tutoring</strong> when the principal reason is the disability,
+          not general education enrichment. The LMN should explicitly tie the placement to the
+          medical need.
+        </li>
+        <li>
+          <strong>Adaptive equipment and home modifications.</strong> AAC devices, sensory
+          equipment, weighted blankets, safety locks, fencing for elopement risk — the deductible
+          amount is the cost above what a non-disabled household would spend.
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        The <em>LMN unlock</em>
+      </h3>
+      <p>
+        A Letter of Medical Necessity does more than win an insurance appeal. For tax purposes, an
+        LMN converts otherwise-personal expenses into deductible medical expenses — special diets,
+        special schools, tutoring, certain travel, certain home modifications. If your child&apos;s
+        clinician hasn&apos;t written one, ask. They&apos;re routine to produce; most clinicians keep a
+        template.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Saver&apos;s Credit (for <em>ABLE contributors</em>)
+      </h3>
+      <p>
+        Federal credit on Form 8880 for retirement and ABLE-account contributions. ABLE beneficiaries
+        who contribute to their own ABLE account from earned income can claim a credit of 10–50% of
+        contributions, up to $2,000 in contributions ($4,000 if married filing jointly), based on
+        AGI [verify current-year income limits]. Often missed by working ABLE beneficiaries and the
+        families filing for them.
+      </p>
+
+      <h3 className={styles.subhead}>
+        EITC and the <em>permanently disabled adult child</em>
+      </h3>
+      <p>
+        The Earned Income Tax Credit&apos;s &ldquo;qualifying child&rdquo; rule normally caps at age 19
+        (24 if the child is a full-time student). For a child with a permanent and total disability,
+        that age cap is waived — the disabled adult child can remain a qualifying child for EITC
+        purposes indefinitely, regardless of age. This single rule meaningfully shifts EITC
+        eligibility for many caregiver households once children move into their twenties.
+      </p>
+
+      <h3 className={styles.subhead}>
+        A note on <em>recordkeeping</em>
+      </h3>
+      <p>
+        These deductions and credits all live or die on documentation. A simple system that works:
+        a folder per tax year (digital is fine), a running mileage log in your phone (date, purpose,
+        miles), and a habit of asking every provider for a year-end summary statement. Twenty
+        minutes of monthly upkeep saves a frantic April.
+      </p>
+    </div>
+  );
+}
+
+/* ── 06 · Planning for adulthood ──────────────────────────── */
+
+function AdulthoodBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Planning for the adult years is the part of caregiving most parents postpone until something
+        forces it — a guardianship deadline, an SSI redetermination letter, a school services cliff
+        notice. The four conversations below are the ones that benefit most from being had years
+        early. None of them is one decision; each is a series of decisions that get easier when
+        you&apos;re looking at them on a normal Tuesday instead of in a crisis.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Special Needs Trust <em>vs</em> ABLE
+      </h3>
+      <p>
+        Both protect benefits eligibility while preserving funds for your child&apos;s future. They do
+        different jobs, and most families end up needing both.
+      </p>
+      <ul>
+        <li>
+          <strong>ABLE</strong> (see §03) is the <em>working account</em>. The beneficiary owns it,
+          contributions are limited annually, balances above $100,000 start affecting SSI, and
+          withdrawals must be Qualified Disability Expenses. It&apos;s ideal for day-to-day disability
+          spending — therapy copays, sensory equipment, transportation, technology.
+        </li>
+        <li>
+          <strong>Special Needs Trust (SNT)</strong> is the <em>wrapper for larger wealth</em>. No
+          $100,000 ceiling; allowable uses are broader (entertainment, travel, restaurants, hobbies
+          — things SSI/Medicaid won&apos;t cover); the trustee, not the beneficiary, controls
+          distributions, which protects funds from creditors and from the beneficiary&apos;s own
+          decisions when capacity varies. Setup costs from an attorney typically run $1,500–$3,500
+          for a third-party SNT [verify current-market range], with annual trustee fees if you use a
+          professional trustee.
+        </li>
+        <li>
+          <strong>Third-party SNT</strong> is funded by parents, grandparents, others — and at the
+          beneficiary&apos;s death, remaining funds can pass to other people you choose.
+          <strong> First-party SNT</strong> (or &ldquo;self-settled&rdquo; SNT) holds the
+          beneficiary&apos;s own money — usually from an inheritance received outright, a personal-injury
+          settlement, or back-pay from SSI — and at death, Medicaid is repaid first from any
+          remaining funds before anything passes to heirs.
+        </li>
+      </ul>
+      <p>
+        <strong>When you need both.</strong> Use ABLE for routine, accessible spending. Use an SNT
+        for larger inheritances and parent estate planning. The classic mistake: a grandparent
+        leaves $50,000 outright to the disabled grandchild in a will — the grandchild loses SSI
+        and Medicaid the day the check arrives. The fix is preventive: tell relatives that any gift
+        or bequest needs to flow into the SNT or, for smaller amounts, the ABLE.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Guardianship <em>vs</em> supported decision-making
+      </h3>
+      <p>
+        A common misconception: that turning 18 means a parent must get full guardianship to keep
+        helping their disabled child. There is a spectrum, and the most restrictive option is rarely
+        the right one.
+      </p>
+      <ul>
+        <li>
+          <strong>Full guardianship.</strong> A court legally removes some or all of the disabled
+          adult&apos;s decision-making rights and assigns them to you. Setup typically costs $1,500–$5,000
+          in attorney and court fees [verify], with ongoing annual reporting to the court (often
+          requiring an annual attorney bill). The adult loses the legal right to enter contracts,
+          choose where to live, marry, vote in some states, or make medical decisions independently.
+        </li>
+        <li>
+          <strong>Supported decision-making (SDM).</strong> The disabled adult retains legal
+          authority and designates trusted &ldquo;supporters&rdquo; (parents, siblings, friends) who
+          help process information and communicate decisions. Setup is essentially the cost of
+          drafting a Supporter Agreement — often a few hundred dollars or free through a disability
+          rights legal clinic. Texas was the first state to formally recognize SDM in statute (2015);
+          most states now recognize it in some form.
+        </li>
+        <li>
+          <strong>Powers of attorney + healthcare proxies.</strong> A middle path, especially when
+          full guardianship is overkill but informal SDM doesn&apos;t carry enough legal weight.
+          Documents are domain-specific (financial POA, medical POA, HIPAA release) and can be
+          revoked by the adult at any time. Often $200–$500 to draft with an attorney; templates
+          exist for self-preparation.
+        </li>
+      </ul>
+      <p>
+        <strong>Cost framing.</strong> Guardianship costs more upfront, more every year, and removes
+        rights that can be hard to restore. SDM and POAs cost a fraction and preserve autonomy. The
+        principle worth holding onto: needing help with a decision is not the same as needing to
+        lose the right to make it.
+      </p>
+
+      <h3 className={styles.subhead}>
+        SSI at <em>18</em> — the redetermination
+      </h3>
+      <p>
+        At age 18, the Social Security Administration runs an &ldquo;age-18 redetermination&rdquo;
+        — a fresh disability eligibility review using the adult standard. Two big things shift:
+      </p>
+      <ul>
+        <li>
+          <strong>Parental income and resources stop counting.</strong> Many families whose children
+          were ineligible for SSI as minors (because of household income) suddenly qualify at 18,
+          based only on the now-adult child&apos;s income and assets. <em>Apply 60–90 days before the
+          18th birthday</em> to avoid a coverage gap; SSI does not back-date eligibility to the
+          birthday if the application is late.
+        </li>
+        <li>
+          <strong>The adult disability standard applies.</strong> Instead of the childhood
+          &ldquo;marked and severe functional limitations&rdquo; test, the SSA evaluates inability
+          to engage in substantial gainful activity (SGA) — essentially, can the person earn above
+          a defined monthly threshold ($1,550/month in 2024 [verify current-year SGA limit])?
+          Roughly a third of childhood SSI recipients are redetermined as ineligible at 18 under
+          adult standards [verify recent figure]; appeal rates are high and the disabled adult is
+          entitled to continued benefits during appeal.
+        </li>
+      </ul>
+      <p>
+        Bring updated medical records (the last two years), a function-and-daily-living narrative,
+        and any school records that document support needs. The SSA reviewer is looking for evidence
+        that translates to adult standards — not test scores.
+      </p>
+
+      <h3 className={styles.subhead}>
+        The <em>cliff</em> at 22
+      </h3>
+      <p>
+        Public special education under IDEA ends at age 22 (some states age 21, depending on
+        jurisdiction). The end is real and abrupt: structured day, transportation, related services
+        (OT, ST), behavioral support, social skills programming — all of it stops. Many families are
+        unprepared, even when they know the date is coming, because nothing in the school years
+        prepares you for the size of the hole.
+      </p>
+      <p>
+        The bridge is built from several programs, most of which require advance enrollment:
+      </p>
+      <ul>
+        <li>
+          <strong>Vocational Rehabilitation (VR).</strong> Every state runs a VR program that funds
+          assessment, training, and supported employment for adults with disabilities. In Texas this
+          is Texas Workforce Solutions–Vocational Rehabilitation Services. Apply during high school
+          — VR can run alongside the IEP transition plan.
+        </li>
+        <li>
+          <strong>Day habilitation</strong> (covered by HCS, CLASS, and TxHmL waivers — yet another
+          reason to be on those interest lists from years before; see §02). For adults whose
+          support needs make competitive employment unrealistic, day hab provides a structured
+          weekday alternative.
+        </li>
+        <li>
+          <strong>Supported employment</strong> models (covered by HCS and many waivers in other
+          states). Includes job coaching, customized employment, and microenterprise — paths that
+          make work possible even when traditional jobs aren&apos;t.
+        </li>
+        <li>
+          <strong>Community college disability services.</strong> If college is on the table,
+          community-college disability offices are often more flexible than four-year ones. Many
+          have dedicated transition programs for students with intellectual disabilities, including
+          Think College–accredited programs across the country.
+        </li>
+      </ul>
+      <p>
+        Federal IDEA requires transition planning to begin no later than age 16, but many states
+        start at 14 — and the families with the smoothest cliffs are usually the ones who started
+        earlier, treating the post-school years as the actual goal of all the planning instead of as
+        an afterthought.
+      </p>
+    </div>
+  );
+}
+
+/* ── 07 · Scripts & templates ─────────────────────────────── */
+
+function ScriptsBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Five copy-pasteable starting points for the conversations and letters this guide keeps
+        pointing you toward. Tap any item to expand it. None of these is a contract — adapt the
+        language to your voice and your situation.
+      </p>
+
+      <details className={styles.scriptDetails}>
+        <summary>Insurance appeal letter — outline you can adapt</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            <strong>Header.</strong> Your name and address · today&apos;s date · the insurer&apos;s appeal
+            address (on the denial letter) · subject line: <em>&ldquo;Formal Appeal of Denial — [Member
+            name], Member ID [number], Claim/Auth #[number].&rdquo;</em>
+          </p>
+          <div className={styles.scriptBlock}>
+            To Whom It May Concern,
+            <br /><br />
+            I am writing to formally appeal the denial of [<span className={styles.kbd}>service</span>]
+            for my [<span className={styles.kbd}>relationship</span>], [<span className={styles.kbd}>name</span>],
+            Member ID [<span className={styles.kbd}>number</span>], dated [<span className={styles.kbd}>date</span>],
+            reference [<span className={styles.kbd}>denial reference</span>].
+            <br /><br />
+            The denial cited [<span className={styles.kbd}>reason as written on the denial</span>].
+            I am providing the following documentation in support of this appeal:
+            (1) a Letter of Medical Necessity from [<span className={styles.kbd}>provider</span>],
+            (2) clinical notes from the most recent [<span className={styles.kbd}>n</span>] sessions,
+            (3) the most recent diagnostic evaluation, and
+            (4) the relevant clinical guideline supporting medical necessity.
+            <br /><br />
+            The medical necessity criteria are met: [<span className={styles.kbd}>cite the criteria
+            from the LMN, in plain language</span>]. The denial does not address these
+            documented needs. I respectfully request that the denial be overturned and the service
+            authorized for [<span className={styles.kbd}>duration / frequency requested</span>].
+            <br /><br />
+            Please respond in writing within the timeframe required by my plan and applicable state
+            law. If the internal appeal is denied, I intend to pursue external review.
+            <br /><br />
+            Sincerely,
+            <br />
+            [<span className={styles.kbd}>Your name</span>]
+            <br />
+            [<span className={styles.kbd}>Phone, email</span>]
+          </div>
+          <p>
+            Send the appeal by both fax and certified mail; keep proof of delivery. The 180-day
+            deadline starts on the denial date — don&apos;t wait.
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>Letter of Medical Necessity — request to your provider</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            Send this as a portal message or short email. Most clinicians keep an LMN template and
+            can fill it in within the week.
+          </p>
+          <div className={styles.scriptBlock}>
+            Subject: LMN request for [<span className={styles.kbd}>child&apos;s name</span>] — [<span className={styles.kbd}>service</span>]
+            <br /><br />
+            Hi Dr. [<span className={styles.kbd}>name</span>],
+            <br /><br />
+            I&apos;m requesting a Letter of Medical Necessity for [<span className={styles.kbd}>child&apos;s
+            name</span>] in support of [<span className={styles.kbd}>specific service / equipment /
+            therapy</span>]. The insurer ([<span className={styles.kbd}>company</span>]) is asking
+            for documentation that includes:
+            <br /><br />
+            • Diagnosis with ICD-10 code(s)
+            <br />
+            • Medical necessity rationale tied to the diagnosis
+            <br />
+            • Frequency and duration of the recommended service
+            <br />
+            • Expected functional outcomes
+            <br />
+            • Why alternatives (lower-intensity or different services) are insufficient
+            <br /><br />
+            Could you fax / portal-submit the LMN to [<span className={styles.kbd}>insurer fax /
+            portal</span>] and copy us at [<span className={styles.kbd}>your email</span>]? I&apos;m happy
+            to pick it up if that&apos;s easier.
+            <br /><br />
+            Thank you — I know writing these takes time outside the appointment.
+            <br /><br />
+            [<span className={styles.kbd}>Your name</span>]
+          </div>
+          <p>
+            Same template works for tax purposes — for special diets, special schools, tutoring,
+            travel, or home modifications you intend to deduct (see §05).
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>School district request for evaluation under IDEA / Section 504</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            Send by email <em>and</em> hand-deliver / certified mail to the special education
+            director at the district level (not just the campus). The 60-calendar-day timeline for
+            evaluation in most states starts the day the district receives the written request.
+          </p>
+          <div className={styles.scriptBlock}>
+            [<span className={styles.kbd}>Date</span>]
+            <br /><br />
+            [<span className={styles.kbd}>Special Education Director name, title, district
+            address</span>]
+            <br /><br />
+            Re: Request for full and individual initial evaluation under IDEA and Section 504 —
+            [<span className={styles.kbd}>student name, DOB, campus, grade, student ID</span>]
+            <br /><br />
+            Dear [<span className={styles.kbd}>name</span>],
+            <br /><br />
+            I am the parent / legal guardian of [<span className={styles.kbd}>student name</span>]. I
+            am formally requesting a comprehensive evaluation under IDEA and Section 504 to
+            determine eligibility for special education and related services.
+            <br /><br />
+            I am requesting evaluation in the following areas: [<span className={styles.kbd}>academic
+            achievement, cognitive, behavioral, speech-language, occupational therapy, autism
+            evaluation, assistive technology, transition — list whatever applies</span>].
+            <br /><br />
+            My specific concerns include: [<span className={styles.kbd}>list 3–5 concrete
+            observations — academic, behavioral, social, sensory, communication. Be specific:
+            &ldquo;skips assignments,&rdquo; &ldquo;hides under desk during loud activities,&rdquo;
+            &ldquo;eats only 4 foods.&rdquo;</span>]
+            <br /><br />
+            Please confirm receipt of this request in writing and provide the timeline for the
+            evaluation plan and consent forms. I understand the district has 15 school days to
+            respond with a written notice and consent form, after which the 60-calendar-day
+            evaluation window begins.
+            <br /><br />
+            Thank you,
+            <br />
+            [<span className={styles.kbd}>Parent name, phone, email</span>]
+          </div>
+          <p>
+            Two notes that change outcomes: (1) request evaluation in <em>all</em> areas of
+            suspected disability, even ones you&apos;re not sure about — the district can decline to test
+            in an area, but they must justify in writing; (2) keep a copy of every email you send
+            and reply you receive — paper trails are the single biggest advantage parents have at IEP
+            meetings.
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>Employer FMLA conversation — opener for HR</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            FMLA covers a parent&apos;s care of a child with a serious health condition. For most autism
+            families, the version that helps most is intermittent FMLA — protecting time off in
+            small chunks across the year for therapy, evaluations, school meetings, and acute
+            episodes.
+          </p>
+          <div className={styles.scriptBlock}>
+            Hi [<span className={styles.kbd}>HR contact</span>],
+            <br /><br />
+            I&apos;d like to talk about taking FMLA leave to manage my child&apos;s medical needs. I&apos;m
+            requesting [<span className={styles.kbd}>intermittent FMLA / a reduced schedule / a
+            continuous block of [duration]</span>] for [<span className={styles.kbd}>child&apos;s
+            name</span>], who has [<span className={styles.kbd}>diagnosis or qualifying
+            condition</span>].
+            <br /><br />
+            FMLA covers a parent&apos;s care of a child with a serious health condition. The clinician
+            will provide the WH-380-F certification form. The leave I&apos;m anticipating is for
+            [<span className={styles.kbd}>therapy appointments, evaluations, school meetings,
+            hospital admissions, recovery time, episodes of acute behavioral need</span>].
+            <br /><br />
+            Could we walk through the next steps — paperwork, timing, what your HR process needs from
+            me, and whether benefits or accruals are affected — and put a follow-up on the calendar?
+            <br /><br />
+            Thank you,
+            <br />
+            [<span className={styles.kbd}>Your name</span>]
+          </div>
+          <p>
+            FMLA is unpaid by federal default, but many employers run paid leave or short-term
+            disability concurrent. Ask whether your company has a separate paid family leave
+            policy — some states (CA, NY, NJ, MA, WA, CT, OR, CO, RI, DC, and others [verify list])
+            have state-funded paid family leave that can stack with FMLA.
+          </p>
+        </div>
+      </details>
+
+      <details className={styles.scriptDetails}>
+        <summary>Asking family for help with money — script for the hard conversation</summary>
+        <div className={styles.scriptDetailsBody}>
+          <p>
+            This is the hardest one to say out loud. The version that lands well is honest, specific,
+            and gives the other person a way to say no without it being a wound.
+          </p>
+          <div className={styles.scriptBlock}>
+            I want to be honest about something. The therapy and equipment costs for
+            [<span className={styles.kbd}>child&apos;s name</span>] are running about
+            [<span className={styles.kbd}>amount</span>] above what insurance covers, and we&apos;re
+            stretched. I&apos;m not asking you to fix it — I just need you to know what we&apos;re carrying.
+            <br /><br />
+            If you do have the means and the inclination to help, the things that would make the
+            biggest difference are: [<span className={styles.kbd}>contributing to
+            [name]&apos;s ABLE account / paying a specific therapy bill / a one-time gift toward
+            [equipment] / regular small contributions / a 529 transfer</span>]. We can talk through
+            any of those.
+            <br /><br />
+            And if you can&apos;t — that&apos;s okay. Telling you is part of what makes this feel manageable.
+            We can talk about it whenever you&apos;d like.
+          </div>
+          <p>
+            Two structural pointers worth knowing before this conversation: gifts into an ABLE
+            account up to the annual cap don&apos;t affect SSI eligibility (see §03); larger gifts or
+            bequests should flow through a Special Needs Trust to avoid disqualifying benefits (see
+            §06). Ask the giver to route the help through one of those vehicles rather than handing
+            cash to the disabled adult directly.
+          </p>
+        </div>
+      </details>
+    </div>
+  );
+}
+
+/* ── 08 · Get help navigating this ────────────────────────── */
+
+function NavigatorsBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        You will not navigate all of this on your own — and you shouldn&apos;t. Three free, federally- or
+        community-funded resources do nothing all day except help families like yours sort through
+        exactly the territory in this guide. They&apos;re under-used because they&apos;re under-publicized,
+        not because they&apos;re hard to access.
+      </p>
+
+      <div className={styles.cardList}>
+        <div className={styles.resCard}>
+          <h4>211 — community services and benefits navigation</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Cost</strong> Free</span>
+            <span><strong>Coverage</strong> Nationwide, U.S.</span>
+            <span><strong>Hours</strong> 24/7 in most regions</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              211 is the universal U.S. number for community services and benefits. Trained
+              specialists know which local agencies handle what, which programs have funding right
+              now, and which application windows are open. Use it for emergency rent / utility / food
+              assistance, finding waiver intake offices, locating respite providers, identifying
+              local grants, or just sorting through which acronyms apply to your situation. Bilingual
+              support in most regions.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> Dial <span className={styles.kbd}>211</span> from any U.S.
+            phone, or visit <span className={styles.kbd}>211.org</span>. Text and web chat available
+            in many regions.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Family-to-Family Health Information Center (F2F HIC)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Cost</strong> Free</span>
+            <span><strong>Coverage</strong> One in every U.S. state and territory</span>
+            <span><strong>Best for</strong> Insurance, Medicaid, ABLE, transition planning</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Federally-funded centers staffed by parents of children with disabilities. Every state
+              has one. They specialize in exactly the territory this guide covers — insurance
+              navigation, Medicaid waivers, ABLE, adulthood transition — and will walk you through
+              your specific situation by phone, email, or video. Because the staff are caregivers
+              themselves, they&apos;re often the only resource that <em>genuinely gets it</em> the first
+              time you call.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> Find your state&apos;s F2F HIC at{' '}
+            <span className={styles.kbd}>familyvoices.org/affiliates</span>. Most operate by phone,
+            email, and Zoom; intake replies usually within a few business days.
+          </div>
+        </div>
+
+        <div className={styles.resCard}>
+          <h4>Parent Training and Information Center (PTI)</h4>
+          <div className={styles.resCardMeta}>
+            <span><strong>Cost</strong> Free</span>
+            <span><strong>Coverage</strong> Every state has at least one PTI</span>
+            <span><strong>Best for</strong> IEPs, IDEA, special education advocacy</span>
+          </div>
+          <div className={styles.resCardBody}>
+            <p>
+              Federally-funded centers focused on special education and IDEA navigation — the
+              school-side counterpart to F2F HIC&apos;s medical-side coverage. PTIs train parents in IEP
+              advocacy, evaluation rights, due process, dispute resolution, and transition planning.
+              Free, confidential, parent-led. Larger states have several regional centers; some have
+              specialized centers for underserved communities.
+            </p>
+          </div>
+          <div className={styles.resCardReach}>
+            <strong>To reach:</strong> Find your state&apos;s PTI at{' '}
+            <span className={styles.kbd}>parentcenterhub.org/find-your-center</span>. Most offer
+            free workshops, IEP review, and one-on-one parent consultations.
+          </div>
+        </div>
+      </div>
+
+      <p style={{ marginTop: 28 }}>
+        One more thing worth saying out loud: the people staffing these resources are not gatekeepers.
+        They are advocates. If a call ends without an answer, ask the next question. If a program
+        says no, ask <em>which other program would say yes</em>. The system rewards persistence
+        partly because it punishes everyone who can&apos;t afford it.
+      </p>
     </div>
   );
 }

@@ -1,0 +1,512 @@
+/* ─── Editorial typography + layout for /support/financial ─── */
+
+.root {
+  --ink:        #2A2520;
+  --ink-soft:   #5A5048;
+  --ink-muted:  #897E72;
+  --ink-faint:  #B8AE9F;
+  --line:       #E5DBC9;
+  --line-soft:  #EFE7D6;
+  --paper:      #FBF7EF;
+  --cream:      #F5EFE6;
+  --cream-deep: #EDE4D3;
+  --navy:       #1a2e52;
+  --navy-soft:  #d4dbeb;
+  --red:        #c41f32;
+  --red-soft:   #f9a8af;
+  --red-tint:   #fcd4d7;
+  --peach-bg:   #fbf2eb;
+  --peach-line: #f0d8c4;
+
+  font-family: var(--font-body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Hero ─── */
+
+.hero {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line-soft);
+  margin-bottom: 32px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--navy);
+  margin-bottom: 18px;
+}
+.chip::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--navy);
+  opacity: 0.7;
+}
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 16px;
+  max-width: 800px;
+}
+.heroTitle em {
+  font-style: italic;
+  color: var(--navy);
+  font-weight: 400;
+}
+.heroSubtitle {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 680px;
+  margin-bottom: 24px;
+}
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+  align-items: center;
+}
+.heroReviewed {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.heroDisclaimer {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  font-style: italic;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+/* ─── Two-column page (sticky TOC + reading column) ─── */
+
+.shell {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+@media (max-width: 980px) {
+  .shell { grid-template-columns: 1fr; gap: 24px; }
+}
+
+.toc {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  padding-right: 8px;
+  border-right: 1px solid var(--line-soft);
+}
+.toc::-webkit-scrollbar { width: 4px; }
+.toc::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+.tocLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 14px;
+}
+.tocList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tocList a {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 7px 10px 7px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  transition: color 0.18s ease, background 0.18s ease;
+  border-left: 2px solid transparent;
+}
+.tocList a:hover {
+  color: var(--ink);
+  background: var(--cream);
+  border-left-color: var(--navy-soft);
+}
+.tocNum {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-faint);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+@media (max-width: 980px) {
+  .toc { display: none; }
+}
+
+/* ─── Reading column ─── */
+
+.reading {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.section {
+  scroll-margin-top: 96px;
+}
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.sectionNum {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--navy);
+  background: var(--navy-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  align-self: center;
+}
+.sectionIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--cream);
+  color: var(--navy);
+  flex-shrink: 0;
+  align-self: center;
+}
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  flex: 1;
+}
+.sectionTitle em {
+  font-style: italic;
+  color: var(--navy);
+  font-weight: 400;
+}
+
+/* ─── Body copy ─── */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.body strong { color: var(--ink); font-weight: 600; }
+.body em { color: var(--ink); font-style: italic; }
+.body p { margin: 0; }
+.body ul, .body ol {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.body li { line-height: 1.65; }
+
+.subhead {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-top: 24px;
+  margin-bottom: 4px;
+}
+.subhead em { font-style: italic; color: var(--navy); font-weight: 400; }
+
+/* ─── Callout box (peach background, red left border) ─── */
+
+.callout {
+  background: var(--peach-bg);
+  border: 1px solid var(--peach-line);
+  border-left: 3px solid var(--red);
+  border-radius: 12px;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.calloutLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.calloutTitle {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.calloutBody {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.calloutBody p { margin: 0 0 10px; }
+.calloutBody p:last-child { margin-bottom: 0; }
+
+/* ─── Resource cards (Section 8 + funding sources in Section 4) ─── */
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.resCard {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 22px;
+}
+.resCard h4 {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.resCardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.resCardMeta strong { color: var(--ink-soft); }
+.resCardBody {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.resCardBody p { margin: 0; }
+.resCardReach {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+.resCardReach strong { color: var(--ink); font-weight: 600; }
+
+/* ─── Texas-specific waiver block ─── */
+
+.waiverList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.waiverItem {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  align-items: baseline;
+}
+.waiverName {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.waiverPlain {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.waiverMeta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+.waiverMeta strong {
+  color: var(--ink-soft);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 10.5px;
+  margin-right: 4px;
+}
+
+/* ─── Step list (3-step "How to open one") ─── */
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  counter-reset: step;
+  padding: 0;
+  margin: 0;
+}
+.stepList li {
+  counter-increment: step;
+  position: relative;
+  padding: 14px 18px 14px 56px;
+  background: var(--cream);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+.stepList li::before {
+  content: counter(step);
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--paper);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-display);
+}
+.stepList li strong { color: var(--ink); font-weight: 600; }
+
+/* ─── Scripts & templates accordion (Section 7) ─── */
+
+.scriptDetails {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.18s ease;
+}
+.scriptDetails[open] {
+  border-color: var(--navy-soft);
+}
+.scriptDetails > summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.scriptDetails > summary::-webkit-details-marker { display: none; }
+.scriptDetails > summary::after {
+  content: '+';
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--ink-faint);
+  transition: transform 0.18s ease;
+}
+.scriptDetails[open] > summary::after {
+  content: '−';
+  color: var(--navy);
+}
+.scriptDetailsBody {
+  padding: 0 18px 18px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.scriptDetailsBody p { margin: 0; }
+.scriptDetailsBody strong { color: var(--ink); font-weight: 600; }
+.scriptBlock {
+  background: var(--cream);
+  border-left: 3px solid var(--navy);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-style: italic;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Used to inline-block a piece of code-like text */
+.kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12.5px;
+  background: var(--cream-deep);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--ink);
+}
+
+/* ─── Mobile adjustments ─── */
+@media (max-width: 720px) {
+  .heroTitle { font-size: 34px; }
+  .heroSubtitle { font-size: 15.5px; }
+  .sectionTitle { font-size: 22px; }
+  .body { font-size: 14.5px; }
+  .reading { gap: 40px; }
+  .callout { padding: 18px 20px; }
+  .sectionHead { gap: 10px; }
+  .sectionNum { font-size: 12.5px; padding: 3px 8px; }
+}

@@ -17,6 +17,7 @@ import {
   Users,
   HelpCircle,
   HeartPulse,
+  Wallet,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -50,6 +51,7 @@ const navGroups = [
   {
     label: 'Your Family',
     items: [
+      { href: '/support/financial', label: 'Financial', icon: Wallet },
       { href: '/support/siblings', label: 'Sibling Support', icon: Users },
     ],
   },

@@ -1,10 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import type { Inputs, HistoryDay, Driver } from './RiskEngine';
 import { riskState } from './RiskEngine';
-import type { Rec, Insight } from './RecommendationsEngine';
+import type { Rec, RecAction, Insight } from './RecommendationsEngine';
 import { SliderPanel } from './SliderPanel';
 import { TrendChart } from './TrendChart';
 import styles from '../mental-health.module.css';
@@ -95,6 +94,7 @@ interface Props {
   onRangeChange: (r: number) => void;
   onMetricChange: (m: string) => void;
   onNavigate: (tab: string) => void;
+  onRecAction: (action: RecAction) => void;
 }
 
 export function DashboardTab({
@@ -115,6 +115,7 @@ export function DashboardTab({
   onRangeChange,
   onMetricChange,
   onNavigate,
+  onRecAction,
 }: Props) {
   const animatedWellness = useAnimatedNumber(wellness);
   const rs = riskState(risk);
@@ -233,22 +234,22 @@ export function DashboardTab({
               </div>
               <div className={styles.recTitle}>{r.title}</div>
               <div className={styles.recBody}>{r.body}</div>
-              {r.href
-                ? <Link href={r.href} className={styles.recAction}>{r.action}</Link>
-                : <button className={styles.recAction}>{r.action}</button>}
+              <button className={styles.recAction} onClick={() => onRecAction(r.to)}>
+                {r.action}
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Trend — collapsed to a tighter card; a button reveals the deeper Trends tab */}
-      <div className={`${styles.card} ${styles.sectionSpacer}`}>
-        <div className={styles.cardHeader}>
+      {/* Trend — collapsed to a tighter card; metric segmented control sits in the header */}
+      <div className={`${styles.card} ${styles.sectionSpacer} ${styles.chartCard}`}>
+        <div className={styles.chartCardTop}>
           <div>
             <div className={styles.cardTitle}>Wellness over time</div>
-            <div className={styles.cardSubtitle}>Last {range} days · Tap a metric to overlay</div>
+            <div className={styles.cardSubtitle}>Last {range} days · Pick a metric to overlay</div>
           </div>
-          <div className={styles.cardHeaderRight}>
+          <div className={styles.chartCardActions}>
             <div className={styles.rangeTabs}>
               {[7, 30].map((r) => (
                 <button
@@ -268,6 +269,21 @@ export function DashboardTab({
             </button>
           </div>
         </div>
+
+        <div className={styles.metricSegments} role="tablist" aria-label="Choose metric">
+          {METRICS.map((m) => (
+            <button
+              key={m}
+              role="tab"
+              aria-selected={metric === m}
+              className={`${styles.metricSegment} ${metric === m ? styles.metricSegmentActive : ''}`}
+              onClick={() => onMetricChange(m)}
+            >
+              {METRIC_LABELS[m]}
+            </button>
+          ))}
+        </div>
+
         <div className={styles.chartCompact}>
           <TrendChart
             history={history}
@@ -276,18 +292,10 @@ export function DashboardTab({
             maxTicksLimit={range === 7 ? 7 : 8}
           />
         </div>
-        <div className={styles.chartToggles}>
-          {METRICS.map((m) => (
-            <button
-              key={m}
-              className={`${styles.togglePill} ${metric === m ? styles.togglePillActive : ''}`}
-              onClick={() => onMetricChange(m)}
-            >
-              {METRIC_LABELS[m]}
-            </button>
-          ))}
-        </div>
       </div>
+
+      {/* Your data — small surface showing what's saved on this device */}
+      <YourDataSummary streak={streak} historyLen={history.length} />
 
       {/* Patterns — improved presentation, grouped */}
       <div className={`${styles.card} ${styles.sectionSpacer}`}>
@@ -320,6 +328,67 @@ export function DashboardTab({
               </div>
             );
           })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Your-data summary (small footer card) ───────────────────────────── */
+
+interface YourDataProps { streak: number; historyLen: number; }
+
+function YourDataSummary({ streak, historyLen }: YourDataProps) {
+  const [journalCount, setJournalCount] = useState(0);
+  const [hardDaySaved, setHardDaySaved] = useState(false);
+  const [toolUses, setToolUses] = useState(0);
+
+  useEffect(() => {
+    try {
+      const j = localStorage.getItem('cg-journal');
+      if (j) setJournalCount((JSON.parse(j) as unknown[]).length);
+      const h = localStorage.getItem('cg-hard-day-plan');
+      if (h) {
+        const parsed = JSON.parse(h) as { savedAt: string | null };
+        setHardDaySaved(Boolean(parsed.savedAt));
+      }
+      const u = localStorage.getItem('cg-tool-usage');
+      if (u) {
+        const totals: number = Object.values(JSON.parse(u) as Record<string, { total: number }>)
+          .reduce((acc, v) => acc + (v.total ?? 0), 0);
+        setToolUses(totals);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  return (
+    <div className={`${styles.card} ${styles.sectionSpacer} ${styles.dataSummaryCard}`}>
+      <div className={styles.cardHeader}>
+        <div>
+          <div className={styles.cardTitle}>Your data, on this device</div>
+          <div className={styles.cardSubtitle}>Saved locally · only you see it · clears when you sign out</div>
+        </div>
+      </div>
+      <div className={styles.dataStatsGrid}>
+        <div className={styles.dataStat}>
+          <div className={styles.dataStatValue}>{streak}</div>
+          <div className={styles.dataStatLabel}>day check-in streak</div>
+        </div>
+        <div className={styles.dataStat}>
+          <div className={styles.dataStatValue}>{historyLen}</div>
+          <div className={styles.dataStatLabel}>days of history</div>
+        </div>
+        <div className={styles.dataStat}>
+          <div className={styles.dataStatValue}>{journalCount}</div>
+          <div className={styles.dataStatLabel}>journal lines</div>
+        </div>
+        <div className={styles.dataStat}>
+          <div className={styles.dataStatValue}>{toolUses}</div>
+          <div className={styles.dataStatLabel}>calming sessions</div>
+        </div>
+        <div className={styles.dataStat}>
+          <div className={styles.dataStatValue}>{hardDaySaved ? '✓' : '—'}</div>
+          <div className={styles.dataStatLabel}>hard-day plan</div>
         </div>
       </div>
     </div>

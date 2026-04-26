@@ -188,6 +188,11 @@ export function CheckInTab({ inputs, onInputChange, onComplete }: Props) {
                 <div className={styles.checkinNextStepLabel}>Your next step</div>
                 <div className={styles.checkinNextStepText}>{nextStepCopy}</div>
               </div>
+
+              <div className={styles.checkinSavedBanner}>
+                <span className={styles.savedDot} />
+                Saved on this device. Your patterns build over time.
+              </div>
             </div>
           )}
 
