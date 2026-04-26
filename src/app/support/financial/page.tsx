@@ -170,6 +170,10 @@ function SectionBody({ id }: { id: string }) {
       return <AbleBody />;
     case 'respite':
       return <RespiteBody />;
+    case 'taxes':
+      return <TaxesBody />;
+    case 'adulthood':
+      return <AdulthoodBody />;
     default:
       return null;
   }
@@ -718,6 +722,309 @@ function RespiteBody() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ── 05 · Tax credits & deductions ─────────────────────────── */
+
+function TaxesBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Taxes are one of the few places autism caregiving gets a structural break — and one of the
+        most under-claimed. The barrier is documentation: most of these benefits require either a
+        Letter of Medical Necessity from a physician (see §01) or itemizing on Schedule A.
+        Caregivers who use them well leave thousands on the floor every year by not. The list below
+        is a working starting set; specific numbers shift annually, so confirm each line against
+        the current tax year before filing.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Child &amp; Dependent Care <em>Credit</em>
+      </h3>
+      <p>
+        Federal credit for childcare or respite costs paid so you can work (or look for work). Up to
+        $3,000 in qualifying expenses for one dependent or $6,000 for two or more [verify for
+        current tax year]. The credit rate scales with income — between 20% and 35% of qualifying
+        expenses. For an autism family, the under-used part is that:
+      </p>
+      <ul>
+        <li>
+          <strong>Respite care counts</strong> if it lets you work. Day camps, in-home respite, and
+          some after-school programs all qualify.
+        </li>
+        <li>
+          <strong>Disabled dependents over age 13 still count</strong> if they cannot care for
+          themselves. The age-13 cutoff that applies to neurotypical children is waived.
+        </li>
+        <li>
+          You report the provider&apos;s name, address, and SSN/EIN on Form 2441. Keep receipts and a
+          short log of dates served.
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        Medical expense <em>deduction</em>
+      </h3>
+      <p>
+        If you itemize on Schedule A, medical expenses above 7.5% of your AGI are deductible. For
+        most autism families, this floor gets crossed easily — the surprise is how broadly the IRS
+        defines &ldquo;medical expense&rdquo; once a Letter of Medical Necessity backs the line item.
+        What counts:
+      </p>
+      <ul>
+        <li>
+          <strong>Therapies.</strong> ABA, OT, ST, behavioral therapy, counseling — including
+          out-of-pocket portions of insured care and the full cost of out-of-network or self-pay
+          providers.
+        </li>
+        <li>
+          <strong>Mileage to and from medical appointments.</strong> Track every drive at the
+          current IRS medical-mileage rate (21¢ per mile for 2024 [verify current year]). Over a
+          year of weekly therapy visits this adds up to real dollars.
+        </li>
+        <li>
+          <strong>Lodging during medical travel</strong> — up to $50 per night per person — when
+          care is delivered far from home (for example, a developmental evaluation at a regional
+          children&apos;s hospital).
+        </li>
+        <li>
+          <strong>Special diets when prescribed.</strong> The <em>incremental</em> cost above a
+          regular diet is deductible if a physician has prescribed the diet (gluten-free,
+          casein-free, ketogenic, etc.). Document with an LMN and keep receipts; the IRS will accept
+          a reasonable comparison-pricing method.
+        </li>
+        <li>
+          <strong>Conferences and seminars on the medical condition.</strong> Registration and
+          travel costs to attend conferences specifically about your child&apos;s diagnosis are
+          deductible — meals are not.
+        </li>
+        <li>
+          <strong>Special schools and tutoring</strong> when the principal reason is the disability,
+          not general education enrichment. The LMN should explicitly tie the placement to the
+          medical need.
+        </li>
+        <li>
+          <strong>Adaptive equipment and home modifications.</strong> AAC devices, sensory
+          equipment, weighted blankets, safety locks, fencing for elopement risk — the deductible
+          amount is the cost above what a non-disabled household would spend.
+        </li>
+      </ul>
+
+      <h3 className={styles.subhead}>
+        The <em>LMN unlock</em>
+      </h3>
+      <p>
+        A Letter of Medical Necessity does more than win an insurance appeal. For tax purposes, an
+        LMN converts otherwise-personal expenses into deductible medical expenses — special diets,
+        special schools, tutoring, certain travel, certain home modifications. If your child&apos;s
+        clinician hasn&apos;t written one, ask. They&apos;re routine to produce; most clinicians keep a
+        template.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Saver&apos;s Credit (for <em>ABLE contributors</em>)
+      </h3>
+      <p>
+        Federal credit on Form 8880 for retirement and ABLE-account contributions. ABLE beneficiaries
+        who contribute to their own ABLE account from earned income can claim a credit of 10–50% of
+        contributions, up to $2,000 in contributions ($4,000 if married filing jointly), based on
+        AGI [verify current-year income limits]. Often missed by working ABLE beneficiaries and the
+        families filing for them.
+      </p>
+
+      <h3 className={styles.subhead}>
+        EITC and the <em>permanently disabled adult child</em>
+      </h3>
+      <p>
+        The Earned Income Tax Credit&apos;s &ldquo;qualifying child&rdquo; rule normally caps at age 19
+        (24 if the child is a full-time student). For a child with a permanent and total disability,
+        that age cap is waived — the disabled adult child can remain a qualifying child for EITC
+        purposes indefinitely, regardless of age. This single rule meaningfully shifts EITC
+        eligibility for many caregiver households once children move into their twenties.
+      </p>
+
+      <h3 className={styles.subhead}>
+        A note on <em>recordkeeping</em>
+      </h3>
+      <p>
+        These deductions and credits all live or die on documentation. A simple system that works:
+        a folder per tax year (digital is fine), a running mileage log in your phone (date, purpose,
+        miles), and a habit of asking every provider for a year-end summary statement. Twenty
+        minutes of monthly upkeep saves a frantic April.
+      </p>
+    </div>
+  );
+}
+
+/* ── 06 · Planning for adulthood ──────────────────────────── */
+
+function AdulthoodBody() {
+  return (
+    <div className={styles.body}>
+      <p>
+        Planning for the adult years is the part of caregiving most parents postpone until something
+        forces it — a guardianship deadline, an SSI redetermination letter, a school services cliff
+        notice. The four conversations below are the ones that benefit most from being had years
+        early. None of them is one decision; each is a series of decisions that get easier when
+        you&apos;re looking at them on a normal Tuesday instead of in a crisis.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Special Needs Trust <em>vs</em> ABLE
+      </h3>
+      <p>
+        Both protect benefits eligibility while preserving funds for your child&apos;s future. They do
+        different jobs, and most families end up needing both.
+      </p>
+      <ul>
+        <li>
+          <strong>ABLE</strong> (see §03) is the <em>working account</em>. The beneficiary owns it,
+          contributions are limited annually, balances above $100,000 start affecting SSI, and
+          withdrawals must be Qualified Disability Expenses. It&apos;s ideal for day-to-day disability
+          spending — therapy copays, sensory equipment, transportation, technology.
+        </li>
+        <li>
+          <strong>Special Needs Trust (SNT)</strong> is the <em>wrapper for larger wealth</em>. No
+          $100,000 ceiling; allowable uses are broader (entertainment, travel, restaurants, hobbies
+          — things SSI/Medicaid won&apos;t cover); the trustee, not the beneficiary, controls
+          distributions, which protects funds from creditors and from the beneficiary&apos;s own
+          decisions when capacity varies. Setup costs from an attorney typically run $1,500–$3,500
+          for a third-party SNT [verify current-market range], with annual trustee fees if you use a
+          professional trustee.
+        </li>
+        <li>
+          <strong>Third-party SNT</strong> is funded by parents, grandparents, others — and at the
+          beneficiary&apos;s death, remaining funds can pass to other people you choose.
+          <strong> First-party SNT</strong> (or &ldquo;self-settled&rdquo; SNT) holds the
+          beneficiary&apos;s own money — usually from an inheritance received outright, a personal-injury
+          settlement, or back-pay from SSI — and at death, Medicaid is repaid first from any
+          remaining funds before anything passes to heirs.
+        </li>
+      </ul>
+      <p>
+        <strong>When you need both.</strong> Use ABLE for routine, accessible spending. Use an SNT
+        for larger inheritances and parent estate planning. The classic mistake: a grandparent
+        leaves $50,000 outright to the disabled grandchild in a will — the grandchild loses SSI
+        and Medicaid the day the check arrives. The fix is preventive: tell relatives that any gift
+        or bequest needs to flow into the SNT or, for smaller amounts, the ABLE.
+      </p>
+
+      <h3 className={styles.subhead}>
+        Guardianship <em>vs</em> supported decision-making
+      </h3>
+      <p>
+        A common misconception: that turning 18 means a parent must get full guardianship to keep
+        helping their disabled child. There is a spectrum, and the most restrictive option is rarely
+        the right one.
+      </p>
+      <ul>
+        <li>
+          <strong>Full guardianship.</strong> A court legally removes some or all of the disabled
+          adult&apos;s decision-making rights and assigns them to you. Setup typically costs $1,500–$5,000
+          in attorney and court fees [verify], with ongoing annual reporting to the court (often
+          requiring an annual attorney bill). The adult loses the legal right to enter contracts,
+          choose where to live, marry, vote in some states, or make medical decisions independently.
+        </li>
+        <li>
+          <strong>Supported decision-making (SDM).</strong> The disabled adult retains legal
+          authority and designates trusted &ldquo;supporters&rdquo; (parents, siblings, friends) who
+          help process information and communicate decisions. Setup is essentially the cost of
+          drafting a Supporter Agreement — often a few hundred dollars or free through a disability
+          rights legal clinic. Texas was the first state to formally recognize SDM in statute (2015);
+          most states now recognize it in some form.
+        </li>
+        <li>
+          <strong>Powers of attorney + healthcare proxies.</strong> A middle path, especially when
+          full guardianship is overkill but informal SDM doesn&apos;t carry enough legal weight.
+          Documents are domain-specific (financial POA, medical POA, HIPAA release) and can be
+          revoked by the adult at any time. Often $200–$500 to draft with an attorney; templates
+          exist for self-preparation.
+        </li>
+      </ul>
+      <p>
+        <strong>Cost framing.</strong> Guardianship costs more upfront, more every year, and removes
+        rights that can be hard to restore. SDM and POAs cost a fraction and preserve autonomy. The
+        principle worth holding onto: needing help with a decision is not the same as needing to
+        lose the right to make it.
+      </p>
+
+      <h3 className={styles.subhead}>
+        SSI at <em>18</em> — the redetermination
+      </h3>
+      <p>
+        At age 18, the Social Security Administration runs an &ldquo;age-18 redetermination&rdquo;
+        — a fresh disability eligibility review using the adult standard. Two big things shift:
+      </p>
+      <ul>
+        <li>
+          <strong>Parental income and resources stop counting.</strong> Many families whose children
+          were ineligible for SSI as minors (because of household income) suddenly qualify at 18,
+          based only on the now-adult child&apos;s income and assets. <em>Apply 60–90 days before the
+          18th birthday</em> to avoid a coverage gap; SSI does not back-date eligibility to the
+          birthday if the application is late.
+        </li>
+        <li>
+          <strong>The adult disability standard applies.</strong> Instead of the childhood
+          &ldquo;marked and severe functional limitations&rdquo; test, the SSA evaluates inability
+          to engage in substantial gainful activity (SGA) — essentially, can the person earn above
+          a defined monthly threshold ($1,550/month in 2024 [verify current-year SGA limit])?
+          Roughly a third of childhood SSI recipients are redetermined as ineligible at 18 under
+          adult standards [verify recent figure]; appeal rates are high and the disabled adult is
+          entitled to continued benefits during appeal.
+        </li>
+      </ul>
+      <p>
+        Bring updated medical records (the last two years), a function-and-daily-living narrative,
+        and any school records that document support needs. The SSA reviewer is looking for evidence
+        that translates to adult standards — not test scores.
+      </p>
+
+      <h3 className={styles.subhead}>
+        The <em>cliff</em> at 22
+      </h3>
+      <p>
+        Public special education under IDEA ends at age 22 (some states age 21, depending on
+        jurisdiction). The end is real and abrupt: structured day, transportation, related services
+        (OT, ST), behavioral support, social skills programming — all of it stops. Many families are
+        unprepared, even when they know the date is coming, because nothing in the school years
+        prepares you for the size of the hole.
+      </p>
+      <p>
+        The bridge is built from several programs, most of which require advance enrollment:
+      </p>
+      <ul>
+        <li>
+          <strong>Vocational Rehabilitation (VR).</strong> Every state runs a VR program that funds
+          assessment, training, and supported employment for adults with disabilities. In Texas this
+          is Texas Workforce Solutions–Vocational Rehabilitation Services. Apply during high school
+          — VR can run alongside the IEP transition plan.
+        </li>
+        <li>
+          <strong>Day habilitation</strong> (covered by HCS, CLASS, and TxHmL waivers — yet another
+          reason to be on those interest lists from years before; see §02). For adults whose
+          support needs make competitive employment unrealistic, day hab provides a structured
+          weekday alternative.
+        </li>
+        <li>
+          <strong>Supported employment</strong> models (covered by HCS and many waivers in other
+          states). Includes job coaching, customized employment, and microenterprise — paths that
+          make work possible even when traditional jobs aren&apos;t.
+        </li>
+        <li>
+          <strong>Community college disability services.</strong> If college is on the table,
+          community-college disability offices are often more flexible than four-year ones. Many
+          have dedicated transition programs for students with intellectual disabilities, including
+          Think College–accredited programs across the country.
+        </li>
+      </ul>
+      <p>
+        Federal IDEA requires transition planning to begin no later than age 16, but many states
+        start at 14 — and the families with the smoothest cliffs are usually the ones who started
+        earlier, treating the post-school years as the actual goal of all the planning instead of as
+        an afterthought.
+      </p>
     </div>
   );
 }
