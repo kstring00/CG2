@@ -69,7 +69,7 @@ export default function ResourcesPage() {
   return (
     <div className="page-shell">
       <header className="page-header">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">Resource Library</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">Helpful Guides</p>
         <h1 className="page-title">Resources that actually help.</h1>
         <p className="page-description">
           Vetted, trusted resources — not a firehose. Each one was chosen because it answers a

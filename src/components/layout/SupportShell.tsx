@@ -34,18 +34,18 @@ const navGroups = [
   {
     label: 'For You',
     items: [
-      { href: '/support/mental-health', label: 'Mental Health Center', icon: HeartPulse, highlight: true },
+      { href: '/support/mental-health', label: 'Support for Parents', icon: HeartPulse, highlight: true },
     ],
   },
   {
-    label: 'Care Navigation',
+    label: 'Get Help Choosing What to Do',
     items: [
       { href: '/support', label: 'Home', icon: LayoutDashboard },
-      { href: '/support/next-steps', label: 'Guided Next Steps', icon: Compass },
+      { href: '/support/next-steps', label: 'Start Here: My Next Step', icon: Compass },
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
-      { href: '/support/resources', label: 'Resource Library', icon: BookOpen },
-      { href: '/support/find', label: 'Find Support', icon: Search },
-      { href: '/support/connect', label: 'Connect', icon: Link2 },
+      { href: '/support/resources', label: 'Helpful Guides', icon: BookOpen },
+      { href: '/support/find', label: 'Find Help Near Me', icon: Search },
+      { href: '/support/connect', label: 'Talk With Other Parents', icon: Link2 },
     ],
   },
   {
@@ -76,11 +76,11 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           />
         </Link>
         <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-          <CompassIcon className="h-3 w-3" /> Care Navigation
+          <CompassIcon className="h-3 w-3" /> Get Help Choosing What to Do
         </span>
       </div>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Care Navigation">
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Get Help Choosing What to Do">
         {navGroups.map((group, gi) => (
           <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
             <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
@@ -108,9 +108,6 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
                       <span className="flex-1 text-[13px]">{item.label}</span>
-                      {isHighlight && !isActive && (
-                        <span className="rounded-full bg-brand-plum-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-plum-700">For you</span>
-                      )}
                     </a>
                   </li>
                 );
@@ -140,7 +137,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       <div className="border-t border-surface-border px-4 py-4">
         <div className="rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 text-center">
           <p className="text-xs font-semibold text-primary">
-            Start with Guided Next Steps
+            Start Here: My Next Step
           </p>
           <p className="mt-0.5 text-[11px] text-brand-muted-500">
             Keep the next move simple
@@ -214,7 +211,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <div className={cn('mx-auto flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8', isFindPage ? 'max-w-[1600px]' : 'max-w-6xl')}>
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
-              Care Navigation · open to every family
+              Get Help Choosing What to Do · open to every family
             </p>
             <Link
               href="/client"
@@ -236,7 +233,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
               </button>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
-                  Common Ground · Care Navigation
+                  Common Ground · Get Help Choosing What to Do
                 </p>
                 <p className="truncate text-sm text-brand-muted-700">
                   For every family

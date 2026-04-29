@@ -50,7 +50,7 @@ type Locale = 'en' | 'es';
 
 const copy = {
   en: {
-    eyebrow: 'Find Support',
+    eyebrow: 'Find Help Near Me',
     title: 'Real help, near you.',
     description:
       'Every provider, place, and group here has been reviewed by our care navigation team. Pick the situation that fits — we\'ll narrow the list to what makes sense.',
@@ -141,7 +141,7 @@ const copy = {
     ] as const,
   },
   es: {
-    eyebrow: 'Encuentra Apoyo',
+    eyebrow: 'Encuentra Ayuda Cerca de Mí',
     title: 'Ayuda real, cerca de ti.',
     description:
       'Cada proveedor, lugar y grupo ha sido revisado por nuestro equipo de navegación. Elige la situación que mejor describe la tuya — filtraremos la lista.',

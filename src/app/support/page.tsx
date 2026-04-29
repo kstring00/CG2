@@ -45,7 +45,7 @@ export default function SupportHome() {
       {/* Header */}
       <header className="page-header">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">
-          Care Navigation
+          Get Help Choosing What to Do
         </p>
         <h1 className="page-title">What do you need right now?</h1>
         <p className="page-description">
