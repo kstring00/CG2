@@ -689,7 +689,7 @@ export default function ConnectPage() {
           </p>
           <a
             href="tel:988"
-            className="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-amber-900 transition-colors hover:bg-amber-100"
+            className="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
           >
             <Phone className="h-3 w-3" aria-hidden />
             {t.crisisBannerLinkLabel}
@@ -708,12 +708,12 @@ export default function ConnectPage() {
             <button
               type="button"
               onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-muted-600 hover:border-primary/30 hover:text-primary"
-              aria-label="Toggle language"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-muted-600 hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+              aria-label={locale === 'en' ? 'Switch to Spanish' : 'Switch to English'}
             >
-              <Languages className="h-3.5 w-3.5" />
-              <span>{locale === 'en' ? 'EN' : 'ES'}</span>
-              <span className="text-brand-muted-400">·</span>
+              <Languages className="h-3.5 w-3.5" aria-hidden />
+              <span aria-hidden>{locale === 'en' ? 'EN' : 'ES'}</span>
+              <span aria-hidden className="text-brand-muted-400">·</span>
               <span>{t.languageToggle}</span>
             </button>
           </div>
@@ -940,7 +940,7 @@ export default function ConnectPage() {
               >
                 <span
                   aria-hidden
-                  className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-brand-plum-400 transition-transform duration-300 group-hover/axis:scale-x-100"
+                  className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-brand-plum-400 transition-transform duration-300 motion-reduce:duration-0 motion-safe:group-hover/axis:scale-x-100"
                 />
                 <p className="text-[12px] font-semibold text-brand-muted-900">{axis.label}</p>
                 <p className="mt-0.5 text-[11px] text-brand-muted-500">{axis.hint}</p>
@@ -977,9 +977,10 @@ export default function ConnectPage() {
                   href={row.href}
                   className={cn(
                     'group/exit flex items-center justify-between gap-3 rounded-xl border border-surface-border bg-white px-3 py-2.5 text-[13px] font-semibold transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                     row.accent
-                      ? 'text-red-700 hover:border-red-200 hover:bg-red-50'
-                      : 'text-brand-muted-800 hover:border-primary/30 hover:bg-primary/5 hover:text-primary',
+                      ? 'text-red-700 hover:border-red-200 hover:bg-red-50 focus-visible:ring-red-400'
+                      : 'text-brand-muted-800 hover:border-primary/30 hover:bg-primary/5 hover:text-primary focus-visible:ring-primary/40',
                   )}
                 >
                   <span className="inline-flex items-center gap-2">
@@ -1238,6 +1239,7 @@ export default function ConnectPage() {
                   }}
                   className={cn(
                     'inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
                     intakeComplete
                       ? 'bg-primary hover:bg-primary-dark'
                       : 'bg-primary/70 hover:bg-primary',
