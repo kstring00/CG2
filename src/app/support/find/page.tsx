@@ -61,15 +61,6 @@ const sourceMeta: Record<SourceFilter, { label: string }> = {
   'help-support': { label: 'Help Lines & Support' },
 };
 
-const stageMeta: Record<StageFilter, { label: string }> = {
-  'all-stages': { label: 'All Stages' },
-  'just-diagnosed': { label: 'Just Diagnosed' },
-  'starting-therapy': { label: 'Starting Therapy' },
-  'struggling-home': { label: 'Struggling at Home' },
-  'school-challenges': { label: 'School Challenges' },
-  'burned-out': { label: 'Burned Out / Overwhelmed' },
-};
-
 function SupportCard({ item }: { item: UnifiedItem }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -193,7 +184,6 @@ function SupportCard({ item }: { item: UnifiedItem }) {
 
 export default function FindSupportPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeStage, setActiveStage] = useState<StageFilter>('all-stages');
   const [activeSource, setActiveSource] = useState<SourceFilter>('all');
 
   const unifiedItems = useMemo<UnifiedItem[]>(() => {
@@ -378,7 +368,6 @@ export default function FindSupportPage() {
 
     return unifiedItems.filter((item) => {
       const sourceMatch = activeSource === 'all' || item.source === activeSource;
-      const stageMatch = activeStage === 'all-stages' || item.stages.includes(activeStage);
       const searchMatch =
         !query ||
         item.name.toLowerCase().includes(query) ||
@@ -387,11 +376,11 @@ export default function FindSupportPage() {
         (item.location ?? '').toLowerCase().includes(query) ||
         item.tags.some((tag) => tag.toLowerCase().includes(query));
 
-      return sourceMatch && stageMatch && searchMatch;
+      return sourceMatch && searchMatch;
     });
-  }, [activeSource, activeStage, searchQuery, unifiedItems]);
+  }, [activeSource, searchQuery, unifiedItems]);
 
-  const hasFilters = activeSource !== 'all' || activeStage !== 'all-stages' || searchQuery !== '';
+  const hasFilters = activeSource !== 'all' || searchQuery !== '';
 
   return (
     <div className="page-shell">
@@ -443,23 +432,6 @@ export default function FindSupportPage() {
         </label>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          {(Object.keys(stageMeta) as StageFilter[]).map((stage) => (
-            <button
-              key={stage}
-              onClick={() => setActiveStage(stage)}
-              className={cn(
-                'rounded-xl border px-3.5 py-2 text-sm font-medium transition',
-                activeStage === stage
-                  ? 'border-primary bg-primary text-white shadow-soft'
-                  : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30 hover:text-primary',
-              )}
-            >
-              {stageMeta[stage].label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
           {(Object.keys(sourceMeta) as SourceFilter[]).map((source) => (
             <button
               key={source}
@@ -487,7 +459,6 @@ export default function FindSupportPage() {
             <button
               onClick={() => {
                 setSearchQuery('');
-                setActiveStage('all-stages');
                 setActiveSource('all');
               }}
               className="mt-4 inline-flex items-center gap-2 rounded-xl border border-surface-border px-4 py-2 text-sm font-semibold text-primary"
