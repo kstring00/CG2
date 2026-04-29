@@ -21,6 +21,7 @@ import {
   Printer,
   Search,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   Star,
   Trash2,
@@ -126,6 +127,9 @@ const copy = {
     keyboardButton: 'Keyboard shortcuts',
     helpTitle: 'Keyboard shortcuts',
     helpClose: 'Close',
+    mobileFiltersButton: 'Filters',
+    mobileSavedButton: 'Saved',
+    mobileDrawerClose: 'Close drawer',
     helpRows: [
       ['/', 'Focus search'],
       ['⌘K · Ctrl+K', 'Focus search'],
@@ -214,6 +218,9 @@ const copy = {
     keyboardButton: 'Atajos de teclado',
     helpTitle: 'Atajos de teclado',
     helpClose: 'Cerrar',
+    mobileFiltersButton: 'Filtros',
+    mobileSavedButton: 'Guardados',
+    mobileDrawerClose: 'Cerrar panel',
     helpRows: [
       ['/', 'Enfocar búsqueda'],
       ['⌘K · Ctrl+K', 'Enfocar búsqueda'],
@@ -1439,6 +1446,8 @@ export default function FindSupportPage() {
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
+  const [savedDrawerOpen, setSavedDrawerOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const t = copy[locale];
 
@@ -1559,6 +1568,8 @@ export default function FindSupportPage() {
 
       if (e.key === 'Escape') {
         if (helpOpen) setHelpOpen(false);
+        else if (filtersDrawerOpen) setFiltersDrawerOpen(false);
+        else if (savedDrawerOpen) setSavedDrawerOpen(false);
         else if (pinnedId) setPinnedId(null);
         else if (hoveredId) setHoveredId(null);
         return;
@@ -1713,8 +1724,8 @@ export default function FindSupportPage() {
       <section id="directory" className="border-t border-surface-border bg-page">
         <div className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)_320px] xl:grid-cols-[280px_minmax(0,1fr)_360px]">
-            {/* Left rail */}
-            <aside className="lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto lg:pr-1">
+            {/* Left rail (hidden < lg; opens as a drawer instead) */}
+            <aside className="hidden lg:sticky lg:top-[104px] lg:block lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto lg:pr-1">
               <LeftFilters locale={locale} filters={filters} setFilters={setFilters} />
             </aside>
 
@@ -1733,11 +1744,39 @@ export default function FindSupportPage() {
                       placeholder={t.searchPlaceholder}
                       className="w-full rounded-xl border border-surface-border bg-white py-2 pl-9 pr-24 text-sm outline-none ring-primary/20 transition focus:ring-2"
                     />
-                    <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-400 sm:flex">
+                    <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-400 lg:flex">
                       <kbd className="rounded border border-surface-border bg-surface-muted px-1 py-0.5 text-[10px] font-mono text-brand-muted-500">/</kbd>
                       <span>{t.searchShortcut}</span>
                     </span>
                   </label>
+
+                  <button
+                    type="button"
+                    onClick={() => setFiltersDrawerOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-2.5 py-1.5 text-[12px] font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary lg:hidden"
+                  >
+                    <SlidersHorizontal className="h-3.5 w-3.5" />
+                    {t.mobileFiltersButton}
+                    {countActiveFilters(filters) > 0 && (
+                      <span className="rounded-full bg-primary/10 px-1.5 py-0 text-[10px] font-bold text-primary">
+                        {countActiveFilters(filters)}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSavedDrawerOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-2.5 py-1.5 text-[12px] font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary lg:hidden"
+                  >
+                    <BookmarkPlus className={cn('h-3.5 w-3.5', savedIds.length > 0 && 'fill-amber-500 text-amber-500')} />
+                    {t.mobileSavedButton}
+                    {savedIds.length > 0 && (
+                      <span className="rounded-full bg-amber-100 px-1.5 py-0 text-[10px] font-bold text-amber-700">
+                        {savedIds.length}
+                      </span>
+                    )}
+                  </button>
 
                   <div className="inline-flex items-center gap-1 rounded-xl border border-surface-border bg-white p-0.5">
                     <button
@@ -1884,6 +1923,132 @@ export default function FindSupportPage() {
           </div>
         </div>
       </section>
+
+      {/* Mobile filters drawer (< lg) */}
+      {filtersDrawerOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.filtersTitle}
+        >
+          <button
+            type="button"
+            aria-label={t.mobileDrawerClose}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setFiltersDrawerOpen(false)}
+          />
+          <div className="absolute inset-y-0 left-0 flex w-[88%] max-w-[340px] flex-col bg-white shadow-card-hover">
+            <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-900">
+                <SlidersHorizontal className="h-4 w-4 text-primary" />
+                {t.filtersTitle}
+              </p>
+              <button
+                type="button"
+                onClick={() => setFiltersDrawerOpen(false)}
+                className="rounded-md p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
+                aria-label={t.mobileDrawerClose}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-4">
+              <LeftFilters locale={locale} filters={filters} setFilters={setFilters} />
+            </div>
+            <div className="border-t border-surface-border px-4 py-3">
+              <button
+                type="button"
+                onClick={() => setFiltersDrawerOpen(false)}
+                className="w-full rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
+              >
+                {t.showing(filteredResources.length, findResources.length)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile saved drawer (< lg) */}
+      {savedDrawerOpen && (
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.rightDefaultTitle}
+        >
+          <button
+            type="button"
+            aria-label={t.mobileDrawerClose}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setSavedDrawerOpen(false)}
+          />
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col rounded-t-3xl bg-white shadow-card-hover sm:inset-y-0 sm:bottom-auto sm:right-0 sm:left-auto sm:max-h-none sm:w-[420px] sm:max-w-full sm:rounded-none sm:rounded-l-3xl">
+            <div className="flex items-center justify-between border-b border-surface-border px-4 py-3">
+              <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-900">
+                <BookmarkPlus className="h-4 w-4 text-amber-500" />
+                {t.rightDefaultTitle}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSavedDrawerOpen(false)}
+                className="rounded-md p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
+                aria-label={t.mobileDrawerClose}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+              <SavedResourcesPanel
+                locale={locale}
+                savedResources={savedResources}
+                onUnsave={(id) => setSavedIds((prev) => prev.filter((x) => x !== id))}
+                onClear={() => setSavedIds([])}
+                onPin={(id) => {
+                  handlePin(id);
+                  setSavedDrawerOpen(false);
+                }}
+              />
+              <NavigatorCTA locale={locale} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile pinned-detail modal (< lg) — the right rail's expanded view as a modal */}
+      {pinnedId && (
+        <div
+          className="fixed inset-0 z-40 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.pinnedLabel}
+        >
+          <button
+            type="button"
+            aria-label={t.expandedClose}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setPinnedId(null)}
+          />
+          <div className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col overflow-hidden rounded-t-3xl bg-white shadow-card-hover sm:inset-y-6 sm:left-1/2 sm:bottom-auto sm:max-h-[88vh] sm:w-[520px] sm:max-w-full sm:-translate-x-1/2 sm:rounded-2xl">
+            {(() => {
+              const focused = findResources.find((r) => r.id === pinnedId);
+              if (!focused) return null;
+              return (
+                <div className="flex-1 overflow-y-auto p-4">
+                  <ExpandedResourcePanel
+                    resource={focused}
+                    locale={locale}
+                    isPinned
+                    isSaved={savedIds.includes(focused.id)}
+                    onClose={() => setPinnedId(null)}
+                    onToggleSave={toggleSave}
+                  />
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
 
       {helpOpen && (
         <div
