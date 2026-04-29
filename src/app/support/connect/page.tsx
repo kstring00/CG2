@@ -4,8 +4,11 @@ import { useState } from 'react';
 import {
   ArrowRight,
   Heart,
+  Languages,
   Link2,
+  Lock,
   MessageSquare,
+  Phone,
   Shield,
   Sparkles,
   Users,
@@ -27,6 +30,49 @@ import { cn } from '@/lib/utils';
 /* ─── Types ─────────────────────────────────────────────────── */
 type AgeRange = '0-2' | '2-5' | '6-12' | '13-17';
 type ActiveTab = 'get-started' | 'matches' | 'groups' | 'messages';
+type Locale = 'en' | 'es';
+
+/* ─── EN/ES copy ────────────────────────────────────────────── */
+const connectCopy = {
+  en: {
+    eyebrow: 'Parent Connection',
+    headline: "You don't have to explain it. They already know.",
+    subhead:
+      'Connect with other parents who are living this — same stage, same struggles, same long days. Moderated, private, and low-pressure.',
+    ctaPrimary: 'Find my match',
+    ctaSecondary: 'Browse small groups',
+    trustModerated: 'Moderated',
+    trustPrivate: 'Private',
+    trustFree: 'Free',
+    trustStripAria: 'How this space is run',
+    testimonialQuote: '“I didn’t have to start at the beginning. They already knew.”',
+    testimonialMeta: 'Parent of a 6-year-old, 14 months in',
+    testimonialBadge: 'Parent voice',
+    crisisBannerLead: 'In crisis right now?',
+    crisisBannerCallText: 'Call or text 988 — free, confidential, 24/7.',
+    crisisBannerLinkLabel: 'Call 988',
+    languageToggle: 'Español',
+  },
+  es: {
+    eyebrow: 'Conexión entre padres',
+    headline: 'No tienes que explicarlo. Ya lo entienden.',
+    subhead:
+      'Conecta con otros padres que están viviendo esto — la misma etapa, las mismas luchas, los mismos días largos. Moderado, privado y sin presión.',
+    ctaPrimary: 'Encontrar mi conexión',
+    ctaSecondary: 'Ver grupos pequeños',
+    trustModerated: 'Moderado',
+    trustPrivate: 'Privado',
+    trustFree: 'Gratis',
+    trustStripAria: 'Cómo se mantiene este espacio',
+    testimonialQuote: '“No tuve que empezar desde el principio. Ya lo entendían.”',
+    testimonialMeta: 'Madre de un niño de 6 años, 14 meses en este camino',
+    testimonialBadge: 'Voz de un padre',
+    crisisBannerLead: '¿Estás en crisis ahora?',
+    crisisBannerCallText: 'Llama o envía mensaje al 988 — gratis, confidencial, 24/7.',
+    crisisBannerLinkLabel: 'Llamar al 988',
+    languageToggle: 'English',
+  },
+} as const;
 
 const ageRangeOptions: { value: AgeRange; label: string }[] = [
   { value: '0-2', label: '0–2 years' },
@@ -277,7 +323,9 @@ function GroupCard({ group }: { group: (typeof peerGroups)[0] }) {
 
 /* ─── Main Page ──────────────────────────────────────────────── */
 export default function ConnectPage() {
+  const [locale, setLocale] = useState<Locale>('en');
   const [activeTab, setActiveTab] = useState<ActiveTab>('get-started');
+  const t = connectCopy[locale];
 
   // Intake form state
   const [ageRanges, setAgeRanges] = useState<AgeRange[]>([]);
@@ -301,31 +349,134 @@ export default function ConnectPage() {
 
   return (
     <div className="page-shell">
-      {/* Header */}
-      <header className="page-header">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">
-          Parent Connection
-        </p>
-        <h1 className="page-title">You don&apos;t have to explain it. They already know.</h1>
-        <p className="page-description">
-          Connect with other parents who are living this — same stage, same struggles, same long days.
-          Moderated, private, and low-pressure.
-        </p>
-        {/* CTA above fold */}
-        <div className="mt-5 flex flex-wrap gap-3">
-          <button
-            onClick={() => setActiveTab('get-started')}
-            className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+      {/* Sticky 988 mini-banner — quiet, persistent crisis line. Pins below
+          the support nav header so it's always within reach without
+          dominating this connection-focused page. */}
+      <div
+        className="sticky top-[56px] z-10 -mx-4 -mt-6 border-b border-amber-200/70 bg-amber-50/95 backdrop-blur-md sm:-mx-6 sm:-mt-8 lg:-mx-8"
+        role="region"
+        aria-label="Crisis support"
+      >
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1.5 sm:px-6 lg:px-8">
+          <p className="inline-flex items-center gap-2 text-[12px] text-amber-900">
+            <Phone className="h-3.5 w-3.5" aria-hidden />
+            <span className="font-semibold">{t.crisisBannerLead}</span>
+            <span className="hidden sm:inline">{t.crisisBannerCallText}</span>
+          </p>
+          <a
+            href="tel:988"
+            className="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-amber-900 transition-colors hover:bg-amber-100"
           >
-            Find my match <ArrowRight className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setActiveTab('groups')}
-            className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:border-primary/30 hover:text-primary"
-          >
-            Browse small groups
-          </button>
+            <Phone className="h-3 w-3" aria-hidden />
+            {t.crisisBannerLinkLabel}
+          </a>
         </div>
+      </div>
+
+      {/* Hero — headline (the whole page in one line), subhead, two CTAs,
+          trust strip, and a parent-voice testimonial card on the right. */}
+      <header className="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-center">
+        <div className="min-w-0">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+              {t.eyebrow}
+            </p>
+            <button
+              type="button"
+              onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-muted-600 hover:border-primary/30 hover:text-primary"
+              aria-label="Toggle language"
+            >
+              <Languages className="h-3.5 w-3.5" />
+              <span>{locale === 'en' ? 'EN' : 'ES'}</span>
+              <span className="text-brand-muted-400">·</span>
+              <span>{t.languageToggle}</span>
+            </button>
+          </div>
+          <h1 className="mt-2 text-3xl font-bold leading-[1.1] tracking-tight text-brand-muted-900 sm:text-[2.25rem] lg:text-[2.6rem]">
+            {t.headline}
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-brand-muted-600">
+            {t.subhead}
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              onClick={() => {
+                setActiveTab('get-started');
+                if (typeof window !== 'undefined') {
+                  requestAnimationFrame(() =>
+                    document.getElementById('intake')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+                  );
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-primary-dark"
+            >
+              {t.ctaPrimary}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('groups');
+                if (typeof window !== 'undefined') {
+                  requestAnimationFrame(() =>
+                    document.getElementById('groups')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+                  );
+                }
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 hover:text-primary"
+            >
+              {t.ctaSecondary}
+            </button>
+          </div>
+
+          <ul
+            className="mt-4 inline-flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-brand-muted-500"
+            aria-label={t.trustStripAria}
+          >
+            <li className="inline-flex items-center gap-1.5">
+              <Shield className="h-3 w-3 text-emerald-600" aria-hidden /> {t.trustModerated}
+            </li>
+            <li aria-hidden className="text-brand-muted-300">·</li>
+            <li className="inline-flex items-center gap-1.5">
+              <Lock className="h-3 w-3 text-emerald-600" aria-hidden /> {t.trustPrivate}
+            </li>
+            <li aria-hidden className="text-brand-muted-300">·</li>
+            <li className="inline-flex items-center gap-1.5">
+              <Heart className="h-3 w-3 text-emerald-600" aria-hidden /> {t.trustFree}
+            </li>
+          </ul>
+        </div>
+
+        {/* Parent-voice testimonial card */}
+        <figure className="relative overflow-hidden rounded-3xl border border-brand-plum-100 bg-gradient-to-br from-brand-plum-50 via-white to-brand-warm-100 p-6 shadow-soft sm:p-7">
+          <div
+            aria-hidden
+            className="absolute -top-10 -right-8 h-40 w-40 rounded-full bg-brand-plum-100/60 blur-3xl"
+          />
+          <div
+            aria-hidden
+            className="absolute -bottom-12 -left-6 h-32 w-32 rounded-full bg-brand-warm-200/70 blur-2xl"
+          />
+          <span className="relative inline-flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-plum-700 ring-1 ring-brand-plum-200">
+            <Sparkles className="h-3 w-3" aria-hidden />
+            {t.testimonialBadge}
+          </span>
+          <blockquote className="relative mt-4">
+            <p className="text-[18px] font-semibold leading-snug text-brand-muted-900 sm:text-[20px]">
+              {t.testimonialQuote}
+            </p>
+          </blockquote>
+          <figcaption className="relative mt-4 flex items-center gap-3">
+            <span
+              aria-hidden
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-plum-100 text-[11px] font-bold text-brand-plum-700"
+            >
+              ✦
+            </span>
+            <span className="text-[12.5px] text-brand-muted-600">{t.testimonialMeta}</span>
+          </figcaption>
+        </figure>
       </header>
 
       {/* Four feature cards */}
@@ -416,7 +567,7 @@ export default function ConnectPage() {
 
       {/* ── GET STARTED tab ── */}
       {activeTab === 'get-started' && (
-        <div className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
+        <div id="intake" className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
           {/* Left: how it works */}
           <div className="space-y-5">
             <article className="rounded-3xl border border-surface-border bg-white p-5">
@@ -590,7 +741,7 @@ export default function ConnectPage() {
 
       {/* ── SMALL GROUPS tab ── */}
       {activeTab === 'groups' && (
-        <div className="space-y-4">
+        <div id="groups" className="space-y-4">
           <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4">
             <p className="text-sm font-semibold text-amber-900">Example group experience</p>
             <p className="mt-0.5 text-sm text-amber-800">
