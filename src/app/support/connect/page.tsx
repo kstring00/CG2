@@ -7,7 +7,6 @@ import {
   Check,
   Heart,
   Languages,
-  Link2,
   Lock,
   MessageCircle,
   MessageSquare,
@@ -19,11 +18,9 @@ import {
   Video,
 } from 'lucide-react';
 import {
-  conversationPrompts,
   diagnosisStageLabels,
   mockParentMatches,
   peerGroups,
-  struggleLabels,
   type ConnectionPreference,
   type DiagnosisStage,
   type Struggle,
@@ -33,7 +30,6 @@ import { cn } from '@/lib/utils';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 type AgeRange = '0-2' | '2-5' | '6-12' | '13-17';
-type ActiveTab = 'get-started' | 'matches' | 'groups' | 'messages';
 type Locale = 'en' | 'es';
 
 /* ─── EN/ES copy ────────────────────────────────────────────── */
@@ -141,6 +137,22 @@ const connectCopy = {
     intakeOptionConnectGroup: 'Small group',
     intakeOptionStyleFaith: 'Faith-based',
     intakeOptionStyleGeneral: 'General',
+
+    // Preview
+    previewEyebrow: 'Preview',
+    previewTitle: 'What matches look like',
+    previewSub:
+      'Sample profiles styled exactly like the real product. Use these to get a feel — answer the intake above for real, tailored suggestions.',
+    previewMatchesHeading: 'Example parent matches',
+    previewGroupsHeading: 'Example small groups',
+    previewMatchBadge: 'Example match',
+    previewGroupBadge: 'Example group',
+    previewBioLead: 'In their words',
+    previewMatchCtaGuided: 'Guided intro',
+    previewMatchCtaMod: 'Moderator-supported intro',
+    previewGroupCta: 'Request to join',
+    previewDemoNote:
+      'Names, schedules, and any specific details are placeholders — real listings replace these once a navigator approves them.',
   },
   es: {
     eyebrow: 'Conexión entre padres',
@@ -245,6 +257,22 @@ const connectCopy = {
     intakeOptionConnectGroup: 'Grupo pequeño',
     intakeOptionStyleFaith: 'Con base en la fe',
     intakeOptionStyleGeneral: 'General',
+
+    // Preview
+    previewEyebrow: 'Vista previa',
+    previewTitle: 'Cómo se ven los emparejamientos',
+    previewSub:
+      'Perfiles de muestra con el mismo estilo que el producto real. Úsalos para hacerte una idea — responde al cuestionario para obtener sugerencias reales.',
+    previewMatchesHeading: 'Ejemplos de padres compatibles',
+    previewGroupsHeading: 'Ejemplos de grupos pequeños',
+    previewMatchBadge: 'Ejemplo',
+    previewGroupBadge: 'Ejemplo',
+    previewBioLead: 'En sus palabras',
+    previewMatchCtaGuided: 'Introducción guiada',
+    previewMatchCtaMod: 'Introducción con moderador',
+    previewGroupCta: 'Pedir unirme',
+    previewDemoNote:
+      'Los nombres, horarios y detalles específicos son temporales — los listados reales los reemplazarán cuando un navegador los apruebe.',
   },
 } as const;
 
@@ -384,189 +412,161 @@ function IntakeSection({
   );
 }
 
-/* ─── Match Card ─────────────────────────────────────────────── */
-function MatchCard({ match, prompts }: { match: (typeof mockParentMatches)[0]; prompts: typeof conversationPrompts }) {
-  const [expanded, setExpanded] = useState(false);
-  const [selectedPrompt, setSelectedPrompt] = useState<string | null>(null);
+/* ─── Preview match card ────────────────────────────────────── */
+interface PreviewMatchCardProps {
+  match: (typeof mockParentMatches)[0];
+  locale: Locale;
+}
+
+function PreviewMatchCard({ match, locale }: PreviewMatchCardProps) {
+  const t = connectCopy[locale];
   const stageLabel = diagnosisStageLabels[match.diagnosisStage];
-  const prompt = prompts.find((p) => p.id === selectedPrompt);
+  const formatChip = (c: ConnectionPreference): string => {
+    if (c === 'text') return t.intakeOptionConnectText;
+    if (c === 'call') return t.intakeOptionConnectCall;
+    return t.intakeOptionConnectGroup;
+  };
+  const ageChip: Record<AgeRange, string> = {
+    '0-2': t.intakeOptionAge02,
+    '2-5': t.intakeOptionAge25,
+    '6-12': t.intakeOptionAge612,
+    '13-17': t.intakeOptionAge1317,
+  };
 
   return (
-    <article className="rounded-3xl border border-surface-border bg-white p-5">
-      {/* Header row */}
-      <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-base font-bold text-primary">
-          {match.avatar}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="font-semibold text-brand-muted-900">{match.displayName}</p>
-            <span className={cn('rounded-full border px-2.5 py-0.5 text-[11px] font-semibold', stageLabel.color)}>
-              {stageLabel.label}
-            </span>
-          </div>
-          <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{match.bio}</p>
-        </div>
-        <div className="shrink-0 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-center">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Match</p>
-          <p className="text-lg font-bold text-emerald-700">{match.matchScore}%</p>
-        </div>
-      </div>
-
-      {/* Struggles */}
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {match.struggles.map((s) => (
-          <span key={s} className="rounded-full border border-surface-border bg-surface-muted px-2.5 py-0.5 text-xs text-brand-muted-600">
-            {struggleLabels[s]}
-          </span>
-        ))}
-        {match.connectionPreference.map((c) => (
-          <span key={c} className="rounded-full border border-primary/15 bg-primary/5 px-2.5 py-0.5 text-xs font-medium text-primary">
-            {c === 'text' ? 'Text' : c === 'call' ? 'Call / video' : 'Small group'}
-          </span>
-        ))}
-      </div>
-
-      {/* Why matched */}
-      <div className="mt-4 rounded-2xl border border-surface-border bg-surface-muted p-4">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">Why this match</p>
-        <ul className="mt-2 space-y-1">
-          {match.matchReasons.map((r) => (
-            <li key={r} className="flex items-start gap-2 text-xs text-brand-muted-700">
-              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-              {r}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Expand */}
-      {expanded && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">What is shared with a match</p>
-            <p className="mt-1 text-xs leading-relaxed text-brand-muted-600">{match.sharedInfo}</p>
-          </div>
-          <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">What stays private</p>
-            <p className="mt-1 text-xs leading-relaxed text-brand-muted-600">{match.keptPrivate}</p>
-          </div>
-          <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 sm:col-span-2">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-700">After a match</p>
-            <p className="mt-1 text-xs leading-relaxed text-brand-muted-700">{match.nextStepAfterMatch}</p>
-          </div>
-
-          {/* Conversation prompt picker */}
-          <div className="sm:col-span-2">
-            <p className="text-xs font-semibold text-brand-muted-600">
-              Start with a conversation prompt — or write your own.
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {conversationPrompts.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedPrompt(p.id === selectedPrompt ? null : p.id)}
-                  className={cn(
-                    'rounded-xl border px-3 py-1.5 text-xs transition-all',
-                    p.id === selectedPrompt
-                      ? 'border-primary bg-primary text-white'
-                      : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30',
-                  )}
-                >
-                  {p.text}
-                </button>
-              ))}
-            </div>
-            {prompt && (
-              <div className="mt-3 rounded-2xl border border-primary/15 bg-primary/5 p-4">
-                <p className="text-xs font-semibold uppercase tracking-widest text-primary">Selected opening</p>
-                <p className="mt-1 text-sm font-medium text-brand-muted-900">&ldquo;{prompt.text}&rdquo;</p>
-                <button className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white transition hover:bg-primary/90">
-                  <MessageSquare className="h-3.5 w-3.5" /> Send this introduction (demo)
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+    <article
+      className={cn(
+        'group/match relative overflow-hidden rounded-3xl bg-white p-5 shadow-soft transition-all',
+        'motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-card-hover',
       )}
+    >
+      <span
+        className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800"
+        aria-label={t.previewMatchBadge}
+      >
+        <Sparkles className="h-3 w-3" aria-hidden />
+        {t.previewMatchBadge}
+      </span>
 
-      <div className="mt-4 flex flex-wrap gap-2 border-t border-surface-border pt-3">
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-surface-muted px-4 py-2 text-xs font-semibold text-brand-muted-700 transition hover:border-primary/30 hover:text-primary"
+      <div className="flex items-start gap-3 pr-20">
+        <span
+          aria-hidden
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-[13px] font-bold text-primary"
         >
-          {expanded ? 'Show less' : 'See more details'}
+          {match.avatar}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] font-semibold leading-snug text-brand-muted-900">{match.displayName}</p>
+          <span className={cn('mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10.5px] font-semibold', stageLabel.color)}>
+            {stageLabel.label}
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-4 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-muted-400">
+        {t.previewBioLead}
+      </p>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-brand-muted-700">{match.bio}</p>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        <span className="rounded-full border border-surface-border bg-surface-muted px-2 py-0.5 text-[10.5px] font-semibold text-brand-muted-600">
+          {ageChip[match.childAgeRange as AgeRange]}
+        </span>
+        {match.connectionPreference.map((c) => (
+          <span
+            key={c}
+            className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[10.5px] font-semibold text-primary"
+          >
+            {formatChip(c)}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+          {t.previewMatchCtaGuided}
         </button>
-        <button className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white transition hover:bg-primary/90">
-          <MessageSquare className="h-3.5 w-3.5" /> Connect (demo)
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3 py-1.5 text-[12px] font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          <Shield className="h-3.5 w-3.5" aria-hidden />
+          {t.previewMatchCtaMod}
         </button>
       </div>
     </article>
   );
 }
 
-/* ─── Group Card ─────────────────────────────────────────────── */
-function GroupCard({ group }: { group: (typeof peerGroups)[0] }) {
+/* ─── Preview group card ────────────────────────────────────── */
+interface PreviewGroupCardProps {
+  group: (typeof peerGroups)[0];
+  locale: Locale;
+}
+
+function PreviewGroupCard({ group, locale }: PreviewGroupCardProps) {
+  const t = connectCopy[locale];
+  const formatLabel =
+    group.format === 'virtual' ? 'Virtual' : group.format === 'in-person' ? 'In-person' : 'Hybrid';
+  const styleLabel =
+    group.faithStyle === 'faith-based'
+      ? t.intakeOptionStyleFaith
+      : group.faithStyle === 'faith-friendly'
+        ? `${t.intakeOptionStyleFaith}-friendly`
+        : t.intakeOptionStyleGeneral;
   const spotsLeft = group.maxMembers - group.memberCount;
+
   return (
-    <article className="rounded-3xl border border-surface-border bg-white p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap gap-2">
-            <span className={cn(
-              'rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
-              group.faithStyle === 'faith-based' ? 'border-amber-200 bg-amber-50 text-amber-800' :
-              group.faithStyle === 'faith-friendly' ? 'border-amber-100 bg-amber-50/50 text-amber-700' :
-              'border-surface-border bg-surface-muted text-brand-muted-500'
-            )}>
-              {group.faithStyle === 'faith-based' ? 'Faith-based' : group.faithStyle === 'faith-friendly' ? 'Faith-friendly' : 'General'}
-            </span>
-            <span className={cn(
-              'rounded-full border px-2.5 py-0.5 text-[11px] font-semibold',
-              group.format === 'virtual' ? 'border-primary/20 bg-primary/5 text-primary' :
-              group.format === 'in-person' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' :
-              'border-brand-plum-100 bg-brand-plum-50 text-brand-plum-700'
-            )}>
-              {group.format === 'virtual' ? 'Virtual' : group.format === 'in-person' ? 'In-person' : 'Hybrid'}
-            </span>
-          </div>
-          <h3 className="mt-2 text-base font-semibold text-brand-muted-900">{group.name}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{group.description}</p>
-        </div>
-        <div className="shrink-0 text-right">
-          <p className={cn('text-sm font-bold', spotsLeft <= 2 ? 'text-accent' : 'text-emerald-600')}>
-            {spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} left
-          </p>
-          <p className="text-xs text-brand-muted-400">{group.memberCount}/{group.maxMembers}</p>
-        </div>
+    <article
+      className={cn(
+        'group/grp relative overflow-hidden rounded-3xl bg-white p-5 shadow-soft transition-all',
+        'motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-card-hover',
+      )}
+    >
+      <span
+        className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800"
+        aria-label={t.previewGroupBadge}
+      >
+        <Sparkles className="h-3 w-3" aria-hidden />
+        {t.previewGroupBadge}
+      </span>
+
+      <div className="flex flex-wrap items-start gap-2 pr-20">
+        <span className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[10.5px] font-semibold text-primary">
+          {formatLabel}
+        </span>
+        <span className="rounded-full border border-amber-100 bg-amber-50/80 px-2 py-0.5 text-[10.5px] font-semibold text-amber-800">
+          {styleLabel}
+        </span>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-surface-border bg-surface-muted p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">Who it is for</p>
-          <p className="mt-1 text-xs leading-relaxed text-brand-muted-700">{group.audience}</p>
-        </div>
-        <div className="rounded-2xl border border-surface-border bg-surface-muted p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">Moderation</p>
-          <p className="mt-1 text-xs leading-relaxed text-brand-muted-700">{group.moderation}</p>
-        </div>
-      </div>
+      <h3 className="mt-3 text-[15.5px] font-semibold leading-snug text-brand-muted-900">{group.name}</h3>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-brand-muted-600">{group.description}</p>
 
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {group.tags.map((tag) => (
-          <span key={tag} className="rounded-full border border-surface-border bg-white px-2.5 py-0.5 text-[11px] text-brand-muted-500">
-            {tag}
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-surface-border pt-3 text-xs text-brand-muted-500">
-        <div className="flex flex-wrap gap-3">
-          <span>{group.meetingSchedule}</span>
-          <span>Hosted by {group.moderator}</span>
+      <dl className="mt-3 grid grid-cols-2 gap-2 text-[11.5px]">
+        <div className="rounded-xl bg-surface-muted/60 px-2.5 py-1.5">
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">Schedule</dt>
+          <dd className="mt-0.5 text-brand-muted-700">{group.meetingSchedule}</dd>
         </div>
-        <button className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-xs font-semibold text-white transition hover:bg-primary/90">
-          Request to join (demo)
+        <div className="rounded-xl bg-surface-muted/60 px-2.5 py-1.5">
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">Spots</dt>
+          <dd className="mt-0.5 text-brand-muted-700">
+            {spotsLeft} / {group.maxMembers}
+          </dd>
+        </div>
+      </dl>
+
+      <div className="mt-4 flex items-center justify-end">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          <Users className="h-3.5 w-3.5" aria-hidden />
+          {t.previewGroupCta}
         </button>
       </div>
     </article>
@@ -576,7 +576,6 @@ function GroupCard({ group }: { group: (typeof peerGroups)[0] }) {
 /* ─── Main Page ──────────────────────────────────────────────── */
 export default function ConnectPage() {
   const [locale, setLocale] = useState<Locale>('en');
-  const [activeTab, setActiveTab] = useState<ActiveTab>('get-started');
   const t = connectCopy[locale];
 
   // Intake form state
@@ -631,13 +630,6 @@ export default function ConnectPage() {
     'faith-based': t.intakeOptionStyleFaith,
     general: t.intakeOptionStyleGeneral,
   };
-
-  const tabs: { id: ActiveTab; label: string; icon: typeof Sparkles; disabled?: boolean }[] = [
-    { id: 'get-started', label: 'Get started', icon: Sparkles },
-    { id: 'matches', label: 'Parent matches', icon: Heart },
-    { id: 'groups', label: 'Small groups', icon: Users },
-    { id: 'messages', label: 'Messages', icon: MessageSquare, disabled: true },
-  ];
 
   return (
     <div className="page-shell">
@@ -695,28 +687,20 @@ export default function ConnectPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <button
               onClick={() => {
-                setActiveTab('get-started');
-                if (typeof window !== 'undefined') {
-                  requestAnimationFrame(() =>
-                    document.getElementById('intake')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-                  );
-                }
+                if (typeof window === 'undefined') return;
+                document.getElementById('intake')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
-              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-primary-dark"
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
             >
               {t.ctaPrimary}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </button>
             <button
               onClick={() => {
-                setActiveTab('groups');
-                if (typeof window !== 'undefined') {
-                  requestAnimationFrame(() =>
-                    document.getElementById('groups')?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-                  );
-                }
+                if (typeof window === 'undefined') return;
+                document.getElementById('preview-groups')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
-              className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 hover:text-primary"
+              className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
             >
               {t.ctaSecondary}
             </button>
@@ -973,41 +957,8 @@ export default function ConnectPage() {
         </article>
       </section>
 
-      {/* Tab bar */}
-      <div className="rounded-3xl border border-surface-border bg-white p-2">
-        <div className="flex flex-wrap gap-1">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => !tab.disabled && setActiveTab(tab.id)}
-              disabled={tab.disabled}
-              className={cn(
-                'inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-medium transition-all',
-                tab.disabled
-                  ? 'cursor-not-allowed text-brand-muted-300'
-                  : activeTab === tab.id
-                  ? 'bg-primary text-white shadow-soft'
-                  : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-              )}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-              {tab.disabled && (
-                <span className="rounded-full border border-surface-border bg-surface-muted px-2 py-0.5 text-[10px] text-brand-muted-400">
-                  Unlocks after match
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-        <p className="mt-3 px-2 text-xs text-brand-muted-400">
-          You can browse example matches and groups right away. Complete the short intake to tailor them to your stage.
-        </p>
-      </div>
-
       {/* ── INTAKE — single-page progressive form ── */}
-      {activeTab === 'get-started' && (
-        <section
+      <section
           id="intake"
           className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-7"
           aria-labelledby="intake-heading"
@@ -1025,15 +976,23 @@ export default function ConnectPage() {
               </p>
               <div className="mt-5 flex flex-wrap justify-center gap-3">
                 <button
-                  onClick={() => setActiveTab('matches')}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+                  onClick={() =>
+                    document
+                      .getElementById('preview-matches')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
                 >
                   <Heart className="h-4 w-4" aria-hidden /> {t.intakeSubmittedSeeMatches}
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </button>
                 <button
-                  onClick={() => setActiveTab('groups')}
-                  className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-muted px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30"
+                  onClick={() =>
+                    document
+                      .getElementById('preview-groups')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                  className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-muted px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
                 >
                   <Users className="h-4 w-4" aria-hidden /> {t.intakeSubmittedSeeGroups}
                 </button>
@@ -1255,39 +1214,57 @@ export default function ConnectPage() {
             </>
           )}
         </section>
-      )}
 
-      {/* ── PARENT MATCHES tab ── */}
-      {activeTab === 'matches' && (
-        <div className="space-y-4">
-          <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4">
-            <p className="text-sm font-semibold text-amber-900">Example matching experience</p>
-            <p className="mt-0.5 text-sm text-amber-800">
-              Parent profiles and match scores are demo content. The moderation, privacy, and escalation patterns are the real product behavior.
+      {/* ── POST-INTAKE PREVIEW — example matches and groups ── */}
+      <section
+        id="preview"
+        aria-labelledby="preview-heading"
+        className="space-y-6"
+      >
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-primary">
+              {t.previewEyebrow}
+            </p>
+            <h2
+              id="preview-heading"
+              className="mt-1 text-xl font-semibold leading-snug text-brand-muted-900 sm:text-[22px]"
+            >
+              {t.previewTitle}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-muted-600">
+              {t.previewSub}
             </p>
           </div>
-          {mockParentMatches.map((match) => (
-            <MatchCard key={match.id} match={match} prompts={conversationPrompts} />
-          ))}
-        </div>
-      )}
+        </header>
 
-      {/* ── SMALL GROUPS tab ── */}
-      {activeTab === 'groups' && (
-        <div id="groups" className="space-y-4">
-          <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4">
-            <p className="text-sm font-semibold text-amber-900">Example group experience</p>
-            <p className="mt-0.5 text-sm text-amber-800">
-              Group names, member counts, and schedules are demo content. Moderation framing and privacy guardrails reflect real product behavior.
-            </p>
-          </div>
-          <div className="grid gap-4 xl:grid-cols-2">
-            {peerGroups.map((group) => (
-              <GroupCard key={group.id} group={group} />
+        {/* Example parent matches — three cards in a 3-up grid (lg+),
+            stack on mobile. Each card carries an "Example match" badge. */}
+        <div id="preview-matches">
+          <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {t.previewMatchesHeading}
+          </h3>
+          <div className="mt-3 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {mockParentMatches.slice(0, 3).map((match) => (
+              <PreviewMatchCard key={match.id} match={match} locale={locale} />
             ))}
           </div>
         </div>
-      )}
+
+        {/* Example small groups — two cards in a 2-up grid (md+). */}
+        <div id="preview-groups">
+          <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {t.previewGroupsHeading}
+          </h3>
+          <div className="mt-3 grid gap-4 md:grid-cols-2">
+            {peerGroups.slice(0, 2).map((group) => (
+              <PreviewGroupCard key={group.id} group={group} locale={locale} />
+            ))}
+          </div>
+        </div>
+
+        <p className="text-[11.5px] italic text-brand-muted-500">{t.previewDemoNote}</p>
+      </section>
     </div>
   );
 }
