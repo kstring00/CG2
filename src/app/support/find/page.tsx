@@ -7,16 +7,22 @@ import {
   BookmarkPlus,
   Eraser,
   ExternalLink,
+  Globe,
   HeartHandshake,
   Languages,
   List,
+  Mail,
   MapPin,
   Map as MapIcon,
+  Navigation,
   Phone,
+  Pin,
+  Printer,
   Search,
   ShieldCheck,
   Sparkles,
   Star,
+  Trash2,
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -91,6 +97,31 @@ const copy = {
     emptyBody: 'Try removing a filter or broadening the location. Or talk to a navigator.',
     mapEmpty: 'No resources to show on the map yet.',
     mapHint: 'Hover a city to highlight its resources.',
+    rightDefaultTitle: 'Your saved resources',
+    rightDefaultEmpty: 'Save anything you want to come back to. They\'ll live here, in your browser, no login required.',
+    rightDefaultEmptyHint: 'Tip: hover a card to preview · click to pin · ⌘/Ctrl+S to save the focused one.',
+    rightSavedCount: (n: number) => (n === 1 ? '1 saved' : `${n} saved`),
+    rightEmailLabel: 'Email this list to myself',
+    rightEmailPlaceholder: 'you@example.com',
+    rightEmailSend: 'Send',
+    rightPrint: 'Print',
+    rightClear: 'Clear list',
+    rightNavigatorTitle: 'Not finding what you need?',
+    rightNavigatorBody: 'A care navigator can spend ten minutes with you and point you to what fits your week.',
+    rightNavigatorCta: 'Talk to a navigator',
+    expandedReviewed: (date: string) => `Reviewed ${date} · vetted by Texas ABA Centers`,
+    expandedSection: 'About',
+    expandedSectionGood: 'Helpful to know',
+    expandedSectionContact: 'How to reach them',
+    expandedDirections: 'Get directions',
+    expandedClose: 'Close',
+    expandedAddress: 'Address',
+    expandedAge: 'Age range',
+    expandedServices: 'Services',
+    expandedDelivery: 'How they deliver',
+    expandedInsurance: 'Insurance',
+    pinnedLabel: 'Pinned',
+    hoveringLabel: 'Hover preview',
   },
   es: {
     eyebrow: 'Encuentra Apoyo',
@@ -142,6 +173,31 @@ const copy = {
     emptyBody: 'Intenta quitar un filtro o ampliar la ubicación. O habla con un navegador.',
     mapEmpty: 'No hay recursos para mostrar en el mapa.',
     mapHint: 'Pasa el cursor sobre una ciudad para resaltar sus recursos.',
+    rightDefaultTitle: 'Tus recursos guardados',
+    rightDefaultEmpty: 'Guarda lo que quieras revisar después. Vivirá aquí, en tu navegador, sin necesidad de cuenta.',
+    rightDefaultEmptyHint: 'Tip: pasa el cursor para previsualizar · clic para fijar · ⌘/Ctrl+S para guardar el seleccionado.',
+    rightSavedCount: (n: number) => (n === 1 ? '1 guardado' : `${n} guardados`),
+    rightEmailLabel: 'Enviarme esta lista por email',
+    rightEmailPlaceholder: 'tu@ejemplo.com',
+    rightEmailSend: 'Enviar',
+    rightPrint: 'Imprimir',
+    rightClear: 'Vaciar lista',
+    rightNavigatorTitle: '¿No encuentras lo que necesitas?',
+    rightNavigatorBody: 'Un navegador de atención puede dedicarte diez minutos y guiarte a lo que encaje con tu semana.',
+    rightNavigatorCta: 'Habla con un navegador',
+    expandedReviewed: (date: string) => `Revisado ${date} · verificado por Texas ABA Centers`,
+    expandedSection: 'Acerca de',
+    expandedSectionGood: 'Bueno saber',
+    expandedSectionContact: 'Cómo contactar',
+    expandedDirections: 'Ver indicaciones',
+    expandedClose: 'Cerrar',
+    expandedAddress: 'Dirección',
+    expandedAge: 'Rango de edad',
+    expandedServices: 'Servicios',
+    expandedDelivery: 'Cómo atienden',
+    expandedInsurance: 'Seguro',
+    pinnedLabel: 'Fijado',
+    hoveringLabel: 'Vista previa',
   },
 } as const;
 
@@ -323,6 +379,386 @@ const intentCopy: Record<Locale, Record<Intent, { label: string; sublabel: strin
     crisis: { label: 'Estoy luchando', sublabel: 'Salud mental del cuidador y apoyo de crisis.' },
   },
 };
+
+// ── Right rail: expanded card details ─────────────────────────
+
+function directionsHref(r: Resource): string | null {
+  const target = r.address || r.cities[0];
+  if (!target) return null;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(target)}`;
+}
+
+interface ExpandedPanelProps {
+  resource: Resource;
+  locale: Locale;
+  isPinned: boolean;
+  isSaved: boolean;
+  onClose: () => void;
+  onToggleSave: (id: string) => void;
+}
+
+function ExpandedResourcePanel({
+  resource,
+  locale,
+  isPinned,
+  isSaved,
+  onClose,
+  onToggleSave,
+}: ExpandedPanelProps) {
+  const t = copy[locale];
+  const labels = localizedLabel[locale];
+  const isCrisis = resource.urgency === 'crisis';
+  const directions = directionsHref(resource);
+
+  return (
+    <div
+      className={cn(
+        'rounded-2xl border bg-white p-4 shadow-card',
+        isCrisis ? 'border-red-200' : 'border-surface-border',
+      )}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider',
+            isPinned ? 'bg-primary text-white' : 'bg-primary/10 text-primary',
+          )}
+        >
+          {isPinned ? <Pin className="h-3 w-3" /> : null}
+          {isPinned ? t.pinnedLabel : t.hoveringLabel}
+        </span>
+        {isPinned && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
+            aria-label={t.expandedClose}
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+
+      <h3 className="mt-2 text-[16px] font-semibold leading-snug text-brand-muted-900">
+        {resource.name}
+      </h3>
+      <p className="mt-1 text-[11.5px] text-brand-muted-500" title={t.expandedReviewed(resource.lastReviewed)}>
+        <ShieldCheck className="mr-1 inline h-3 w-3" />
+        {t.expandedReviewed(resource.lastReviewed)}
+      </p>
+
+      <div className="mt-3 space-y-3 text-[13px] leading-relaxed text-brand-muted-700">
+        <p className="whitespace-pre-line">{resource.description}</p>
+        {resource.helpfulToKnow && (
+          <div className="rounded-xl bg-surface-muted p-3">
+            <p className="text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-500">
+              {t.expandedSectionGood}
+            </p>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-brand-muted-700">{resource.helpfulToKnow}</p>
+          </div>
+        )}
+      </div>
+
+      <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[11.5px]">
+        <div>
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedAge}</dt>
+          <dd className="mt-0.5 text-brand-muted-700">{resource.ageGroups.join(', ')}</dd>
+        </div>
+        <div>
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedInsurance}</dt>
+          <dd className="mt-0.5 text-brand-muted-700">{labels.insurance[resource.insurance]}</dd>
+        </div>
+        <div className="col-span-2">
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedServices}</dt>
+          <dd className="mt-0.5 text-brand-muted-700">
+            {resource.services.map((s) => labels.services[s]).join(' · ')}
+          </dd>
+        </div>
+        <div className="col-span-2">
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedDelivery}</dt>
+          <dd className="mt-0.5 text-brand-muted-700">
+            {resource.delivery.map((d) => labels.delivery[d]).join(' · ')}
+          </dd>
+        </div>
+        {resource.address && (
+          <div className="col-span-2">
+            <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedAddress}</dt>
+            <dd className="mt-0.5 text-brand-muted-700">{resource.address}</dd>
+          </div>
+        )}
+      </dl>
+
+      <div className="mt-3 border-t border-surface-border pt-3">
+        <p className="text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-400">
+          {t.expandedSectionContact}
+        </p>
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {resource.phone && (
+            <a
+              href={`tel:${resource.phone.replace(/[^0-9+]/g, '')}`}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
+                isCrisis ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-primary text-white hover:bg-primary-dark',
+              )}
+            >
+              <Phone className="h-3.5 w-3.5" />
+              {resource.phone}
+            </a>
+          )}
+          {resource.website && (
+            <a
+              href={resource.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border px-2.5 py-1.5 text-[12px] font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
+            >
+              <Globe className="h-3.5 w-3.5" />
+              {t.websiteButton}
+            </a>
+          )}
+          {directions && (
+            <a
+              href={directions}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border px-2.5 py-1.5 text-[12px] font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              {t.expandedDirections}
+            </a>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onToggleSave(resource.id)}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12px] font-semibold transition-colors',
+            isSaved
+              ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+              : 'border border-surface-border text-brand-muted-700 hover:bg-surface-subtle',
+          )}
+          aria-pressed={isSaved}
+        >
+          <BookmarkPlus className={cn('h-3.5 w-3.5', isSaved && 'fill-amber-500 text-amber-500')} />
+          {isSaved ? t.saved : t.saveCard}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Right rail: saved resources panel ─────────────────────────
+
+interface SavedPanelProps {
+  locale: Locale;
+  savedResources: Resource[];
+  onUnsave: (id: string) => void;
+  onClear: () => void;
+  onPin: (id: string) => void;
+}
+
+function SavedResourcesPanel({ locale, savedResources, onUnsave, onClear, onPin }: SavedPanelProps) {
+  const t = copy[locale];
+  const [email, setEmail] = useState('');
+
+  const buildEmailHref = (to: string): string => {
+    const subject = locale === 'en' ? 'My saved support resources' : 'Mis recursos de apoyo guardados';
+    const intro =
+      locale === 'en'
+        ? 'Saved from texasabacenterscg.com/support/find:\n\n'
+        : 'Guardado desde texasabacenterscg.com/support/find:\n\n';
+    const body = savedResources
+      .map((r) => {
+        const lines = [`• ${r.name}`];
+        if (r.phone) lines.push(`  ☎ ${r.phone}`);
+        if (r.website) lines.push(`  ${r.website}`);
+        if (r.cities[0]) lines.push(`  ${r.cities[0]}`);
+        return lines.join('\n');
+      })
+      .join('\n\n');
+    return `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(intro + body)}`;
+  };
+
+  const handlePrint = () => {
+    if (typeof window === 'undefined') return;
+    const win = window.open('', '_blank', 'width=720,height=900');
+    if (!win) return;
+    const rows = savedResources
+      .map(
+        (r) => `
+        <article>
+          <h2>${escapeHtml(r.name)}</h2>
+          <p class="meta">${escapeHtml(r.cities.join(', '))} · ${escapeHtml(r.lastReviewed)}</p>
+          <p>${escapeHtml(r.description)}</p>
+          <p class="contact">
+            ${r.phone ? `☎ ${escapeHtml(r.phone)}` : ''}
+            ${r.website ? `· ${escapeHtml(r.website)}` : ''}
+            ${r.address ? `· ${escapeHtml(r.address)}` : ''}
+          </p>
+        </article>`,
+      )
+      .join('');
+    win.document.write(`<!doctype html><html><head><title>Saved support resources</title>
+      <style>
+        body { font-family: -apple-system, system-ui, sans-serif; max-width: 680px; margin: 24px auto; padding: 0 16px; color: #212226; }
+        h1 { font-size: 20px; margin-bottom: 4px; }
+        h2 { font-size: 15px; margin: 0 0 4px; }
+        article { padding: 12px 0; border-bottom: 1px solid #d4d8e3; page-break-inside: avoid; }
+        .meta { font-size: 11px; color: #6e727a; margin: 0 0 6px; }
+        .contact { font-size: 11px; color: #5a5d64; margin-top: 6px; }
+        p { font-size: 12.5px; line-height: 1.5; margin: 0 0 6px; }
+      </style></head><body>
+      <h1>${locale === 'en' ? 'Saved support resources' : 'Recursos de apoyo guardados'}</h1>
+      <p class="meta">texasabacenterscg.com/support/find</p>
+      ${rows}
+      <script>window.onload = () => window.print();</script>
+      </body></html>`);
+    win.document.close();
+  };
+
+  const isEmpty = savedResources.length === 0;
+
+  return (
+    <section className="rounded-2xl border border-surface-border bg-white p-4 shadow-soft">
+      <div className="flex items-center justify-between gap-2">
+        <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-muted-900">
+          <BookmarkPlus className="h-4 w-4 text-amber-500" />
+          {t.rightDefaultTitle}
+        </p>
+        {!isEmpty && (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10.5px] font-bold text-amber-700">
+            {t.rightSavedCount(savedResources.length)}
+          </span>
+        )}
+      </div>
+
+      {isEmpty ? (
+        <>
+          <p className="mt-2 text-[12.5px] leading-relaxed text-brand-muted-600">{t.rightDefaultEmpty}</p>
+          <p className="mt-2 text-[11px] leading-snug text-brand-muted-500">{t.rightDefaultEmptyHint}</p>
+        </>
+      ) : (
+        <>
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {savedResources.map((r) => (
+              <li
+                key={`saved-${r.id}`}
+                className="group flex items-start gap-2 rounded-lg border border-surface-border bg-surface-muted/40 p-2"
+              >
+                <button
+                  type="button"
+                  onClick={() => onPin(r.id)}
+                  className="min-w-0 flex-1 text-left"
+                >
+                  <p className="truncate text-[12.5px] font-semibold text-brand-muted-900 hover:text-primary">
+                    {r.name}
+                  </p>
+                  <p className="mt-0.5 text-[10.5px] text-brand-muted-500">
+                    {r.cities[0]}
+                    {r.phone ? ` · ${r.phone}` : ''}
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onUnsave(r.id)}
+                  className="rounded-md p-1 text-brand-muted-400 opacity-0 transition-opacity hover:bg-surface-subtle hover:text-red-600 group-hover:opacity-100 focus:opacity-100"
+                  aria-label="Remove from saved"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-3 border-t border-surface-border pt-3">
+            <label className="text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-500">
+              {t.rightEmailLabel}
+            </label>
+            <div className="mt-1.5 flex gap-1.5">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t.rightEmailPlaceholder}
+                className="min-w-0 flex-1 rounded-lg border border-surface-border bg-white px-2 py-1.5 text-[12px] outline-none ring-primary/20 focus:ring-2"
+              />
+              <a
+                href={email ? buildEmailHref(email) : '#'}
+                onClick={(e) => {
+                  if (!email) e.preventDefault();
+                }}
+                className={cn(
+                  'inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
+                  email
+                    ? 'bg-primary text-white hover:bg-primary-dark'
+                    : 'cursor-not-allowed bg-surface-muted text-brand-muted-400',
+                )}
+                aria-disabled={!email}
+              >
+                <Mail className="h-3.5 w-3.5" />
+                {t.rightEmailSend}
+              </a>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-primary hover:underline"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                {t.rightPrint}
+              </button>
+              <button
+                type="button"
+                onClick={onClear}
+                className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-brand-muted-500 hover:text-red-600"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                {t.rightClear}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function NavigatorCTA({ locale }: { locale: Locale }) {
+  const t = copy[locale];
+  return (
+    <section className="rounded-2xl border border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-4">
+      <div className="flex items-start gap-3">
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-plum-100 text-brand-plum-700">
+          <HeartHandshake className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold text-brand-plum-800">{t.rightNavigatorTitle}</p>
+          <p className="mt-1 text-[11.5px] leading-snug text-brand-plum-700/80">{t.rightNavigatorBody}</p>
+          <a
+            href="/support/connect"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-brand-plum-700 px-3 py-1.5 text-[11.5px] font-semibold text-white hover:bg-brand-plum-800"
+          >
+            {t.rightNavigatorCta}
+            <ArrowRight className="h-3 w-3" />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 // ── Resource card ──────────────────────────────────────────────
 
@@ -917,6 +1353,11 @@ export default function FindSupportPage() {
     return sortResources(b, sort);
   }, [filters, query, sort]);
 
+  const savedResources = useMemo(
+    () => savedIds.map((id) => findResources.find((r) => r.id === id)).filter((r): r is Resource => Boolean(r)),
+    [savedIds],
+  );
+
   const toggleSave = (id: string) => {
     setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
@@ -1165,49 +1606,34 @@ export default function FindSupportPage() {
               </div>
             </div>
 
-            {/* Right rail — minimal stub; full context panel arrives in Step 4 */}
-            <aside className="hidden lg:flex lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:flex-col lg:gap-3 lg:overflow-y-auto">
+            {/* Right rail — context panel */}
+            <aside className="hidden lg:flex lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:flex-col lg:gap-3 lg:overflow-y-auto lg:pr-1">
               {(() => {
-                const focused = findResources.find((r) => r.id === (pinnedId ?? hoveredId));
+                const focusedId = pinnedId ?? hoveredId;
+                const focused = focusedId ? findResources.find((r) => r.id === focusedId) ?? null : null;
                 if (focused) {
                   return (
-                    <div className="rounded-2xl border border-surface-border bg-white p-4 shadow-soft">
-                      <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary">
-                        {pinnedId ? 'Pinned' : 'Hover preview'}
-                      </p>
-                      <h3 className="mt-1 text-[15px] font-semibold text-brand-muted-900">{focused.name}</h3>
-                      <p className="mt-2 whitespace-pre-line text-[12.5px] leading-relaxed text-brand-muted-700">
-                        {focused.description}
-                      </p>
-                      {focused.helpfulToKnow && (
-                        <div className="mt-3 rounded-xl bg-surface-muted p-2.5">
-                          <p className="text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-500">
-                            Helpful to know
-                          </p>
-                          <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-700">
-                            {focused.helpfulToKnow}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    <ExpandedResourcePanel
+                      resource={focused}
+                      locale={locale}
+                      isPinned={pinnedId === focused.id}
+                      isSaved={savedIds.includes(focused.id)}
+                      onClose={() => setPinnedId(null)}
+                      onToggleSave={toggleSave}
+                    />
                   );
                 }
                 return (
-                  <div className="rounded-2xl border border-dashed border-surface-border bg-white/60 p-4 text-[12px] text-brand-muted-500">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-400">
-                      Context panel
-                    </p>
-                    <p className="mt-2">
-                      Hover any card to preview its full editorial blurb here. Click to pin. Saved
-                      resources and the &quot;email to myself&quot; flow arrive in the next step.
-                    </p>
-                    {savedIds.length > 0 && (
-                      <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                        <BookmarkPlus className="h-3 w-3 fill-amber-500 text-amber-500" />
-                        {savedIds.length} saved
-                      </p>
-                    )}
-                  </div>
+                  <>
+                    <SavedResourcesPanel
+                      locale={locale}
+                      savedResources={savedResources}
+                      onUnsave={(id) => setSavedIds((prev) => prev.filter((x) => x !== id))}
+                      onClear={() => setSavedIds([])}
+                      onPin={handlePin}
+                    />
+                    <NavigatorCTA locale={locale} />
+                  </>
                 );
               })()}
             </aside>
