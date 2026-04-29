@@ -314,7 +314,7 @@ export default function MentalHealthCenter() {
 
       {/* Page header row */}
       <div className={styles.pageTop}>
-        <span className={styles.pageTitle}>Mental Health Center</span>
+        <span className={styles.pageTitle}>Support for Parents</span>
         <div className={styles.pageTopActions}>
           {savedFlash && (
             <span className={styles.savedBadge} aria-live="polite">
