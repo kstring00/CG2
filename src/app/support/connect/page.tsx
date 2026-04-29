@@ -153,6 +153,26 @@ const connectCopy = {
     previewGroupCta: 'Request to join',
     previewDemoNote:
       'Names, schedules, and any specific details are placeholders — real listings replace these once a navigator approves them.',
+
+    // Off-ramps
+    offrampEyebrow: 'Off-ramps',
+    offrampHeading: "If peer support isn't the right fit right now",
+    offrampSub:
+      'Real exits — clearly marked. Use any of these the moment peer connection stops being enough.',
+    offrampFindTitle: 'Find a provider',
+    offrampFindBody:
+      'Browse 60 vetted providers and sensory-friendly places — filter by city, service, insurance, and more.',
+    offrampFindCta: 'Open the directory',
+    offrampMentalTitle: 'Mental health for caregivers',
+    offrampMentalBody:
+      'A space designed for the parent — daily check-ins, calming tools, and recommendations sized for your week.',
+    offrampMentalCta: 'Open the mental health center',
+    offrampCrisisTitle: 'Crisis support',
+    offrampCrisisBody:
+      'Call or text 988 (free, 24/7). For Harris County mobile crisis: (713) 970-7000. For an emergency, 911.',
+    offrampCrisisCta988: 'Call or text 988',
+    offrampCrisisCtaHarris: 'Harris Center',
+    offrampCrisisCta911: '911',
   },
   es: {
     eyebrow: 'Conexión entre padres',
@@ -273,6 +293,26 @@ const connectCopy = {
     previewGroupCta: 'Pedir unirme',
     previewDemoNote:
       'Los nombres, horarios y detalles específicos son temporales — los listados reales los reemplazarán cuando un navegador los apruebe.',
+
+    // Off-ramps
+    offrampEyebrow: 'Salidas',
+    offrampHeading: 'Si el apoyo entre padres no es lo correcto en este momento',
+    offrampSub:
+      'Salidas reales — claramente marcadas. Úsalas en cuanto la conexión entre padres deje de ser suficiente.',
+    offrampFindTitle: 'Buscar un proveedor',
+    offrampFindBody:
+      'Explora 60 proveedores verificados y lugares sensorialmente amigables — filtra por ciudad, servicio, seguro y más.',
+    offrampFindCta: 'Abrir el directorio',
+    offrampMentalTitle: 'Salud mental para cuidadores',
+    offrampMentalBody:
+      'Un espacio diseñado para el padre — chequeos diarios, herramientas calmantes y recomendaciones a la medida de tu semana.',
+    offrampMentalCta: 'Abrir el centro de salud mental',
+    offrampCrisisTitle: 'Apoyo en crisis',
+    offrampCrisisBody:
+      'Llama o envía mensaje al 988 (gratis, 24/7). Crisis móvil del condado de Harris: (713) 970-7000. Para emergencia, 911.',
+    offrampCrisisCta988: 'Llamar o texto al 988',
+    offrampCrisisCtaHarris: 'Harris Center',
+    offrampCrisisCta911: '911',
   },
 } as const;
 
@@ -1264,6 +1304,113 @@ export default function ConnectPage() {
         </div>
 
         <p className="text-[11.5px] italic text-brand-muted-500">{t.previewDemoNote}</p>
+      </section>
+
+      {/* ── OFF-RAMPS — quietly styled but clearly marked ── */}
+      <section
+        aria-labelledby="offramps-heading"
+        className="rounded-3xl border border-surface-border bg-surface-muted/40 p-5 sm:p-7"
+      >
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+          {t.offrampEyebrow}
+        </p>
+        <h2
+          id="offramps-heading"
+          className="mt-1 text-lg font-semibold leading-snug text-brand-muted-900 sm:text-xl"
+        >
+          {t.offrampHeading}
+        </h2>
+        <p className="mt-1.5 max-w-2xl text-[13.5px] leading-relaxed text-brand-muted-600">
+          {t.offrampSub}
+        </p>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {/* Find a provider */}
+          <a
+            href="/support/find"
+            className="group/exit flex flex-col rounded-2xl border border-surface-border bg-white p-4 text-left transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Users className="h-4 w-4" aria-hidden />
+              </span>
+              <ArrowUpRight
+                className="h-4 w-4 text-brand-muted-400 transition-transform motion-safe:group-hover/exit:translate-x-0.5 motion-safe:group-hover/exit:-translate-y-0.5 group-hover/exit:text-primary"
+                aria-hidden
+              />
+            </div>
+            <h3 className="mt-3 text-[14.5px] font-semibold text-brand-muted-900">
+              {t.offrampFindTitle}
+            </h3>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-brand-muted-600">
+              {t.offrampFindBody}
+            </p>
+            <span className="mt-3 text-[12px] font-semibold text-primary">
+              {t.offrampFindCta} →
+            </span>
+          </a>
+
+          {/* Mental health for caregivers */}
+          <a
+            href="/support/mental-health"
+            className="group/exit flex flex-col rounded-2xl border border-surface-border bg-white p-4 text-left transition-colors hover:border-brand-plum-300 hover:bg-brand-plum-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-plum-400 focus-visible:ring-offset-2"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-brand-plum-100 text-brand-plum-700">
+                <Heart className="h-4 w-4" aria-hidden />
+              </span>
+              <ArrowUpRight
+                className="h-4 w-4 text-brand-muted-400 transition-transform motion-safe:group-hover/exit:translate-x-0.5 motion-safe:group-hover/exit:-translate-y-0.5 group-hover/exit:text-brand-plum-700"
+                aria-hidden
+              />
+            </div>
+            <h3 className="mt-3 text-[14.5px] font-semibold text-brand-muted-900">
+              {t.offrampMentalTitle}
+            </h3>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-brand-muted-600">
+              {t.offrampMentalBody}
+            </p>
+            <span className="mt-3 text-[12px] font-semibold text-brand-plum-700">
+              {t.offrampMentalCta} →
+            </span>
+          </a>
+
+          {/* Crisis support — three direct dial actions */}
+          <div className="flex flex-col rounded-2xl border border-red-200 bg-red-50/60 p-4">
+            <div className="flex items-start justify-between gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700">
+                <Phone className="h-4 w-4" aria-hidden />
+              </span>
+            </div>
+            <h3 className="mt-3 text-[14.5px] font-semibold text-red-900">
+              {t.offrampCrisisTitle}
+            </h3>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-red-900/80">
+              {t.offrampCrisisBody}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <a
+                href="tel:988"
+                className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-[11.5px] font-semibold text-white hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
+              >
+                <Phone className="h-3 w-3" aria-hidden />
+                {t.offrampCrisisCta988}
+              </a>
+              <a
+                href="tel:+17139707000"
+                className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+              >
+                {t.offrampCrisisCtaHarris}
+              </a>
+              <a
+                href="tel:911"
+                className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+              >
+                {t.offrampCrisisCta911}
+              </a>
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   );
