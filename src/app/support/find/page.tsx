@@ -9,6 +9,7 @@ import {
   ExternalLink,
   Globe,
   HeartHandshake,
+  Keyboard,
   Languages,
   List,
   Mail,
@@ -122,6 +123,18 @@ const copy = {
     expandedInsurance: 'Insurance',
     pinnedLabel: 'Pinned',
     hoveringLabel: 'Hover preview',
+    keyboardButton: 'Keyboard shortcuts',
+    helpTitle: 'Keyboard shortcuts',
+    helpClose: 'Close',
+    helpRows: [
+      ['/', 'Focus search'],
+      ['⌘K · Ctrl+K', 'Focus search'],
+      ['↑ ↓', 'Walk through results'],
+      ['Enter', 'Pin the focused card'],
+      ['⌘S · Ctrl+S', 'Save the focused card'],
+      ['Esc', 'Clear the right-rail panel'],
+      ['?', 'Toggle this overlay'],
+    ] as const,
   },
   es: {
     eyebrow: 'Encuentra Apoyo',
@@ -198,6 +211,18 @@ const copy = {
     expandedInsurance: 'Seguro',
     pinnedLabel: 'Fijado',
     hoveringLabel: 'Vista previa',
+    keyboardButton: 'Atajos de teclado',
+    helpTitle: 'Atajos de teclado',
+    helpClose: 'Cerrar',
+    helpRows: [
+      ['/', 'Enfocar búsqueda'],
+      ['⌘K · Ctrl+K', 'Enfocar búsqueda'],
+      ['↑ ↓', 'Recorrer resultados'],
+      ['Enter', 'Fijar la tarjeta enfocada'],
+      ['⌘S · Ctrl+S', 'Guardar la tarjeta enfocada'],
+      ['Esc', 'Cerrar el panel derecho'],
+      ['?', 'Alternar este panel'],
+    ] as const,
   },
 } as const;
 
@@ -290,6 +315,123 @@ function countActiveFilters(f: FilterState): number {
     f.delivery.length +
     (f.goodFirstStepOnly ? 1 : 0)
   );
+}
+
+// ── URL encoding ───────────────────────────────────────────────
+
+const citySlug: Record<City, string> = {
+  'Sugar Land': 'sugar-land',
+  Katy: 'katy',
+  Pearland: 'pearland',
+  'Missouri City': 'missouri-city',
+  'Clear Lake': 'clear-lake',
+  Houston: 'houston',
+  'Fort Bend County': 'fort-bend',
+  'The Woodlands': 'woodlands',
+  Statewide: 'statewide',
+  Online: 'online',
+};
+
+const serviceSlug: Record<Service, string> = {
+  ABA: 'aba',
+  Speech: 'speech',
+  OT: 'ot',
+  Feeding: 'feeding',
+  Diagnosis: 'diagnosis',
+  Pediatrician: 'pediatrician',
+  'Mental Health': 'mental-health',
+  Respite: 'respite',
+  Advocacy: 'advocacy',
+  Recreation: 'recreation',
+  'Sensory-friendly business': 'sensory',
+};
+
+const ageSlug: Record<AgeGroup, string> = {
+  'Birth–5': 'birth-5',
+  '6–12': '6-12',
+  '13–17': '13-17',
+  Adult: 'adult',
+  'All ages': 'all',
+};
+
+const insuranceSlug: Record<Insurance, string> = {
+  'Accepts insurance': 'yes',
+  'No insurance needed': 'no',
+  Varies: 'varies',
+};
+
+const deliverySlug: Record<Delivery, string> = {
+  'In-person': 'in-person',
+  'In-home/Mobile': 'mobile',
+  Virtual: 'virtual',
+};
+
+function invert<K extends string, V extends string>(map: Record<K, V>): Record<V, K> {
+  const out = {} as Record<V, K>;
+  (Object.keys(map) as K[]).forEach((k) => {
+    out[map[k]] = k;
+  });
+  return out;
+}
+
+const cityFromSlug = invert(citySlug);
+const serviceFromSlug = invert(serviceSlug);
+const ageFromSlug = invert(ageSlug);
+const insuranceFromSlug = invert(insuranceSlug);
+const deliveryFromSlug = invert(deliverySlug);
+
+interface UrlState {
+  filters: FilterState;
+  query: string;
+  intent: Intent | null;
+  sort: SortKey;
+  view: ViewKey;
+}
+
+function urlStateToParams(s: UrlState): URLSearchParams {
+  const params = new URLSearchParams();
+  if (s.intent) params.set('need', s.intent);
+  if (s.query.trim()) params.set('q', s.query.trim());
+  if (s.filters.cities.length) params.set('city', s.filters.cities.map((c) => citySlug[c]).join(','));
+  if (s.filters.services.length) params.set('service', s.filters.services.map((c) => serviceSlug[c]).join(','));
+  if (s.filters.ageGroups.length) params.set('age', s.filters.ageGroups.map((c) => ageSlug[c]).join(','));
+  if (s.filters.insurance.length) params.set('insurance', s.filters.insurance.map((c) => insuranceSlug[c]).join(','));
+  if (s.filters.delivery.length) params.set('delivery', s.filters.delivery.map((c) => deliverySlug[c]).join(','));
+  if (s.filters.goodFirstStepOnly) params.set('gfs', '1');
+  if (s.sort !== 'recommended') params.set('sort', s.sort);
+  if (s.view !== 'list') params.set('view', s.view);
+  return params;
+}
+
+function parseList<T extends string>(value: string | null, lookup: Record<string, T>): T[] {
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((s) => lookup[s])
+    .filter((s): s is T => Boolean(s));
+}
+
+function paramsToUrlState(params: URLSearchParams): UrlState {
+  const intentRaw = params.get('need');
+  const intent = (INTENTS as readonly string[]).includes(intentRaw ?? '') ? (intentRaw as Intent) : null;
+  const sortRaw = params.get('sort');
+  const sort: SortKey = sortRaw === 'recent' || sortRaw === 'alpha' ? sortRaw : 'recommended';
+  const viewRaw = params.get('view');
+  const view: ViewKey = viewRaw === 'map' ? 'map' : 'list';
+  return {
+    intent,
+    query: params.get('q') ?? '',
+    sort,
+    view,
+    filters: {
+      cities: parseList(params.get('city'), cityFromSlug),
+      services: parseList(params.get('service'), serviceFromSlug),
+      ageGroups: parseList(params.get('age'), ageFromSlug),
+      insurance: parseList(params.get('insurance'), insuranceFromSlug),
+      delivery: parseList(params.get('delivery'), deliveryFromSlug),
+      goodFirstStepOnly: params.get('gfs') === '1',
+    },
+  };
 }
 
 function applyFilters(items: Resource[], f: FilterState): Resource[] {
@@ -1296,20 +1438,41 @@ export default function FindSupportPage() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const t = copy[locale];
 
-  // Restore saved filter set from prior session, once.
+  // Restore from URL first (shareable links win), then fall back to localStorage.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const raw = window.localStorage.getItem('cg2.find.filters');
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw) as Partial<FilterState>;
-        setFilters({ ...emptyFilters, ...parsed });
-      } catch {
-        /* ignore corrupt JSON */
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = paramsToUrlState(params);
+    const hasUrlState =
+      params.toString().length > 0 &&
+      (fromUrl.query ||
+        fromUrl.intent ||
+        countActiveFilters(fromUrl.filters) > 0 ||
+        fromUrl.sort !== 'recommended' ||
+        fromUrl.view !== 'list');
+
+    if (hasUrlState) {
+      setActiveIntent(fromUrl.intent);
+      setFilters(fromUrl.filters);
+      setQuery(fromUrl.query);
+      setSort(fromUrl.sort);
+      setView(fromUrl.view);
+    } else {
+      const raw = window.localStorage.getItem('cg2.find.filters');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as Partial<FilterState>;
+          setFilters({ ...emptyFilters, ...parsed });
+        } catch {
+          /* ignore corrupt JSON */
+        }
       }
     }
+
     const savedRaw = window.localStorage.getItem('cg2.find.saved');
     if (savedRaw) {
       try {
@@ -1319,7 +1482,17 @@ export default function FindSupportPage() {
         /* ignore */
       }
     }
+    setHydrated(true);
   }, []);
+
+  // Keep the URL in sync after hydration so refresh / share links round-trip.
+  useEffect(() => {
+    if (!hydrated || typeof window === 'undefined') return;
+    const params = urlStateToParams({ filters, query, intent: activeIntent, sort, view });
+    const qs = params.toString();
+    const next = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+    window.history.replaceState(null, '', next);
+  }, [filters, query, activeIntent, sort, view, hydrated]);
 
   // Persist saved-resource IDs.
   useEffect(() => {
@@ -1331,22 +1504,6 @@ export default function FindSupportPage() {
     }
   }, [savedIds]);
 
-  // `/` keyboard shortcut to focus the search input.
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
-      if (e.key === '/' && !isTyping) {
-        e.preventDefault();
-        document.getElementById('find-search')?.focus();
-      } else if (e.key === 'Escape' && pinnedId) {
-        setPinnedId(null);
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [pinnedId]);
-
   const filteredResources = useMemo(() => {
     const a = applyFilters(findResources, filters);
     const b = searchResources(a, query);
@@ -1357,6 +1514,83 @@ export default function FindSupportPage() {
     () => savedIds.map((id) => findResources.find((r) => r.id === id)).filter((r): r is Resource => Boolean(r)),
     [savedIds],
   );
+
+  // Keyboard shortcuts: /, ⌘K, ⌘S, ↑/↓, Enter, Esc, ?
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTyping = !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+      const focusedId = pinnedId ?? hoveredId;
+
+      // ⌘K / Ctrl+K → focus search (works even while typing in another input).
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        document.getElementById('find-search')?.focus();
+        return;
+      }
+
+      // ⌘S / Ctrl+S → save the focused card.
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        if (focusedId) {
+          e.preventDefault();
+          setSavedIds((prev) =>
+            prev.includes(focusedId) ? prev.filter((x) => x !== focusedId) : [...prev, focusedId],
+          );
+        }
+        return;
+      }
+
+      if (isTyping) {
+        if (e.key === 'Escape') (target as HTMLElement).blur();
+        return;
+      }
+
+      if (e.key === '/') {
+        e.preventDefault();
+        document.getElementById('find-search')?.focus();
+        return;
+      }
+
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setHelpOpen((p) => !p);
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        if (helpOpen) setHelpOpen(false);
+        else if (pinnedId) setPinnedId(null);
+        else if (hoveredId) setHoveredId(null);
+        return;
+      }
+
+      if (filteredResources.length === 0) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const currentIndex = focusedId
+          ? filteredResources.findIndex((r) => r.id === focusedId)
+          : -1;
+        const delta = e.key === 'ArrowDown' ? 1 : -1;
+        const nextIndex = Math.max(
+          0,
+          Math.min(filteredResources.length - 1, (currentIndex < 0 ? -1 : currentIndex) + delta),
+        );
+        const nextId = filteredResources[nextIndex].id;
+        setHoveredId(nextId);
+        const node = document.getElementById(`card-${nextId}`);
+        node?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+
+      if (e.key === 'Enter' && focusedId) {
+        e.preventDefault();
+        setPinnedId((prev) => (prev === focusedId ? null : focusedId));
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [filteredResources, hoveredId, pinnedId, helpOpen]);
 
   const toggleSave = (id: string) => {
     setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -1392,16 +1626,26 @@ export default function FindSupportPage() {
               <h1 className="mt-1.5 text-2xl font-bold text-brand-muted-900 sm:text-[28px]">{t.title}</h1>
               <p className="mt-1.5 max-w-2xl text-sm text-brand-muted-600">{t.description}</p>
             </div>
-            <button
-              onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
-              className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
-              aria-label="Toggle language"
-            >
-              <Languages className="h-4 w-4" />
-              <span>{locale === 'en' ? 'EN' : 'ES'}</span>
-              <span className="text-brand-muted-400">·</span>
-              <span>{t.languageToggle}</span>
-            </button>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                onClick={() => setHelpOpen(true)}
+                className="hidden items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary md:inline-flex"
+                aria-label={t.keyboardButton}
+              >
+                <Keyboard className="h-4 w-4" />
+                <span>?</span>
+              </button>
+              <button
+                onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
+                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
+                aria-label="Toggle language"
+              >
+                <Languages className="h-4 w-4" />
+                <span>{locale === 'en' ? 'EN' : 'ES'}</span>
+                <span className="text-brand-muted-400">·</span>
+                <span>{t.languageToggle}</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -1585,7 +1829,7 @@ export default function FindSupportPage() {
                 ) : (
                   <div className="flex flex-col gap-3">
                     {filteredResources.map((r, i) => (
-                      <div key={r.id}>
+                      <div key={r.id} id={`card-${r.id}`}>
                         <ResourceCard
                           resource={r}
                           locale={locale}
@@ -1640,6 +1884,52 @@ export default function FindSupportPage() {
           </div>
         </div>
       </section>
+
+      {helpOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.helpTitle}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setHelpOpen(false);
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl border border-surface-border bg-white p-5 shadow-card-hover">
+            <div className="flex items-start justify-between gap-3">
+              <p className="inline-flex items-center gap-2 text-base font-semibold text-brand-muted-900">
+                <Keyboard className="h-4 w-4 text-primary" />
+                {t.helpTitle}
+              </p>
+              <button
+                onClick={() => setHelpOpen(false)}
+                className="rounded-md p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
+                aria-label={t.helpClose}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ul className="mt-4 flex flex-col gap-2">
+              {t.helpRows.map(([keys, label]) => (
+                <li
+                  key={keys}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-surface-border bg-surface-muted/40 px-3 py-2"
+                >
+                  <span className="text-[12.5px] text-brand-muted-700">{label}</span>
+                  <span className="rounded-md border border-surface-border bg-white px-2 py-0.5 text-[11px] font-mono font-semibold text-brand-muted-700">
+                    {keys}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-[11px] text-brand-muted-500">
+              {locale === 'en'
+                ? 'Filtered URLs are shareable — copy this tab\'s link to send a co-parent the same view.'
+                : 'Las URLs filtradas se pueden compartir — copia el enlace para que tu copadre vea la misma vista.'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
