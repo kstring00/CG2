@@ -96,6 +96,51 @@ const connectCopy = {
     pillarMoreLinkFind: 'Find a vetted provider',
     pillarMoreLinkMental: 'Mental health for caregivers',
     pillarMoreLinkCrisis: 'Crisis support — 988',
+
+    // Intake
+    intakeEyebrow: 'A short intake',
+    intakeTitle: 'Tell us what support feels right',
+    intakeSub:
+      'We do not ask for identifying child details. Five quick questions to make the first step feel safer and more relevant.',
+    intakeProgress: (done: number, total: number) => `${done} of ${total} answered`,
+    intakeStep1Title: 'Child age range',
+    intakeStep1Hint: 'Pick one or more — helps us match you with parents at the same stage of growth.',
+    intakeStep2Title: 'Where are you in the journey?',
+    intakeStep2Hint: 'Pick one. There is no wrong answer.',
+    intakeStep3Eyebrow: 'The human moment',
+    intakeStep3Title: 'What is hardest right now?',
+    intakeStep3Reassure: 'Pick what fits today. You can change this anytime.',
+    intakeStep3Hint: 'Pick one or more.',
+    intakeStep4Title: 'How would you like to connect?',
+    intakeStep4Hint: 'Pick one or more — text, calls, small groups, or any combination.',
+    intakeStep5Title: 'Support style',
+    intakeStep5Hint: 'Pick one. We use this to surface compatible parents and groups.',
+    intakeInlineRequired: 'Pick at least one to continue.',
+    intakeSectionDone: 'Done',
+    intakeSubmit: 'Get my parent matches',
+    intakeSubmitHint: 'We’ll show you 3–5 matches. You choose if and when to reach out.',
+    intakeSubmittedHeading: 'Preferences saved.',
+    intakeSubmittedBody: 'Scroll down to preview the kind of matches and groups that fit your answers.',
+    intakeSubmittedSeeMatches: 'See parent matches',
+    intakeSubmittedSeeGroups: 'Browse small groups',
+    intakeOptionAge02: '0–2 years',
+    intakeOptionAge25: '2–5 years',
+    intakeOptionAge612: '6–12 years',
+    intakeOptionAge1317: '13–17 years',
+    intakeOptionStageNew: 'Newly diagnosed',
+    intakeOptionStageOngoing: 'Ongoing journey',
+    intakeOptionStageAdvanced: 'Experienced parent',
+    intakeOptionStruggleBehavior: 'Behavior challenges',
+    intakeOptionStruggleCommunication: 'Communication',
+    intakeOptionStruggleSchool: 'School / IEP',
+    intakeOptionStruggleBurnout: 'Caregiver burnout',
+    intakeOptionStruggleIsolation: 'Feeling isolated',
+    intakeOptionStruggleInsurance: 'Insurance / access',
+    intakeOptionConnectText: 'Text',
+    intakeOptionConnectCall: 'Call / video',
+    intakeOptionConnectGroup: 'Small group',
+    intakeOptionStyleFaith: 'Faith-based',
+    intakeOptionStyleGeneral: 'General',
   },
   es: {
     eyebrow: 'Conexión entre padres',
@@ -155,41 +200,70 @@ const connectCopy = {
     pillarMoreLinkFind: 'Buscar un proveedor verificado',
     pillarMoreLinkMental: 'Salud mental para cuidadores',
     pillarMoreLinkCrisis: 'Apoyo en crisis — 988',
+
+    // Intake
+    intakeEyebrow: 'Un cuestionario breve',
+    intakeTitle: 'Cuéntanos qué apoyo se siente correcto',
+    intakeSub:
+      'No pedimos detalles que identifiquen al niño. Cinco preguntas rápidas para que el primer paso se sienta más seguro y relevante.',
+    intakeProgress: (done: number, total: number) => `${done} de ${total} contestadas`,
+    intakeStep1Title: 'Rango de edad del niño',
+    intakeStep1Hint: 'Elige una o más — ayuda a emparejarte con padres en la misma etapa.',
+    intakeStep2Title: '¿En qué punto del camino estás?',
+    intakeStep2Hint: 'Elige una. No hay respuesta incorrecta.',
+    intakeStep3Eyebrow: 'El momento humano',
+    intakeStep3Title: '¿Qué es lo más difícil ahora?',
+    intakeStep3Reassure: 'Elige lo que encaje hoy. Puedes cambiarlo cuando quieras.',
+    intakeStep3Hint: 'Elige una o más.',
+    intakeStep4Title: '¿Cómo prefieres conectar?',
+    intakeStep4Hint: 'Elige una o más — texto, llamadas, grupos o cualquier combinación.',
+    intakeStep5Title: 'Estilo de apoyo',
+    intakeStep5Hint: 'Elige una. Usamos esto para sugerir padres y grupos compatibles.',
+    intakeInlineRequired: 'Elige al menos una opción para continuar.',
+    intakeSectionDone: 'Listo',
+    intakeSubmit: 'Ver mis emparejamientos',
+    intakeSubmitHint: 'Te mostraremos de 3 a 5 emparejamientos. Tú decides si y cuándo escribir.',
+    intakeSubmittedHeading: 'Preferencias guardadas.',
+    intakeSubmittedBody: 'Desplázate para ver el tipo de emparejamientos y grupos que encajan con tus respuestas.',
+    intakeSubmittedSeeMatches: 'Ver emparejamientos',
+    intakeSubmittedSeeGroups: 'Ver grupos pequeños',
+    intakeOptionAge02: '0–2 años',
+    intakeOptionAge25: '2–5 años',
+    intakeOptionAge612: '6–12 años',
+    intakeOptionAge1317: '13–17 años',
+    intakeOptionStageNew: 'Recién diagnosticado',
+    intakeOptionStageOngoing: 'Camino en curso',
+    intakeOptionStageAdvanced: 'Padre con experiencia',
+    intakeOptionStruggleBehavior: 'Retos de comportamiento',
+    intakeOptionStruggleCommunication: 'Comunicación',
+    intakeOptionStruggleSchool: 'Escuela / IEP',
+    intakeOptionStruggleBurnout: 'Agotamiento del cuidador',
+    intakeOptionStruggleIsolation: 'Sentirse aislado',
+    intakeOptionStruggleInsurance: 'Seguro / acceso',
+    intakeOptionConnectText: 'Texto',
+    intakeOptionConnectCall: 'Llamada / video',
+    intakeOptionConnectGroup: 'Grupo pequeño',
+    intakeOptionStyleFaith: 'Con base en la fe',
+    intakeOptionStyleGeneral: 'General',
   },
 } as const;
 
-const ageRangeOptions: { value: AgeRange; label: string }[] = [
-  { value: '0-2', label: '0–2 years' },
-  { value: '2-5', label: '2–5 years' },
-  { value: '6-12', label: '6–12 years' },
-  { value: '13-17', label: '13–17 years' },
+const ageRangeValues: AgeRange[] = ['0-2', '2-5', '6-12', '13-17'];
+const stageValues: DiagnosisStage[] = ['new', 'ongoing', 'advanced'];
+const struggleValues: Struggle[] = [
+  'behavior',
+  'communication',
+  'school',
+  'burnout',
+  'isolation',
+  'insurance',
 ];
-
-const stageOptions: { value: DiagnosisStage; label: string }[] = [
-  { value: 'new', label: 'Newly diagnosed' },
-  { value: 'ongoing', label: 'Ongoing journey' },
-  { value: 'advanced', label: 'Experienced parent' },
+const connectionValues: { value: ConnectionPreference; icon: typeof MessageSquare }[] = [
+  { value: 'text', icon: MessageSquare },
+  { value: 'call', icon: Video },
+  { value: 'group', icon: Users },
 ];
-
-const struggleOptions: { value: Struggle; label: string }[] = [
-  { value: 'behavior', label: 'Behavior challenges' },
-  { value: 'communication', label: 'Communication' },
-  { value: 'school', label: 'School / IEP' },
-  { value: 'burnout', label: 'Caregiver burnout' },
-  { value: 'isolation', label: 'Feeling isolated' },
-  { value: 'insurance', label: 'Insurance / access' },
-];
-
-const connectionOptions: { value: ConnectionPreference; label: string; icon: typeof MessageSquare }[] = [
-  { value: 'text', label: 'Text', icon: MessageSquare },
-  { value: 'call', label: 'Call / video', icon: Video },
-  { value: 'group', label: 'Small group', icon: Users },
-];
-
-const styleOptions: { value: SupportStyle; label: string }[] = [
-  { value: 'faith-based', label: 'Faith-based' },
-  { value: 'general', label: 'General' },
-];
+const styleValues: SupportStyle[] = ['faith-based', 'general'];
 
 function Toggle({
   active,
@@ -204,8 +278,10 @@ function Toggle({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
         'rounded-xl border px-3.5 py-2 text-sm font-medium transition-all',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
         active
           ? 'border-primary bg-primary text-white shadow-soft'
           : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30 hover:text-primary',
@@ -213,6 +289,98 @@ function Toggle({
     >
       {children}
     </button>
+  );
+}
+
+/* ─── Intake section wrapper ────────────────────────────────── */
+interface IntakeSectionProps {
+  number: number;
+  total: number;
+  done: boolean;
+  invalid: boolean;
+  title: string;
+  hint: string;
+  doneLabel: string;
+  errorLabel: string;
+  /** Render the section as the page's "human moment" — softer
+   *  inset background, eyebrow + reassurance line above the title. */
+  human?: boolean;
+  eyebrow?: string;
+  reassurance?: string;
+  children: React.ReactNode;
+}
+
+function IntakeSection({
+  number,
+  total,
+  done,
+  invalid,
+  title,
+  hint,
+  doneLabel,
+  errorLabel,
+  human,
+  eyebrow,
+  reassurance,
+  children,
+}: IntakeSectionProps) {
+  return (
+    <div
+      className={cn(
+        'rounded-2xl border p-4 sm:p-5 transition-colors',
+        human
+          ? 'border-brand-plum-100 bg-gradient-to-br from-brand-plum-50/60 via-white to-brand-warm-100/40'
+          : 'border-surface-border bg-white',
+        invalid && 'border-red-300 bg-red-50/40',
+      )}
+      aria-invalid={invalid || undefined}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {human && eyebrow && (
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
+              {eyebrow}
+            </p>
+          )}
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-muted-400">
+            {number} / {total}
+          </p>
+          <h3
+            className={cn(
+              'mt-1 text-[15.5px] font-semibold leading-snug text-brand-muted-900 sm:text-base',
+              human && 'text-[16px]',
+            )}
+          >
+            {title}
+          </h3>
+          {human && reassurance && (
+            <p className="mt-1.5 text-[12.5px] italic leading-snug text-brand-plum-700/85">
+              {reassurance}
+            </p>
+          )}
+          <p className="mt-1 text-[12px] text-brand-muted-500">{hint}</p>
+        </div>
+        {done && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700"
+            aria-label={doneLabel}
+          >
+            <Check className="h-3 w-3" aria-hidden />
+            {doneLabel}
+          </span>
+        )}
+      </div>
+      <div className="mt-3">{children}</div>
+      {invalid && (
+        <p
+          className="mt-2 text-[12px] font-semibold text-red-700"
+          role="alert"
+          aria-live="polite"
+        >
+          {errorLabel}
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -418,11 +586,51 @@ export default function ConnectPage() {
   const [connections, setConnections] = useState<ConnectionPreference[]>([]);
   const [style, setStyle] = useState<SupportStyle | null>(null);
   const [intakeSubmitted, setIntakeSubmitted] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
 
   const toggleArr = <T,>(arr: T[], val: T): T[] =>
     arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
 
-  const intakeComplete = ageRanges.length > 0 && stage !== null && struggles.length > 0 && connections.length > 0 && style !== null;
+  // Per-section completion → drives the inline progress indicator
+  // and the per-section validation messages.
+  const sectionDone = {
+    age: ageRanges.length > 0,
+    stage: stage !== null,
+    struggles: struggles.length > 0,
+    connections: connections.length > 0,
+    style: style !== null,
+  };
+  const sectionsComplete = Object.values(sectionDone).filter(Boolean).length;
+  const intakeComplete = sectionsComplete === 5;
+
+  const ageLabel: Record<AgeRange, string> = {
+    '0-2': t.intakeOptionAge02,
+    '2-5': t.intakeOptionAge25,
+    '6-12': t.intakeOptionAge612,
+    '13-17': t.intakeOptionAge1317,
+  };
+  const stageLabelLocal: Record<DiagnosisStage, string> = {
+    new: t.intakeOptionStageNew,
+    ongoing: t.intakeOptionStageOngoing,
+    advanced: t.intakeOptionStageAdvanced,
+  };
+  const struggleLabelLocal: Record<Struggle, string> = {
+    behavior: t.intakeOptionStruggleBehavior,
+    communication: t.intakeOptionStruggleCommunication,
+    school: t.intakeOptionStruggleSchool,
+    burnout: t.intakeOptionStruggleBurnout,
+    isolation: t.intakeOptionStruggleIsolation,
+    insurance: t.intakeOptionStruggleInsurance,
+  };
+  const connectionLabelLocal: Record<ConnectionPreference, string> = {
+    text: t.intakeOptionConnectText,
+    call: t.intakeOptionConnectCall,
+    group: t.intakeOptionConnectGroup,
+  };
+  const styleLabelLocal: Record<SupportStyle, string> = {
+    'faith-based': t.intakeOptionStyleFaith,
+    general: t.intakeOptionStyleGeneral,
+  };
 
   const tabs: { id: ActiveTab; label: string; icon: typeof Sparkles; disabled?: boolean }[] = [
     { id: 'get-started', label: 'Get started', icon: Sparkles },
@@ -797,163 +1005,256 @@ export default function ConnectPage() {
         </p>
       </div>
 
-      {/* ── GET STARTED tab ── */}
+      {/* ── INTAKE — single-page progressive form ── */}
       {activeTab === 'get-started' && (
-        <div id="intake" className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
-          {/* Left: how it works */}
-          <div className="space-y-5">
-            <article className="rounded-3xl border border-surface-border bg-white p-5">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
-                <Shield className="h-5 w-5 text-primary" />
+        <section
+          id="intake"
+          className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-7"
+          aria-labelledby="intake-heading"
+        >
+          {intakeSubmitted ? (
+            <div className="py-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
+                <Heart className="h-8 w-8 text-emerald-600" aria-hidden />
               </div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">How matching works</p>
-              <h3 className="mt-1.5 text-base font-semibold text-brand-muted-900">A low-pressure way to ask for support</h3>
-              <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-                Parents can choose text, calls, or small groups. A guided prompt helps start the
-                conversation, and a moderator can support the introduction if needed.
+              <h2 id="intake-heading" className="mt-5 text-xl font-semibold text-brand-muted-900">
+                {t.intakeSubmittedHeading}
+              </h2>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-brand-muted-600">
+                {t.intakeSubmittedBody}
               </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {['Match by age and stage', 'Choose your format', 'Change preferences anytime'].map((t) => (
-                  <span key={t} className="rounded-full border border-surface-border bg-surface-muted px-2.5 py-0.5 text-[11px] text-brand-muted-500">{t}</span>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <button
+                  onClick={() => setActiveTab('matches')}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark"
+                >
+                  <Heart className="h-4 w-4" aria-hidden /> {t.intakeSubmittedSeeMatches}
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </button>
+                <button
+                  onClick={() => setActiveTab('groups')}
+                  className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-muted px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30"
+                >
+                  <Users className="h-4 w-4" aria-hidden /> {t.intakeSubmittedSeeGroups}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-primary">
+                    {t.intakeEyebrow}
+                  </p>
+                  <h2 id="intake-heading" className="mt-1 text-xl font-semibold leading-snug text-brand-muted-900 sm:text-[22px]">
+                    {t.intakeTitle}
+                  </h2>
+                </div>
+                <p
+                  className="text-[12px] font-semibold text-brand-muted-500"
+                  aria-live="polite"
+                >
+                  {t.intakeProgress(sectionsComplete, 5)}
+                </p>
+              </div>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-muted-600">{t.intakeSub}</p>
+
+              {/* Slim segmented progress bar — five segments, fills as
+                  sections complete. Decorative; the live region above
+                  carries the assistive announcement. */}
+              <div
+                aria-hidden
+                className="mt-4 grid grid-cols-5 gap-1"
+              >
+                {Object.values(sectionDone).map((done, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'h-1.5 rounded-full',
+                      done ? 'bg-primary' : 'bg-surface-muted',
+                    )}
+                  />
                 ))}
               </div>
-            </article>
 
-            <article className="rounded-3xl border border-surface-border bg-white p-5">
-              <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
-                <MessageSquare className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">After a match</p>
-              <h3 className="mt-1.5 text-base font-semibold text-brand-muted-900">The first step is simple</h3>
-              <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-                Parents can send a guided introduction, ask for a moderator-supported intro, or move to
-                a small group if 1:1 feels like too much right now.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {['Start with a prompt', 'Move at your pace', 'Use Support if peer help is not enough'].map((t) => (
-                  <span key={t} className="rounded-full border border-surface-border bg-surface-muted px-2.5 py-0.5 text-[11px] text-brand-muted-500">{t}</span>
-                ))}
-              </div>
-            </article>
-          </div>
-
-          {/* Right: intake form */}
-          <div className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6">
-            {intakeSubmitted ? (
-              <div className="py-8 text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
-                  <Heart className="h-8 w-8 text-emerald-600" />
-                </div>
-                <h3 className="mt-5 text-xl font-semibold text-brand-muted-900">Preferences saved.</h3>
-                <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-brand-muted-600">
-                  Switch to the Parent Matches or Small Groups tabs to see who fits your stage.
-                </p>
-                <div className="mt-5 flex flex-wrap justify-center gap-3">
-                  <button
-                    onClick={() => setActiveTab('matches')}
-                    className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90"
-                  >
-                    <Heart className="h-4 w-4" /> See parent matches <ArrowRight className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('groups')}
-                    className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-muted px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:border-primary/30"
-                  >
-                    <Users className="h-4 w-4" /> Browse small groups
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h2 className="text-lg font-semibold text-brand-muted-900">Tell us what support feels right</h2>
-                <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">
-                  This intake does not ask for identifying child details. It is here to make the first
-                  support step feel safer and more relevant.
-                </p>
-
-                <div className="mt-6 space-y-6">
-                  {/* Age range */}
-                  <div>
-                    <label className="block text-sm font-semibold text-brand-muted-800">Child age range</label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {ageRangeOptions.map((opt) => (
-                        <Toggle key={opt.value} active={ageRanges.includes(opt.value)} onClick={() => setAgeRanges(toggleArr(ageRanges, opt.value))}>
-                          {opt.label}
+              <div className="mt-7 space-y-6">
+                {/* 1 — Age range (multi-select) */}
+                <IntakeSection
+                  number={1}
+                  total={5}
+                  done={sectionDone.age}
+                  invalid={attemptedSubmit && !sectionDone.age}
+                  title={t.intakeStep1Title}
+                  hint={t.intakeStep1Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep1Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {ageRangeValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={ageRanges.includes(value)}
+                          onClick={() => setAgeRanges(toggleArr(ageRanges, value))}
+                        >
+                          {ageLabel[value]}
                         </Toggle>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
+                </IntakeSection>
 
-                  {/* Stage */}
-                  <div>
-                    <label className="block text-sm font-semibold text-brand-muted-800">Journey stage</label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {stageOptions.map((opt) => (
-                        <Toggle key={opt.value} active={stage === opt.value} onClick={() => setStage(opt.value)}>
-                          {opt.label}
+                {/* 2 — Journey stage (single-select) */}
+                <IntakeSection
+                  number={2}
+                  total={5}
+                  done={sectionDone.stage}
+                  invalid={attemptedSubmit && !sectionDone.stage}
+                  title={t.intakeStep2Title}
+                  hint={t.intakeStep2Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep2Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {stageValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={stage === value}
+                          onClick={() => setStage(value)}
+                        >
+                          {stageLabelLocal[value]}
                         </Toggle>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
+                </IntakeSection>
 
-                  {/* Struggles */}
-                  <div>
-                    <label className="block text-sm font-semibold text-brand-muted-800">What is hardest right now?</label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {struggleOptions.map((opt) => (
-                        <Toggle key={opt.value} active={struggles.includes(opt.value)} onClick={() => setStruggles(toggleArr(struggles, opt.value))}>
-                          {opt.label}
+                {/* 3 — Hardest right now (multi-select). Visually
+                    distinct: softer inset background, reassurance line. */}
+                <IntakeSection
+                  number={3}
+                  total={5}
+                  done={sectionDone.struggles}
+                  invalid={attemptedSubmit && !sectionDone.struggles}
+                  title={t.intakeStep3Title}
+                  hint={t.intakeStep3Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                  human
+                  eyebrow={t.intakeStep3Eyebrow}
+                  reassurance={t.intakeStep3Reassure}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep3Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {struggleValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={struggles.includes(value)}
+                          onClick={() => setStruggles(toggleArr(struggles, value))}
+                        >
+                          {struggleLabelLocal[value]}
                         </Toggle>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
+                </IntakeSection>
 
-                  {/* Connection format */}
-                  <div>
-                    <label className="block text-sm font-semibold text-brand-muted-800">Preferred connection format</label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {connectionOptions.map((opt) => (
-                        <Toggle key={opt.value} active={connections.includes(opt.value)} onClick={() => setConnections(toggleArr(connections, opt.value))}>
+                {/* 4 — Connection format (multi-select) */}
+                <IntakeSection
+                  number={4}
+                  total={5}
+                  done={sectionDone.connections}
+                  invalid={attemptedSubmit && !sectionDone.connections}
+                  title={t.intakeStep4Title}
+                  hint={t.intakeStep4Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep4Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {connectionValues.map((opt) => (
+                        <Toggle
+                          key={opt.value}
+                          active={connections.includes(opt.value)}
+                          onClick={() => setConnections(toggleArr(connections, opt.value))}
+                        >
                           <span className="inline-flex items-center gap-1.5">
-                            <opt.icon className="h-3.5 w-3.5" /> {opt.label}
+                            <opt.icon className="h-3.5 w-3.5" aria-hidden />
+                            {connectionLabelLocal[opt.value]}
                           </span>
                         </Toggle>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
+                </IntakeSection>
 
-                  {/* Support style */}
-                  <div>
-                    <label className="block text-sm font-semibold text-brand-muted-800">Support style</label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {styleOptions.map((opt) => (
-                        <Toggle key={opt.value} active={style === opt.value} onClick={() => setStyle(opt.value)}>
-                          {opt.label}
+                {/* 5 — Support style (single-select) */}
+                <IntakeSection
+                  number={5}
+                  total={5}
+                  done={sectionDone.style}
+                  invalid={attemptedSubmit && !sectionDone.style}
+                  title={t.intakeStep5Title}
+                  hint={t.intakeStep5Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep5Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {styleValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={style === value}
+                          onClick={() => setStyle(value)}
+                        >
+                          {styleLabelLocal[value]}
                         </Toggle>
                       ))}
                     </div>
-                  </div>
-                </div>
+                  </fieldset>
+                </IntakeSection>
+              </div>
 
+              <div className="mt-8 border-t border-surface-border pt-6">
                 <button
-                  onClick={() => intakeComplete && setIntakeSubmitted(true)}
-                  disabled={!intakeComplete}
+                  type="button"
+                  onClick={() => {
+                    if (intakeComplete) {
+                      setIntakeSubmitted(true);
+                      setAttemptedSubmit(false);
+                      requestAnimationFrame(() =>
+                        document
+                          .getElementById('preview')
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+                      );
+                    } else {
+                      setAttemptedSubmit(true);
+                    }
+                  }}
                   className={cn(
-                    'mt-8 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition',
-                    intakeComplete ? 'bg-primary hover:bg-primary/90' : 'cursor-not-allowed bg-brand-muted-300',
+                    'inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition-colors',
+                    intakeComplete
+                      ? 'bg-primary hover:bg-primary-dark'
+                      : 'bg-primary/70 hover:bg-primary',
                   )}
+                  aria-disabled={!intakeComplete}
                 >
-                  Get my parent matches <ArrowRight className="h-4 w-4" />
+                  {t.intakeSubmit}
+                  <ArrowRight className="h-4 w-4" aria-hidden />
                 </button>
-                {!intakeComplete && (
-                  <p className="mt-2 text-center text-xs text-brand-muted-400">
-                    Select at least one option in each section to continue.
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+                <p className="mt-2 text-center text-[12px] text-brand-muted-500">
+                  {t.intakeSubmitHint}
+                </p>
+              </div>
+            </>
+          )}
+        </section>
       )}
 
       {/* ── PARENT MATCHES tab ── */}
