@@ -60,6 +60,7 @@ const navGroups = [
 export function SupportShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isFindPage = pathname?.startsWith('/support/find') ?? false;
 
   const SidebarContent = () => (
     <>
@@ -177,10 +178,40 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <SidebarContent />
       </aside>
 
-      <div className="flex-1 lg:ml-64">
+      <div className="flex min-h-screen flex-1 flex-col lg:ml-64">
+        {isFindPage && (
+          <div
+            className="sticky top-0 z-40 border-b border-red-700/40 bg-gradient-to-r from-red-700 via-red-600 to-orange-600 text-white shadow-md"
+            role="region"
+            aria-label="Crisis support"
+          >
+            <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 text-[12px] font-semibold sm:px-6 lg:px-8">
+              <p className="inline-flex items-center gap-2">
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                  Need help now?
+                </span>
+              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <a href="tel:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                  <span aria-hidden>📞</span> Call 988
+                </a>
+                <a href="sms:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                  <span aria-hidden>💬</span> Text 988
+                </a>
+                <a href="tel:+17139707000" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                  <span aria-hidden>📞</span> Harris Center (713) 970-7000
+                </a>
+                <a href="tel:911" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                  <span aria-hidden>🚨</span> Emergency 911
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Persistent mode banner — makes the layer unmistakable at all times */}
         <div className="border-b border-primary/15 bg-primary/5">
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+          <div className={cn('mx-auto flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8', isFindPage ? 'max-w-[1600px]' : 'max-w-6xl')}>
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
               Care Navigation · open to every family
@@ -194,28 +225,44 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <header className="sticky top-0 z-20 border-b border-surface-border/70 bg-white/85 backdrop-blur-xl">
-          <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="rounded-xl p-2 hover:bg-surface-subtle lg:hidden"
-            >
-              <Menu className="h-5 w-5 text-brand-muted-600" />
-            </button>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
-                Common Ground · Care Navigation
-              </p>
-              <p className="truncate text-sm text-brand-muted-700">
-                For every family
-              </p>
+        {!isFindPage && (
+          <header className="sticky top-0 z-20 border-b border-surface-border/70 bg-white/85 backdrop-blur-xl">
+            <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="rounded-xl p-2 hover:bg-surface-subtle lg:hidden"
+              >
+                <Menu className="h-5 w-5 text-brand-muted-600" />
+              </button>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
+                  Common Ground · Care Navigation
+                </p>
+                <p className="truncate text-sm text-brand-muted-700">
+                  For every family
+                </p>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-          {children}
-        </main>
+        {isFindPage && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="absolute left-3 top-[88px] z-30 rounded-xl bg-white p-2 shadow-soft hover:bg-surface-subtle lg:hidden"
+            aria-label="Open navigation"
+          >
+            <Menu className="h-5 w-5 text-brand-muted-600" />
+          </button>
+        )}
+
+        {isFindPage ? (
+          <main className="flex-1">{children}</main>
+        ) : (
+          <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+            {children}
+          </main>
+        )}
       </div>
     </div>
   );
