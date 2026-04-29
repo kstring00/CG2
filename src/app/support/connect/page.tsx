@@ -3,13 +3,17 @@
 import { useState } from 'react';
 import {
   ArrowRight,
+  ArrowUpRight,
+  Check,
   Heart,
   Languages,
   Link2,
   Lock,
+  MessageCircle,
   MessageSquare,
   Phone,
   Shield,
+  ShieldCheck,
   Sparkles,
   Users,
   Video,
@@ -52,6 +56,46 @@ const connectCopy = {
     crisisBannerCallText: 'Call or text 988 — free, confidential, 24/7.',
     crisisBannerLinkLabel: 'Call 988',
     languageToggle: 'Español',
+
+    // Pillars
+    pillarsAria: 'How Parent Connection works',
+    pillarModerationEyebrow: 'Moderation',
+    pillarModerationTitle: 'Real moderators in every space',
+    pillarModerationLead:
+      'Moderators set the tone, reset hard threads, and step in when a conversation needs care.',
+    threadModNote: 'A gentle reminder before we share: stories stay in this room.',
+    threadParent1Name: 'Parent A',
+    threadParent1Reply: 'Thank you. That helps me actually post tonight.',
+    threadParent2Name: 'Parent B',
+    threadParent2Reply: 'Same. The structure is part of why I keep showing up.',
+
+    pillarPrivacyEyebrow: 'Privacy',
+    pillarPrivacyTitle: 'Your child stays private. Always.',
+    pillarPrivacyLead: 'Three commitments, in plain language.',
+    privacyItem1: 'No child records, names, schools, or diagnoses are ever shared.',
+    privacyItem2: 'No home address required — ever.',
+    privacyItem3: 'Opt-in only. Nothing is shared with another parent until you say so.',
+
+    pillarMatchingEyebrow: 'Matching',
+    pillarMatchingTitle: 'Matched by stage and fit, not by algorithm guessing',
+    pillarMatchingLead:
+      'We use four signals — and only four — to suggest parents who actually get your week.',
+    matchAxisAge: 'Age range',
+    matchAxisStage: 'Journey stage',
+    matchAxisFormat: 'Format',
+    matchAxisStyle: 'Support style',
+    matchAxisAgeHint: 'e.g. 6–12',
+    matchAxisStageHint: 'e.g. ongoing',
+    matchAxisFormatHint: 'e.g. text · group',
+    matchAxisStyleHint: 'e.g. faith-based',
+
+    pillarMoreEyebrow: 'When you need more',
+    pillarMoreTitle: 'Peer support is not the last stop.',
+    pillarMoreLead:
+      'If peer support isn’t enough, we don’t leave you holding it. Three real exits, always reachable.',
+    pillarMoreLinkFind: 'Find a vetted provider',
+    pillarMoreLinkMental: 'Mental health for caregivers',
+    pillarMoreLinkCrisis: 'Crisis support — 988',
   },
   es: {
     eyebrow: 'Conexión entre padres',
@@ -71,6 +115,46 @@ const connectCopy = {
     crisisBannerCallText: 'Llama o envía mensaje al 988 — gratis, confidencial, 24/7.',
     crisisBannerLinkLabel: 'Llamar al 988',
     languageToggle: 'English',
+
+    // Pillars
+    pillarsAria: 'Cómo funciona la conexión entre padres',
+    pillarModerationEyebrow: 'Moderación',
+    pillarModerationTitle: 'Moderadores reales en cada espacio',
+    pillarModerationLead:
+      'Los moderadores marcan el tono, reencauzan los hilos difíciles y ayudan cuando una conversación necesita cuidado.',
+    threadModNote: 'Recordatorio suave antes de compartir: lo que se cuenta aquí, se queda aquí.',
+    threadParent1Name: 'Padre A',
+    threadParent1Reply: 'Gracias. Eso me ayuda a publicar esta noche.',
+    threadParent2Name: 'Madre B',
+    threadParent2Reply: 'Igual. La estructura es parte de por qué sigo viniendo.',
+
+    pillarPrivacyEyebrow: 'Privacidad',
+    pillarPrivacyTitle: 'Tu hijo permanece privado. Siempre.',
+    pillarPrivacyLead: 'Tres compromisos, en lenguaje claro.',
+    privacyItem1: 'Nunca se comparten registros, nombres, escuelas ni diagnósticos del niño.',
+    privacyItem2: 'Nunca se requiere dirección de casa.',
+    privacyItem3: 'Solo si tú aceptas. Nada se comparte con otro padre hasta que lo decidas.',
+
+    pillarMatchingEyebrow: 'Emparejamiento',
+    pillarMatchingTitle: 'Por etapa y afinidad, no por adivinanzas algorítmicas',
+    pillarMatchingLead:
+      'Usamos cuatro señales — y solo cuatro — para sugerir padres que entienden tu semana.',
+    matchAxisAge: 'Rango de edad',
+    matchAxisStage: 'Etapa del camino',
+    matchAxisFormat: 'Formato',
+    matchAxisStyle: 'Estilo de apoyo',
+    matchAxisAgeHint: 'p. ej. 6–12',
+    matchAxisStageHint: 'p. ej. en curso',
+    matchAxisFormatHint: 'p. ej. texto · grupo',
+    matchAxisStyleHint: 'p. ej. con base en la fe',
+
+    pillarMoreEyebrow: 'Cuando necesitas más',
+    pillarMoreTitle: 'El apoyo entre padres no es la última parada.',
+    pillarMoreLead:
+      'Si el apoyo entre padres no alcanza, no te dejamos sostenerlo. Tres salidas reales, siempre disponibles.',
+    pillarMoreLinkFind: 'Buscar un proveedor verificado',
+    pillarMoreLinkMental: 'Salud mental para cuidadores',
+    pillarMoreLinkCrisis: 'Apoyo en crisis — 988',
   },
 } as const;
 
@@ -479,58 +563,206 @@ export default function ConnectPage() {
         </figure>
       </header>
 
-      {/* Four feature cards */}
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          {
-            icon: Shield,
-            eyebrow: 'Moderation',
-            title: 'A safe, guided space',
-            body: 'Every group has a moderator. Conversations follow clear norms. You will not be left to navigate it alone.',
-            tags: ['Guided onboarding', 'Moderator support', 'Clear group norms'],
-            color: 'bg-primary/10 text-primary',
-          },
-          {
-            icon: Shield,
-            eyebrow: 'Privacy',
-            title: 'Your child stays private',
-            body: 'No identifying child details are shared. You control what you share — stage, struggles, and format only.',
-            tags: ['No child records shared', 'No address required', 'Opt-in only'],
-            color: 'bg-emerald-100 text-emerald-700',
-          },
-          {
-            icon: Sparkles,
-            eyebrow: 'Matching',
-            title: 'Matched by stage and fit',
-            body: 'We pair you with parents at the same stage, with the same struggles, and the same support style you prefer.',
-            tags: ['Age range', 'Journey stage', 'Support preference'],
-            color: 'bg-brand-plum-100 text-brand-plum-700',
-          },
-          {
-            icon: Heart,
-            eyebrow: 'When you need more',
-            title: 'Peer support is not the last stop',
-            body: 'If you need therapy, respite, or real clinical help — we will point you there. You do not have to carry this alone.',
-            tags: ['Routes to real help', 'No dead ends', 'Your pace'],
-            color: 'bg-accent/10 text-accent',
-          },
-        ].map((card) => (
-          <article key={card.eyebrow} className="rounded-3xl border border-surface-border bg-white p-5">
-            <div className={cn('mb-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl', card.color)}>
-              <card.icon className="h-5 w-5" />
+      {/* Pillars — four cards, four different treatments. Privacy is the
+          load-bearing promise so it gets the visually heaviest card. */}
+      <section
+        aria-label={t.pillarsAria}
+        className="grid gap-4 lg:grid-cols-2"
+      >
+        {/* Moderation — show, don't tell. A miniature moderated thread. */}
+        <article className="group/card relative rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Shield className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+              {t.pillarModerationEyebrow}
+            </p>
+          </div>
+          <h3 className="text-[17px] font-semibold leading-snug text-brand-muted-900">
+            {t.pillarModerationTitle}
+          </h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {t.pillarModerationLead}
+          </p>
+
+          {/* Mock moderated thread — purely illustrative. */}
+          <div
+            aria-hidden
+            className="mt-4 space-y-2 rounded-2xl border border-surface-border bg-surface-muted/60 p-3"
+          >
+            <div className="flex items-start gap-2">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                M
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11.5px] font-semibold text-brand-muted-900">Mod</span>
+                  <span className="rounded-full bg-primary/10 px-1.5 py-0 text-[9.5px] font-bold uppercase tracking-wider text-primary">
+                    Moderator
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[12px] leading-snug text-brand-muted-700">
+                  {t.threadModNote}
+                </p>
+              </div>
             </div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-brand-muted-400">{card.eyebrow}</p>
-            <h3 className="mt-1.5 text-sm font-semibold text-brand-muted-900">{card.title}</h3>
-            <p className="mt-2 text-xs leading-relaxed text-brand-muted-600">{card.body}</p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {card.tags.map((t) => (
-                <span key={t} className="rounded-full border border-surface-border bg-surface-muted px-2.5 py-0.5 text-[11px] text-brand-muted-500">
-                  {t}
-                </span>
+
+            <div className="ml-9 flex items-start gap-2">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-plum-100 text-[10px] font-bold text-brand-plum-700">
+                A
+              </span>
+              <div className="min-w-0 flex-1 rounded-xl border border-surface-border bg-white px-2.5 py-1.5">
+                <p className="text-[11px] font-semibold text-brand-muted-900">{t.threadParent1Name}</p>
+                <p className="text-[11.5px] leading-snug text-brand-muted-600">
+                  {t.threadParent1Reply}
+                </p>
+              </div>
+            </div>
+
+            <div className="ml-9 flex items-start gap-2">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
+                B
+              </span>
+              <div className="min-w-0 flex-1 rounded-xl border border-surface-border bg-white px-2.5 py-1.5">
+                <p className="text-[11px] font-semibold text-brand-muted-900">{t.threadParent2Name}</p>
+                <p className="text-[11.5px] leading-snug text-brand-muted-600">
+                  {t.threadParent2Reply}
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {/* Privacy — heaviest card. Deep navy panel with white text +
+            three checkmark commitments. AAA contrast on body copy. */}
+        <article className="relative overflow-hidden rounded-3xl border border-brand-navy-700 bg-gradient-to-br from-brand-navy-700 via-brand-navy-600 to-brand-navy-500 p-5 text-white shadow-card sm:p-6">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-16 -right-12 h-52 w-52 rounded-full bg-emerald-400/10 blur-3xl"
+          />
+          <div className="relative">
+            <div className="mb-3 inline-flex items-center gap-2">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-400/15 text-emerald-200">
+                <ShieldCheck className="h-4 w-4" aria-hidden />
+              </span>
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
+                {t.pillarPrivacyEyebrow}
+              </p>
+            </div>
+            <h3 className="text-[18px] font-semibold leading-snug text-white sm:text-[19px]">
+              {t.pillarPrivacyTitle}
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-white/85">{t.pillarPrivacyLead}</p>
+
+            <ul className="mt-5 space-y-3">
+              {[t.privacyItem1, t.privacyItem2, t.privacyItem3].map((line, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400/20 ring-1 ring-emerald-300/40"
+                  >
+                    <Check className="h-3.5 w-3.5 text-emerald-200" />
+                  </span>
+                  <span className="text-[14px] leading-snug text-white">{line}</span>
+                </li>
               ))}
-            </div>
-          </article>
-        ))}
+            </ul>
+          </div>
+        </article>
+
+        {/* Matching — the four matching axes as chips that highlight on hover. */}
+        <article className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-brand-plum-100 text-brand-plum-700">
+              <Sparkles className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+              {t.pillarMatchingEyebrow}
+            </p>
+          </div>
+          <h3 className="text-[17px] font-semibold leading-snug text-brand-muted-900">
+            {t.pillarMatchingTitle}
+          </h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {t.pillarMatchingLead}
+          </p>
+
+          <ul
+            aria-label={t.pillarMatchingEyebrow}
+            className="mt-4 grid grid-cols-2 gap-2"
+          >
+            {[
+              { label: t.matchAxisAge, hint: t.matchAxisAgeHint },
+              { label: t.matchAxisStage, hint: t.matchAxisStageHint },
+              { label: t.matchAxisFormat, hint: t.matchAxisFormatHint },
+              { label: t.matchAxisStyle, hint: t.matchAxisStyleHint },
+            ].map((axis, i) => (
+              <li
+                key={axis.label}
+                className={cn(
+                  'group/axis relative overflow-hidden rounded-xl border border-surface-border bg-surface-muted/40 px-3 py-2 transition-all',
+                  'motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-brand-plum-300 motion-safe:hover:bg-brand-plum-50',
+                )}
+                style={{ transitionDelay: `${i * 30}ms` }}
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-brand-plum-400 transition-transform duration-300 group-hover/axis:scale-x-100"
+                />
+                <p className="text-[12px] font-semibold text-brand-muted-900">{axis.label}</p>
+                <p className="mt-0.5 text-[11px] text-brand-muted-500">{axis.hint}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        {/* When you need more — a door, not a wall. Three explicit exits. */}
+        <article className="rounded-3xl border border-surface-border bg-gradient-to-br from-white to-brand-warm-100 p-5 shadow-soft sm:p-6">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+              {t.pillarMoreEyebrow}
+            </p>
+          </div>
+          <h3 className="text-[17px] font-semibold leading-snug text-brand-muted-900">
+            {t.pillarMoreTitle}
+          </h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {t.pillarMoreLead}
+          </p>
+
+          <ul className="mt-4 space-y-2">
+            {[
+              { label: t.pillarMoreLinkFind, href: '/support/find', icon: Users },
+              { label: t.pillarMoreLinkMental, href: '/support/mental-health', icon: Heart },
+              { label: t.pillarMoreLinkCrisis, href: 'tel:988', icon: Phone, accent: true },
+            ].map((row) => (
+              <li key={row.label}>
+                <a
+                  href={row.href}
+                  className={cn(
+                    'group/exit flex items-center justify-between gap-3 rounded-xl border border-surface-border bg-white px-3 py-2.5 text-[13px] font-semibold transition-colors',
+                    row.accent
+                      ? 'text-red-700 hover:border-red-200 hover:bg-red-50'
+                      : 'text-brand-muted-800 hover:border-primary/30 hover:bg-primary/5 hover:text-primary',
+                  )}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <row.icon className="h-3.5 w-3.5" aria-hidden />
+                    {row.label}
+                  </span>
+                  <ArrowUpRight
+                    className="h-4 w-4 text-brand-muted-400 transition-transform motion-safe:group-hover/exit:translate-x-0.5 motion-safe:group-hover/exit:-translate-y-0.5 group-hover/exit:text-current"
+                    aria-hidden
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </article>
       </section>
 
       {/* Tab bar */}
