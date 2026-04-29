@@ -1,7 +1,24 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, BookmarkPlus, Eraser, Languages, Sparkles, Star } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowRight,
+  BookmarkPlus,
+  Eraser,
+  ExternalLink,
+  HeartHandshake,
+  Languages,
+  List,
+  MapPin,
+  Map as MapIcon,
+  Phone,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  X,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   AGE_GROUPS,
@@ -47,6 +64,33 @@ const copy = {
     saveFilterSetHelp: 'Stored in your browser so you can pick up where you left off.',
     savedFilterSet: 'Filter set saved ✓',
     centerPlaceholder: (n: number) => `${n} of ${findResources.length} resources match`,
+    searchPlaceholder: 'Search by name, service, neighborhood, or keyword',
+    searchShortcut: 'Press / to focus',
+    showing: (n: number, total: number) => `Showing ${n} of ${total}`,
+    sortLabel: 'Sort',
+    sortRecommended: 'Recommended',
+    sortRecent: 'Recently reviewed',
+    sortAlpha: 'Alphabetical',
+    viewList: 'List',
+    viewMap: 'By city',
+    activeChipsLabel: 'Active filters',
+    callButton: 'Call',
+    websiteButton: 'Website',
+    saveCard: 'Save',
+    saved: 'Saved',
+    crisisBadge: '24/7',
+    goodFirstStepBadge: 'Good first step',
+    sensoryBadge: 'Sensory-friendly',
+    crisisLabel: 'Crisis & urgent support',
+    reviewedTooltip: (date: string) => `Reviewed ${date} by Texas ABA Centers`,
+    hoverHint: 'Hover for details · click to pin',
+    inlineHelpTitle: "Don't see what you need?",
+    inlineHelpBody: 'A care navigator can spend 10 minutes with you and point to the right place.',
+    inlineHelpCta: 'Connect with a navigator',
+    emptyTitle: 'Nothing matches yet',
+    emptyBody: 'Try removing a filter or broadening the location. Or talk to a navigator.',
+    mapEmpty: 'No resources to show on the map yet.',
+    mapHint: 'Hover a city to highlight its resources.',
   },
   es: {
     eyebrow: 'Encuentra Apoyo',
@@ -71,6 +115,33 @@ const copy = {
     saveFilterSetHelp: 'Se guarda en tu navegador para que puedas retomar.',
     savedFilterSet: 'Conjunto guardado ✓',
     centerPlaceholder: (n: number) => `${n} de ${findResources.length} recursos coinciden`,
+    searchPlaceholder: 'Buscar por nombre, servicio, vecindario o palabra clave',
+    searchShortcut: 'Presiona / para enfocar',
+    showing: (n: number, total: number) => `Mostrando ${n} de ${total}`,
+    sortLabel: 'Ordenar',
+    sortRecommended: 'Recomendado',
+    sortRecent: 'Revisado recientemente',
+    sortAlpha: 'Alfabético',
+    viewList: 'Lista',
+    viewMap: 'Por ciudad',
+    activeChipsLabel: 'Filtros activos',
+    callButton: 'Llamar',
+    websiteButton: 'Sitio web',
+    saveCard: 'Guardar',
+    saved: 'Guardado',
+    crisisBadge: '24/7',
+    goodFirstStepBadge: 'Buen primer paso',
+    sensoryBadge: 'Sensorial-amigable',
+    crisisLabel: 'Apoyo de crisis y urgente',
+    reviewedTooltip: (date: string) => `Revisado ${date} por Texas ABA Centers`,
+    hoverHint: 'Pasa el cursor para ver detalles · haz clic para fijar',
+    inlineHelpTitle: '¿No encuentras lo que necesitas?',
+    inlineHelpBody: 'Un navegador de atención puede dedicarte 10 minutos y guiarte al lugar correcto.',
+    inlineHelpCta: 'Conectar con un navegador',
+    emptyTitle: 'Nada coincide aún',
+    emptyBody: 'Intenta quitar un filtro o ampliar la ubicación. O habla con un navegador.',
+    mapEmpty: 'No hay recursos para mostrar en el mapa.',
+    mapHint: 'Pasa el cursor sobre una ciudad para resaltar sus recursos.',
   },
 } as const;
 
@@ -177,6 +248,63 @@ function applyFilters(items: Resource[], f: FilterState): Resource[] {
   });
 }
 
+type SortKey = 'recommended' | 'recent' | 'alpha';
+type ViewKey = 'list' | 'map';
+
+const MONTHS: Record<string, number> = {
+  january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+  july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+};
+
+function reviewedToTime(s: string): number {
+  const [m, y] = s.toLowerCase().split(/\s+/);
+  const mi = MONTHS[m] ?? 0;
+  const yi = parseInt(y ?? '2026', 10);
+  return new Date(yi, mi, 1).getTime();
+}
+
+function searchResources(items: Resource[], q: string): Resource[] {
+  const query = q.trim().toLowerCase();
+  if (!query) return items;
+  const tokens = query.split(/\s+/);
+  return items.filter((r) => {
+    const haystack = [
+      r.name,
+      r.blurb,
+      r.description,
+      r.helpfulToKnow ?? '',
+      r.cities.join(' '),
+      r.services.join(' '),
+      r.tags.join(' '),
+      r.address ?? '',
+    ]
+      .join(' ')
+      .toLowerCase();
+    return tokens.every((t) => haystack.includes(t));
+  });
+}
+
+function sortResources(items: Resource[], key: SortKey): Resource[] {
+  const arr = [...items];
+  if (key === 'alpha') {
+    arr.sort((a, b) => a.name.localeCompare(b.name));
+    return arr;
+  }
+  if (key === 'recent') {
+    arr.sort((a, b) => reviewedToTime(b.lastReviewed) - reviewedToTime(a.lastReviewed));
+    return arr;
+  }
+  // recommended: crisis → good first step → alpha
+  arr.sort((a, b) => {
+    const rank = (r: Resource) => (r.urgency === 'crisis' ? 0 : r.goodFirstStep ? 1 : 2);
+    const ra = rank(a);
+    const rb = rank(b);
+    if (ra !== rb) return ra - rb;
+    return a.name.localeCompare(b.name);
+  });
+  return arr;
+}
+
 const intentCopy: Record<Locale, Record<Intent, { label: string; sublabel: string }>> = {
   en: {
     'just-diagnosed': { label: 'Just got a diagnosis', sublabel: 'A guided starter path of first calls.' },
@@ -195,6 +323,355 @@ const intentCopy: Record<Locale, Record<Intent, { label: string; sublabel: strin
     crisis: { label: 'Estoy luchando', sublabel: 'Salud mental del cuidador y apoyo de crisis.' },
   },
 };
+
+// ── Resource card ──────────────────────────────────────────────
+
+interface ResourceCardProps {
+  resource: Resource;
+  locale: Locale;
+  isPinned: boolean;
+  isHovered: boolean;
+  isSaved: boolean;
+  onHover: (id: string | null) => void;
+  onPin: (id: string) => void;
+  onToggleSave: (id: string) => void;
+}
+
+function ResourceCard({
+  resource,
+  locale,
+  isPinned,
+  isHovered,
+  isSaved,
+  onHover,
+  onPin,
+  onToggleSave,
+}: ResourceCardProps) {
+  const t = copy[locale];
+  const labels = localizedLabel[locale];
+  const isCrisis = resource.urgency === 'crisis';
+  const isBrowse = resource.urgency === 'sensory-browse';
+  const goodFirstStep = resource.goodFirstStep;
+
+  const meta = [
+    resource.cities[0],
+    resource.ageGroups.includes('All ages') ? 'All ages' : resource.ageGroups.join(', '),
+    labels.insurance[resource.insurance],
+    resource.delivery.map((d) => labels.delivery[d]).join(' · '),
+  ].filter(Boolean);
+
+  type Tone = 'green' | 'red' | 'emerald' | 'neutral';
+  const tagList: { label: string; tone: Tone }[] = [];
+  if (goodFirstStep) tagList.push({ label: t.goodFirstStepBadge, tone: 'green' });
+  if (isCrisis) tagList.push({ label: t.crisisBadge, tone: 'red' });
+  if (resource.services.includes('Sensory-friendly business'))
+    tagList.push({ label: t.sensoryBadge, tone: 'emerald' });
+  resource.tags
+    .filter((tg) => !['Good first step', '24/7', 'Sensory-friendly'].includes(tg))
+    .slice(0, 2)
+    .forEach((tg) => tagList.push({ label: tg, tone: 'neutral' }));
+
+  return (
+    <article
+      onMouseEnter={() => onHover(resource.id)}
+      onMouseLeave={() => onHover(null)}
+      onFocus={() => onHover(resource.id)}
+      onClick={() => onPin(resource.id)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          onPin(resource.id);
+        }
+      }}
+      tabIndex={0}
+      aria-pressed={isPinned}
+      className={cn(
+        'group relative flex cursor-pointer flex-col gap-2 rounded-2xl border bg-white p-4 text-left shadow-soft outline-none transition-all',
+        'focus-visible:ring-2 focus-visible:ring-primary/40',
+        isCrisis ? 'border-l-4 border-red-500' : 'border-surface-border',
+        isPinned ? 'ring-2 ring-primary/40 shadow-card-hover' : isHovered ? 'border-primary/40 shadow-card-hover' : '',
+        isBrowse ? 'p-3' : '',
+      )}
+    >
+      <div className="flex items-start gap-2">
+        {goodFirstStep && !isCrisis && (
+          <span aria-hidden className="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-700">
+            <Star className="h-3 w-3 fill-emerald-600 text-emerald-600" />
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className={cn('font-semibold leading-snug text-brand-muted-900', isBrowse ? 'text-[14px]' : 'text-[15px]')}>
+              {resource.name}
+            </h3>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSave(resource.id);
+              }}
+              className={cn(
+                'inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors',
+                isSaved ? 'bg-amber-100 text-amber-700' : 'text-brand-muted-400 hover:bg-surface-subtle hover:text-primary',
+              )}
+              aria-label={isSaved ? t.saved : t.saveCard}
+              aria-pressed={isSaved}
+            >
+              <BookmarkPlus className={cn('h-3.5 w-3.5', isSaved && 'fill-amber-500 text-amber-500')} />
+              <span className="hidden sm:inline">{isSaved ? t.saved : t.saveCard}</span>
+            </button>
+          </div>
+          {!isBrowse && (
+            <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-brand-muted-600">{resource.blurb}</p>
+          )}
+        </div>
+      </div>
+
+      {!isBrowse && (
+        <p className="text-[11.5px] text-brand-muted-500">
+          {meta.map((m, i) => (
+            <span key={`${resource.id}-meta-${i}`}>
+              {i > 0 && <span className="mx-1.5 text-brand-muted-300">·</span>}
+              {m}
+            </span>
+          ))}
+        </p>
+      )}
+
+      {isBrowse && (
+        <p className="text-[11px] text-brand-muted-500">
+          <span className="inline-flex items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            {resource.cities[0]}
+          </span>
+        </p>
+      )}
+
+      {tagList.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {tagList.map((tag, i) => (
+            <span
+              key={`${resource.id}-tag-${i}`}
+              className={cn(
+                'inline-flex items-center rounded-full border px-2 py-0.5 text-[10.5px] font-semibold',
+                tag.tone === 'green' && 'border-emerald-200 bg-emerald-50 text-emerald-700',
+                tag.tone === 'red' && 'border-red-200 bg-red-50 text-red-700',
+                tag.tone === 'emerald' && 'border-emerald-200 bg-emerald-50 text-emerald-700',
+                tag.tone === 'neutral' && 'border-surface-border bg-surface-muted text-brand-muted-600',
+              )}
+            >
+              {tag.label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {(resource.phone || resource.website) && !isBrowse && (
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          {resource.phone && (
+            <a
+              href={`tel:${resource.phone.replace(/[^0-9+]/g, '')}`}
+              onClick={(e) => e.stopPropagation()}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
+                isCrisis
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'bg-primary text-white hover:bg-primary-dark',
+              )}
+            >
+              <Phone className={cn('h-3.5 w-3.5', isCrisis && 'h-4 w-4')} />
+              {t.callButton} {resource.phone}
+            </a>
+          )}
+          {resource.website && (
+            <a
+              href={resource.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border px-2.5 py-1.5 text-[12px] font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              {t.websiteButton}
+            </a>
+          )}
+        </div>
+      )}
+
+      <div className="mt-1 flex items-center justify-between text-[10.5px] text-brand-muted-400">
+        <span title={t.reviewedTooltip(resource.lastReviewed)} className="inline-flex items-center gap-1">
+          <ShieldCheck className="h-3 w-3" />
+          {resource.lastReviewed}
+        </span>
+        {!isPinned && <span className="opacity-0 transition-opacity group-hover:opacity-100">{t.hoverHint}</span>}
+      </div>
+    </article>
+  );
+}
+
+// ── Active filter chips ────────────────────────────────────────
+
+function ActiveChips({
+  locale,
+  filters,
+  setFilters,
+  query,
+  setQuery,
+}: {
+  locale: Locale;
+  filters: FilterState;
+  setFilters: (f: FilterState) => void;
+  query: string;
+  setQuery: (q: string) => void;
+}) {
+  const labels = localizedLabel[locale];
+  const t = copy[locale];
+
+  const chips: { key: string; label: string; remove: () => void }[] = [];
+  if (filters.goodFirstStepOnly) {
+    chips.push({ key: 'gfs', label: t.goodFirstStepBadge, remove: () => setFilters({ ...filters, goodFirstStepOnly: false }) });
+  }
+  filters.cities.forEach((c) => chips.push({ key: `c-${c}`, label: c, remove: () => setFilters({ ...filters, cities: filters.cities.filter((x) => x !== c) }) }));
+  filters.services.forEach((s) => chips.push({ key: `s-${s}`, label: labels.services[s], remove: () => setFilters({ ...filters, services: filters.services.filter((x) => x !== s) }) }));
+  filters.ageGroups.forEach((a) => chips.push({ key: `a-${a}`, label: a, remove: () => setFilters({ ...filters, ageGroups: filters.ageGroups.filter((x) => x !== a) }) }));
+  filters.insurance.forEach((i) => chips.push({ key: `i-${i}`, label: labels.insurance[i], remove: () => setFilters({ ...filters, insurance: filters.insurance.filter((x) => x !== i) }) }));
+  filters.delivery.forEach((d) => chips.push({ key: `d-${d}`, label: labels.delivery[d], remove: () => setFilters({ ...filters, delivery: filters.delivery.filter((x) => x !== d) }) }));
+  if (query.trim()) chips.push({ key: 'q', label: `“${query.trim()}”`, remove: () => setQuery('') });
+
+  if (chips.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-muted-400">
+        {t.activeChipsLabel}:
+      </span>
+      {chips.map((chip) => (
+        <button
+          key={chip.key}
+          type="button"
+          onClick={chip.remove}
+          className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 text-[11.5px] font-medium text-primary transition-colors hover:bg-primary/15"
+        >
+          <span>{chip.label}</span>
+          <X className="h-3 w-3" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Inline navigator help row ─────────────────────────────────
+
+function InlineNavigatorHelp({ locale }: { locale: Locale }) {
+  const t = copy[locale];
+  return (
+    <div className="my-2 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/70 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span aria-hidden className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-brand-plum-100 text-brand-plum-700">
+            <HeartHandshake className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[13.5px] font-semibold text-brand-plum-800">{t.inlineHelpTitle}</p>
+            <p className="text-[12px] text-brand-plum-700/80">{t.inlineHelpBody}</p>
+          </div>
+        </div>
+        <a
+          href="/support/connect"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-brand-plum-700 px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-brand-plum-800"
+        >
+          {t.inlineHelpCta}
+          <ArrowRight className="h-3.5 w-3.5" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ── Map view (city-grouped fallback for the map toggle) ──────
+
+function MapByCity({
+  locale,
+  resources,
+  hoveredId,
+  pinnedId,
+  onHover,
+  onPin,
+}: {
+  locale: Locale;
+  resources: Resource[];
+  hoveredId: string | null;
+  pinnedId: string | null;
+  onHover: (id: string | null) => void;
+  onPin: (id: string) => void;
+}) {
+  const t = copy[locale];
+  if (resources.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-surface-border bg-white/60 p-8 text-center text-sm text-brand-muted-500">
+        {t.mapEmpty}
+      </div>
+    );
+  }
+  const byCity = new Map<City, Resource[]>();
+  resources.forEach((r) => {
+    r.cities.forEach((c) => {
+      if (!byCity.has(c)) byCity.set(c, []);
+      byCity.get(c)!.push(r);
+    });
+  });
+  const ordered = Array.from(byCity.entries()).sort((a, b) => b[1].length - a[1].length);
+  return (
+    <div className="space-y-3">
+      <p className="text-[12px] text-brand-muted-500">{t.mapHint}</p>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {ordered.map(([city, list]) => (
+          <div
+            key={city}
+            className="rounded-2xl border border-surface-border bg-white p-4 shadow-soft"
+          >
+            <div className="flex items-center justify-between">
+              <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-muted-900">
+                <MapPin className="h-3.5 w-3.5 text-primary" />
+                {city}
+              </p>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+                {list.length}
+              </span>
+            </div>
+            <ul className="mt-3 flex flex-col gap-1">
+              {list.slice(0, 8).map((r) => (
+                <li key={`${city}-${r.id}`}>
+                  <button
+                    type="button"
+                    onMouseEnter={() => onHover(r.id)}
+                    onMouseLeave={() => onHover(null)}
+                    onFocus={() => onHover(r.id)}
+                    onClick={() => onPin(r.id)}
+                    className={cn(
+                      'flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left text-[12.5px] transition-colors',
+                      pinnedId === r.id
+                        ? 'bg-primary text-white'
+                        : hoveredId === r.id
+                          ? 'bg-primary/10 text-brand-muted-900'
+                          : 'text-brand-muted-700 hover:bg-surface-subtle',
+                    )}
+                  >
+                    <span className="truncate">{r.name}</span>
+                    {r.urgency === 'crisis' && <span className="ml-1 rounded-full bg-red-100 px-1.5 py-0 text-[10px] font-bold text-red-700">24/7</span>}
+                  </button>
+                </li>
+              ))}
+              {list.length > 8 && (
+                <li className="px-2 pt-1 text-[11px] text-brand-muted-400">+{list.length - 8} more in {city}</li>
+              )}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface CheckboxGroupProps<T extends string> {
   legend: string;
@@ -377,22 +854,76 @@ export default function FindSupportPage() {
   const [locale, setLocale] = useState<Locale>('en');
   const [activeIntent, setActiveIntent] = useState<Intent | null>(null);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState<SortKey>('recommended');
+  const [view, setView] = useState<ViewKey>('list');
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
   const t = copy[locale];
 
   // Restore saved filter set from prior session, once.
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const raw = window.localStorage.getItem('cg2.find.filters');
-    if (!raw) return;
-    try {
-      const parsed = JSON.parse(raw) as Partial<FilterState>;
-      setFilters({ ...emptyFilters, ...parsed });
-    } catch {
-      /* ignore corrupt JSON */
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as Partial<FilterState>;
+        setFilters({ ...emptyFilters, ...parsed });
+      } catch {
+        /* ignore corrupt JSON */
+      }
+    }
+    const savedRaw = window.localStorage.getItem('cg2.find.saved');
+    if (savedRaw) {
+      try {
+        const parsed = JSON.parse(savedRaw) as string[];
+        if (Array.isArray(parsed)) setSavedIds(parsed);
+      } catch {
+        /* ignore */
+      }
     }
   }, []);
 
-  const filteredResources = useMemo(() => applyFilters(findResources, filters), [filters]);
+  // Persist saved-resource IDs.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem('cg2.find.saved', JSON.stringify(savedIds));
+    } catch {
+      /* ignore */
+    }
+  }, [savedIds]);
+
+  // `/` keyboard shortcut to focus the search input.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+      if (e.key === '/' && !isTyping) {
+        e.preventDefault();
+        document.getElementById('find-search')?.focus();
+      } else if (e.key === 'Escape' && pinnedId) {
+        setPinnedId(null);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [pinnedId]);
+
+  const filteredResources = useMemo(() => {
+    const a = applyFilters(findResources, filters);
+    const b = searchResources(a, query);
+    return sortResources(b, sort);
+  }, [filters, query, sort]);
+
+  const toggleSave = (id: string) => {
+    setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const handlePin = (id: string) => {
+    setPinnedId((prev) => (prev === id ? null : id));
+  };
 
   const handleIntentClick = (intent: Intent) => {
     const next = activeIntent === intent ? null : intent;
@@ -502,24 +1033,183 @@ export default function FindSupportPage() {
               <LeftFilters locale={locale} filters={filters} setFilters={setFilters} />
             </aside>
 
-            {/* Center column — populated in Step 3 */}
+            {/* Center column */}
             <div className="min-w-0">
-              <div className="rounded-2xl border border-dashed border-surface-border bg-white/60 p-6 text-center">
-                <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  {t.centerPlaceholder(filteredResources.length)}
-                </p>
-                <p className="mt-2 text-[12px] text-brand-muted-500">
-                  Search bar, sort dropdown, view toggle, and result cards arrive in the next step.
-                </p>
+              {/* Sticky toolbar */}
+              <div className="sticky top-[88px] z-10 -mx-1 flex flex-col gap-3 rounded-2xl border border-surface-border bg-white/95 p-3 shadow-soft backdrop-blur-md">
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="relative min-w-0 flex-1">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+                    <input
+                      id="find-search"
+                      type="search"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder={t.searchPlaceholder}
+                      className="w-full rounded-xl border border-surface-border bg-white py-2 pl-9 pr-24 text-sm outline-none ring-primary/20 transition focus:ring-2"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-400 sm:flex">
+                      <kbd className="rounded border border-surface-border bg-surface-muted px-1 py-0.5 text-[10px] font-mono text-brand-muted-500">/</kbd>
+                      <span>{t.searchShortcut}</span>
+                    </span>
+                  </label>
+
+                  <div className="inline-flex items-center gap-1 rounded-xl border border-surface-border bg-white p-0.5">
+                    <button
+                      type="button"
+                      onClick={() => setView('list')}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
+                        view === 'list' ? 'bg-primary text-white' : 'text-brand-muted-600 hover:text-primary',
+                      )}
+                      aria-pressed={view === 'list'}
+                    >
+                      <List className="h-3.5 w-3.5" />
+                      {t.viewList}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setView('map')}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
+                        view === 'map' ? 'bg-primary text-white' : 'text-brand-muted-600 hover:text-primary',
+                      )}
+                      aria-pressed={view === 'map'}
+                    >
+                      <MapIcon className="h-3.5 w-3.5" />
+                      {t.viewMap}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[12.5px] font-semibold text-brand-muted-700">
+                    {t.showing(filteredResources.length, findResources.length)}
+                  </p>
+                  <label className="inline-flex items-center gap-2 text-[12px] text-brand-muted-600">
+                    <span className="font-semibold uppercase tracking-wider text-brand-muted-400">
+                      {t.sortLabel}
+                    </span>
+                    <select
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value as SortKey)}
+                      className="rounded-lg border border-surface-border bg-white px-2 py-1 text-[12px] outline-none ring-primary/20 focus:ring-2"
+                    >
+                      <option value="recommended">{t.sortRecommended}</option>
+                      <option value="recent">{t.sortRecent}</option>
+                      <option value="alpha">{t.sortAlpha}</option>
+                    </select>
+                  </label>
+                </div>
+
+                <ActiveChips
+                  locale={locale}
+                  filters={filters}
+                  setFilters={setFilters}
+                  query={query}
+                  setQuery={setQuery}
+                />
+              </div>
+
+              {/* Results body */}
+              <div className="mt-4">
+                {view === 'map' ? (
+                  <MapByCity
+                    locale={locale}
+                    resources={filteredResources}
+                    hoveredId={hoveredId}
+                    pinnedId={pinnedId}
+                    onHover={setHoveredId}
+                    onPin={handlePin}
+                  />
+                ) : filteredResources.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-surface-border bg-white/60 p-8 text-center">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      {t.emptyTitle}
+                    </p>
+                    <p className="mt-2 text-[12.5px] text-brand-muted-500">{t.emptyBody}</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFilters(emptyFilters);
+                        setQuery('');
+                      }}
+                      className="mt-3 inline-flex items-center gap-1 rounded-lg border border-surface-border px-3 py-1.5 text-[12px] font-semibold text-primary hover:bg-primary/5"
+                    >
+                      <Eraser className="h-3.5 w-3.5" />
+                      {t.clearAll}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {filteredResources.map((r, i) => (
+                      <div key={r.id}>
+                        <ResourceCard
+                          resource={r}
+                          locale={locale}
+                          isPinned={pinnedId === r.id}
+                          isHovered={hoveredId === r.id}
+                          isSaved={savedIds.includes(r.id)}
+                          onHover={setHoveredId}
+                          onPin={handlePin}
+                          onToggleSave={toggleSave}
+                        />
+                        {(i + 1) % 12 === 0 && i < filteredResources.length - 1 && (
+                          <InlineNavigatorHelp locale={locale} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right rail — populated in Step 4 */}
-            <aside className="hidden lg:block lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto">
-              <div className="rounded-2xl border border-dashed border-surface-border bg-white/60 p-4 text-[12px] text-brand-muted-500">
-                Context panel · default state arrives in the next step (saved resources + navigator CTA).
-              </div>
+            {/* Right rail — minimal stub; full context panel arrives in Step 4 */}
+            <aside className="hidden lg:flex lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:flex-col lg:gap-3 lg:overflow-y-auto">
+              {(() => {
+                const focused = findResources.find((r) => r.id === (pinnedId ?? hoveredId));
+                if (focused) {
+                  return (
+                    <div className="rounded-2xl border border-surface-border bg-white p-4 shadow-soft">
+                      <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-primary">
+                        {pinnedId ? 'Pinned' : 'Hover preview'}
+                      </p>
+                      <h3 className="mt-1 text-[15px] font-semibold text-brand-muted-900">{focused.name}</h3>
+                      <p className="mt-2 whitespace-pre-line text-[12.5px] leading-relaxed text-brand-muted-700">
+                        {focused.description}
+                      </p>
+                      {focused.helpfulToKnow && (
+                        <div className="mt-3 rounded-xl bg-surface-muted p-2.5">
+                          <p className="text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-500">
+                            Helpful to know
+                          </p>
+                          <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-700">
+                            {focused.helpfulToKnow}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <div className="rounded-2xl border border-dashed border-surface-border bg-white/60 p-4 text-[12px] text-brand-muted-500">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-400">
+                      Context panel
+                    </p>
+                    <p className="mt-2">
+                      Hover any card to preview its full editorial blurb here. Click to pin. Saved
+                      resources and the &quot;email to myself&quot; flow arrive in the next step.
+                    </p>
+                    {savedIds.length > 0 && (
+                      <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                        <BookmarkPlus className="h-3 w-3 fill-amber-500 text-amber-500" />
+                        {savedIds.length} saved
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
             </aside>
           </div>
         </div>
