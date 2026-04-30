@@ -260,7 +260,7 @@ export default function SupportHome() {
 
         {/* Card 2 — Sensory-friendly */}
         <Link
-          href="/support/sensory-friendly"
+          href="/support/find?need=sensory-friendly"
           className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
           style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)' }}
         >
@@ -283,7 +283,7 @@ export default function SupportHome() {
 
         {/* Card 3 — Crisis / Help lines */}
         <Link
-          href="/support/help"
+          href="/support/find?need=crisis"
           className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
           style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)' }}
         >
