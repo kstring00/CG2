@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -11,7 +11,6 @@ import {
   Search,
   Menu,
   X,
-  ChevronDown,
   Compass as CompassIcon,
   Lock,
   ArrowRight,
@@ -32,97 +31,37 @@ import CrisisPill from '@/components/CrisisPill';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
-type NavItem = {
-  href: string;
-  label: string;
-  icon: typeof LayoutDashboard;
-  highlight?: boolean;
-};
-
-const defaultItems: NavItem[] = [
-  { href: '/support', label: 'Home', icon: LayoutDashboard },
-  { href: '/support/next-steps', label: 'Start Here: My Next Step', icon: Compass },
-  { href: '/support/connect', label: 'Talk With Other Parents', icon: Link2 },
+const navGroups = [
+  {
+    label: 'For You',
+    items: [
+      { href: '/support/mental-health', label: 'Support for Parents', icon: HeartPulse, highlight: true },
+    ],
+  },
+  {
+    label: 'Get Help Choosing What to Do',
+    items: [
+      { href: '/support', label: 'Home', icon: LayoutDashboard },
+      { href: '/support/next-steps', label: 'Start Here: My Next Step', icon: Compass },
+      { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
+      { href: '/support/resources', label: 'Helpful Guides', icon: BookOpen },
+      { href: '/support/find', label: 'Find Help Near Me', icon: Search },
+      { href: '/support/connect', label: 'Talk With Other Parents', icon: Link2 },
+    ],
+  },
+  {
+    label: 'Your Family',
+    items: [
+      { href: '/support/financial', label: 'Financial', icon: Wallet },
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+    ],
+  },
 ];
-
-const everythingElseItems: NavItem[] = [
-  { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
-  { href: '/support/resources', label: 'Helpful Guides', icon: BookOpen },
-  { href: '/support/find', label: 'Find Help Near Me', icon: Search },
-  { href: '/support/financial', label: 'Financial', icon: Wallet },
-  { href: '/support/siblings', label: 'Sibling Support', icon: Users },
-  { href: '/support/mental-health', label: 'Support for Parents', icon: HeartPulse, highlight: true },
-];
-
-const EVERYTHING_ELSE_STORAGE_KEY = 'cg2.sidebar.everythingElse';
 
 export function SupportShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [everythingElseOpen, setEverythingElseOpen] = useState(false);
   const isFindPage = pathname?.startsWith('/support/find') ?? false;
-
-  useEffect(() => {
-    try {
-      const v = window.sessionStorage.getItem(EVERYTHING_ELSE_STORAGE_KEY);
-      if (v !== null) {
-        setEverythingElseOpen(v === '1');
-        return;
-      }
-    } catch {
-      /* sessionStorage unavailable */
-    }
-    if (
-      pathname &&
-      everythingElseItems.some((i) => pathname.startsWith(i.href))
-    ) {
-      setEverythingElseOpen(true);
-    }
-  }, [pathname]);
-
-  function toggleEverythingElse() {
-    setEverythingElseOpen((prev) => {
-      const next = !prev;
-      try {
-        window.sessionStorage.setItem(
-          EVERYTHING_ELSE_STORAGE_KEY,
-          next ? '1' : '0',
-        );
-      } catch {
-        /* noop */
-      }
-      return next;
-    });
-  }
-
-  function isItemActive(href: string) {
-    if (!pathname) return false;
-    if (href === '/support') return pathname === '/support';
-    return pathname === href || pathname.startsWith(href + '/') || pathname.startsWith(href);
-  }
-
-  function renderNavItem(item: NavItem) {
-    const isActive = isItemActive(item.href);
-    return (
-      <li key={item.href}>
-        <a
-          href={item.href}
-          onClick={() => setSidebarOpen(false)}
-          className={cn(
-            'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
-            isActive
-              ? 'bg-primary text-white shadow-soft'
-              : item.highlight
-              ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
-              : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-          )}
-        >
-          <item.icon className="h-4 w-4 shrink-0" />
-          <span className="flex-1 text-[13px]">{item.label}</span>
-        </a>
-      </li>
-    );
-  }
 
   const SidebarContent = () => (
     <>
@@ -143,18 +82,48 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Get Help Choosing What to Do">
-        <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
-          {defaultItems.map(renderNavItem)}
-        </ul>
+        {navGroups.map((group, gi) => (
+          <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
+            <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+              {group.label}
+            </p>
+            <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
+              {group.items.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/support' && pathname.startsWith(item.href));
+                const isHighlight = (item as { highlight?: boolean }).highlight;
+                return (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
+                        isActive
+                          ? 'bg-primary text-white shadow-soft'
+                          : isHighlight
+                          ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
+                          : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
+                      )}
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      <span className="flex-1 text-[13px]">{item.label}</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
 
         {/* Cross-layer handoff — clearly labeled, visually distinct */}
-        <div className="mt-4 border-t border-surface-border/60 pt-4">
+        <div className="mt-6 border-t border-surface-border/60 pt-4">
           <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
             Current Texas ABA client?
           </p>
           <Link
             href="/client"
-            onClick={() => setSidebarOpen(false)}
             className="group flex items-center justify-between gap-3 rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 text-sm font-semibold text-accent transition-all hover:bg-accent/10"
           >
             <span className="inline-flex items-center gap-2">
@@ -163,34 +132,6 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             </span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-        </div>
-
-        {/* Everything else — collapsible */}
-        <div className="mt-5 border-t border-surface-border/60 pt-3">
-          <button
-            type="button"
-            onClick={toggleEverythingElse}
-            aria-expanded={everythingElseOpen}
-            aria-controls="sidebar-everything-else"
-            className="flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-500 transition hover:bg-surface-subtle hover:text-brand-muted-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <span>Everything else</span>
-            <ChevronDown
-              className={cn(
-                'h-3.5 w-3.5 transition-transform',
-                everythingElseOpen && 'rotate-180',
-              )}
-              aria-hidden
-            />
-          </button>
-          {everythingElseOpen ? (
-            <ul
-              id="sidebar-everything-else"
-              className="mt-1 flex list-none flex-col gap-0.5 p-0"
-            >
-              {everythingElseItems.map(renderNavItem)}
-            </ul>
-          ) : null}
         </div>
       </nav>
 
