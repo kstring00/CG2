@@ -12,7 +12,7 @@ export type RecommendedAction = TodayAction | CalmSignal;
 const DEFAULT_ACTION: TodayAction = {
   type: 'route',
   label: 'Start with two quick questions',
-  value: '/intake',
+  value: '/',
 };
 
 export function getRecommendedAction(
@@ -35,13 +35,13 @@ export function getRecommendedAction(
       return {
         type: 'route',
         label: 'IEP starter guide',
-        value: '/support/iep-starter',
+        value: '/?stage=school-transition',
       };
     case 'Therapy is in progress':
       return {
         type: 'route',
         label: "This week's focus",
-        value: '/support/this-week',
+        value: '/?stage=starting-therapy',
       };
     case "I'm just tired":
       return { type: 'calm' };

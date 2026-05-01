@@ -177,7 +177,7 @@ export default function SupportHome() {
             <p className="text-xs font-semibold uppercase tracking-widest text-primary">Next best step</p>
             <p className="mt-2 text-sm font-medium leading-relaxed text-brand-muted-900">{nextStep}</p>
             <Link
-              href="/support/next-steps"
+              href="/"
               className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
             >
               See the full plan <ArrowRight className="h-4 w-4" />
