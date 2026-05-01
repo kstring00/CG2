@@ -3,16 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
-import IntakeFlow, { type IntakeAnswers } from '@/components/IntakeFlow';
-import { useParentContext } from '@/lib/useParentContext';
+import IntakeFlow from '@/components/IntakeFlow';
+import { useParentContext, type ParentContext } from '@/lib/useParentContext';
 
 export default function IntakePreviewPage() {
   const { context, clearContext, ready } = useParentContext();
-  const [submission, setSubmission] = useState<IntakeAnswers | null>(null);
+  const [submission, setSubmission] = useState<ParentContext | null>(null);
   const [version, setVersion] = useState(0);
 
-  function handleComplete(answers: IntakeAnswers) {
-    setSubmission(answers);
+  function handleComplete(next: ParentContext) {
+    setSubmission(next);
   }
 
   function reset() {
