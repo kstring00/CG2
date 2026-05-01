@@ -2,8 +2,20 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Heart, Lock, Wind } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Heart, Lock, Wind } from 'lucide-react';
 import CrisisPill from '@/components/CrisisPill';
+
+const CREDIBILITY_CHECKS = [
+  'Parent mental health tools & therapist referrals',
+  'Clinically reviewed by BCBAs at Texas ABA Centers',
+  'Free for every family — no sign-up required',
+] as const;
+
+const PATH_STEPS = [
+  { n: '1', title: 'Understand where you are', desc: 'Quick guidance based on your situation — no jargon.' },
+  { n: '2', title: 'Get your next steps', desc: 'Clear, simple actions. No guessing. No overwhelm.' },
+  { n: '3', title: 'Find real support', desc: 'Local providers, parent connections, and help for you.' },
+] as const;
 
 const GROUNDING_TOOLS = [
   {
@@ -31,9 +43,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
-      {/* NAV — copied forward verbatim from the prior homepage. We intentionally
-          did not extract this into a shared component yet; that will happen in a
-          later pass once the new intake-first homepage is settled. */}
+      {/* NAV — copied forward verbatim from the prior homepage. */}
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
@@ -65,38 +75,100 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* HERO — intake-first */}
-      <section className="px-6 pt-24 pb-16 sm:px-8 sm:pt-32 sm:pb-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white/70 px-3 py-1 text-xs font-medium text-stone-600 backdrop-blur-sm">
-            <Heart className="h-3 w-3 text-rose-500" /> Texas ABA Centers · Common Ground
-          </span>
-          <h1 className="mt-6 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-stone-900 sm:text-5xl lg:text-[3.5rem]">
-            What do you need today?
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-stone-600 sm:text-lg sm:leading-8">
-            A few quick questions and we&apos;ll point you to the next right step. Takes 2 minutes. No sign-up.
-          </p>
-          <div className="mt-9 flex flex-col items-center gap-3">
-            <button
-              type="button"
-              onClick={handleStartIntake}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
-            >
-              Get your next steps <ArrowRight className="h-4 w-4" />
-            </button>
-            <Link
-              href="/support"
-              className="text-sm font-medium text-stone-500 underline-offset-4 transition hover:text-stone-800 hover:underline"
-            >
-              Or browse support directly →
-            </Link>
+      {/* HERO — warm photograph + emotional headline + action subhead + intake CTA */}
+      <section className="relative overflow-hidden pt-16" style={{ minHeight: '680px' }}>
+        <div className="absolute inset-0">
+          <Image
+            src="/hero-selected.jpg"
+            alt="Father and daughter doing a puzzle with Texas ABA Centers therapy kit"
+            fill
+            priority
+            quality={100}
+            sizes="100vw"
+            className="object-cover"
+            style={{ objectPosition: '62% 28%' }}
+          />
+          {/* Left overlay — keeps the headline readable over the bright left side */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to right, rgba(8,15,30,0.82) 0%, rgba(8,15,30,0.70) 28%, rgba(8,15,30,0.30) 52%, rgba(8,15,30,0.0) 72%)',
+            }}
+          />
+          {/* Top fade — softens the boundary with the fixed nav */}
+          <div
+            className="absolute top-0 left-0 right-0 h-20"
+            style={{ background: 'linear-gradient(to bottom, rgba(8,15,30,0.55) 0%, transparent 100%)' }}
+          />
+        </div>
+
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="flex min-h-[620px] items-center py-20 sm:py-28">
+            <div className="w-full max-w-[560px]">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
+                <Heart className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Common Ground
+              </span>
+              <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
+                You don&apos;t have to figure this out alone.
+              </h1>
+              <p className="mt-5 text-xl font-semibold leading-snug text-white sm:text-2xl">
+                Get your next steps now.
+              </p>
+              <p className="mt-3 max-w-md text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
+                Common Ground helps parents understand what to do next — with clear guidance, local support, and real help for you, not just your child.
+              </p>
+
+              <div className="mt-7 flex flex-col gap-2.5 text-sm text-white/80">
+                {CREDIBILITY_CHECKS.map((line) => (
+                  <div key={line} className="flex items-center gap-2.5">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
+                    <span>{line}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-9 flex flex-col items-start gap-3">
+                <button
+                  type="button"
+                  onClick={handleStartIntake}
+                  className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-md transition hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                >
+                  Get your next steps <ArrowRight className="h-4 w-4" />
+                </button>
+                <Link
+                  href="/support"
+                  className="text-sm font-medium text-white/80 underline-offset-4 transition hover:text-white hover:underline"
+                >
+                  Or browse support directly →
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PATH PREVIEW — what to expect after clicking the CTA */}
+      <section className="border-y border-stone-100 bg-white px-6 py-10 sm:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-6 sm:grid-cols-3">
+            {PATH_STEPS.map((step) => (
+              <div key={step.n} className="flex items-start gap-4">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+                  {step.n}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-stone-900">{step.title}</p>
+                  <p className="mt-0.5 text-sm text-stone-500">{step.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* QUIET WARMTH — short paragraph + grounding tools, compact */}
-      <section className="border-t border-stone-200/70 bg-white/70 px-6 py-12 sm:px-8 sm:py-14">
+      <section className="px-6 py-12 sm:px-8 sm:py-14" style={{ backgroundColor: '#f4efe8' }}>
         <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-plum-600">

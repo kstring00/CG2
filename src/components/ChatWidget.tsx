@@ -84,12 +84,15 @@ export default function ChatWidget() {
       {/* Chat Panel */}
       {open && (
         <div
-          className="fixed bottom-24 right-4 z-50 flex flex-col rounded-2xl shadow-glow overflow-hidden"
+          className="fixed right-4 z-50 flex flex-col rounded-2xl shadow-glow overflow-hidden"
           style={{
+            // Lifted above the persistent CrisisBar (height = --crisis-bar-height
+            // from globals.css). 6rem = original Tailwind bottom-24.
+            bottom: 'calc(6rem + var(--crisis-bar-height))',
             width: '360px',
             maxWidth: 'calc(100vw - 32px)',
             height: '520px',
-            maxHeight: 'calc(100vh - 120px)',
+            maxHeight: 'calc(100vh - 120px - var(--crisis-bar-height))',
             backgroundColor: '#ffffff',
             border: '1px solid #d4d8e3',
           }}
@@ -211,11 +214,17 @@ export default function ChatWidget() {
         </div>
       )}
 
-      {/* Floating Button */}
+      {/* Floating Button — lifted above the persistent CrisisBar so it sits
+          ABOVE the bar in the bottom-right corner, not on top of it.
+          1.25rem = original Tailwind bottom-5; --crisis-bar-height comes from
+          globals.css and matches the bar's actual height at the current bp. */}
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="fixed bottom-5 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-glow transition-transform hover:scale-105 active:scale-95"
-        style={{ backgroundColor: '#1a2e52' }}
+        className="fixed right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-glow transition-transform hover:scale-105 active:scale-95"
+        style={{
+          bottom: 'calc(1.25rem + var(--crisis-bar-height))',
+          backgroundColor: '#1a2e52',
+        }}
         aria-label="Open ABA Guide chat"
       >
         {open ? (
