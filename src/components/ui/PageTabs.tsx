@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 export interface TabDef {
   key: string;
   label: string;
+  helperText?: string;
   /**
    * When true, the panel is only mounted while active.
    * Use for tabs containing heavy interactive elements
@@ -90,7 +91,7 @@ function PageTabsImpl({ tabs, children }: Props) {
               onClick={() => activate(tab.key)}
               onKeyDown={(e) => handleKeyDown(e, idx)}
               className={[
-                'shrink-0 px-4 py-2.5 text-sm font-medium whitespace-nowrap',
+                'shrink-0 px-4 py-2 text-left',
                 'border-b-2 -mb-px transition-colors',
                 'focus-visible:outline-none focus-visible:ring-2',
                 'focus-visible:ring-primary focus-visible:ring-offset-1',
@@ -99,7 +100,12 @@ function PageTabsImpl({ tabs, children }: Props) {
                   : 'border-transparent text-brand-muted-500 hover:text-brand-muted-700 hover:border-brand-muted-300',
               ].join(' ')}
             >
-              {tab.label}
+              <span className="block text-sm font-medium whitespace-nowrap">{tab.label}</span>
+              {tab.helperText ? (
+                <span className="block text-xs text-brand-muted-500 whitespace-nowrap">
+                  {tab.helperText}
+                </span>
+              ) : null}
             </button>
           );
         })}

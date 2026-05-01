@@ -213,10 +213,10 @@ const resourceColorMap: Record<string, string> = {
 /* ─── tabs ──────────────────────────────────────────────────── */
 
 const TABS = [
-  { key: 'right-now',     label: 'Right now',     lazy: true  },
-  { key: 'burnout-check', label: 'Burnout check',  lazy: true  },
-  { key: 'tools',         label: 'Tools'                       },
-  { key: 'get-help',      label: 'Get help'                    },
+  { key: 'right-now', label: 'Calm now', helperText: 'Settle your body fast', lazy: true },
+  { key: 'burnout-check', label: 'Check my stress', helperText: 'Spot burnout signs early', lazy: true },
+  { key: 'tools', label: 'Quick coping tools', helperText: 'Use a reset in under 5 minutes' },
+  { key: 'get-help', label: 'Find real support', helperText: 'Connect with people who can help' },
 ];
 
 /* ─── component ────────────────────────────────────────────── */
