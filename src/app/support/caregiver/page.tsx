@@ -259,6 +259,54 @@ export default function CaregiverSupportPage() {
         </p>
       </header>
 
+      <section
+        aria-label="Start here actions"
+        className="mb-8 rounded-3xl border border-surface-border bg-white p-4 shadow-card sm:p-6"
+      >
+        <div className="mb-4 flex items-center gap-2">
+          <Zap className="h-4 w-4 text-brand-plum-600" />
+          <h2 className="text-base font-semibold text-brand-muted-900 sm:text-lg">Start here</h2>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <a
+            href="tel:988"
+            aria-label="I need help now - call or text 988 crisis support"
+            data-track-label="caregiver_start_here_urgent_help_now_988"
+            className="inline-flex items-center justify-between gap-3 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-left transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-2"
+          >
+            <span className="text-sm font-semibold text-rose-800">I need help now</span>
+            <Phone className="h-4 w-4 shrink-0 text-rose-700" />
+          </a>
+          <Link
+            href="/support/connect"
+            aria-label="Talk to my care team - open care team connection pathway"
+            data-track-label="caregiver_start_here_talk_to_care_team_connect_path"
+            className="inline-flex items-center justify-between gap-3 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 px-4 py-3 text-left transition hover:bg-brand-plum-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-plum-500 focus-visible:ring-offset-2"
+          >
+            <span className="text-sm font-semibold text-brand-plum-800">Talk to my care team</span>
+            <HeartHandshake className="h-4 w-4 shrink-0 text-brand-plum-700" />
+          </Link>
+          <Link
+            href="?tab=get-help"
+            aria-label="Find local caregiver support - open support directory resources"
+            data-track-label="caregiver_start_here_find_local_support_directory_tab"
+            className="inline-flex items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-left transition hover:bg-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
+          >
+            <span className="text-sm font-semibold text-sky-800">Find local caregiver support</span>
+            <ArrowRight className="h-4 w-4 shrink-0 text-sky-700" />
+          </Link>
+          <Link
+            href="?tab=right-now#panel-right-now"
+            aria-label="Take a 2-minute reset - open breathing reset tool"
+            data-track-label="caregiver_start_here_two_minute_reset_breathing_tool"
+            className="inline-flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left transition hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          >
+            <span className="text-sm font-semibold text-emerald-800">Take a 2-minute reset</span>
+            <Leaf className="h-4 w-4 shrink-0 text-emerald-700" />
+          </Link>
+        </div>
+      </section>
+
       <PageTabs tabs={TABS}>
 
         {/* ── Tab 1: Right now ─────────────────────────────────────────── */}
