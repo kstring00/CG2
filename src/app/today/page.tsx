@@ -4,11 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import TodayCard from '@/components/TodayCard';
-import {
-  getRecommendedAction,
-  isCalmSignal,
-  type RecommendedAction,
-} from '@/lib/getRecommendedAction';
+import { getRecommendedAction } from '@/lib/getRecommendedAction';
 
 const SITUATIONS = [
   null,
@@ -19,31 +15,10 @@ const SITUATIONS = [
   "I'm just tired",
 ] as const;
 
-const FRAMING: Record<string, string> = {
-  'We just got the diagnosis':
-    'A diagnosis is a starting point, not a verdict. Here is the next concrete step.',
-  "We're waiting on an evaluation":
-    'While you wait, you can track milestones and prepare what to bring.',
-  "School isn't working":
-    'A clearer plan starts with the right document. Begin with the IEP basics.',
-  'Therapy is in progress':
-    "You're already on the path. Here is one small focus for this week.",
-  "I'm just tired":
-    'Take a breath first. Everything else can wait two minutes.',
-  default: 'Two short questions and we will tailor what to do next.',
-};
-
-const PERMISSION_LINE =
-  "If today isn't the day for this, that's okay. Come back when you can.";
-
 export default function TodayPreviewPage() {
   const [situation, setSituation] = useState<string | null>(null);
 
-  const action: RecommendedAction = getRecommendedAction({
-    currentSituation: situation,
-  });
-
-  const framing = FRAMING[situation ?? 'default'] ?? FRAMING.default;
+  const action = getRecommendedAction({ currentSituation: situation });
 
   return (
     <main
@@ -99,16 +74,7 @@ export default function TodayPreviewPage() {
         </section>
 
         <div className="mt-10">
-          {isCalmSignal(action) ? (
-            <CalmPlaceholder />
-          ) : (
-            <TodayCard
-              framing={framing}
-              action={action}
-              permissionLine={PERMISSION_LINE}
-              fallback={<FallbackOptions />}
-            />
-          )}
+          <TodayCard action={action} fallback={<FallbackOptions />} />
         </div>
 
         <section className="mt-10 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -144,21 +110,5 @@ function FallbackOptions() {
         </li>
       ))}
     </ul>
-  );
-}
-
-function CalmPlaceholder() {
-  return (
-    <div className="rounded-3xl border border-brand-plum-200 bg-brand-plum-50 p-8 text-center shadow-sm">
-      <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-600">
-        Calm signal received
-      </p>
-      <p className="mt-2 text-base font-semibold text-stone-800">
-        getRecommendedAction returned <code className="rounded bg-white/60 px-1.5 py-0.5 text-sm">{`{ type: 'calm' }`}</code>
-      </p>
-      <p className="mt-2 text-sm text-stone-600">
-        The home page will render Calm Mode here instead of TodayCard. That UI is a later phase.
-      </p>
-    </div>
   );
 }

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 export type ParentContext = {
   childAge: string | null;
   currentSituation: string | null;
+  completedIntakeAt: string | null;
   lastVisit: string | null;
   lastSection: string | null;
   calmModeUsedAt: string | null;
@@ -15,6 +16,7 @@ export const PARENT_CONTEXT_STORAGE_KEY = 'cg_parent_context';
 const DEFAULT_CONTEXT: ParentContext = {
   childAge: null,
   currentSituation: null,
+  completedIntakeAt: null,
   lastVisit: null,
   lastSection: null,
   calmModeUsedAt: null,
@@ -23,6 +25,7 @@ const DEFAULT_CONTEXT: ParentContext = {
 const FIELDS: (keyof ParentContext)[] = [
   'childAge',
   'currentSituation',
+  'completedIntakeAt',
   'lastVisit',
   'lastSection',
   'calmModeUsedAt',

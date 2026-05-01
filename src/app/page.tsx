@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -18,9 +19,61 @@ import {
   Wind,
 } from 'lucide-react';
 import CrisisPill from '@/components/CrisisPill';
+import IntakeFlow from '@/components/IntakeFlow';
+import TodayCard from '@/components/TodayCard';
+import { useParentContext } from '@/lib/useParentContext';
+import { getRecommendedAction } from '@/lib/getRecommendedAction';
 
 
 export default function HomePage() {
+  const { context, ready, setContext } = useParentContext();
+  const [skipped, setSkipped] = useState(false);
+  const [restartIntake, setRestartIntake] = useState(false);
+  const todayHeadingRef = useRef<HTMLHeadingElement | null>(null);
+
+  const hasCompletedIntake = Boolean(context.completedIntakeAt);
+  const showIntakeFlow = restartIntake || (!hasCompletedIntake && !skipped);
+
+  const focusTodayHeading = useCallback(() => {
+    window.requestAnimationFrame(() => {
+      todayHeadingRef.current?.focus();
+      todayHeadingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
+  const handleIntakeComplete = useCallback(() => {
+    setRestartIntake(false);
+    setSkipped(false);
+    focusTodayHeading();
+  }, [focusTodayHeading]);
+
+  const handleSkip = useCallback(() => {
+    setSkipped(true);
+    setRestartIntake(false);
+  }, []);
+
+  const handleStartIntake = useCallback(() => {
+    setSkipped(false);
+    setRestartIntake(true);
+    // Clear stale completion so the IntakeFlow shows again on refresh too
+    // until they answer.
+    setContext({ completedIntakeAt: null });
+  }, [setContext]);
+
+  const handleCalmFallback = useCallback(() => {
+    // TODO (Phase 4): replace with in-place Calm Mode card. For now, scroll
+    // to and focus the existing overwhelm card so the path is never silent.
+    if (typeof document === 'undefined') return;
+    const el = document.getElementById('overwhelm-card');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.focus({ preventScroll: true });
+  }, []);
+
+  const action = getRecommendedAction({
+    currentSituation: hasCompletedIntake ? context.currentSituation : null,
+  });
+
   return (
     <main className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
 
@@ -197,101 +250,24 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Primary CTA — dominant, unmissable */}
-          <Link
-            href="/support/next-steps"
-            className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border-2 border-primary bg-primary p-7 shadow-md transition hover:bg-primary/95 sm:p-9"
-          >
-            <div className="flex items-start gap-5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20">
-                <Compass className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                  Most parents start here
-                </p>
-                <h3 className="mt-1 text-xl font-bold text-white sm:text-2xl">
-                  &ldquo;I don&apos;t know what to do next.&rdquo;
-                </h3>
-                <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/80">
-                  A short plan for where you are today — just the next right step.
-                </p>
-              </div>
-            </div>
-            <div className="hidden shrink-0 flex-col items-center gap-1.5 sm:flex">
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-primary shadow-sm transition group-hover:bg-white/95">
-                Start here <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
-              <span className="text-xs text-white/50">Takes about 2 minutes</span>
-            </div>
-          </Link>
-
-          {/* 3 companion cards */}
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              {
-                eyebrow: 'I need real-world help near me',
-                title: 'Local sensory-friendly guide',
-                desc: 'Parks, restaurants, stores, and places that are sensory-smart and good for kids on the spectrum. Verified. Local. Go-ready.',
-                cta: 'See places near you',
-                href: '/support/find',
-                icon: MapPin,
-                color: 'text-emerald-400',
-                eyebrow_color: 'text-emerald-400',
-              },
-              {
-                eyebrow: 'I want to understand more',
-                title: 'What is ABA, really?',
-                desc: 'Plain answers to the questions every parent has. No jargon. Just clarity on what ABA therapy actually looks like day to day.',
-                cta: 'Get clear answers',
-                href: '/support/what-is-aba',
-                icon: BookOpen,
-                color: 'text-amber-400',
-                eyebrow_color: 'text-amber-400',
-              },
-              {
-                eyebrow: 'I feel alone',
-                title: 'Community & connection',
-                desc: 'Other parents who have been where you are. Local meetups, online spaces, and people who get it.',
-                cta: 'Find your people',
-                href: '/support/connect',
-                icon: Users,
-                color: 'text-violet-400',
-                eyebrow_color: 'text-violet-400',
-              },
-            ].map((card) => (
-              <Link
-                key={card.title}
-                href={card.href}
-                className="group flex flex-col rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition hover:shadow-md"
-              >
-                <p className={`text-[10px] font-semibold uppercase tracking-widest ${card.eyebrow_color}`}>
-                  {card.eyebrow}
-                </p>
-                <h3 className="mt-2 text-base font-bold text-stone-900">{card.title}</h3>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-stone-600">{card.desc}</p>
-                <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${card.color}`}>
-                  {card.cta} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Quiet secondary links */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <p className="w-full text-center text-[11px] font-medium uppercase tracking-widest text-stone-400">Or go straight to what you need</p>
-            <Link href="/support/caregiver" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
-              <Heart className="h-3.5 w-3.5" /> I need support too
-            </Link>
-            <span className="text-stone-300">·</span>
-            <Link href="/support/siblings" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
-              <Users className="h-3.5 w-3.5" /> My other kids are struggling
-            </Link>
-            <span className="text-stone-300">·</span>
-            <Link href="/support/hard-days" className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 underline-offset-2 hover:underline">
-              <Wind className="h-3.5 w-3.5" /> I need support right now
-            </Link>
-          </div>
+          {ready ? (
+            showIntakeFlow ? (
+              <IntakeFlow onComplete={handleIntakeComplete} onSkip={handleSkip} />
+            ) : (
+              <TodayCard
+                ref={todayHeadingRef}
+                action={action}
+                onStartIntake={handleStartIntake}
+                onCalmFallback={handleCalmFallback}
+                fallback={<HomeFallback />}
+              />
+            )
+          ) : (
+            <div
+              aria-hidden="true"
+              className="mx-auto h-[280px] w-full max-w-2xl rounded-3xl border border-stone-200 bg-white/60 shadow-sm"
+            />
+          )}
         </div>
       </section>
 
@@ -337,7 +313,11 @@ export default function HomePage() {
             </div>
 
             {/* Right — grounding tools */}
-            <div className="border-t border-stone-100 bg-stone-50 p-8 lg:border-l lg:border-t-0 sm:p-10">
+            <div
+              id="overwhelm-card"
+              tabIndex={-1}
+              className="border-t border-stone-100 bg-stone-50 p-8 outline-none lg:border-l lg:border-t-0 sm:p-10"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">
                 If today is hard — right now
               </p>
@@ -483,5 +463,115 @@ export default function HomePage() {
       </section>
 
     </main>
+  );
+}
+
+/**
+ * The original "primary CTA + 3 companion cards + secondary links" block,
+ * preserved verbatim. It was the home page's default placement before the
+ * intake-or-skip hero shipped; now it lives only inside TodayCard's
+ * "Not this? Show me other options" disclosure.
+ */
+function HomeFallback() {
+  const cards = [
+    {
+      eyebrow: 'I need real-world help near me',
+      title: 'Local sensory-friendly guide',
+      desc: 'Parks, restaurants, stores, and places that are sensory-smart and good for kids on the spectrum. Verified. Local. Go-ready.',
+      cta: 'See places near you',
+      href: '/support/find',
+      icon: MapPin,
+      color: 'text-emerald-400',
+      eyebrow_color: 'text-emerald-400',
+    },
+    {
+      eyebrow: 'I want to understand more',
+      title: 'What is ABA, really?',
+      desc: 'Plain answers to the questions every parent has. No jargon. Just clarity on what ABA therapy actually looks like day to day.',
+      cta: 'Get clear answers',
+      href: '/support/what-is-aba',
+      icon: BookOpen,
+      color: 'text-amber-400',
+      eyebrow_color: 'text-amber-400',
+    },
+    {
+      eyebrow: 'I feel alone',
+      title: 'Community & connection',
+      desc: 'Other parents who have been where you are. Local meetups, online spaces, and people who get it.',
+      cta: 'Find your people',
+      href: '/support/connect',
+      icon: Users,
+      color: 'text-violet-400',
+      eyebrow_color: 'text-violet-400',
+    },
+  ];
+
+  return (
+    <div>
+      {/* Primary CTA — dominant, unmissable */}
+      <Link
+        href="/support/next-steps"
+        className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border-2 border-primary bg-primary p-7 shadow-md transition hover:bg-primary/95 sm:p-9"
+      >
+        <div className="flex items-start gap-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20">
+            <Compass className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+              Most parents start here
+            </p>
+            <h3 className="mt-1 text-xl font-bold text-white sm:text-2xl">
+              &ldquo;I don&apos;t know what to do next.&rdquo;
+            </h3>
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/80">
+              A short plan for where you are today — just the next right step.
+            </p>
+          </div>
+        </div>
+        <div className="hidden shrink-0 flex-col items-center gap-1.5 sm:flex">
+          <span className="inline-flex items-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-semibold text-primary shadow-sm transition group-hover:bg-white/95">
+            Start here <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+          <span className="text-xs text-white/50">Takes about 2 minutes</span>
+        </div>
+      </Link>
+
+      {/* 3 companion cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        {cards.map((card) => (
+          <Link
+            key={card.title}
+            href={card.href}
+            className="group flex flex-col rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition hover:shadow-md"
+          >
+            <p className={`text-[10px] font-semibold uppercase tracking-widest ${card.eyebrow_color}`}>
+              {card.eyebrow}
+            </p>
+            <h3 className="mt-2 text-base font-bold text-stone-900">{card.title}</h3>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-stone-600">{card.desc}</p>
+            <span className={`mt-4 inline-flex items-center gap-1.5 text-sm font-semibold ${card.color}`}>
+              {card.cta} <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Quiet secondary links */}
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        <p className="w-full text-center text-[11px] font-medium uppercase tracking-widest text-stone-400">Or go straight to what you need</p>
+        <Link href="/support/caregiver" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
+          <Heart className="h-3.5 w-3.5" /> I need support too
+        </Link>
+        <span className="text-stone-300">·</span>
+        <Link href="/support/siblings" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
+          <Users className="h-3.5 w-3.5" /> My other kids are struggling
+        </Link>
+        <span className="text-stone-300">·</span>
+        <Link href="/support/hard-days" className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 underline-offset-2 hover:underline">
+          <Wind className="h-3.5 w-3.5" /> I need support right now
+        </Link>
+      </div>
+    </div>
   );
 }
