@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,6 +14,7 @@ const WELCOME_MESSAGE: Message = {
 };
 
 export default function ChatWidget() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState('');
@@ -74,6 +76,8 @@ export default function ChatWidget() {
       sendMessage();
     }
   };
+
+  if (pathname === '/calm') return null;
 
   return (
     <>

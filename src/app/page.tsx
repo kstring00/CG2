@@ -17,6 +17,7 @@ import {
   Users,
   Wind,
 } from 'lucide-react';
+import CrisisPill from '@/components/CrisisPill';
 
 
 export default function HomePage() {
@@ -40,6 +41,7 @@ export default function HomePage() {
             />
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
+            <CrisisPill />
             <Link
               href="/client"
               className="hidden items-center gap-1.5 text-sm font-semibold text-accent transition hover:text-accent/80 sm:inline-flex"
