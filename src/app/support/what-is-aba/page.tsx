@@ -460,7 +460,7 @@ export default function WhatIsABAPage() {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
-            href="/support/next-steps"
+            href="/"
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
           >
             See your next steps <ArrowRight className="h-4 w-4" />

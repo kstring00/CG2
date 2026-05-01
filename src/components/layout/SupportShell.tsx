@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard,
   BookOpen,
   Link2,
   Compass,
@@ -41,7 +40,6 @@ const navGroups = [
   {
     label: 'Get Help Choosing What to Do',
     items: [
-      { href: '/support', label: 'Home', icon: LayoutDashboard },
       { href: '/support/next-steps', label: 'Start Here: My Next Step', icon: Compass },
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
       { href: '/support/resources', label: 'Helpful Guides', icon: BookOpen },
