@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
 import { cn } from '@/lib/utils';
+import CrisisPill from '@/components/CrisisPill';
 
 const navItems = [
   { href: '/client/portal', label: 'Home', icon: LayoutDashboard },
@@ -177,6 +178,7 @@ export function ClientShell({
                 Client Portal · {clientName}
               </p>
             </div>
+            <CrisisPill />
           </div>
         </header>
 

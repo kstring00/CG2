@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import CrisisPill from '@/components/CrisisPill';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -213,12 +214,15 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
               <CompassIcon className="h-3.5 w-3.5" />
               Get Help Choosing What to Do · open to every family
             </p>
-            <Link
-              href="/client"
-              className="hidden text-[11px] font-semibold text-accent hover:underline sm:inline"
-            >
-              Current client? Sign in →
-            </Link>
+            <div className="flex items-center gap-3">
+              <CrisisPill />
+              <Link
+                href="/client"
+                className="hidden text-[11px] font-semibold text-accent hover:underline sm:inline"
+              >
+                Current client? Sign in →
+              </Link>
+            </div>
           </div>
         </div>
 
