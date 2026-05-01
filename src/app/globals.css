@@ -35,10 +35,22 @@
     --font-display: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --radius: 0.75rem;
+    /* Reserved viewport space for the persistent CrisisBar (z-60).
+       The CrisisBar component (src/components/layout/CrisisBar.tsx) is the
+       source of truth for visual treatment; this variable is the source of
+       truth for layout offset. */
+    --crisis-bar-height: 36px;
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --crisis-bar-height: 40px;
+    }
   }
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: var(--crisis-bar-height);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -46,7 +58,22 @@
   body {
     /* Warm light grey — off-white with a hint of blue-grey, much warmer than pure white */
     background-color: #f2f4f8;
+    padding-top: var(--crisis-bar-height);
     @apply text-brand-muted-800;
+  }
+
+  /* Top-anchored chrome must clear the persistent CrisisBar.
+     Body padding handles normal in-flow content, but elements positioned
+     `fixed` or `sticky` against viewport top: 0 ignore body padding and
+     would slide under the bar. We offset them here without modifying
+     individual nav/shell source files. Existing matches:
+       - Homepage/client/privacy inline <nav class="fixed ... top-0">
+       - SupportShell + ClientShell sticky <header class="sticky top-0">
+       - SupportShell Find-page sub-bar <div class="sticky top-0 z-40"> */
+  nav.fixed.top-0,
+  header.sticky.top-0,
+  div.sticky.top-0 {
+    top: var(--crisis-bar-height);
   }
 
   h1, h2, h3, h4 {
