@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   BookOpen,
   Link2,
-  Compass,
   Search,
   Menu,
   X,
@@ -40,7 +39,6 @@ const navGroups = [
   {
     label: 'Get Help Choosing What to Do',
     items: [
-      { href: '/support/next-steps', label: 'Start Here: My Next Step', icon: Compass },
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
       { href: '/support/resources', label: 'Helpful Guides', icon: BookOpen },
       { href: '/support/find', label: 'Find Help Near Me', icon: Search },

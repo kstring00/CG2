@@ -123,7 +123,7 @@ export default function HomePage() {
               </div>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Link
-                  href="/support/next-steps"
+                  href="/"
                   className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary shadow-md transition hover:bg-white/92"
                 >
                   Start Here <ArrowRight className="h-4 w-4" />
@@ -199,7 +199,7 @@ export default function HomePage() {
 
           {/* Primary CTA — dominant, unmissable */}
           <Link
-            href="/support/next-steps"
+            href="/"
             className="group mb-5 flex items-center justify-between gap-6 overflow-hidden rounded-3xl border-2 border-primary bg-primary p-7 shadow-md transition hover:bg-primary/95 sm:p-9"
           >
             <div className="flex items-start gap-5">
@@ -465,7 +465,7 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/support/next-steps"
+              href="/"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-semibold text-primary shadow-sm transition hover:bg-white/95"
             >
               Start here <ArrowRight className="h-4 w-4" />
