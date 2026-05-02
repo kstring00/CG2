@@ -174,8 +174,6 @@ export default function IntakePage() {
   const plan = useMemo(() => (done ? buildCarePlan(answers) : null), [done, answers]);
 
   const current = QUESTIONS[step];
-  const key = current?.key;
-  const selectedValue = key ? answers[key] : undefined;
 
   const selectOption = (value: string) => {
     if (!current) return;
