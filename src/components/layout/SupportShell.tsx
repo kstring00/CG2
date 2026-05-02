@@ -33,6 +33,7 @@ const navGroups = [
   {
     label: 'For You',
     items: [
+      { href: '/support/intake', label: 'Intake', icon: CompassIcon, highlight: true },
       { href: '/support/mental-health', label: 'Support for Parents', icon: HeartPulse, highlight: true },
     ],
   },
