@@ -53,7 +53,6 @@ export default function HomePage() {
   const [recommendation, setRecommendation] = useState<TodayAction | null>(null);
   const [welcomeBackDismissed, setWelcomeBackDismissed] = useState(false);
   const [announcement, setAnnouncement] = useState('');
-  const ctaRef = useRef<HTMLButtonElement>(null);
   const intakeContainerRef = useRef<HTMLDivElement>(null);
   const recommendCardRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +87,6 @@ export default function HomePage() {
     setView('hero');
     setRecommendation(null);
     setAnnouncement('Intake closed. Returned to homepage.');
-    requestAnimationFrame(() => ctaRef.current?.focus());
   }
 
   function handleIntakeComplete(answers: IntakeAnswers) {
@@ -172,7 +170,7 @@ export default function HomePage() {
               <Lock className="h-3.5 w-3.5" /> Client sign in
             </Link>
             <Link
-              href="/support"
+              href="/support/intake"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
               Care Navigation <ArrowRight className="h-3.5 w-3.5" />
@@ -293,14 +291,12 @@ export default function HomePage() {
                     </div>
 
                     <div className="mt-9 flex flex-col items-start gap-3">
-                      <button
-                        ref={ctaRef}
-                        type="button"
-                        onClick={openIntake}
+                      <Link
+                        href="/support/intake"
                         className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-md transition hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
                         Get your next steps <ArrowRight className="h-4 w-4" />
-                      </button>
+                      </Link>
                       <Link
                         href="/support"
                         className="text-sm font-medium text-white/80 underline-offset-4 transition hover:text-white hover:underline"
