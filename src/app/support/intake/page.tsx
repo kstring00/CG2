@@ -13,6 +13,14 @@ type Answers = {
   connected: string | null;
 };
 
+type QuestionKey = keyof Answers;
+
+type Question = {
+  key: QuestionKey;
+  label: string;
+  options: readonly string[];
+};
+
 type CarePlan = {
   summary: string;
   nextSteps: string[];
@@ -22,7 +30,7 @@ type CarePlan = {
   portalNote?: string;
 };
 
-const QUESTIONS = [
+const QUESTIONS: readonly Question[] = [
   {
     key: 'hardest',
     label: 'What feels hardest right now?',
@@ -160,17 +168,26 @@ export default function IntakePage() {
   const [answers, setAnswers] = useState<Answers>({ hardest: null, support: null, confidence: null, easier: null, connected: null });
   const [email, setEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<string | null>(null);
+  const [showPlan, setShowPlan] = useState(false);
 
-  const done = step >= QUESTIONS.length;
+  const done = showPlan || step >= QUESTIONS.length;
   const plan = useMemo(() => (done ? buildCarePlan(answers) : null), [done, answers]);
 
-  const current = QUESTIONS[step as keyof typeof QUESTIONS];
-  const key = current?.key as keyof Answers;
+  const current = QUESTIONS[step];
 
   const selectOption = (value: string) => {
-    if (!key) return;
-    setAnswers((prev) => ({ ...prev, [key]: value }));
-    setStep((s) => s + 1);
+    if (!current) return;
+
+    setAnswers((prev) => ({
+      ...prev,
+      [current.key]: value,
+    }));
+
+    if (step < QUESTIONS.length - 1) {
+      setStep((prev) => prev + 1);
+    } else {
+      setShowPlan(true);
+    }
   };
 
   const sendEmail = async () => {
@@ -194,10 +211,10 @@ export default function IntakePage() {
             <p className="mt-2 text-brand-muted-700">Answer a few quick questions and we’ll build a simple care plan with support options for your family.</p>
             <p className="mt-2 text-sm text-brand-muted-500">This is not a clinical assessment. It is a starting point to help you find support, resources, and next steps.</p>
             <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-primary">Question {step + 1} of {QUESTIONS.length}</p>
-            <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">{current.label}</h2>
+            <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">{current?.label}</h2>
 
             <div className="mt-5 grid gap-3">
-              {current.options.map((opt) => (
+              {current?.options.map((opt) => (
                 <button key={opt} type="button" aria-label={opt} onClick={() => selectOption(opt)} className="flex w-full items-center justify-between rounded-2xl border-2 border-surface-border px-4 py-4 text-left font-semibold text-brand-muted-800 hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   <span>{opt}</span>
                   <Check className="h-4 w-4 text-primary opacity-60" />
@@ -207,7 +224,7 @@ export default function IntakePage() {
 
             <div className="mt-6">
               {step > 0 && (
-                <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
+                <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </button>
               )}
@@ -259,7 +276,7 @@ export default function IntakePage() {
               {emailStatus && <p className="mt-2 text-sm text-brand-muted-700">{emailStatus}</p>}
             </section>
 
-            <button type="button" onClick={() => { setStep(0); setAnswers({ hardest: null, support: null, confidence: null, easier: null, connected: null }); setEmail(''); setEmailStatus(null); }} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
+            <button type="button" onClick={() => { setStep(0); setShowPlan(false); setAnswers({ hardest: null, support: null, confidence: null, easier: null, connected: null }); setEmail(''); setEmailStatus(null); }} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
               <RefreshCw className="h-4 w-4" /> Restart
             </button>
           </>
