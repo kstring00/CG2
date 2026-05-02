@@ -1,330 +1,214 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
   BookOpen,
+  Compass,
   Heart,
   HeartHandshake,
-  HelpCircle,
-  Compass,
-  MapPin,
-  Phone,
+  Home,
+  MessageCircleHeart,
+  Sparkles,
   Users,
+  Wallet,
+  MapPin,
+  HandHelping,
+  CheckCircle2,
   Wind,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
-import {
-  guidedSteps,
-  resources,
-  stageMeta,
-  type JourneyStageId,
-} from '@/lib/data';
+
+const supportActions = [
+  {
+    title: 'I need a next step',
+    desc: 'Get a simple plan for what to do first.',
+    cta: 'Build my plan',
+    href: '/support/intake',
+    icon: Compass,
+  },
+  {
+    title: 'I need help at home',
+    desc: 'Try practical routines and home strategies.',
+    cta: 'Home strategies',
+    href: '/support/help',
+    icon: Home,
+  },
+  {
+    title: 'I feel overwhelmed',
+    desc: 'Use gentle tools when today feels too heavy.',
+    cta: 'Start small',
+    href: '/support/hard-days',
+    icon: Wind,
+  },
+  {
+    title: 'I want to understand ABA',
+    desc: 'Learn the basics in clear, parent-friendly language.',
+    cta: 'ABA basics',
+    href: '/support/what-is-aba',
+    icon: BookOpen,
+  },
+  {
+    title: 'I want to connect',
+    desc: 'Find parent groups and supportive community spaces.',
+    cta: 'Parent connection',
+    href: '/support/connect',
+    icon: Users,
+  },
+  {
+    title: 'I need practical resources',
+    desc: 'Access financial, local, and daily-life support options.',
+    cta: 'Practical resources',
+    href: '/support/resources',
+    icon: HandHelping,
+  },
+];
 
 export default function SupportHome() {
-  const [activeStage, setActiveStage] = useState<JourneyStageId>('just-diagnosed');
-  const [overwhelmedOpen, setOverwhelmedOpen] = useState(false);
-
-  const stage = useMemo(
-    () => guidedSteps.find((item) => item.id === activeStage) ?? guidedSteps[0],
-    [activeStage],
-  );
-
-  const recommendedResource = useMemo(
-    () =>
-      resources.find((r) => r.isFeatured && r.journeyStages.includes(activeStage)) ??
-      resources.find((r) => r.journeyStages.includes(activeStage)) ??
-      resources[0],
-    [activeStage],
-  );
-
-  const nextStep = stage.checklist[0];
+  const [checkInOpen, setCheckInOpen] = useState(false);
 
   return (
-    <div className="page-shell">
-      {/* Header */}
-      <header className="page-header">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">
-          Get Help Choosing What to Do
-        </p>
-        <h1 className="page-title">What do you need right now?</h1>
-        <p className="page-description">
-          Pick what fits today. We will keep the next step simple — one thing at a time.
-        </p>
-      </header>
+    <div className="page-shell gap-8">
+      <section className="relative overflow-hidden rounded-[2rem] border border-primary/15 bg-gradient-to-br from-[#f8f2ea] via-white to-[#fdf7f2] p-7 sm:p-9">
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-70">
+          <div className="absolute right-10 top-10 h-28 w-28 rounded-full bg-brand-plum-100/80" />
+          <div className="absolute right-28 top-24 h-16 w-16 rounded-full bg-accent/20" />
+          <div className="absolute bottom-10 right-16 h-24 w-24 rounded-3xl bg-primary/10" />
+          <div className="absolute bottom-24 right-40 h-10 w-10 rounded-full bg-primary/20" />
+        </div>
 
-      {/* Overwhelmed Today card — emotionally primary */}
-      {overwhelmedOpen ? (
-        <section className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 via-white to-white p-6 sm:p-8">
-          <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-plum-100">
-              <Wind className="h-6 w-6 text-brand-plum-700" />
-            </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold uppercase tracking-widest text-brand-plum-700">
-                If today feels heavy
-              </p>
-              <h2 className="mt-2 text-2xl font-semibold text-brand-muted-900">
-                One breath. One step. That is enough.
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-brand-muted-600">
-                You do not have to solve everything today. Here are the only things that matter right now.
-              </p>
-              <ol className="mt-5 space-y-3">
-                {[
-                  'Take one slow breath. Seriously — just that.',
-                  'Pick one small thing from the list below, not the whole list.',
-                  'If things feel unsafe or unmanageable, call or text 988. Someone will answer.',
-                  'Your care team is one message away. You do not have to figure this out alone.',
-                ].map((step, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-brand-muted-700">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-plum-100 text-xs font-bold text-brand-plum-700">
-                      {i + 1}
-                    </span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  href="/support/caregiver"
-                  className="inline-flex items-center gap-2 rounded-2xl bg-brand-plum-700 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-brand-plum-800"
-                >
-                  <HeartHandshake className="h-4 w-4" /> Support for you
-                </Link>
-                <Link
-                  href="/support/find"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-brand-plum-200 bg-white px-5 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
-                >
-                  Help lines &amp; hotlines
-                </Link>
-                <button
-                  onClick={() => setOverwhelmedOpen(false)}
-                  className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-600 transition hover:bg-surface-muted"
-                >
-                  I am okay for now
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : (
-        <button
-          onClick={() => setOverwhelmedOpen(true)}
-          className="group w-full rounded-3xl border-2 border-brand-plum-100 bg-gradient-to-r from-brand-plum-50/80 to-white p-5 text-left transition hover:border-brand-plum-200 hover:shadow-soft"
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-plum-100">
-                <Wind className="h-5 w-5 text-brand-plum-700" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-brand-muted-900">
-                  If today feels overwhelming — start here.
-                </p>
-                <p className="mt-0.5 text-xs text-brand-muted-500">
-                  One breath, one step. We will hold the rest.
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-brand-plum-500 transition-transform group-hover:translate-x-1" />
-          </div>
-        </button>
-      )}
-
-      {/* Stage selector + This Week focus */}
-      <section className="rounded-3xl border border-surface-border bg-white p-5 sm:p-6 shadow-card">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              Where are you right now?
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Parent Support</p>
+            <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-muted-900 sm:text-4xl">
+              You do not have to figure this out alone.
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-brand-muted-600 sm:text-base">
+              Start with what your family needs today. Common Ground will point you toward simple next steps,
+              helpful tools, and support options.
             </p>
-            <h2 className="mt-1 text-xl font-semibold text-brand-muted-900">
-              Choose the stage that fits today
-            </h2>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/support/intake" className="btn-primary px-5 py-2.5 text-sm">
+                Build My Family Care Plan
+              </Link>
+              <Link href="#support-actions" className="btn-secondary px-5 py-2.5 text-sm">
+                Find support for today
+              </Link>
+            </div>
+            <p className="mt-4 text-xs text-brand-muted-500">
+              No pressure. No clinical form. Just a simple place to start.
+            </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {guidedSteps.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveStage(item.id)}
-                className={`rounded-xl border px-3.5 py-2 text-sm font-medium transition-all ${
-                  activeStage === item.id
-                    ? 'border-primary bg-primary text-white shadow-soft'
-                    : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30 hover:text-primary'
-                }`}
-              >
-                {stageMeta[item.id].shortLabel}
-              </button>
+
+          <div className="hidden lg:block">
+            <div className="rounded-3xl border border-white/70 bg-white/80 p-5 shadow-soft backdrop-blur-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-plum-700">Today can be lighter</p>
+              <div className="mt-4 space-y-3">
+                {['One clear next step', 'Tools for home and school', 'Support for you, too'].map((item) => (
+                  <p key={item} className="flex items-center gap-2 text-sm text-brand-muted-700">
+                    <CheckCircle2 className="h-4 w-4 text-brand-plum-600" /> {item}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="support-actions" className="space-y-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-brand-muted-900">What do you need today?</h2>
+          <p className="mt-1 text-sm text-brand-muted-500">Pick one path. You can always come back for the rest.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {supportActions.map((item) => (
+            <article key={item.title} className="group rounded-2xl border border-surface-border bg-white p-4 transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-soft">
+              <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10">
+                <item.icon className="h-4 w-4 text-primary" />
+              </div>
+              <h3 className="text-base font-semibold text-brand-muted-900">{item.title}</h3>
+              <p className="mt-1 text-sm text-brand-muted-600">{item.desc}</p>
+              <Link href={item.href} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                {item.cta} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/60 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-plum-700">Start small</p>
+          <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">When everything feels like too much</h2>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            {[
+              { label: 'Pause', icon: Wind },
+              { label: 'Pick one thing', icon: Sparkles },
+              { label: 'Reach out', icon: MessageCircleHeart },
+            ].map((step) => (
+              <div key={step.label} className="rounded-2xl bg-white/90 p-3 text-center">
+                <step.icon className="mx-auto h-4 w-4 text-brand-plum-700" />
+                <p className="mt-2 text-sm font-medium text-brand-muted-800">{step.label}</p>
+              </div>
             ))}
           </div>
+          <Link href="/support/hard-days" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-plum-700 hover:underline">
+            See calm-now support <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
-        {/* Four action cards */}
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-3xl border border-primary/15 bg-primary/5 p-5">
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white">
-              <Compass className="h-5 w-5 text-primary" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">This week&apos;s focus</p>
-            <p className="mt-2 text-sm font-semibold leading-snug text-brand-muted-900">{stage.focus}</p>
-          </article>
-
-          <article className="rounded-3xl border border-surface-border bg-surface-muted p-5">
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white">
-              <ArrowRight className="h-5 w-5 text-primary" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Next best step</p>
-            <p className="mt-2 text-sm font-medium leading-relaxed text-brand-muted-900">{nextStep}</p>
-            <Link
-              href="/"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-            >
-              See the full plan <ArrowRight className="h-4 w-4" />
-            </Link>
-          </article>
-
-          <article className="rounded-3xl border border-surface-border bg-white p-5">
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10">
-              <BookOpen className="h-5 w-5 text-primary" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">Helpful right now</p>
-            <p className="mt-2 text-sm font-semibold leading-snug text-brand-muted-900">
-              {recommendedResource.title}
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-brand-muted-500">
-              {recommendedResource.whoItsFor}
-            </p>
-            <Link
-              href={recommendedResource.url ?? '/support/resources'}
-              target={recommendedResource.url ? '_blank' : undefined}
-              rel={recommendedResource.url ? 'noopener noreferrer' : undefined}
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
-            >
-              {recommendedResource.url ? 'Open resource' : 'Browse the library'} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </article>
-
-          <article className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/60 p-5">
-            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white">
-              <HeartHandshake className="h-5 w-5 text-brand-plum-700" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-plum-700">Support for you</p>
-            <p className="mt-2 text-sm font-medium leading-relaxed text-brand-muted-900">
-              {stage.supportAction}
-            </p>
-            <Link
-              href="/support/caregiver"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-plum-700 hover:underline"
-            >
-              Caregiver support <ArrowRight className="h-4 w-4" />
-            </Link>
-          </article>
+        <div className="rounded-3xl border border-surface-border bg-white p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Support for your family</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {[
+              { title: 'Understanding ABA', href: '/support/what-is-aba', icon: BookOpen },
+              { title: 'Home strategies', href: '/support/help', icon: Home },
+              { title: 'Family resources', href: '/support/resources', icon: Wallet },
+              { title: 'Parent connection', href: '/support/connect', icon: Users },
+            ].map((item) => (
+              <Link key={item.title} href={item.href} className="rounded-2xl border border-surface-border bg-surface-muted p-3.5 transition hover:border-primary/30 hover:bg-white">
+                <p className="flex items-center gap-2 text-sm font-semibold text-brand-muted-800">
+                  <item.icon className="h-4 w-4 text-primary" /> {item.title}
+                </p>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-4 grid gap-2 text-sm text-brand-muted-600 sm:grid-cols-2">
+            <Link href="/support/financial" className="flex items-center gap-1.5 hover:text-primary"><Wallet className="h-4 w-4" /> Financial Help</Link>
+            <Link href="/support/siblings" className="flex items-center gap-1.5 hover:text-primary"><Heart className="h-4 w-4" /> Sibling Support</Link>
+            <Link href="/support/find" className="flex items-center gap-1.5 hover:text-primary"><MapPin className="h-4 w-4" /> Local Help</Link>
+            <Link href="/support/connect" className="flex items-center gap-1.5 hover:text-primary"><HeartHandshake className="h-4 w-4" /> Connect With Parents</Link>
+          </div>
         </div>
       </section>
 
-      {/* Decision-path section label */}
-      <div className="flex items-center gap-3">
-        <div className="h-px flex-1 bg-surface-border" />
-        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
-          Or go directly to
-        </span>
-        <div className="h-px flex-1 bg-surface-border" />
-      </div>
-
-      {/* Bottom paths */}
-      <section className="grid gap-4 md:grid-cols-3">
-
-        {/* Card 1 — Community */}
-        <Link
-          href="/support/connect"
-          className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
-          style={{ background: 'linear-gradient(135deg, #1a2e52 0%, #32175a 100%)' }}
-        >
-          <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 60%)' }} />
-          <div className="relative">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
-              <Users className="h-5 w-5 text-white" />
-            </div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">Community</p>
-            <h3 className="text-lg font-bold text-white leading-snug">You are not alone in this.</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">
-              Local groups and online spaces where parents share what is actually working — not just what sounds good.
-            </p>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white/90">
-              Find your people <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </div>
-        </Link>
-
-        {/* Card 2 — Sensory-friendly */}
-        <Link
-          href="/support/find?need=sensory-friendly"
-          className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
-          style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)' }}
-        >
-          <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: 'radial-gradient(circle at 20% 80%, #ffffff 0%, transparent 60%)' }} />
-          <div className="relative">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
-              <MapPin className="h-5 w-5 text-white" />
-            </div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">Local Guide</p>
-            <h3 className="text-lg font-bold text-white leading-snug">Places that actually get it.</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">
-              Haircuts, dentists, parks, restaurants — real Houston-area spots that are good with your child.
-            </p>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white/90">
-              See the guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </div>
-        </Link>
-
-        {/* Card 3 — Crisis / Help lines */}
-        <Link
-          href="/support/find?need=crisis"
-          className="group relative overflow-hidden rounded-3xl p-6 shadow-card transition hover:shadow-card-hover hover:-translate-y-0.5"
-          style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)' }}
-        >
-          <div className="absolute inset-0 opacity-10"
-            style={{ backgroundImage: 'radial-gradient(circle at 50% 0%, #ffffff 0%, transparent 55%)' }} />
-          <div className="relative">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15">
-              <Phone className="h-5 w-5 text-white" />
-            </div>
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-white/50">Crisis Support</p>
-            <h3 className="text-lg font-bold text-white leading-snug">Someone is always there.</h3>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">
-              Real numbers, always staffed. If today is hard — or if you need to talk right now.
-            </p>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-white/90">
-              See help lines <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </span>
-          </div>
-        </Link>
-
-      </section>
-
-      {/* Reassurance footer */}
-      <div className="rounded-3xl border border-primary/10 bg-white p-6 sm:p-8 shadow-soft">
-        <div className="flex items-start gap-4">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/10">
-            <Heart className="h-5 w-5 text-accent" />
-          </div>
+      <section className="rounded-2xl border border-surface-border bg-surface-muted/60 p-5">
+        <button onClick={() => setCheckInOpen((v) => !v)} className="flex w-full items-center justify-between gap-3 text-left">
           <div>
-            <h2 className="text-xl font-semibold text-brand-muted-900">
-              You are doing more than you think.
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-              Showing up, searching for help, reading this — that counts. Parenting a child with
-              support needs is one of the most demanding things there is. Common Ground is here to
-              make it a little lighter. One step at a time.
-            </p>
-            <p className="mt-3 text-xs text-brand-muted-400">— The team at Texas ABA Centers</p>
+            <h3 className="text-lg font-semibold text-brand-muted-900">Want to check in with yourself for a minute?</h3>
+            <p className="mt-1 text-sm text-brand-muted-600">A quick check-in can help you pause and notice what you need today.</p>
           </div>
+          {checkInOpen ? <ChevronUp className="h-5 w-5 text-brand-muted-500" /> : <ChevronDown className="h-5 w-5 text-brand-muted-500" />}
+        </button>
+        {checkInOpen && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-surface-border pt-4">
+            <Link href="/support/mental-health" className="btn-secondary px-4 py-2 text-sm">Start quick check-in</Link>
+            <p className="text-xs text-brand-muted-500">Optional and private to this device.</p>
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-3xl border border-primary/10 bg-white p-6 sm:p-8 shadow-soft">
+        <h2 className="text-xl font-semibold text-brand-muted-900">You are doing more than you think.</h2>
+        <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
+          Common Ground is a support guide, not clinical care. For urgent safety concerns, call or text 988.
+        </p>
+        <div className="mt-5">
+          <Link href="/support/intake" className="btn-primary px-5 py-2.5 text-sm">Build My Family Care Plan</Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
