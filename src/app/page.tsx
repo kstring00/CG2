@@ -173,7 +173,7 @@ export default function HomePage() {
               href="/support/intake"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
-              Care Navigation <ArrowRight className="h-3.5 w-3.5" />
+              Help Me Find My Next Step <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
