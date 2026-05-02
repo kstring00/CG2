@@ -19,6 +19,7 @@ import {
   Wind,
   ChevronDown,
   ChevronUp,
+  Feather,
 } from 'lucide-react';
 
 const supportActions = [
@@ -135,6 +136,28 @@ export default function SupportHome() {
               </Link>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="overflow-hidden rounded-3xl border border-slate-300/60" style={{ background: 'linear-gradient(135deg, #2a3956 0%, #1f2c44 55%, #1a2335 100%)' }}>
+        <div className="grid gap-6 p-7 sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="text-white">
+            <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+              <Feather className="h-3.5 w-3.5" /> Still Waters
+            </p>
+            <h2 className="mt-3 text-2xl leading-snug sm:text-[1.7rem]" style={{ fontFamily: 'Lora, Georgia, serif' }}>
+              A quiet place to write. One prompt at a time.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300">
+              No streaks. No metrics. Just a page that holds whatever today was.
+            </p>
+          </div>
+          <Link
+            href="/support/still-waters"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-medium text-slate-800 transition hover:bg-slate-100"
+          >
+            Open Still Waters <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </section>
 
