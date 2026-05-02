@@ -25,6 +25,10 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
+  Droplets,
+  RefreshCcw,
+  Waves,
+  X,
 } from 'lucide-react';
 
 /* ─── data ─────────────────────────────────────────────────── */
@@ -36,6 +40,16 @@ const affirmations = [
   "You are allowed to grieve the hard moments and still be grateful. Both are true.",
   "Asking for support is not giving up. It is how you keep going.",
 ];
+
+const stillWatersPrompts = [
+  'What part of today have you not said out loud yet?',
+  'What did your child do today that someone else might have missed?',
+  'Where did today feel heaviest in your body?',
+  'What are you carrying that is not yours to solve tonight?',
+  'What small moment reminded you that progress is still happening?',
+];
+
+const stillWatersMoods = ['Frayed', 'Heavy', 'Numb', 'Steady', 'Hopeful'];
 
 const burnoutSigns = [
   { label: 'Skipping meals or sleep regularly', icon: Moon },
@@ -226,6 +240,10 @@ export default function CaregiverSupportPage() {
   const [openCategory, setOpenCategory] = useState<number | null>(0);
   const [affirmIdx] = useState(() => Math.floor(Math.random() * affirmations.length));
   const [quizChecked, setQuizChecked] = useState<Set<number>>(new Set());
+  const [showStillWatersPreview, setShowStillWatersPreview] = useState(false);
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [stillWatersText, setStillWatersText] = useState('');
+  const [promptIdx, setPromptIdx] = useState(0);
 
   const toggleQuiz = (i: number) => {
     setQuizChecked((prev) => {
@@ -235,6 +253,13 @@ export default function CaregiverSupportPage() {
     });
   };
   const quizCount = quizChecked.size;
+  const currentPrompt = stillWatersPrompts[promptIdx];
+  const swapPrompt = () => setPromptIdx((prev) => (prev + 1) % stillWatersPrompts.length);
+  const clearPreview = () => {
+    setStillWatersText('');
+    setSelectedMood(null);
+    setPromptIdx(0);
+  };
   const quizResult = quizCount === 0
     ? null
     : quizCount <= 2
@@ -246,18 +271,65 @@ export default function CaregiverSupportPage() {
   return (
     <div className="page-shell">
 
-      {/* Page header — always visible above the tabs */}
       <header className="page-header">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1.5 text-xs font-semibold text-brand-plum-700">
-          <HeartHandshake className="h-3.5 w-3.5" /> Your mental health
+          <HeartHandshake className="h-3.5 w-3.5" /> Parent Support
         </div>
         <h1 className="page-title text-3xl font-bold sm:text-4xl">
-          You matter in this too.
+          Support for the parent, not just the plan.
         </h1>
         <p className="page-description text-base leading-relaxed">
-          This page is not about your child&apos;s progress. It is about you — the person holding everything together, often without anyone asking how you&apos;re doing. We&apos;re asking.
+          Common Ground helps families find next steps, practical tools, and a quieter place to process the weight of the day.
         </p>
       </header>
+
+      <section className="mb-8 grid gap-4 lg:grid-cols-2" aria-label="Two-lane support">
+        <article className="rounded-3xl border border-surface-border bg-white p-5 shadow-card sm:p-6">
+          <h2 className="text-base font-semibold text-brand-muted-900 sm:text-lg">Help me handle what&apos;s happening</h2>
+          <p className="mt-2 text-sm text-brand-muted-600">Practical support, resources, caregiver tools, and next steps.</p>
+          <p className="mt-3 text-xs text-brand-muted-500">Use the quick actions below, then explore tabs for deeper support.</p>
+        </article>
+        <article className="rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-slate-100 shadow-card sm:p-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-slate-500/50 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200"><Droplets className="h-3.5 w-3.5" /> Help me process what I&apos;m carrying</div>
+          <h2 className="mt-3 text-2xl font-semibold">Still Waters</h2>
+          <p className="mt-2 text-base text-slate-200">A private place to write what the day took out of you.</p>
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">Some days parents need resources. Some days they need somewhere quiet to put the weight down. Still Waters is a guided reflection space built for the parent, not the paperwork.</p>
+          <p className="mt-3 text-xs text-slate-300/90">Still Waters is a private reflection tool. It is not therapy, crisis care, or clinical guidance.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button onClick={() => setShowStillWatersPreview(true)} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-white">Preview Still Waters</button>
+            <button onClick={() => { setShowStillWatersPreview(true); setSelectedMood('Skip'); }} className="rounded-xl border border-slate-500/70 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-white/10">See reflection prompts</button>
+          </div>
+        </article>
+      </section>
+
+      {showStillWatersPreview && (
+        <section className="mb-8 rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-5 text-slate-100 shadow-card sm:p-7">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-xl font-semibold">Still Waters preview</h3>
+            <button onClick={() => { clearPreview(); setShowStillWatersPreview(false); }} className="inline-flex items-center gap-1 rounded-lg border border-slate-500/70 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/10"><X className="h-3.5 w-3.5" /> Close preview</button>
+          </div>
+          <p className="mt-3 text-sm text-slate-300">How are you walking in today?</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {stillWatersMoods.map((mood) => <button key={mood} onClick={() => setSelectedMood(mood)} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${selectedMood === mood ? 'border-slate-100 bg-slate-100 text-slate-900' : 'border-slate-500/80 text-slate-100 hover:bg-white/10'}`}>{mood}</button>)}
+            <button onClick={() => setSelectedMood('Skip')} className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${selectedMood === 'Skip' ? 'border-slate-100 bg-slate-100 text-slate-900' : 'border-slate-500/80 text-slate-100 hover:bg-white/10'}`}>Skip</button>
+          </div>
+          {selectedMood && <div className="mt-5 rounded-2xl border border-slate-500/70 bg-slate-950/40 p-4">
+            <div className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-slate-300"><Waves className="h-3.5 w-3.5" /> Reflection prompt</div>
+            <p className="mt-2 text-lg leading-relaxed text-slate-50">{currentPrompt}</p>
+            <label htmlFor="still-waters-preview" className="sr-only">Still Waters writing preview</label>
+            <textarea id="still-waters-preview" value={stillWatersText} onChange={(e) => setStillWatersText(e.target.value)} rows={6} className="mt-4 w-full rounded-2xl border border-slate-500/70 bg-slate-950/50 p-3 text-sm text-slate-50 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200" placeholder="Write one sentence. Or more. Stop whenever you want." />
+            <p className="mt-2 text-xs text-slate-300">This preview does not save what you write.</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button onClick={swapPrompt} className="inline-flex items-center gap-1 rounded-lg border border-slate-500/70 px-3 py-1.5 text-xs font-semibold hover:bg-white/10"><RefreshCcw className="h-3.5 w-3.5" /> Swap prompt</button>
+              <button onClick={clearPreview} className="rounded-lg border border-slate-500/70 px-3 py-1.5 text-xs font-semibold hover:bg-white/10">Clear preview</button>
+            </div>
+          </div>}
+          <aside className="mt-4 rounded-2xl border border-slate-500/70 bg-slate-950/35 p-4">
+            <p className="text-xs uppercase tracking-wide text-slate-300">The future version</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-100">Later, Still Waters can help parents revisit what they wrote months ago and notice what changed. Not as a dashboard. Not as a score. Just a quiet look back.</p>
+          </aside>
+        </section>
+      )}
 
       <section
         aria-label="Start here actions"
