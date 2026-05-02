@@ -1,16 +1,21 @@
 'use client';
 
 import { useReducer, useEffect, useState, useMemo, useCallback } from 'react';
+import Link from 'next/link';
 import { Fraunces, Inter_Tight } from 'next/font/google';
 import {
-  LayoutDashboard,
   ClipboardCheck,
-  Activity,
   Sparkles,
   Compass,
   AlertTriangle,
   LogIn,
   LogOut,
+  Home,
+  Heart,
+  BookOpen,
+  Users,
+  MapPin,
+  CheckCircle2,
 } from 'lucide-react';
 import styles from './mental-health.module.css';
 import { OnboardingModal } from './components/OnboardingModal';
@@ -108,11 +113,10 @@ function reducer(state: AppState, action: Action): AppState {
 // ─── Tabs ──────────────────────────────────────────────────────────────────
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode; urgent?: boolean }[] = [
-  { key: 'dashboard', label: 'Today', icon: <LayoutDashboard size={14} /> },
   { key: 'checkin', label: 'Check-In', icon: <ClipboardCheck size={14} /> },
   { key: 'calming', label: 'Calming Tools', icon: <Sparkles size={14} /> },
-  { key: 'trends', label: 'Trends', icon: <Activity size={14} /> },
   { key: 'topics', label: 'Topics', icon: <Compass size={14} /> },
+  { key: 'trends', label: 'Trends', icon: <Sparkles size={14} /> },
   { key: 'urgent', label: 'Urgent Help', icon: <AlertTriangle size={14} />, urgent: true },
 ];
 
@@ -150,7 +154,7 @@ export default function MentalHealthCenter() {
     metric2: 'overall',
   });
 
-  const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabKey>('checkin');
   const [pendingTool, setPendingTool] = useState<string | null>(null);
   const [pendingTopic, setPendingTopic] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -342,7 +346,77 @@ export default function MentalHealthCenter() {
         </div>
       </div>
 
-      {/* Tab bar */}
+
+      <section className={styles.card + ' ' + styles.cardPadLg}>
+        <p className={styles.pageTitle}>Parent Support</p>
+        <h1 className={styles.heroHeadline}>You do not have to figure this out alone.</h1>
+        <p className={styles.heroSubtitle}>
+          Start with what your family needs today. Common Ground will point you toward simple next steps, helpful tools, and support options.
+        </p>
+        <div className={styles.headerActions}>
+          <Link href="/support/intake" className={styles.btn + ' ' + styles.btnPrimary}>Build My Family Care Plan</Link>
+          <button className={styles.btn + ' ' + styles.btnSecondary} onClick={() => document.getElementById('support-options')?.scrollIntoView({ behavior: 'smooth' })}>Find support for today</button>
+        </div>
+        <p className={styles.cardSubtitle}>No pressure. No clinical form. Just a simple place to start.</p>
+      </section>
+
+      <section id="support-options" className={styles.card}>
+        <h2 className={styles.cardTitle}>What do you need today?</h2>
+        <div className={styles.hubGrid}>
+          {[
+            { title: 'I need a next step', desc: 'Answer a few quick questions and get a simple Family Care Plan.', cta: 'Build my plan', href: '/support/intake', icon: Compass },
+            { title: 'I need help at home', desc: 'Find simple strategies for routines, transitions, and everyday challenges.', cta: 'See home strategies', href: '/support/resources', icon: Home },
+            { title: 'I feel overwhelmed', desc: 'Find encouragement and small steps for when everything feels like too much.', cta: 'Get encouragement', href: '#start-small', icon: Heart },
+            { title: 'I want to understand ABA', desc: 'Read plain-language explanations of common ABA terms and what they mean.', cta: 'Learn ABA basics', href: '/support/what-is-aba', icon: BookOpen },
+            { title: 'I want to connect', desc: 'Explore parent connection, community support, and family-friendly opportunities.', cta: 'Connect with parents', href: '/support/connect', icon: Users },
+            { title: 'I need practical resources', desc: 'Find local help, financial support, sibling support, and community resources.', cta: 'Find resources', href: '/support/find', icon: MapPin },
+          ].map((item) => (
+            <article key={item.title} className={styles.hubCard}>
+              <item.icon size={18} />
+              <h3>{item.title}</h3>
+              <p>{item.desc}</p>
+              {item.href.startsWith('#') ? <a href={item.href} className={styles.inlineLink}>{item.cta}</a> : <Link href={item.href} className={styles.inlineLink}>{item.cta}</Link>}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="start-small" className={styles.card}>
+        <h2 className={styles.cardTitle}>When everything feels like too much</h2>
+        <p className={styles.heroSubtitle}>You do not have to solve the whole week today. Pick one small next step.</p>
+        <div className={styles.hubGrid3}>
+          <article className={styles.hubCard}><h3>Pause</h3><p>Take a breath before trying to solve everything at once.</p></article>
+          <article className={styles.hubCard}><h3>Pick one thing</h3><p>Choose one small next step: read a guide, build your plan, or ask for support.</p></article>
+          <article className={styles.hubCard}><h3>Reach out</h3><p>Use Common Ground, your clinic team, or trusted people around you to help carry the load.</p></article>
+        </div>
+        <Link href="/support/intake" className={styles.btn + ' ' + styles.btnPrimary}>Build My Family Care Plan</Link>
+      </section>
+
+      <section className={styles.card}>
+        <h2 className={styles.cardTitle}>Common Ground can help with</h2>
+        <ul className={styles.checkList}>
+          {['Understanding ABA in plain language','Finding practical home strategies','Preparing for clinic conversations','Finding local family resources','Supporting siblings','Navigating financial questions','Connecting with other parents','Feeling less alone in the process'].map((item) => <li key={item}><CheckCircle2 size={16} />{item}</li>)}
+        </ul>
+      </section>
+
+      <section className={styles.card}>
+        <h2 className={styles.cardTitle}>Quick parent check-in</h2>
+        <p className={styles.heroSubtitle}>Want to pause and reflect for a minute? You can check in with how you’re doing today.</p>
+        <button className={styles.btn + ' ' + styles.btnSecondary} onClick={() => setActiveTab('checkin')}>Start a quick check-in</button>
+      </section>
+
+      <section className={styles.card}>
+        <h2 className={styles.cardTitle}>Common Ground is a support guide</h2>
+        <p className={styles.heroSubtitle}>Common Ground does not replace your child’s clinical team, BCBA, doctor, therapist, or emergency support. For clinical questions, treatment changes, safety concerns, or urgent needs, please contact the appropriate professional or your care team.</p>
+      </section>
+
+      <section className={styles.card + ' ' + styles.cardPadLg}>
+        <h2 className={styles.cardTitle}>Ready to find your next step?</h2>
+        <p className={styles.heroSubtitle}>Answer a few quick questions and get a simple Family Care Plan built around what your family needs.</p>
+        <Link href="/support/intake" className={styles.btn + ' ' + styles.btnPrimary}>Build My Family Care Plan</Link>
+      </section>
+
+      {/* Optional tools */}
       <div className={styles.tabBar} role="tablist">
         {TABS.map((tab) => {
           const isActive = activeTab === tab.key;

@@ -2616,3 +2616,14 @@
   .topicCallout { padding: 18px 20px; }
   .sleepQRow { flex-wrap: wrap; }
 }
+
+.heroHeadline { font-family: var(--font-display); font-size: 34px; line-height: 1.1; margin: 8px 0; }
+.heroSubtitle { color: var(--ink-soft); max-width: 70ch; margin-bottom: 14px; }
+.hubGrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 12px; }
+.hubGrid3 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin: 12px 0 16px; }
+.hubCard { border: 1px solid var(--line); border-radius: 12px; background: #fffdf8; padding: 14px; display: grid; gap: 8px; }
+.hubCard h3 { font-weight: 600; }
+.hubCard p { color: var(--ink-soft); font-size: 14px; }
+.inlineLink { color: var(--navy); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.checkList { margin-top: 10px; display: grid; gap: 8px; }
+.checkList li { display: flex; gap: 8px; align-items: flex-start; color: var(--ink-soft); }
