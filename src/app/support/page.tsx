@@ -13,6 +13,9 @@ import {
   Phone,
   Users,
   Wind,
+  TrendingUp,
+  Clock3,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   guidedSteps,
@@ -40,6 +43,52 @@ export default function SupportHome() {
 
   const nextStep = stage.checklist[0];
 
+
+  const stagePlaybook: Record<JourneyStageId, { title: string; stat: string; actions: string[]; reassurance: string }> = {
+    'just-diagnosed': {
+      title: 'Most families start by stabilizing the week',
+      stat: 'Week 1 focus used by families nationwide',
+      actions: [
+        'Schedule one pediatrician or specialist follow-up and write down 3 questions beforehand.',
+        'Start a single-page notes tracker for behavior, sleep, and communication patterns.',
+        'Choose one trusted education resource instead of doom-scrolling every source.',
+      ],
+      reassurance: 'You are not behind. Families who simplify early usually make faster, calmer progress by month two.',
+    },
+    'evaluation': {
+      title: 'Most families gather records and clarify next decisions',
+      stat: 'Top workflow during evaluation weeks',
+      actions: [
+        'Collect school/daycare observations plus medical history in one folder.',
+        'Confirm insurance benefits for assessments and therapies before appointments.',
+        'Prepare a 60-second summary of your concerns to share with each provider.',
+      ],
+      reassurance: 'Clarity beats speed. A better-organized evaluation week reduces delays later.',
+    },
+    'starting-therapy': {
+      title: 'Most families build consistency over intensity',
+      stat: 'Common first-month therapy pattern',
+      actions: [
+        'Pick 1–2 home carryover routines your family can actually sustain.',
+        'Create a shared communication rhythm with the care team (weekly notes/check-in).',
+        'Protect caregiver energy by scheduling one no-therapy recovery block this week.',
+      ],
+      reassurance: 'Consistency at home drives compounding wins more than trying to do everything at once.',
+    },
+    'ongoing-support': {
+      title: 'Most families shift to progress tracking and resilience',
+      stat: 'Typical long-term family cadence',
+      actions: [
+        'Review one measurable gain from the last month with your care team.',
+        'Choose one friction point (sleep, transitions, meals) to target this week only.',
+        'Refresh your support network touchpoint: group, coach, or caregiver check-in.',
+      ],
+      reassurance: 'Plateaus are normal. Families who review data and protect routines keep moving forward.',
+    },
+  };
+
+  const playbook = stagePlaybook[activeStage];
+
   return (
     <div className="page-shell">
       {/* Header */}
@@ -47,9 +96,9 @@ export default function SupportHome() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mb-2">
           Get Help Choosing What to Do
         </p>
-        <h1 className="page-title">What do you need right now?</h1>
+        <h1 className="page-title">Your visual action plan starts here</h1>
         <p className="page-description">
-          Pick what fits today. We will keep the next step simple — one thing at a time.
+          Built for parents under pressure: choose your current stage and get the exact moves most families make this week.
         </p>
       </header>
 
@@ -166,8 +215,9 @@ export default function SupportHome() {
             <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white">
               <Compass className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">This week&apos;s focus</p>
-            <p className="mt-2 text-sm font-semibold leading-snug text-brand-muted-900">{stage.focus}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">What families do this week</p>
+            <p className="mt-2 text-sm font-semibold leading-snug text-brand-muted-900">{playbook.title}</p>
+            <p className="mt-2 text-xs text-brand-muted-600">{playbook.stat}</p>
           </article>
 
           <article className="rounded-3xl border border-surface-border bg-surface-muted p-5">
@@ -220,6 +270,36 @@ export default function SupportHome() {
               Caregiver support <ArrowRight className="h-4 w-4" />
             </Link>
           </article>
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Parent playbook</p>
+            <h2 className="mt-1 text-2xl font-semibold text-brand-muted-900">What parents across the U.S. usually do next</h2>
+          </div>
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary">
+            <TrendingUp className="h-3.5 w-3.5" /> Stage-based guidance
+          </span>
+        </div>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {playbook.actions.map((action, idx) => (
+            <article key={action} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
+              <p className="inline-flex items-center gap-2 rounded-full bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-muted-500">
+                <Clock3 className="h-3.5 w-3.5" /> Step {idx + 1}
+              </p>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-brand-muted-800">{action}</p>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+            <ShieldCheck className="h-4 w-4" /> Reassurance from real family patterns
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-emerald-900">{playbook.reassurance}</p>
         </div>
       </section>
 
