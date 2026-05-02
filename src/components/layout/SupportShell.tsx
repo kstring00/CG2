@@ -31,25 +31,25 @@ import CrisisPill from '@/components/CrisisPill';
  */
 const navGroups = [
   {
-    label: 'For You',
+    label: 'Start Here',
     items: [
-      { href: '/support/intake', label: 'Intake', icon: CompassIcon, highlight: true },
-      { href: '/support/mental-health', label: 'Support for Parents', icon: HeartPulse, highlight: true },
+      { href: '/support/intake', label: 'My Care Plan', icon: CompassIcon, highlight: true },
+      { href: '/support/mental-health', label: 'Parent Support', icon: HeartPulse, highlight: true },
     ],
   },
   {
-    label: 'Get Help Choosing What to Do',
+    label: 'Learn & Find Help',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
-      { href: '/support/resources', label: 'Helpful Guides', icon: BookOpen },
-      { href: '/support/find', label: 'Find Help Near Me', icon: Search },
-      { href: '/support/connect', label: 'Talk With Other Parents', icon: Link2 },
+      { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
+      { href: '/support/find', label: 'Find Local Help', icon: Search },
+      { href: '/support/connect', label: 'Connect With Parents', icon: Link2 },
     ],
   },
   {
-    label: 'Your Family',
+    label: 'Family Needs',
     items: [
-      { href: '/support/financial', label: 'Financial', icon: Wallet },
+      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
       { href: '/support/siblings', label: 'Sibling Support', icon: Users },
     ],
   },
@@ -73,12 +73,24 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             style={{ objectFit: 'contain' }}
           />
         </Link>
-        <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-          <CompassIcon className="h-3 w-3" /> Get Help Choosing What to Do
-        </span>
       </div>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Get Help Choosing What to Do">
+      <div className="px-4 pt-4">
+        <Link
+          href="/support/intake"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Help me find my next step — start the guided care plan"
+          className="group flex w-full items-center justify-between gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+        >
+          <span className="inline-flex items-center gap-2">
+            <CompassIcon className="h-4 w-4" />
+            Help Me Find My Next Step
+          </span>
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+
+      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Common Ground parent support navigation">
         {navGroups.map((group, gi) => (
           <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
             <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
@@ -114,33 +126,24 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </div>
         ))}
 
-        {/* Cross-layer handoff — clearly labeled, visually distinct */}
-        <div className="mt-6 border-t border-surface-border/60 pt-4">
-          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-            Current Texas ABA client?
-          </p>
-          <Link
-            href="/client"
-            className="group flex items-center justify-between gap-3 rounded-xl border border-accent/25 bg-accent/5 px-3 py-2.5 text-sm font-semibold text-accent transition-all hover:bg-accent/10"
-          >
-            <span className="inline-flex items-center gap-2">
-              <Lock className="h-4 w-4" />
-              Go to client portal
-            </span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
       </nav>
 
-      <div className="border-t border-surface-border px-4 py-4">
-        <div className="rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 text-center">
-          <p className="text-xs font-semibold text-primary">
-            Start Here: My Next Step
-          </p>
-          <p className="mt-0.5 text-[11px] text-brand-muted-500">
-            Keep the next move simple
-          </p>
-        </div>
+      {/* Cross-layer handoff — visually separate so parents understand it is for current Texas ABA clients only */}
+      <div className="border-t-2 border-accent/20 bg-accent/5 px-4 py-4">
+        <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent/80">
+          Texas ABA Families
+        </p>
+        <Link
+          href="/client"
+          aria-label="Go to client portal — for current Texas ABA clients"
+          className="group flex items-center justify-between gap-3 rounded-xl border border-accent/30 bg-white px-3 py-2.5 text-sm font-semibold text-accent shadow-soft transition-all hover:bg-accent/10"
+        >
+          <span className="inline-flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            Go to Client Portal
+          </span>
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </Link>
       </div>
     </>
   );
@@ -166,6 +169,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       >
         <button
           onClick={() => setSidebarOpen(false)}
+          aria-label="Close navigation"
           className="absolute right-4 top-4 rounded-lg p-1 hover:bg-surface-subtle"
         >
           <X className="h-5 w-5 text-brand-muted-500" />
@@ -209,7 +213,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <div className={cn('mx-auto flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8', isFindPage ? 'max-w-[1600px]' : 'max-w-6xl')}>
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
-              Get Help Choosing What to Do · open to every family
+              Parent Support · open to every family
             </p>
             <div className="flex items-center gap-3">
               <CrisisPill />
@@ -228,13 +232,14 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
               <button
                 onClick={() => setSidebarOpen(true)}
+                aria-label="Open navigation"
                 className="rounded-xl p-2 hover:bg-surface-subtle lg:hidden"
               >
                 <Menu className="h-5 w-5 text-brand-muted-600" />
               </button>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
-                  Common Ground · Get Help Choosing What to Do
+                  Common Ground · Parent Support
                 </p>
                 <p className="truncate text-sm text-brand-muted-700">
                   For every family
