@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   Compass as CompassIcon,
+  Home,
   Lock,
   ArrowRight,
   Users,
@@ -33,6 +34,7 @@ const navGroups = [
   {
     label: 'Start Here',
     items: [
+      { href: '/support', label: 'Home Base', icon: Home },
       { href: '/support/intake', label: 'My Care Plan', icon: CompassIcon, highlight: true },
       { href: '/support/mental-health', label: 'Parent Support', icon: HeartPulse, highlight: true },
     ],
