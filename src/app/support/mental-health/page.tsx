@@ -11,7 +11,9 @@ import {
   AlertTriangle,
   LogIn,
   LogOut,
+  ArrowLeft,
 } from 'lucide-react';
+import Link from 'next/link';
 import styles from './mental-health.module.css';
 import { OnboardingModal } from './components/OnboardingModal';
 import { DashboardTab } from './components/DashboardTab';
@@ -311,6 +313,24 @@ export default function MentalHealthCenter() {
       {showOnboarding && (
         <OnboardingModal onComplete={handleOnboardingComplete} />
       )}
+
+      {/* Back to Parent Support — keeps the dashboard from feeling orphaned. */}
+      <div style={{ padding: '8px 12px 0' }}>
+        <Link
+          href="/support/caregiver"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 12.5,
+            fontWeight: 600,
+            color: 'var(--ink-600, #5a5d64)',
+            textDecoration: 'none',
+          }}
+        >
+          <ArrowLeft size={13} aria-hidden /> back to parent support
+        </Link>
+      </div>
 
       {/* Page header row */}
       <div className={styles.pageTop}>

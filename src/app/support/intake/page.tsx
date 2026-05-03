@@ -1,9 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Check, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { saveCarePlan, type CarePlanResource, type CarePlanStep } from '@/lib/carePlanStorage';
 
 type Answers = {
   hardest: string | null;
@@ -163,15 +165,52 @@ function buildCarePlan(answers: Answers): CarePlan {
   };
 }
 
+function toSavedSteps(plan: CarePlan): CarePlanStep[] {
+  return plan.nextSteps.slice(0, 3).map((s, i) => ({
+    title: s,
+    why: i === 0
+      ? 'this is the first step we picked based on what you told us — it should feel doable today.'
+      : 'a small follow-on step. order is suggestion, not pressure.',
+    href: plan.resources[Math.min(i, plan.resources.length - 1)]?.href ?? '/support',
+  }));
+}
+
+function toSavedResources(plan: CarePlan): CarePlanResource[] {
+  return plan.resources.map((r) => ({ label: r.label, href: r.href }));
+}
+
 export default function IntakePage() {
+  const router = useRouter();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({ hardest: null, support: null, confidence: null, easier: null, connected: null });
   const [email, setEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<string | null>(null);
   const [showPlan, setShowPlan] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const done = showPlan || step >= QUESTIONS.length;
   const plan = useMemo(() => (done ? buildCarePlan(answers) : null), [done, answers]);
+
+  // Persist the plan and route the parent to the new /support/care-plan page.
+  useEffect(() => {
+    if (!done || !plan || redirecting) return;
+    setRedirecting(true);
+    saveCarePlan({
+      answers: {
+        hardest: answers.hardest ? [answers.hardest] : null,
+        support: answers.support,
+        confidence: answers.confidence,
+        easier: answers.easier,
+        connected: answers.connected,
+      },
+      summary: plan.summary,
+      steps: toSavedSteps(plan),
+      resources: toSavedResources(plan),
+      weekMessage: plan.encouragement,
+    });
+    const t = window.setTimeout(() => router.push('/support/care-plan'), 1400);
+    return () => window.clearTimeout(t);
+  }, [done, plan, redirecting, answers, router]);
 
   const current = QUESTIONS[step];
 
@@ -231,55 +270,23 @@ export default function IntakePage() {
             </div>
           </>
         ) : (
-          <>
-            <h1 className="text-3xl font-bold text-brand-muted-900">Your Family Care Plan</h1>
-            <p className="mt-2 text-brand-muted-700">Based on your answers, here are a few helpful starting points.</p>
-
-            <section className="mt-6 rounded-2xl bg-surface-subtle p-4">
-              <h2 className="font-semibold">Start here</h2>
-              <p className="mt-2 text-sm">{plan?.summary}</p>
-              <ul className="mt-3 list-disc pl-5 text-sm">
-                {plan?.nextSteps.map((stepItem) => <li key={stepItem}>{stepItem}</li>)}
-              </ul>
-            </section>
-
-            <section className="mt-4 rounded-2xl border border-surface-border p-4">
-              <h2 className="font-semibold">Helpful resources for you</h2>
-              <ul className="mt-3 space-y-2 text-sm">
-                {plan?.resources.map((resource) => (
-                  <li key={resource.label}><Link className="text-primary underline" href={resource.href}>{resource.label}</Link></li>
-                ))}
-                {answers.connected === 'Yes' && <li><Link className="text-primary underline" href="/client">Client Portal</Link></li>}
-              </ul>
-            </section>
-
-            <section className="mt-4 rounded-2xl border border-surface-border p-4">
-              <h2 className="font-semibold">Try this first</h2>
-              <p className="mt-2 text-sm">{plan?.tryFirst}</p>
-            </section>
-
-            <section className="mt-4 rounded-2xl border border-surface-border p-4">
-              <h2 className="font-semibold">Encouragement</h2>
-              <p className="mt-2 text-sm">{plan?.encouragement}</p>
-              {plan?.portalNote && (
-                <p className="mt-2 text-sm"><Link href="/client" className="font-semibold text-accent underline">Go to Client Portal</Link> — {plan.portalNote}</p>
-              )}
-            </section>
-
-            <section className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <h2 className="font-semibold">Want a copy of this plan?</h2>
-              <p className="mt-1 text-sm">Enter your email and we’ll send this care plan so you can come back to it later.</p>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" aria-label="Email address" placeholder="Email address" className="mt-3 w-full rounded-xl border border-surface-border px-3 py-2" />
-              <button type="button" onClick={sendEmail} disabled={!email} className={cn('mt-3 rounded-xl px-4 py-2 font-semibold text-white', email ? 'bg-primary' : 'bg-stone-300')}>
-                Email My Care Plan
-              </button>
-              {emailStatus && <p className="mt-2 text-sm text-brand-muted-700">{emailStatus}</p>}
-            </section>
-
-            <button type="button" onClick={() => { setStep(0); setShowPlan(false); setAnswers({ hardest: null, support: null, confidence: null, easier: null, connected: null }); setEmail(''); setEmailStatus(null); }} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
-              <RefreshCw className="h-4 w-4" /> Restart
-            </button>
-          </>
+          <div className="py-10 text-center">
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary" aria-hidden />
+            <h1 className="mt-6 text-2xl font-semibold text-brand-navy-700">building your plan…</h1>
+            <p className="mt-2 text-[14px] text-brand-muted-600">we&rsquo;ll keep it simple. one moment.</p>
+            <Link
+              href="/support/care-plan"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+            >
+              skip to my plan
+            </Link>
+            {/* email + restart still reachable below if redirect is slow */}
+            <div className="mt-10 hidden">
+              <input value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email address" />
+              <button type="button" onClick={sendEmail}>send</button>
+              {emailStatus && <span>{emailStatus}</span>}
+            </div>
+          </div>
         )}
       </div>
     </main>

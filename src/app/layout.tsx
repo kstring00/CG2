@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import ChatWidget from '@/components/ChatWidget';
+import CrisisStrip from '@/components/CrisisStrip';
+import ReviewBanner from '@/components/ReviewBanner';
 
 export const metadata: Metadata = {
   title: 'Common Ground — Parent Navigation System',
@@ -17,6 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-surface font-body antialiased">
+        <CrisisStrip />
+        <ReviewBanner />
         {children}
         <ChatWidget />
       </body>

@@ -37,8 +37,8 @@ const navGroups = [
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/intake', label: 'My Care Plan', icon: CompassIcon, highlight: true },
-      { href: '/support/mental-health', label: 'Parent Support', icon: HeartPulse, highlight: true },
+      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon, highlight: true },
+      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse, highlight: true },
       { href: '/support/still-waters', label: 'Still Waters', icon: Feather, highlight: true },
     ],
   },
