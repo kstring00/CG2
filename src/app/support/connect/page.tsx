@@ -113,10 +113,12 @@ const connectCopy = {
     intakeStep5Hint: 'Pick one. We use this to surface compatible parents and groups.',
     intakeInlineRequired: 'Pick at least one to continue.',
     intakeSectionDone: 'Done',
-    intakeSubmit: 'Get my parent matches',
-    intakeSubmitHint: 'We’ll show you 3–5 matches. You choose if and when to reach out.',
-    intakeSubmittedHeading: 'Preferences saved.',
-    intakeSubmittedBody: 'Scroll down to preview the kind of matches and groups that fit your answers.',
+    intakeSubmit: 'Join the waitlist',
+    intakeSubmitHint:
+      'common ground is currently building its parent matching pool. when enough parents have joined the waitlist with a similar stage and need to yours, we&rsquo;ll send you matches. there&rsquo;s no firehose, no inbox of strangers. just real parents, when the timing is right.',
+    intakeSubmittedHeading: 'You&rsquo;re on the list.',
+    intakeSubmittedBody:
+      'we&rsquo;ll let you know when we have parents matched to your stage. in the meantime, here&rsquo;s what&rsquo;s nearby and ready right now.',
     intakeSubmittedSeeMatches: 'See parent matches',
     intakeSubmittedSeeGroups: 'Browse small groups',
     intakeOptionAge02: '0–2 years',
@@ -253,10 +255,11 @@ const connectCopy = {
     intakeStep5Hint: 'Elige una. Usamos esto para sugerir padres y grupos compatibles.',
     intakeInlineRequired: 'Elige al menos una opción para continuar.',
     intakeSectionDone: 'Listo',
-    intakeSubmit: 'Ver mis emparejamientos',
-    intakeSubmitHint: 'Te mostraremos de 3 a 5 emparejamientos. Tú decides si y cuándo escribir.',
-    intakeSubmittedHeading: 'Preferencias guardadas.',
-    intakeSubmittedBody: 'Desplázate para ver el tipo de emparejamientos y grupos que encajan con tus respuestas.',
+    intakeSubmit: 'Únete a la lista de espera',
+    intakeSubmitHint:
+      'Common Ground está formando su grupo de emparejamiento de padres. Cuando haya suficientes padres en la lista con una etapa y necesidad similares a la tuya, te enviaremos emparejamientos.',
+    intakeSubmittedHeading: 'Estás en la lista.',
+    intakeSubmittedBody: 'Te avisaremos cuando tengamos padres en tu misma etapa. Mientras tanto, aquí tienes lo que está disponible hoy.',
     intakeSubmittedSeeMatches: 'Ver emparejamientos',
     intakeSubmittedSeeGroups: 'Ver grupos pequeños',
     intakeOptionAge02: '0–2 años',
@@ -1228,6 +1231,28 @@ export default function ConnectPage() {
                     if (intakeComplete) {
                       setIntakeSubmitted(true);
                       setAttemptedSubmit(false);
+                      // Persist the waitlist signup so it survives reloads.
+                      try {
+                        const existing = JSON.parse(
+                          window.localStorage.getItem('cg.connectWaitlist.v1') || '[]',
+                        );
+                        existing.push({
+                          id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+                          locale,
+                          ageRanges,
+                          stage,
+                          struggles,
+                          connections,
+                          style,
+                          createdAt: new Date().toISOString(),
+                        });
+                        window.localStorage.setItem(
+                          'cg.connectWaitlist.v1',
+                          JSON.stringify(existing),
+                        );
+                      } catch {
+                        // ignore — best-effort while there's no backend
+                      }
                       requestAnimationFrame(() =>
                         document
                           .getElementById('preview')

@@ -161,6 +161,7 @@ export default function MentalHealthCenter() {
   const [profileSignedIn, setProfileSignedIn] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [streak, setStreak] = useState(0);
+  const [freshStart, setFreshStart] = useState(false);
 
   function dispatchRecAction(action: RecAction) {
     if (action.kind === 'tab') {
@@ -362,6 +363,69 @@ export default function MentalHealthCenter() {
         </div>
       </div>
 
+      {/* Demo banner — only shows for parents who haven't signed in (i.e. no real data). */}
+      {!profileSignedIn && (
+        <div
+          style={{
+            margin: '8px 12px 0',
+            padding: '12px 16px',
+            borderRadius: 14,
+            background: 'rgba(255,247,232,0.85)',
+            border: '1px solid rgba(180, 130, 30, 0.18)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+          }}
+        >
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <p style={{ margin: 0, fontSize: 13.5, fontWeight: 600, color: '#7a4f00' }}>
+              demo view.
+            </p>
+            <p style={{ margin: '2px 0 0', fontSize: 12.5, color: '#7a4f00', lineHeight: 1.4 }}>
+              this is example data showing how the dashboard reflects a parent&rsquo;s check-ins over time. once you start checking in, you&rsquo;ll see your own patterns here.
+            </p>
+          </div>
+          <div style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setFreshStart(false)}
+              aria-pressed={!freshStart}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 999,
+                fontSize: 12.5,
+                fontWeight: 600,
+                border: '1px solid #d8b46e',
+                background: !freshStart ? '#7a4f00' : 'white',
+                color: !freshStart ? 'white' : '#7a4f00',
+                cursor: 'pointer',
+              }}
+            >
+              view example data
+            </button>
+            <button
+              type="button"
+              onClick={() => setFreshStart(true)}
+              aria-pressed={freshStart}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 999,
+                fontSize: 12.5,
+                fontWeight: 600,
+                border: '1px solid #d8b46e',
+                background: freshStart ? '#7a4f00' : 'white',
+                color: freshStart ? 'white' : '#7a4f00',
+                cursor: 'pointer',
+              }}
+            >
+              start fresh
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Tab bar */}
       <div className={styles.tabBar} role="tablist">
         {TABS.map((tab) => {
@@ -395,6 +459,7 @@ export default function MentalHealthCenter() {
         <DashboardTab
           userName={state.userName}
           isReturning={isReturning}
+          freshStart={freshStart && !profileSignedIn}
           streak={streak}
           inputs={state.inputs}
           history={state.history}

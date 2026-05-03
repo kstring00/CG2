@@ -118,6 +118,30 @@ export default function SupportHome() {
         </div>
       </section>
 
+      {/* Pathfinder presence — above the fold, gentle indicator that there is
+          a real human layer being built. Demo until matching is live. */}
+      <section className="rounded-2xl border border-brand-plum-200 bg-brand-plum-50/40 p-5 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 max-w-xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
+              your pathfinder
+            </p>
+            <h2 className="mt-1 text-base font-semibold text-brand-navy-700 sm:text-lg">
+              your pathfinder will appear here once we&rsquo;re matched.
+            </h2>
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-600">
+              pathfinders are real human navigators. they sort the next step, sit in on school meetings, and check in when the weeks get heavy.
+            </p>
+          </div>
+          <Link
+            href="/support/pathfinders"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-4 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-100"
+          >
+            learn what a pathfinder does <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
       <section id="support-actions" className="space-y-4">
         <div>
           <h2 className="text-2xl font-semibold text-brand-muted-900">What do you need today?</h2>
