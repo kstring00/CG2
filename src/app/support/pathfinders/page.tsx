@@ -5,23 +5,23 @@ import PathfinderCard from '@/components/PathfinderCard';
 const whatTheyDo = [
   {
     icon: Compass,
-    title: 'sorts the next step',
-    body: 'helps you decide what comes first when everything feels first.',
+    title: 'Sorts the next step',
+    body: 'Helps you decide what comes first when everything feels urgent.',
   },
   {
     icon: MessageCircleHeart,
-    title: 'reaches out when the data turns',
-    body: 'when your check-ins say you&rsquo;re carrying more, you don&rsquo;t have to ask. they reach out.',
+    title: 'Reaches out when the data turns',
+    body: 'When your check-ins say you&rsquo;re carrying more, you don&rsquo;t have to ask. They reach out.',
   },
   {
     icon: GraduationCap,
-    title: 'sits in on school meetings if you want',
-    body: 'arD, ieP, 504. they prep with you and show up beside you.',
+    title: 'Sits in on school meetings if you want',
+    body: 'ARD, IEP, 504. They prep with you and show up beside you.',
   },
   {
     icon: Stethoscope,
-    title: 'knows the local providers personally',
-    body: 'so the referral isn&rsquo;t just a name — it&rsquo;s a known door.',
+    title: 'Knows the local providers personally',
+    body: 'So the referral isn&rsquo;t just a name — it&rsquo;s a known door.',
   },
 ];
 
@@ -32,24 +32,24 @@ export default function PathfindersPage() {
         href="/support/caregiver"
         className="inline-flex items-center gap-1 text-sm font-semibold text-brand-muted-600 hover:text-brand-muted-900"
       >
-        <ArrowLeft className="h-4 w-4" /> back to parent support
+        <ArrowLeft className="h-4 w-4" /> Back to Parent Support
       </Link>
 
       <header className="mt-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-plum-600">
-          common ground &middot; pathfinders
+          Common Ground &middot; Pathfinders
         </p>
         <h1 className="mt-2 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
-          meet your pathfinder.
+          Meet your Pathfinder.
         </h1>
         <p className="mt-4 text-[15.5px] leading-relaxed text-brand-muted-700">
-          a real human who has walked this road. pathfinders are texas aba centers care navigators &mdash; trained to help you sort the next step, advocate at school meetings, and check in when the weeks get heavy. you don&rsquo;t have to explain everything from scratch.
+          A real human who has walked this road. Pathfinders are Texas ABA Centers care navigators &mdash; trained to help you sort the next step, advocate at school meetings, and check in when the weeks get heavy. You don&rsquo;t have to explain everything from scratch.
         </p>
       </header>
 
       <section className="mt-10">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          what a pathfinder does
+          What a Pathfinder does
         </h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {whatTheyDo.map(({ icon: Icon, title, body }) => (
@@ -72,10 +72,10 @@ export default function PathfindersPage() {
 
       <section className="mt-10 rounded-2xl border border-amber-200 bg-amber-50/60 p-5 sm:p-6">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-800">
-          a note on where we are
+          A note on where we are
         </h2>
         <p className="mt-2 text-[14.5px] leading-relaxed text-amber-900/95">
-          pathfinders are currently being onboarded. the relationship layer below is shown in demo form so families and providers reviewing common ground can see what we&rsquo;re building. when we launch, this page will introduce you to your real pathfinder by name.
+          Pathfinders are currently being onboarded. The relationship layer below is shown in demo form so families and providers reviewing Common Ground can see what we&rsquo;re building. When we launch, this page will introduce you to your real Pathfinder by name.
         </p>
       </section>
 
@@ -85,10 +85,10 @@ export default function PathfindersPage() {
 
       <section className="mt-10 rounded-2xl border border-primary/15 bg-primary/5 p-5 sm:p-6">
         <h2 className="inline-flex items-center gap-2 text-base font-semibold text-brand-navy-700">
-          <Users className="h-4 w-4 text-primary" /> while you wait
+          <Users className="h-4 w-4 text-primary" /> While you wait
         </h2>
         <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
-          you don&rsquo;t have to wait on us to start. these doors are open today.
+          You don&rsquo;t have to wait on us to start. These doors are open today.
         </p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           <li>
@@ -96,7 +96,7 @@ export default function PathfindersPage() {
               href="/support/intake"
               className="block rounded-xl border border-surface-border bg-white px-4 py-3 text-[13.5px] font-medium text-brand-muted-800 transition hover:border-primary/40 hover:bg-primary/5 hover:text-brand-navy-700"
             >
-              build a 3-minute care plan &rarr;
+              Build a 3-minute care plan &rarr;
             </Link>
           </li>
           <li>
@@ -104,7 +104,7 @@ export default function PathfindersPage() {
               href="/support/find"
               className="block rounded-xl border border-surface-border bg-white px-4 py-3 text-[13.5px] font-medium text-brand-muted-800 transition hover:border-primary/40 hover:bg-primary/5 hover:text-brand-navy-700"
             >
-              find local help today &rarr;
+              Find local help today &rarr;
             </Link>
           </li>
         </ul>

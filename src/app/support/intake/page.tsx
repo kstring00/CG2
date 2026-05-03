@@ -101,7 +101,7 @@ export default function IntakePage() {
         {step < 7 && (
           <header className="mb-6">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-              question {step} of {total - 1}
+              Question {step} of {total - 1}
             </p>
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-subtle">
               <div
@@ -210,9 +210,9 @@ export default function IntakePage() {
               aria-hidden
               className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary"
             />
-            <h1 className="mt-6 text-2xl font-semibold text-brand-navy-700">building your plan…</h1>
+            <h1 className="mt-6 text-2xl font-semibold text-brand-navy-700">Building your plan…</h1>
             <p className="mt-2 text-[14px] text-brand-muted-600">
-              we&rsquo;ll keep it simple. one moment.
+              We&rsquo;ll keep it simple. One moment.
             </p>
           </div>
         )}
@@ -230,7 +230,7 @@ export default function IntakePage() {
                   : 'text-brand-muted-700 hover:bg-surface-subtle hover:text-brand-muted-900',
               )}
             >
-              <ArrowLeft className="h-4 w-4" /> back
+              <ArrowLeft className="h-4 w-4" /> Back
             </button>
             <button
               type="button"
@@ -241,7 +241,7 @@ export default function IntakePage() {
                 canAdvance ? 'bg-primary hover:bg-primary/90' : 'bg-stone-300',
               )}
             >
-              {step === 6 ? 'build my plan' : 'continue'} <ArrowRight className="h-4 w-4" />
+              {step === 6 ? 'Build my plan' : 'Continue'} <ArrowRight className="h-4 w-4" />
             </button>
           </div>
         )}

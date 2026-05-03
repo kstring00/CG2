@@ -153,8 +153,8 @@ export function DashboardTab({
       <div>
         <header className={styles.pageHeader}>
           <div className={styles.greeting}>
-            <h1>start fresh.</h1>
-            <p>after your first check-in, you&rsquo;ll see your data take shape over the next few days.</p>
+            <h1>Start fresh.</h1>
+            <p>After your first check-in, you&rsquo;ll see your data take shape over the next few days.</p>
           </div>
         </header>
         <div
@@ -167,10 +167,10 @@ export function DashboardTab({
           }}
         >
           <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink-900, #1f2227)' }}>
-            how are you right now?
+            How are you right now?
           </p>
           <p style={{ marginTop: 8, color: 'var(--ink-600, #5a5d64)', lineHeight: 1.6 }}>
-            slide to begin. we&rsquo;ll start building your pattern from here.
+            Slide to begin. We&rsquo;ll start building your pattern from here.
           </p>
           <button
             style={{
@@ -186,7 +186,7 @@ export function DashboardTab({
             }}
             onClick={() => onNavigate('checkin')}
           >
-            start your first check-in
+            Start your first check-in
           </button>
         </div>
       </div>
@@ -207,7 +207,7 @@ export function DashboardTab({
           <p>{getDayGreeting(streak, isDemo)}</p>
           {isDemo && (
             <p style={{ marginTop: 4, fontSize: 12.5, color: 'var(--ink-500, #6e727a)' }}>
-              example data — refreshes when you check in
+              Example data — refreshes when you check in
             </p>
           )}
         </div>
@@ -229,7 +229,7 @@ export function DashboardTab({
         <div className={styles.heroCardCompact}>
           <div className={styles.heroLabel}>
             <span className={styles.liveDot} />
-            {isDemo ? 'your check-in pattern this week · example data' : 'your check-in pattern this week'}
+            {isDemo ? 'Your check-in pattern this week · example data' : 'Your check-in pattern this week'}
           </div>
           <div className={styles.heroScoreRow}>
             <div className={styles.heroScoreCompact} style={{ color: heroScoreColor }}>

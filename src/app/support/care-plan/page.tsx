@@ -49,19 +49,19 @@ function EmptyState() {
           <Compass className="h-6 w-6" />
         </div>
         <h1 className="mt-5 text-2xl font-semibold text-brand-navy-700 sm:text-3xl">
-          you haven&rsquo;t built a plan yet.
+          You haven&rsquo;t built a plan yet.
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-brand-muted-700">
-          it takes about 3 minutes. we&rsquo;ll keep it simple.
+          It takes about 3 minutes. We&rsquo;ll keep it simple.
         </p>
         <Link
           href="/support/intake"
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
         >
-          build my plan <ArrowRight className="h-4 w-4" />
+          Build my plan <ArrowRight className="h-4 w-4" />
         </Link>
         <p className="mt-4 text-[13px] text-brand-muted-500">
-          you can always come back and change it.
+          You can always come back and change it.
         </p>
       </div>
     </Shell>
@@ -78,7 +78,7 @@ function PopulatedPlan({
   const { state: wellness } = useWellnessState();
   const handleClear = () => {
     if (typeof window === 'undefined') return;
-    const ok = window.confirm('clear your saved plan? you can re-run the intake to build a new one.');
+    const ok = window.confirm('Clear your saved plan? You can re-run the intake to build a new one.');
     if (!ok) return;
     clearCarePlan();
     onCleared();
@@ -95,22 +95,22 @@ function PopulatedPlan({
     <Shell>
       <header>
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-          your care plan
+          Your care plan
         </p>
         <h1 className="mt-1 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
-          your plan, friend.
+          Your plan, friend.
         </h1>
         <p className="mt-2 text-[15px] leading-relaxed text-brand-muted-700">
-          built from what you told us. you can change it anytime.
+          Built from what you told us. You can change it anytime.
         </p>
         <p className="mt-1 text-[12px] text-brand-muted-500">
-          last updated {updatedDisplay}
+          Last updated {updatedDisplay}
         </p>
       </header>
 
       <section className="mt-8 rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          start here
+          Start here
         </h2>
         <p className="mt-2 text-[15px] leading-relaxed text-brand-muted-800">
           {plan.summary}
@@ -124,7 +124,7 @@ function PopulatedPlan({
             className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6"
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-              step {i + 1}
+              Step {i + 1}
             </p>
             <h3 className="mt-1 text-lg font-semibold text-brand-navy-700">
               {step.title}
@@ -137,18 +137,18 @@ function PopulatedPlan({
                 href={step.href}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
               >
-                start this step <ArrowRight className="h-3.5 w-3.5" />
+                Start this step <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <button
                 type="button"
                 className="text-[13px] font-medium text-brand-muted-500 hover:text-brand-muted-800"
                 onClick={() => {
                   if (typeof window !== 'undefined') {
-                    window.alert('skipped for now. nothing happens to your plan — pick this back up whenever you want.');
+                    window.alert('Skipped for now. Nothing happens to your plan — pick this back up whenever you want.');
                   }
                 }}
               >
-                skip for now
+                Skip for now
               </button>
             </div>
           </div>
@@ -158,7 +158,7 @@ function PopulatedPlan({
       {plan.resources.length > 0 && (
         <section className="mt-8 rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
           <h2 className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> tools we picked for you
+            <Sparkles className="h-3.5 w-3.5 text-primary" /> Tools we picked for you
           </h2>
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {plan.resources.map((r) => (
@@ -179,7 +179,7 @@ function PopulatedPlan({
       {plan.weekMessage && (
         <section className="mt-6 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 p-5 sm:p-6">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-            for you, this week
+            For you, this week
           </h2>
           <p className="mt-2 text-[14.5px] leading-relaxed text-brand-plum-800">
             {plan.weekMessage}
@@ -189,7 +189,7 @@ function PopulatedPlan({
 
       <section className="mt-8">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          your pathfinder
+          Your Pathfinder
         </h2>
         <div className="mt-3">
           <PathfinderCard />
@@ -199,14 +199,14 @@ function PopulatedPlan({
       {wellness.hasData && wellness.historyLen >= 3 && (
         <section className="mt-8 rounded-2xl border border-surface-border bg-surface-muted/40 p-5 sm:p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            from your check-ins
+            From your check-ins
           </p>
           <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
             {wellness.trend === 'declining'
-              ? 'your check-ins from the last few weeks suggest things have felt heavier. we ordered your steps to start with the lighter ones.'
+              ? 'Your check-ins from the last few weeks suggest things have felt heavier. We ordered your steps to start with the lighter ones.'
               : wellness.trend === 'improving'
-              ? 'your check-ins suggest things have steadied a little. these next steps build on that — they don&rsquo;t replace it.'
-              : 'your check-ins look fairly steady. these steps are a way to keep momentum without adding load.'}
+              ? 'Your check-ins suggest things have steadied a little. These next steps build on that — they don&rsquo;t replace it.'
+              : 'Your check-ins look fairly steady. These steps are a way to keep momentum without adding load.'}
           </p>
         </section>
       )}
@@ -216,14 +216,14 @@ function PopulatedPlan({
           href="/support/intake"
           className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80"
         >
-          <RefreshCcw className="h-4 w-4" /> update my plan
+          <RefreshCcw className="h-4 w-4" /> Update my plan
         </Link>
         <button
           type="button"
           onClick={handleClear}
           className="inline-flex items-center gap-2 text-[13px] font-medium text-brand-muted-500 hover:text-accent"
         >
-          <Trash2 className="h-3.5 w-3.5" /> clear plan
+          <Trash2 className="h-3.5 w-3.5" /> Clear plan
         </button>
       </footer>
     </Shell>

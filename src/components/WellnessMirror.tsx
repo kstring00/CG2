@@ -39,13 +39,13 @@ export default function WellnessMirror({ className }: { className?: string }) {
   if (inCrisisSession()) {
     return (
       <section
-        aria-label="quiet mirror"
+        aria-label="Quiet mirror"
         className={cn(
           'rounded-2xl border border-surface-border bg-surface-muted/40 p-5 sm:p-6',
           className,
         )}
       >
-        <p className="text-[14px] leading-relaxed text-brand-muted-700">we&rsquo;re here. take what you need.</p>
+        <p className="text-[14px] leading-relaxed text-brand-muted-700">We&rsquo;re here. Take what you need.</p>
       </section>
     );
   }
@@ -53,23 +53,23 @@ export default function WellnessMirror({ className }: { className?: string }) {
   if (!state.hasData) {
     return (
       <section
-        aria-label="wellness mirror"
+        aria-label="Wellness mirror"
         className={cn(
           'rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6',
           className,
         )}
       >
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
-          a quiet mirror
+          A quiet mirror
         </p>
         <p className="mt-2 text-[14.5px] leading-relaxed text-brand-muted-700">
-          this space will reflect what you&rsquo;ve been carrying — once you&rsquo;ve done a check-in or two. no streaks, no scores. just a quiet mirror.
+          This space will reflect what you&rsquo;ve been carrying — once you&rsquo;ve done a check-in or two. No streaks, no scores. Just a quiet mirror.
         </p>
         <Link
           href="/support/mental-health"
           className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
         >
-          try a check-in <ArrowRight className="h-3.5 w-3.5" />
+          Try a check-in <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </section>
     );
@@ -86,14 +86,14 @@ export default function WellnessMirror({ className }: { className?: string }) {
 
   const message =
     zone === 'steady'
-      ? 'this week has felt steadier than last. whatever you did this week — keep doing it.'
+      ? 'This week has felt steadier than last. Whatever you did this week — keep doing it.'
       : zone === 'watch'
-      ? `this week has been heavier. you&rsquo;ve still shown up ${streak || recent.length} of the last 7 days. that counts.`
-      : 'you&rsquo;ve been carrying a lot. reaching out moves the needle more than anything else — would today be a day for that?';
+      ? `This week has been heavier. You&rsquo;ve still shown up ${streak || recent.length} of the last 7 days. That counts.`
+      : 'You&rsquo;ve been carrying a lot. Reaching out moves the needle more than anything else — would today be a day for that?';
 
   return (
     <section
-      aria-label="wellness mirror"
+      aria-label="Wellness mirror"
       className={cn(
         'rounded-2xl border p-5 shadow-soft sm:p-6',
         tone.ring,
@@ -104,7 +104,7 @@ export default function WellnessMirror({ className }: { className?: string }) {
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            wellness mirror
+            Wellness mirror
           </p>
           <p
             className="mt-2 text-[14.5px] leading-relaxed text-brand-muted-800"
@@ -115,7 +115,7 @@ export default function WellnessMirror({ className }: { className?: string }) {
               href="/support/hard-days"
               className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-rose-800 hover:underline"
             >
-              open hard days <ArrowRight className="h-3.5 w-3.5" />
+              Open Hard Days <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           )}
         </div>
@@ -151,7 +151,7 @@ function Sparkline({ values, stroke }: { values: number[]; stroke: string }) {
       height={h}
       viewBox={`0 0 ${w} ${h}`}
       className="shrink-0"
-      aria-label="last 7 days"
+      aria-label="Last 7 days"
     >
       <polyline
         points={points.join(' ')}

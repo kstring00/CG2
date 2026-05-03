@@ -115,10 +115,10 @@ const connectCopy = {
     intakeSectionDone: 'Done',
     intakeSubmit: 'Join the waitlist',
     intakeSubmitHint:
-      'common ground is currently building its parent matching pool. when enough parents have joined the waitlist with a similar stage and need to yours, we&rsquo;ll send you matches. there&rsquo;s no firehose, no inbox of strangers. just real parents, when the timing is right.',
+      'Common Ground is currently building its parent matching pool. When enough parents have joined the waitlist with a similar stage and need to yours, we&rsquo;ll send you matches. There&rsquo;s no firehose, no inbox of strangers. Just real parents, when the timing is right.',
     intakeSubmittedHeading: 'You&rsquo;re on the list.',
     intakeSubmittedBody:
-      'we&rsquo;ll let you know when we have parents matched to your stage. in the meantime, here&rsquo;s what&rsquo;s nearby and ready right now.',
+      'We&rsquo;ll let you know when we have parents matched to your stage. In the meantime, here&rsquo;s what&rsquo;s nearby and ready right now.',
     intakeSubmittedSeeMatches: 'See parent matches',
     intakeSubmittedSeeGroups: 'Browse small groups',
     intakeOptionAge02: '0–2 years',

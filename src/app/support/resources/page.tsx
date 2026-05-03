@@ -230,7 +230,7 @@ export default function ResourcesPage() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="example resource"
+          aria-label="Example resource"
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
           onClick={() => setDemoModalOpen(null)}
         >
@@ -242,26 +242,26 @@ export default function ResourcesPage() {
             <button
               type="button"
               onClick={() => setDemoModalOpen(null)}
-              aria-label="close"
+              aria-label="Close"
               className="absolute right-3 top-3 rounded-full p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
             >
               <X className="h-4 w-4" />
             </button>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-              example resource
+              Example resource
             </p>
             <h3 className="mt-2 text-lg font-semibold text-brand-navy-700">
-              this is a placeholder while we vet our partner library.
+              This is a placeholder while we vet our partner library.
             </h3>
             <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
-              we&rsquo;ll publish the real version soon. it&rsquo;s here so you can see the kind of guides we&rsquo;re building toward.
+              We&rsquo;ll publish the real version soon. It&rsquo;s here so you can see the kind of guides we&rsquo;re building toward.
             </p>
             <button
               type="button"
               onClick={() => setDemoModalOpen(null)}
               className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-primary/90"
             >
-              got it
+              Got it
             </button>
           </div>
         </div>

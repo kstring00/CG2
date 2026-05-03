@@ -47,8 +47,8 @@ export function generateRecs(inputs: Inputs, risk: number, drivers: Driver[]): R
     recs.push({
       icon: 'priority',
       tag: 'Watch',
-      title: `this week's been heavier. your ${top.label.toLowerCase()} numbers have been higher than usual.`,
-      body: `you've still been showing up. both things are true. a 3-minute reset before the next transition (school pickup, dinner, bedtime) can shift the back half of the day.`,
+      title: `This week's been heavier. Your ${top.label.toLowerCase()} numbers have been higher than usual.`,
+      body: `You've still been showing up. Both things are true. A 3-minute reset before the next transition (school pickup, dinner, bedtime) can shift the back half of the day.`,
       action: "Start a breath reset →",
       to: { kind: 'tool', tool: 'breath' },
     });

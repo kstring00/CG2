@@ -85,7 +85,7 @@ export default function FirstVisitReviewNotice() {
         </button>
 
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-          welcome
+          Welcome
         </p>
         <h2
           id="first-visit-title"
@@ -97,9 +97,9 @@ export default function FirstVisitReviewNotice() {
           id="first-visit-body"
           className="mt-3 text-[14px] leading-relaxed text-brand-muted-700"
         >
-          this site is currently in review with families and providers. some sections show example listings, demo profiles, and placeholder data while we partner with real ones. look for{' '}
+          This site is currently in review with families and providers. Some sections show example listings, demo profiles, and placeholder data while we partner with real ones. Look for{' '}
           <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-[11.5px] font-semibold text-amber-800">
-            example
+            Example
           </span>{' '}
           tags throughout the site to know what&rsquo;s a placeholder.
         </p>
@@ -110,7 +110,7 @@ export default function FirstVisitReviewNotice() {
             onClick={handleLearnMore}
             className="rounded-xl border border-surface-border bg-white px-4 py-2 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-subtle"
           >
-            learn more
+            Learn more
           </button>
           <button
             type="button"
@@ -118,7 +118,7 @@ export default function FirstVisitReviewNotice() {
             className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
             autoFocus
           >
-            got it
+            Got it
           </button>
         </div>
       </div>
