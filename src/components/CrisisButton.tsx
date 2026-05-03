@@ -9,37 +9,32 @@ import { cn } from '@/lib/utils';
  * Floating crisis access — replaces the top-of-page CrisisStrip.
  *
  * Bottom-left so it doesn't overlap the bottom-right ChatWidget. Muted
- * neutral, calm presence — not a flashing red emergency tile. On
- * /support/hard-days the popover is pre-opened and the button is larger,
- * since the parent is already on a crisis route.
+ * neutral, calm presence — not a flashing red emergency tile. Hidden on
+ * /support/hard-days and /crisis routes because those pages already
+ * surface 988, Harris Center, and Emergency inline — a floating popover
+ * on top of that is redundant and visually intrusive.
  */
 export default function CrisisButton() {
   const pathname = usePathname() ?? '';
   const isCrisisRoute =
     pathname.startsWith('/support/hard-days') || pathname.includes('/crisis');
 
-  const [open, setOpen] = useState(isCrisisRoute);
+  const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const popoverId = useId();
-
-  // Re-sync the auto-open behavior on route change.
-  useEffect(() => {
-    if (isCrisisRoute) setOpen(true);
-  }, [isCrisisRoute]);
 
   useEffect(() => {
     if (!open) return;
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape' && !isCrisisRoute) {
+      if (e.key === 'Escape') {
         e.preventDefault();
         setOpen(false);
         buttonRef.current?.focus();
       }
     }
     function onPointerDown(e: MouseEvent) {
-      if (isCrisisRoute) return;
       const target = e.target as Node | null;
       if (!target) return;
       if (popoverRef.current?.contains(target)) return;
@@ -52,10 +47,13 @@ export default function CrisisButton() {
       document.removeEventListener('keydown', onKeyDown);
       document.removeEventListener('mousedown', onPointerDown);
     };
-  }, [open, isCrisisRoute]);
+  }, [open]);
 
-  const buttonSize = isCrisisRoute ? 'h-16 w-16' : 'h-14 w-14';
-  const iconSize = isCrisisRoute ? 'h-6 w-6' : 'h-5 w-5';
+  // The page itself surfaces 988 / Harris / 911 — floating button is redundant.
+  if (isCrisisRoute) return null;
+
+  const buttonSize = 'h-14 w-14';
+  const iconSize = 'h-5 w-5';
 
   return (
     <div className="fixed bottom-6 left-6 z-50">
@@ -76,19 +74,17 @@ export default function CrisisButton() {
                 free, confidential, 24/7. someone will answer.
               </p>
             </div>
-            {!isCrisisRoute && (
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  buttonRef.current?.focus();
-                }}
-                aria-label="close"
-                className="-mr-1 -mt-1 rounded-full p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                buttonRef.current?.focus();
+              }}
+              aria-label="close"
+              className="-mr-1 -mt-1 rounded-full p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
 
           <ul className="mt-3 space-y-1.5">
@@ -130,10 +126,7 @@ export default function CrisisButton() {
       <button
         ref={buttonRef}
         type="button"
-        onClick={() => {
-          if (isCrisisRoute) return; // already pre-expanded
-          setOpen((v) => !v);
-        }}
+        onClick={() => setOpen((v) => !v)}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={popoverId}

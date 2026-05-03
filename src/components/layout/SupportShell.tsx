@@ -18,6 +18,7 @@ import {
   HeartPulse,
   Wallet,
   Feather,
+  Heart,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -36,9 +37,10 @@ const navGroups = [
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon, highlight: true },
-      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse, highlight: true },
-      { href: '/support/still-waters', label: 'Still Waters', icon: Feather, highlight: true },
+      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon },
+      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
+      { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
+      { href: '/support/hard-days', label: 'Hard Days', icon: Heart },
     ],
   },
   {
@@ -105,7 +107,6 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                 const isActive =
                   pathname === item.href ||
                   (item.href !== '/support' && pathname.startsWith(item.href));
-                const isHighlight = (item as { highlight?: boolean }).highlight;
                 return (
                   <li key={item.href}>
                     <a
@@ -115,8 +116,6 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                         'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
                         isActive
                           ? 'bg-primary text-white shadow-soft'
-                          : isHighlight
-                          ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
                           : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
                       )}
                     >
