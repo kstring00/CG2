@@ -21,6 +21,7 @@ import {
   ChevronUp,
   Feather,
 } from 'lucide-react';
+import WellnessMirror from '@/components/WellnessMirror';
 
 const supportActions = [
   {
@@ -117,6 +118,8 @@ export default function SupportHome() {
           </div>
         </div>
       </section>
+
+      <WellnessMirror />
 
       {/* Pathfinder presence — above the fold, gentle indicator that there is
           a real human layer being built. Demo until matching is live. */}

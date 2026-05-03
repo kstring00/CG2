@@ -4,11 +4,8 @@ import { useReducer, useEffect, useState, useMemo, useCallback } from 'react';
 import { Fraunces, Inter_Tight } from 'next/font/google';
 import {
   LayoutDashboard,
-  ClipboardCheck,
   Activity,
   Sparkles,
-  Compass,
-  AlertTriangle,
   LogIn,
   LogOut,
   ArrowLeft,
@@ -17,11 +14,23 @@ import Link from 'next/link';
 import styles from './mental-health.module.css';
 import { OnboardingModal } from './components/OnboardingModal';
 import { DashboardTab } from './components/DashboardTab';
-import { CheckInTab } from './components/CheckInTab';
 import { TrendsTab } from './components/TrendsTab';
 import { CalmingToolsTab } from './components/CalmingToolsTab';
 import { TopicsTab } from './components/TopicsTab';
 import { UrgentTab } from './components/UrgentTab';
+import PathfinderCard from '@/components/PathfinderCard';
+
+/** Pathfinder strip rendered inside the Support tab. */
+function SupportPathfinderBlock() {
+  return (
+    <div>
+      <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink-500, #6e727a)', marginBottom: 8 }}>
+        your pathfinder
+      </p>
+      <PathfinderCard showSendAction />
+    </div>
+  );
+}
 import {
   type Inputs,
   type HistoryDay,
@@ -52,7 +61,7 @@ const interTight = Inter_Tight({
 
 // ─── State + Reducer ───────────────────────────────────────────────────────
 
-type TabKey = 'dashboard' | 'checkin' | 'calming' | 'trends' | 'topics' | 'urgent';
+type TabKey = 'dashboard' | 'trends' | 'support';
 
 interface AppState {
   userName: string;
@@ -111,11 +120,8 @@ function reducer(state: AppState, action: Action): AppState {
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode; urgent?: boolean }[] = [
   { key: 'dashboard', label: 'Today', icon: <LayoutDashboard size={14} /> },
-  { key: 'checkin', label: 'Check-In', icon: <ClipboardCheck size={14} /> },
-  { key: 'calming', label: 'Calming Tools', icon: <Sparkles size={14} /> },
-  { key: 'trends', label: 'Trends', icon: <Activity size={14} /> },
-  { key: 'topics', label: 'Topics', icon: <Compass size={14} /> },
-  { key: 'urgent', label: 'Urgent Help', icon: <AlertTriangle size={14} />, urgent: true },
+  { key: 'trends', label: 'Patterns', icon: <Activity size={14} /> },
+  { key: 'support', label: 'Support', icon: <Sparkles size={14} /> },
 ];
 
 // ─── Local storage helpers ─────────────────────────────────────────────────
@@ -165,17 +171,21 @@ export default function MentalHealthCenter() {
 
   function dispatchRecAction(action: RecAction) {
     if (action.kind === 'tab') {
-      setActiveTab(action.tab);
+      // Old tab keys collapse into the new 3-tab structure (Today / Patterns / Support).
+      const tab = action.tab;
+      if (tab === 'dashboard' || tab === 'checkin') setActiveTab('dashboard');
+      else if (tab === 'trends') setActiveTab('trends');
+      else setActiveTab('support'); // calming, topics, urgent → Support
       return;
     }
     if (action.kind === 'tool') {
       setPendingTool(action.tool);
-      setActiveTab('calming');
+      setActiveTab('support');
       return;
     }
     if (action.kind === 'topic') {
       setPendingTopic(action.topic);
-      setActiveTab('topics');
+      setActiveTab('support');
       return;
     }
     if (action.kind === 'href') {
@@ -479,22 +489,6 @@ export default function MentalHealthCenter() {
         />
       )}
 
-      {ready && activeTab === 'checkin' && (
-        <CheckInTab
-          inputs={state.inputs}
-          onInputChange={handleInputChange}
-          onComplete={handleCheckinComplete}
-        />
-      )}
-
-      {ready && activeTab === 'calming' && (
-        <CalmingToolsTab
-          userName={state.userName}
-          initialTool={pendingTool}
-          onToolConsumed={() => setPendingTool(null)}
-        />
-      )}
-
       {ready && activeTab === 'trends' && (
         <TrendsTab
           history={state.history}
@@ -506,15 +500,29 @@ export default function MentalHealthCenter() {
         />
       )}
 
-      {ready && activeTab === 'topics' && (
-        <TopicsTab
-          onNavigate={(tab) => setActiveTab(tab as TabKey)}
-          initialTopic={pendingTopic as never}
-          onTopicConsumed={() => setPendingTopic(null)}
-        />
+      {/* Support tab — folds Urgent help, Pathfinder, and Calming tools into one
+          place. The persistent crisis strip at the top of every page handles the
+          highest-urgency surface, so the in-tab content can be calm. */}
+      {ready && activeTab === 'support' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <UrgentTab />
+          <SupportPathfinderBlock />
+          <CalmingToolsTab
+            userName={state.userName}
+            initialTool={pendingTool}
+            onToolConsumed={() => setPendingTool(null)}
+          />
+          <TopicsTab
+            onNavigate={(tab) => {
+              if (tab === 'dashboard' || tab === 'checkin') setActiveTab('dashboard');
+              else if (tab === 'trends') setActiveTab('trends');
+              else setActiveTab('support');
+            }}
+            initialTopic={pendingTopic as never}
+            onTopicConsumed={() => setPendingTopic(null)}
+          />
+        </div>
       )}
-
-      {ready && activeTab === 'urgent' && <UrgentTab />}
     </div>
   );
 }

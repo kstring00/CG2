@@ -8,6 +8,8 @@ import {
   loadCarePlan,
   type SavedCarePlan,
 } from '@/lib/carePlanStorage';
+import PathfinderCard from '@/components/PathfinderCard';
+import { useWellnessState } from '@/lib/wellnessState';
 
 /**
  * Persistent care plan view — the *result* of the intake flow.
@@ -73,6 +75,7 @@ function PopulatedPlan({
   plan: SavedCarePlan;
   onCleared: () => void;
 }) {
+  const { state: wellness } = useWellnessState();
   const handleClear = () => {
     if (typeof window === 'undefined') return;
     const ok = window.confirm('clear your saved plan? you can re-run the intake to build a new one.');
@@ -180,6 +183,30 @@ function PopulatedPlan({
           </h2>
           <p className="mt-2 text-[14.5px] leading-relaxed text-brand-plum-800">
             {plan.weekMessage}
+          </p>
+        </section>
+      )}
+
+      <section className="mt-8">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+          your pathfinder
+        </h2>
+        <div className="mt-3">
+          <PathfinderCard />
+        </div>
+      </section>
+
+      {wellness.hasData && wellness.historyLen >= 3 && (
+        <section className="mt-8 rounded-2xl border border-surface-border bg-surface-muted/40 p-5 sm:p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+            from your check-ins
+          </p>
+          <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
+            {wellness.trend === 'declining'
+              ? 'your check-ins from the last few weeks suggest things have felt heavier. we ordered your steps to start with the lighter ones.'
+              : wellness.trend === 'improving'
+              ? 'your check-ins suggest things have steadied a little. these next steps build on that — they don&rsquo;t replace it.'
+              : 'your check-ins look fairly steady. these steps are a way to keep momentum without adding load.'}
           </p>
         </section>
       )}

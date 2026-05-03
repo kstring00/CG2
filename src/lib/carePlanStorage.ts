@@ -7,14 +7,43 @@
  * older saved plans.
  */
 
+export type Hardest =
+  | 'understanding-aba'
+  | 'behavior-home'
+  | 'overwhelmed'
+  | 'finding-resources'
+  | 'financial-insurance'
+  | 'siblings'
+  | 'connecting-parents'
+  | 'school-iep';
+
+export type Stage =
+  | 'newly-diagnosed'
+  | 'waiting-diagnosis'
+  | 'in-aba'
+  | 'looking-for-aba'
+  | 'past-aba';
+
+export type ChildAge = '0-2' | '2-5' | '6-12' | '13-17';
+
+export type HelpKind =
+  | 'practical-info'
+  | 'local-providers'
+  | 'someone-to-talk-to'
+  | 'time-for-me'
+  | 'not-sure';
+
+/** Reuses Still Waters mood vocabulary for consistency across the app. */
+export type WeekMood = 'frayed' | 'heavy' | 'numb' | 'steady' | 'hopeful';
+
 export type CarePlanAnswers = {
-  hardest?: string[] | null;
-  stage?: string | null;
-  childAge?: string | null;
-  helpKind?: string | null;
-  weekMood?: string | null;
+  hardest?: Hardest[] | null;
+  stage?: Stage | null;
+  childAge?: ChildAge | null;
+  helpKind?: HelpKind | null;
+  weekMood?: WeekMood | null;
   notes?: string | null;
-  // Legacy fields — kept readable so existing plans still load.
+  // Legacy fields — kept readable so older plans still load.
   support?: string | null;
   confidence?: string | null;
   easier?: string | null;
