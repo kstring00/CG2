@@ -22,6 +22,7 @@ import {
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
+import ParentCheckIn from '@/components/ParentCheckIn';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -36,8 +37,8 @@ const navGroups = [
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/intake', label: 'My Care Plan', icon: CompassIcon, highlight: true },
-      { href: '/support/mental-health', label: 'Parent Support', icon: HeartPulse, highlight: true },
+      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon, highlight: true },
+      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse, highlight: true },
       { href: '/support/still-waters', label: 'Still Waters', icon: Feather, highlight: true },
     ],
   },
@@ -92,6 +93,10 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </span>
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
+
+        <div className="mt-3">
+          <ParentCheckIn variant="compact" />
+        </div>
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Common Ground parent support navigation">

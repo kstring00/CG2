@@ -34,15 +34,18 @@ function useAnimatedNumber(target: number): number {
   return value;
 }
 
-function getDayGreeting(streak: number): string {
+function getDayGreeting(streak: number, isDemo = false): string {
   const now = new Date();
   const day = now.toLocaleDateString('en-US', { weekday: 'long' });
   const hour = now.getHours();
   const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-  if (streak > 0) {
-    return `${day} ${timeOfDay} · ${streak}-day check-in streak`;
+  if (isDemo) {
+    return `Demo: ${day} ${timeOfDay}, ${streak || 5}-day check-in pattern`;
   }
-  return `${day} ${timeOfDay} · Pull a slider or take a 1-minute check-in`;
+  if (streak > 0) {
+    return `${day} ${timeOfDay} · ${streak}-day check-in pattern`;
+  }
+  return `${day} ${timeOfDay} · pull a slider or take a 1-minute check-in`;
 }
 
 const ICON_SVGS: Record<string, React.ReactNode> = {
@@ -79,6 +82,8 @@ const REC_ICON_CLASS: Record<string, string> = {
 interface Props {
   userName: string;
   isReturning: boolean;
+  /** When true, the dashboard hides the populated demo and prompts for a first check-in. */
+  freshStart?: boolean;
   streak: number;
   inputs: Inputs;
   history: HistoryDay[];
@@ -100,6 +105,7 @@ interface Props {
 export function DashboardTab({
   userName,
   isReturning,
+  freshStart = false,
   streak,
   inputs,
   history,
@@ -142,6 +148,53 @@ export function DashboardTab({
     energy: 'Energy',
   };
 
+  if (freshStart) {
+    return (
+      <div>
+        <header className={styles.pageHeader}>
+          <div className={styles.greeting}>
+            <h1>start fresh.</h1>
+            <p>after your first check-in, you&rsquo;ll see your data take shape over the next few days.</p>
+          </div>
+        </header>
+        <div
+          style={{
+            marginTop: 16,
+            padding: 28,
+            borderRadius: 20,
+            background: 'var(--paper, #FBF7EF)',
+            border: '1px solid rgba(0,0,0,0.06)',
+          }}
+        >
+          <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--ink-900, #1f2227)' }}>
+            how are you right now?
+          </p>
+          <p style={{ marginTop: 8, color: 'var(--ink-600, #5a5d64)', lineHeight: 1.6 }}>
+            slide to begin. we&rsquo;ll start building your pattern from here.
+          </p>
+          <button
+            style={{
+              marginTop: 18,
+              padding: '10px 18px',
+              borderRadius: 12,
+              background: 'var(--ink-900, #1f2227)',
+              color: 'white',
+              fontWeight: 600,
+              fontSize: 14,
+              border: 0,
+              cursor: 'pointer',
+            }}
+            onClick={() => onNavigate('checkin')}
+          >
+            start your first check-in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const isDemo = !userName;
+
   return (
     <div>
       <header className={styles.pageHeader}>
@@ -149,9 +202,14 @@ export function DashboardTab({
           <h1>
             {userName
               ? <>{isReturning ? 'Welcome back, ' : 'Welcome, '}<em>{userName}</em>.</>
-              : (isReturning ? 'Welcome back.' : 'Welcome.')}
+              : 'Demo view.'}
           </h1>
-          <p>{getDayGreeting(streak)}</p>
+          <p>{getDayGreeting(streak, isDemo)}</p>
+          {isDemo && (
+            <p style={{ marginTop: 4, fontSize: 12.5, color: 'var(--ink-500, #6e727a)' }}>
+              example data — refreshes when you check in
+            </p>
+          )}
         </div>
         <div className={styles.headerActions}>
           <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => onNavigate('calming')}>
@@ -171,7 +229,7 @@ export function DashboardTab({
         <div className={styles.heroCardCompact}>
           <div className={styles.heroLabel}>
             <span className={styles.liveDot} />
-            Caregiver wellness · Live
+            {isDemo ? 'your check-in pattern this week · example data' : 'your check-in pattern this week'}
           </div>
           <div className={styles.heroScoreRow}>
             <div className={styles.heroScoreCompact} style={{ color: heroScoreColor }}>

@@ -302,6 +302,27 @@ export default function CaregiverSupportPage() {
         </article>
       </section>
 
+      {/* Secondary entry to the dashboard — gentler door for parents who want
+          to track patterns. Keeps the front of caregiver page calm. */}
+      <section className="mb-8 rounded-3xl border border-surface-border bg-white p-5 shadow-card sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 max-w-xl">
+            <h2 className="text-base font-semibold text-brand-muted-900 sm:text-lg">
+              Want to see how you&rsquo;ve been over the last few weeks?
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-brand-muted-600">
+              Open your check-in dashboard. It tracks small patterns over time so you can notice what&rsquo;s shifting — without grading anything.
+            </p>
+          </div>
+          <Link
+            href="/support/mental-health"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/10"
+          >
+            Open my check-in dashboard <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
       {showStillWatersPreview && (
         <section className="mb-8 rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-5 text-slate-100 shadow-card sm:p-7">
           <div className="flex items-center justify-between gap-3">

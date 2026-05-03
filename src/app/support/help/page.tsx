@@ -62,8 +62,8 @@ export default function SupportPage() {
       </header>
 
       <DemoDataNotice
-        title="Example support listings"
-        description="These listings are demo data presented in a verified-listing format. The goal is to show how Common Ground can route families to the right kind of support with clearer trust signals."
+        title="Some listings here are examples while we expand our verified network"
+        description="Look for the &ldquo;Example listing&rdquo; tag — those are placeholders. Listings tagged &ldquo;Verified by Texas ABA Centers&rdquo; are real, vetted providers you can contact today."
       />
 
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
@@ -144,8 +144,11 @@ export default function SupportPage() {
                       {typeMeta.label}
                     </span>
                     {provider.isDemo && (
-                      <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-medium text-amber-800">
-                        Example listing
+                      <span
+                        className="rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-amber-800"
+                        title="Placeholder while we expand our verified provider network"
+                      >
+                        Example listing — not yet activated
                       </span>
                     )}
                   </div>
@@ -177,9 +180,10 @@ export default function SupportPage() {
                       {provider.location}
                     </p>
                     {provider.phone ? (
-                      <p className="flex items-center gap-1.5">
+                      <p className={cn('flex items-center gap-1.5', provider.isDemo && 'text-brand-muted-400')}>
                         <Phone className="h-4 w-4" />
-                        {provider.phone}
+                        <span className={cn(provider.isDemo && 'line-through')}>{provider.phone}</span>
+                        {provider.isDemo && <span className="ml-1 text-[11px] italic">(example)</span>}
                       </p>
                     ) : (
                       <span />
@@ -198,13 +202,35 @@ export default function SupportPage() {
                     <span className="rounded-full border border-surface-border bg-white px-3 py-1">{provider.verification}</span>
                     <span className="rounded-full border border-surface-border bg-white px-3 py-1">Reviewed {provider.lastReviewed}</span>
                   </div>
+
+                  {provider.isDemo && (
+                    <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2 text-[12px] leading-snug text-amber-900">
+                      Contact info will be added when this provider is added to our network.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex w-full flex-col gap-2 xl:w-[220px]">
-                  <button className="btn-primary px-4 py-2.5 text-sm">
-                    Use this support route <ExternalLink className="h-4 w-4" />
+                  <button
+                    type="button"
+                    disabled={provider.isDemo}
+                    className={cn(
+                      'btn-primary px-4 py-2.5 text-sm',
+                      provider.isDemo && 'cursor-not-allowed opacity-60 hover:bg-primary',
+                    )}
+                  >
+                    {provider.isDemo ? 'Available once activated' : (
+                      <>Use this support route <ExternalLink className="h-4 w-4" /></>
+                    )}
                   </button>
-                  <button className="btn-secondary px-4 py-2.5 text-sm">
+                  <button
+                    type="button"
+                    disabled={provider.isDemo}
+                    className={cn(
+                      'btn-secondary px-4 py-2.5 text-sm',
+                      provider.isDemo && 'cursor-not-allowed opacity-60',
+                    )}
+                  >
                     Keep this option handy
                   </button>
                 </div>

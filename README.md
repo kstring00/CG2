@@ -4,6 +4,9 @@ A parent support platform concept for autism families, by Texas ABA Centers.
 This is a self-contained demo with mock data — no backend, no auth, no
 environment variables required.
 
+> Common Ground is currently optimized for desktop and laptop only. Mobile
+> responsiveness is a planned future pass.
+
 ## The two layers
 
 The product is intentionally split into two distinct experiences. This

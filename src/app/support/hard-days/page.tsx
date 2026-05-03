@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   AlertCircle,
   ArrowRight,
@@ -307,6 +307,12 @@ const TABS = [
 export default function HardDaysPage() {
   const [openFeeling, setOpenFeeling] = useState<string | null>(null);
   const [checkedSigns, setCheckedSigns] = useState<Record<number, boolean>>({});
+
+  // Quiet rule (Step 7b): if a parent has visited hard-days during this
+  // session, the wellness mirror on Home Base goes silent. Resets on a new tab.
+  useEffect(() => {
+    try { window.sessionStorage.setItem('cg.quiet.mirror', '1'); } catch { /* ignore */ }
+  }, []);
 
   const checkedCount = Object.values(checkedSigns).filter(Boolean).length;
   const warningMessage = getWarningMessage(checkedCount);

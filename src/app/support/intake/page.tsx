@@ -1,287 +1,299 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Check, RefreshCw } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { saveCarePlan, type ChildAge, type Hardest, type HelpKind, type Stage, type WeekMood } from '@/lib/carePlanStorage';
+import {
+  generateNextSteps,
+  generateResources,
+  generateSummary,
+  generateWeekMessage,
+  HARDEST_OPTIONS,
+} from '@/lib/generateNextSteps';
 
-type Answers = {
-  hardest: string | null;
-  support: string | null;
-  confidence: string | null;
-  easier: string | null;
-  connected: string | null;
-};
+type StageOption = { value: Stage; label: string };
+const STAGE_OPTIONS: StageOption[] = [
+  { value: 'newly-diagnosed', label: 'Newly diagnosed' },
+  { value: 'waiting-diagnosis', label: 'Waiting on diagnosis' },
+  { value: 'in-aba', label: 'In ABA already' },
+  { value: 'looking-for-aba', label: 'Looking for ABA' },
+  { value: 'past-aba', label: 'Past ABA, ongoing parenting' },
+];
 
-type QuestionKey = keyof Answers;
+const AGE_OPTIONS: { value: ChildAge; label: string }[] = [
+  { value: '0-2', label: '0–2' },
+  { value: '2-5', label: '2–5' },
+  { value: '6-12', label: '6–12' },
+  { value: '13-17', label: '13–17' },
+];
 
-type Question = {
-  key: QuestionKey;
-  label: string;
-  options: readonly string[];
-};
+const HELP_OPTIONS: { value: HelpKind; label: string }[] = [
+  { value: 'practical-info', label: 'Practical info' },
+  { value: 'local-providers', label: 'Local providers' },
+  { value: 'someone-to-talk-to', label: 'Someone to talk to' },
+  { value: 'time-for-me', label: 'Time for me' },
+  { value: 'not-sure', label: 'Not sure' },
+];
 
-type CarePlan = {
-  summary: string;
-  nextSteps: string[];
-  resources: Array<{ label: string; href: string }>;
-  tryFirst: string;
-  encouragement: string;
-  portalNote?: string;
-};
+/** Reuses Still Waters mood vocabulary for consistency. */
+const MOOD_OPTIONS: { value: WeekMood; label: string }[] = [
+  { value: 'frayed', label: 'Frayed' },
+  { value: 'heavy', label: 'Heavy' },
+  { value: 'numb', label: 'Numb' },
+  { value: 'steady', label: 'Steady' },
+  { value: 'hopeful', label: 'Hopeful' },
+];
 
-const QUESTIONS: readonly Question[] = [
-  {
-    key: 'hardest',
-    label: 'What feels hardest right now?',
-    options: [
-      'Understanding ABA',
-      'Managing behavior at home',
-      'Feeling overwhelmed',
-      'Finding resources',
-      'Financial or insurance stress',
-      'Supporting siblings',
-      'Connecting with other parents',
-    ],
-  },
-  {
-    key: 'support',
-    label: 'What kind of support would help most this week?',
-    options: [
-      'A simple explanation',
-      'A home strategy I can try',
-      'Someone to talk to',
-      'Local resources',
-      'Help understanding costs',
-      'Support for the whole family',
-    ],
-  },
-  {
-    key: 'confidence',
-    label: 'How confident do you feel about what to do next?',
-    options: [
-      'I feel lost',
-      'I have some ideas',
-      'I know the next step, but need support',
-      'I feel confident',
-    ],
-  },
-  {
-    key: 'easier',
-    label: 'What would make this easier for your family?',
-    options: [
-      'Clear next steps',
-      'Less confusing information',
-      'Parent connection',
-      'Practical tools for home',
-      'Help finding services',
-      'Encouragement',
-    ],
-  },
-  {
-    key: 'connected',
-    label: 'Are you currently connected with Texas ABA Centers?',
-    options: ['Yes', 'No', "I'm not sure"],
-  },
-] as const;
-
-function buildCarePlan(answers: Answers): CarePlan {
-  const resources: CarePlan['resources'] = [];
-  const nextSteps: string[] = [];
-
-  const addResource = (label: string, href: string) => {
-    if (!resources.find((r) => r.label === label)) resources.push({ label, href });
-  };
-  const addStep = (step: string) => {
-    if (!nextSteps.includes(step)) nextSteps.push(step);
-  };
-
-  if (answers.hardest === 'Understanding ABA') {
-    addResource('What Is ABA?', '/support/what-is-aba');
-    addResource('Guides & Strategies', '/support/resources');
-    addStep('Read the quick What Is ABA? guide for a simple foundation.');
-  }
-  if (answers.hardest === 'Managing behavior at home') {
-    addResource('Guides & Strategies', '/support/resources');
-    addStep('Try one short home strategy from Guides & Strategies today.');
-  }
-  if (answers.hardest === 'Feeling overwhelmed') {
-    addResource('Parent Support', '/support/mental-health');
-    addResource('Connect With Parents', '/support/connect');
-    addStep('Take one small pause for yourself, then reach out to one support connection.');
-  }
-  if (answers.hardest === 'Finding resources') {
-    addResource('Find Local Help', '/support/find');
-    addStep('Use Find Local Help to shortlist two nearby support options.');
-  }
-  if (answers.hardest === 'Financial or insurance stress') {
-    addResource('Financial Help', '/support/financial');
-    addStep('Review Financial Help and write down one question about costs to ask this week.');
-  }
-  if (answers.hardest === 'Supporting siblings') {
-    addResource('Sibling Support', '/support/siblings');
-    addStep('Choose one sibling support idea you can try this week.');
-  }
-  if (answers.hardest === 'Connecting with other parents') {
-    addResource('Connect With Parents', '/support/connect');
-    addStep('Join one parent connection space for encouragement and shared ideas.');
-  }
-
-  if (answers.support === 'A simple explanation') addResource('What Is ABA?', '/support/what-is-aba');
-  if (answers.support === 'A home strategy I can try') addResource('Guides & Strategies', '/support/resources');
-  if (answers.support === 'Someone to talk to') addResource('Connect With Parents', '/support/connect');
-  if (answers.support === 'Local resources') addResource('Find Local Help', '/support/find');
-  if (answers.support === 'Help understanding costs') addResource('Financial Help', '/support/financial');
-  if (answers.support === 'Support for the whole family') addResource('Sibling Support', '/support/siblings');
-
-  if (nextSteps.length < 3) {
-    addStep('Pick one support page below and spend 10 minutes there.');
-    addStep('Write down one next question your family wants answered this week.');
-    addStep('Share your plan with someone you trust so you feel supported.');
-  }
-
-  const summary =
-    answers.confidence === 'I feel lost'
-      ? 'You are carrying a lot right now. We kept this plan extra simple so you can start with one step today.'
-      : 'You already have helpful insight into what your family needs. These next steps can help you move forward with support.';
-
-  const tryFirst =
-    answers.confidence === 'I feel lost'
-      ? 'Start with one step today: open one resource below and choose just one action to try.'
-      : 'Pick one next step below, then set aside 10 minutes to begin today.';
-
-  return {
-    summary,
-    nextSteps: nextSteps.slice(0, 3),
-    resources,
-    tryFirst,
-    encouragement: 'You do not have to figure this out all at once. Start with one next step.',
-    portalNote:
-      answers.connected === 'Yes'
-        ? 'Since you are already connected with Texas ABA Centers, you can also use your client portal for updates and support.'
-        : undefined,
-  };
-}
+type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 export default function IntakePage() {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({ hardest: null, support: null, confidence: null, easier: null, connected: null });
-  const [email, setEmail] = useState('');
-  const [emailStatus, setEmailStatus] = useState<string | null>(null);
-  const [showPlan, setShowPlan] = useState(false);
+  const router = useRouter();
 
-  const done = showPlan || step >= QUESTIONS.length;
-  const plan = useMemo(() => (done ? buildCarePlan(answers) : null), [done, answers]);
+  const [step, setStep] = useState<Step>(1);
+  const [hardest, setHardest] = useState<Hardest[]>([]);
+  const [stage, setStage] = useState<Stage | null>(null);
+  const [childAge, setChildAge] = useState<ChildAge | null>(null);
+  const [helpKind, setHelpKind] = useState<HelpKind | null>(null);
+  const [weekMood, setWeekMood] = useState<WeekMood | null>(null);
+  const [notes, setNotes] = useState('');
 
-  const current = QUESTIONS[step];
-
-  const selectOption = (value: string) => {
-    if (!current) return;
-
-    setAnswers((prev) => ({
-      ...prev,
-      [current.key]: value,
-    }));
-
-    if (step < QUESTIONS.length - 1) {
-      setStep((prev) => prev + 1);
-    } else {
-      setShowPlan(true);
+  const total = 7;
+  const canAdvance = useMemo(() => {
+    switch (step) {
+      case 1: return hardest.length > 0;
+      case 2: return stage !== null;
+      case 3: return childAge !== null;
+      case 4: return helpKind !== null;
+      case 5: return weekMood !== null;
+      case 6: return true; // notes optional
+      default: return true;
     }
+  }, [step, hardest, stage, childAge, helpKind, weekMood]);
+
+  const next = () => setStep((s) => (s < 7 ? ((s + 1) as Step) : s));
+  const back = () => setStep((s) => (s > 1 ? ((s - 1) as Step) : s));
+  const toggleHardest = (h: Hardest) => {
+    setHardest((arr) => (arr.includes(h) ? arr.filter((x) => x !== h) : [...arr, h]));
   };
 
-  const sendEmail = async () => {
-    setEmailStatus('Sending...');
-    const res = await fetch('/api/email-care-plan', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, answers, carePlan: plan }),
+  // Step 7 — confirmation: build & save the plan, then redirect to /support/care-plan.
+  useEffect(() => {
+    if (step !== 7) return;
+    const answers = { hardest, stage, childAge, helpKind, weekMood, notes: notes || null };
+    const steps = generateNextSteps(answers);
+    const resources = generateResources(answers);
+    saveCarePlan({
+      answers,
+      summary: generateSummary(answers),
+      steps,
+      resources,
+      weekMessage: generateWeekMessage(weekMood),
     });
-    const data = await res.json();
-    if (data.ok) setEmailStatus('Your care plan was sent.');
-    else if (data.reason === 'EMAIL_NOT_CONFIGURED') setEmailStatus('Email delivery is not connected yet, but your care plan is ready below. You can copy or screenshot it for now.');
-    else setEmailStatus('We couldn’t send the email right now, but your care plan is still available on this page.');
-  };
+    const t = window.setTimeout(() => router.push('/support/care-plan'), 1600);
+    return () => window.clearTimeout(t);
+  }, [step, hardest, stage, childAge, helpKind, weekMood, notes, router]);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <div className="rounded-3xl border border-surface-border bg-white p-6 shadow-card sm:p-8">
-        {!done ? (
-          <>
-            <h1 className="text-3xl font-bold text-brand-muted-900">Let&apos;s find your next best step</h1>
-            <p className="mt-2 text-brand-muted-700">Answer a few quick questions and we’ll build a simple care plan with support options for your family.</p>
-            <p className="mt-2 text-sm text-brand-muted-500">This is not a clinical assessment. It is a starting point to help you find support, resources, and next steps.</p>
-            <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-primary">Question {step + 1} of {QUESTIONS.length}</p>
-            <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">{current?.label}</h2>
+    <main className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="rounded-3xl border border-surface-border bg-white p-6 shadow-soft sm:p-8">
+        {step < 7 && (
+          <header className="mb-6">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+              question {step} of {total - 1}
+            </p>
+            <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-subtle">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-500"
+                style={{ width: `${((step - 1) / (total - 1)) * 100}%` }}
+              />
+            </div>
+          </header>
+        )}
 
-            <div className="mt-5 grid gap-3">
-              {current?.options.map((opt) => (
-                <button key={opt} type="button" aria-label={opt} onClick={() => selectOption(opt)} className="flex w-full items-center justify-between rounded-2xl border-2 border-surface-border px-4 py-4 text-left font-semibold text-brand-muted-800 hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                  <span>{opt}</span>
-                  <Check className="h-4 w-4 text-primary opacity-60" />
-                </button>
+        {step === 1 && (
+          <Question
+            title="What feels hardest right now?"
+            hint="Pick anything that fits — you can choose more than one."
+          >
+            <div className="grid gap-2">
+              {HARDEST_OPTIONS.map((opt) => (
+                <Toggle
+                  key={opt.value}
+                  active={hardest.includes(opt.value)}
+                  onClick={() => toggleHardest(opt.value)}
+                  label={opt.label}
+                />
               ))}
             </div>
+          </Question>
+        )}
 
-            <div className="mt-6">
-              {step > 0 && (
-                <button type="button" onClick={() => setStep((s) => Math.max(0, s - 1))} className="inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
-                  <ArrowLeft className="h-4 w-4" /> Back
-                </button>
-              )}
+        {step === 2 && (
+          <Question title="What stage are you in?" hint="Pick one. There&rsquo;s no wrong answer.">
+            <div className="grid gap-2">
+              {STAGE_OPTIONS.map((opt) => (
+                <Toggle
+                  key={opt.value}
+                  active={stage === opt.value}
+                  onClick={() => setStage(opt.value)}
+                  label={opt.label}
+                />
+              ))}
             </div>
-          </>
-        ) : (
-          <>
-            <h1 className="text-3xl font-bold text-brand-muted-900">Your Family Care Plan</h1>
-            <p className="mt-2 text-brand-muted-700">Based on your answers, here are a few helpful starting points.</p>
+          </Question>
+        )}
 
-            <section className="mt-6 rounded-2xl bg-surface-subtle p-4">
-              <h2 className="font-semibold">Start here</h2>
-              <p className="mt-2 text-sm">{plan?.summary}</p>
-              <ul className="mt-3 list-disc pl-5 text-sm">
-                {plan?.nextSteps.map((stepItem) => <li key={stepItem}>{stepItem}</li>)}
-              </ul>
-            </section>
+        {step === 3 && (
+          <Question title="How old is your child?">
+            <div className="grid grid-cols-4 gap-2">
+              {AGE_OPTIONS.map((opt) => (
+                <Toggle
+                  key={opt.value}
+                  active={childAge === opt.value}
+                  onClick={() => setChildAge(opt.value)}
+                  label={opt.label}
+                  compact
+                />
+              ))}
+            </div>
+          </Question>
+        )}
 
-            <section className="mt-4 rounded-2xl border border-surface-border p-4">
-              <h2 className="font-semibold">Helpful resources for you</h2>
-              <ul className="mt-3 space-y-2 text-sm">
-                {plan?.resources.map((resource) => (
-                  <li key={resource.label}><Link className="text-primary underline" href={resource.href}>{resource.label}</Link></li>
-                ))}
-                {answers.connected === 'Yes' && <li><Link className="text-primary underline" href="/client">Client Portal</Link></li>}
-              </ul>
-            </section>
+        {step === 4 && (
+          <Question title="What kind of help feels right today?">
+            <div className="grid gap-2 sm:grid-cols-2">
+              {HELP_OPTIONS.map((opt) => (
+                <Toggle
+                  key={opt.value}
+                  active={helpKind === opt.value}
+                  onClick={() => setHelpKind(opt.value)}
+                  label={opt.label}
+                />
+              ))}
+            </div>
+          </Question>
+        )}
 
-            <section className="mt-4 rounded-2xl border border-surface-border p-4">
-              <h2 className="font-semibold">Try this first</h2>
-              <p className="mt-2 text-sm">{plan?.tryFirst}</p>
-            </section>
+        {step === 5 && (
+          <Question title="How are you doing this week?" hint="The same words you'd see in Still Waters.">
+            <div className="grid grid-cols-5 gap-2">
+              {MOOD_OPTIONS.map((opt) => (
+                <Toggle
+                  key={opt.value}
+                  active={weekMood === opt.value}
+                  onClick={() => setWeekMood(opt.value)}
+                  label={opt.label}
+                  compact
+                />
+              ))}
+            </div>
+          </Question>
+        )}
 
-            <section className="mt-4 rounded-2xl border border-surface-border p-4">
-              <h2 className="font-semibold">Encouragement</h2>
-              <p className="mt-2 text-sm">{plan?.encouragement}</p>
-              {plan?.portalNote && (
-                <p className="mt-2 text-sm"><Link href="/client" className="font-semibold text-accent underline">Go to Client Portal</Link> — {plan.portalNote}</p>
+        {step === 6 && (
+          <Question title="Anything you want us to know?" hint="Optional. Skip if today isn&rsquo;t a writing day.">
+            <textarea
+              rows={5}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="A sentence is enough."
+              className="w-full rounded-2xl border border-surface-border bg-white px-3 py-3 text-[14px] focus:border-primary focus:outline-none"
+            />
+          </Question>
+        )}
+
+        {step === 7 && (
+          <div className="py-10 text-center">
+            <div
+              aria-hidden
+              className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary/20 border-t-primary"
+            />
+            <h1 className="mt-6 text-2xl font-semibold text-brand-navy-700">building your plan…</h1>
+            <p className="mt-2 text-[14px] text-brand-muted-600">
+              we&rsquo;ll keep it simple. one moment.
+            </p>
+          </div>
+        )}
+
+        {step < 7 && (
+          <div className="mt-8 flex items-center justify-between">
+            <button
+              type="button"
+              disabled={step === 1}
+              onClick={back}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold',
+                step === 1
+                  ? 'cursor-not-allowed text-brand-muted-300'
+                  : 'text-brand-muted-700 hover:bg-surface-subtle hover:text-brand-muted-900',
               )}
-            </section>
-
-            <section className="mt-6 rounded-2xl border border-primary/20 bg-primary/5 p-4">
-              <h2 className="font-semibold">Want a copy of this plan?</h2>
-              <p className="mt-1 text-sm">Enter your email and we’ll send this care plan so you can come back to it later.</p>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" aria-label="Email address" placeholder="Email address" className="mt-3 w-full rounded-xl border border-surface-border px-3 py-2" />
-              <button type="button" onClick={sendEmail} disabled={!email} className={cn('mt-3 rounded-xl px-4 py-2 font-semibold text-white', email ? 'bg-primary' : 'bg-stone-300')}>
-                Email My Care Plan
-              </button>
-              {emailStatus && <p className="mt-2 text-sm text-brand-muted-700">{emailStatus}</p>}
-            </section>
-
-            <button type="button" onClick={() => { setStep(0); setShowPlan(false); setAnswers({ hardest: null, support: null, confidence: null, easier: null, connected: null }); setEmail(''); setEmailStatus(null); }} className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-muted-700 hover:text-brand-muted-900">
-              <RefreshCw className="h-4 w-4" /> Restart
+            >
+              <ArrowLeft className="h-4 w-4" /> back
             </button>
-          </>
+            <button
+              type="button"
+              disabled={!canAdvance}
+              onClick={next}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition',
+                canAdvance ? 'bg-primary hover:bg-primary/90' : 'bg-stone-300',
+              )}
+            >
+              {step === 6 ? 'build my plan' : 'continue'} <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         )}
       </div>
     </main>
+  );
+}
+
+function Question({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <h1 className="text-2xl font-semibold leading-snug text-brand-navy-700">{title}</h1>
+      {hint && <p className="mt-1 text-[13.5px] text-brand-muted-500">{hint}</p>}
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+function Toggle({
+  active,
+  onClick,
+  label,
+  compact,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        'flex w-full items-center justify-between gap-2 rounded-2xl border-2 text-left text-[13.5px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+        compact ? 'px-3 py-2 text-center justify-center' : 'px-4 py-3.5',
+        active
+          ? 'border-primary bg-primary/5 text-brand-navy-700'
+          : 'border-surface-border bg-white text-brand-muted-700 hover:border-primary/40 hover:bg-primary/5',
+      )}
+    >
+      <span className={compact ? 'mx-auto' : ''}>{label}</span>
+      {!compact && <Check className={cn('h-4 w-4 text-primary', active ? 'opacity-100' : 'opacity-0')} />}
+    </button>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { ArrowUpRight, Bookmark, BookOpen, Clock, Search, Tag } from 'lucide-react';
+import { ArrowUpRight, Bookmark, BookOpen, Clock, Search, Tag, X } from 'lucide-react';
 import {
   categoryMeta,
   resources,
@@ -29,6 +29,7 @@ const RESOURCES_TOC: TocItem[] = CATEGORY_ORDER.map((cat, i) => ({
 export default function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+  const [demoModalOpen, setDemoModalOpen] = useState<string | null>(null);
 
   // Group all resources by category, then filter each group by the search
   // query. A category section is hidden entirely when its filtered list is
@@ -144,6 +145,11 @@ export default function ResourcesPage() {
                             <span className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-semibold ${meta.color}`}>
                               {meta.emoji} {meta.label}
                             </span>
+                            {resource.isDemo && (
+                              <span className="rounded-full border border-amber-300 bg-amber-100 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide text-amber-800">
+                                Example
+                              </span>
+                            )}
                             <span className="rounded-full border border-surface-border bg-surface-muted px-3 py-1 text-[11px] font-medium text-brand-muted-500">
                               {resource.lastUpdated}
                             </span>
@@ -181,7 +187,15 @@ export default function ResourcesPage() {
                             </span>
                             <span>{resource.reviewedBy}</span>
                           </div>
-                          {resource.url ? (
+                          {resource.isDemo ? (
+                            <button
+                              type="button"
+                              onClick={() => setDemoModalOpen(resource.id)}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+                            >
+                              Visit resource <ArrowUpRight className="h-3 w-3" />
+                            </button>
+                          ) : resource.url ? (
                             <a
                               href={resource.url}
                               target="_blank"
@@ -190,10 +204,6 @@ export default function ResourcesPage() {
                             >
                               Visit resource <ArrowUpRight className="h-3 w-3" />
                             </a>
-                          ) : resource.isDemo ? (
-                            <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-amber-800">
-                              Example content
-                            </span>
                           ) : null}
                         </div>
                       </article>
@@ -215,6 +225,47 @@ export default function ResourcesPage() {
           )}
         </div>
       </div>
+
+      {demoModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="example resource"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setDemoModalOpen(null)}
+        >
+          <div
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md rounded-2xl border border-surface-border bg-white p-6 shadow-card"
+          >
+            <button
+              type="button"
+              onClick={() => setDemoModalOpen(null)}
+              aria-label="close"
+              className="absolute right-3 top-3 rounded-full p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+              example resource
+            </p>
+            <h3 className="mt-2 text-lg font-semibold text-brand-navy-700">
+              this is a placeholder while we vet our partner library.
+            </h3>
+            <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
+              we&rsquo;ll publish the real version soon. it&rsquo;s here so you can see the kind of guides we&rsquo;re building toward.
+            </p>
+            <button
+              type="button"
+              onClick={() => setDemoModalOpen(null)}
+              className="mt-5 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-primary/90"
+            >
+              got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
