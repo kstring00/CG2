@@ -33,15 +33,15 @@ type CarePlan = {
 const QUESTIONS: readonly Question[] = [
   {
     key: 'hardest',
-    label: 'What feels hardest right now?',
+    label: 'What kind of support would help most today?',
     options: [
-      'Understanding ABA',
-      'Managing behavior at home',
-      'Feeling overwhelmed',
-      'Finding resources',
-      'Financial or insurance stress',
-      'Supporting siblings',
-      'Connecting with other parents',
+      'I need help understanding ABA',
+      'Behavior at home feels hard right now',
+      'I feel overwhelmed or emotionally drained',
+      'I need help finding resources',
+      'Insurance or financial stress is weighing on me',
+      'I want help supporting siblings',
+      'I want to connect with another parent',
     ],
   },
   {
@@ -96,33 +96,33 @@ function buildCarePlan(answers: Answers): CarePlan {
     if (!nextSteps.includes(step)) nextSteps.push(step);
   };
 
-  if (answers.hardest === 'Understanding ABA') {
+  if (answers.hardest === 'I need help understanding ABA') {
     addResource('What Is ABA?', '/support/what-is-aba');
     addResource('Guides & Strategies', '/support/resources');
     addStep('Read the quick What Is ABA? guide for a simple foundation.');
   }
-  if (answers.hardest === 'Managing behavior at home') {
+  if (answers.hardest === 'Behavior at home feels hard right now') {
     addResource('Guides & Strategies', '/support/resources');
     addStep('Try one short home strategy from Guides & Strategies today.');
   }
-  if (answers.hardest === 'Feeling overwhelmed') {
+  if (answers.hardest === 'I feel overwhelmed or emotionally drained') {
     addResource('Parent Support', '/support/mental-health');
     addResource('Connect With Parents', '/support/connect');
     addStep('Take one small pause for yourself, then reach out to one support connection.');
   }
-  if (answers.hardest === 'Finding resources') {
+  if (answers.hardest === 'I need help finding resources') {
     addResource('Find Local Help', '/support/find');
     addStep('Use Find Local Help to shortlist two nearby support options.');
   }
-  if (answers.hardest === 'Financial or insurance stress') {
+  if (answers.hardest === 'Insurance or financial stress is weighing on me') {
     addResource('Financial Help', '/support/financial');
     addStep('Review Financial Help and write down one question about costs to ask this week.');
   }
-  if (answers.hardest === 'Supporting siblings') {
+  if (answers.hardest === 'I want help supporting siblings') {
     addResource('Sibling Support', '/support/siblings');
     addStep('Choose one sibling support idea you can try this week.');
   }
-  if (answers.hardest === 'Connecting with other parents') {
+  if (answers.hardest === 'I want to connect with another parent') {
     addResource('Connect With Parents', '/support/connect');
     addStep('Join one parent connection space for encouragement and shared ideas.');
   }
@@ -169,6 +169,7 @@ export default function IntakePage() {
   const [email, setEmail] = useState('');
   const [emailStatus, setEmailStatus] = useState<string | null>(null);
   const [showPlan, setShowPlan] = useState(false);
+  const [warmResponse, setWarmResponse] = useState<string | null>(null);
 
   const done = showPlan || step >= QUESTIONS.length;
   const plan = useMemo(() => (done ? buildCarePlan(answers) : null), [done, answers]);
@@ -183,11 +184,22 @@ export default function IntakePage() {
       [current.key]: value,
     }));
 
-    if (step < QUESTIONS.length - 1) {
-      setStep((prev) => prev + 1);
-    } else {
-      setShowPlan(true);
+    if (current.key === 'hardest') {
+      const response =
+        value === 'I feel overwhelmed or emotionally drained'
+          ? 'You are not failing. This can feel heavy. Let’s find one lighter next step.'
+          : 'Thank you for sharing where today feels hard. We’ll guide you to one clear next step.';
+      setWarmResponse(response);
+      window.setTimeout(() => {
+        setWarmResponse(null);
+        if (step < QUESTIONS.length - 1) setStep((prev) => prev + 1);
+        else setShowPlan(true);
+      }, 1000);
+      return;
     }
+
+    if (step < QUESTIONS.length - 1) setStep((prev) => prev + 1);
+    else setShowPlan(true);
   };
 
   const sendEmail = async () => {
@@ -207,20 +219,37 @@ export default function IntakePage() {
       <div className="rounded-3xl border border-surface-border bg-white p-6 shadow-card sm:p-8">
         {!done ? (
           <>
-            <h1 className="text-3xl font-bold text-brand-muted-900">Let&apos;s find your next best step</h1>
-            <p className="mt-2 text-brand-muted-700">Answer a few quick questions and we’ll build a simple care plan with support options for your family.</p>
+            <h1 className="text-3xl font-bold text-brand-muted-900">Start where you are.</h1>
+            <p className="mt-2 text-brand-muted-700">Pick the area that feels heaviest today. We’ll point you toward a next step — not a diagnosis, not a judgment, just support.</p>
             <p className="mt-2 text-sm text-brand-muted-500">This is not a clinical assessment. It is a starting point to help you find support, resources, and next steps.</p>
             <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-primary">Question {step + 1} of {QUESTIONS.length}</p>
             <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">{current?.label}</h2>
+            <div className="mt-3 rounded-2xl bg-surface-subtle px-4 py-3 text-sm text-brand-muted-700">
+              You do not have to know exactly what you need. Choose the closest fit — we’ll help narrow it down.
+            </div>
+            {warmResponse && (
+              <div className="mt-3 rounded-2xl bg-primary/10 px-4 py-3 text-sm font-medium text-brand-muted-800">{warmResponse}</div>
+            )}
 
             <div className="mt-5 grid gap-3">
               {current?.options.map((opt) => (
-                <button key={opt} type="button" aria-label={opt} onClick={() => selectOption(opt)} className="flex w-full items-center justify-between rounded-2xl border-2 border-surface-border px-4 py-4 text-left font-semibold text-brand-muted-800 hover:border-primary/50 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                <button key={opt} type="button" aria-label={opt} onClick={() => selectOption(opt)} className="flex w-full items-center justify-between rounded-2xl border border-surface-border bg-white px-4 py-4 text-left font-semibold text-brand-muted-800 hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                   <span>{opt}</span>
                   <Check className="h-4 w-4 text-primary opacity-60" />
                 </button>
               ))}
             </div>
+
+            <aside className="mt-6 rounded-2xl border border-surface-border/80 bg-surface-subtle/60 p-4">
+              <h3 className="text-sm font-semibold text-brand-muted-900">Today&apos;s Parent Check-In</h3>
+              <p className="mt-1 text-sm text-brand-muted-700">How supported do you feel today?</p>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs text-brand-muted-700">
+                <div className="rounded-xl bg-white px-2 py-2">1 = Barely getting through</div>
+                <div className="rounded-xl bg-white px-2 py-2">3 = Managing</div>
+                <div className="rounded-xl bg-white px-2 py-2">5 = Feeling supported</div>
+              </div>
+              <p className="mt-3 text-xs text-brand-muted-600">Your answer helps us understand what families may need more of this week.</p>
+            </aside>
 
             <div className="mt-6">
               {step > 0 && (
