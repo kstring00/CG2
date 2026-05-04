@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import type { Inputs, HistoryDay, Driver } from './RiskEngine';
 import { riskState } from './RiskEngine';
 import type { Rec, RecAction, Insight } from './RecommendationsEngine';
@@ -298,6 +299,36 @@ export function DashboardTab({
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Ground Level — deeper read on what the week is asking. Lives here, not the sidebar. */}
+      <div
+        className={`${styles.card} ${styles.sectionSpacer}`}
+        style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}
+      >
+        <div style={{ minWidth: 0, maxWidth: 520 }}>
+          <p style={{ margin: 0, fontSize: 14.5, color: 'var(--ink-700, #474950)', lineHeight: 1.5 }}>
+            want a deeper read on what your week is asking of you?
+          </p>
+        </div>
+        <Link
+          href="/support/ground-level"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 14px',
+            borderRadius: 12,
+            background: 'var(--ink-900, #1f2227)',
+            color: 'white',
+            fontWeight: 600,
+            fontSize: 13,
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          open ground level →
+        </Link>
       </div>
 
       {/* Trend — collapsed to a tighter card; metric segmented control sits in the header */}

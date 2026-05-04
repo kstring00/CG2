@@ -321,6 +321,12 @@ export default function CaregiverSupportPage() {
             Open my check-in dashboard <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
+        <p className="mt-3 text-[13px] text-brand-muted-600">
+          or read what&rsquo;s underneath this week —{' '}
+          <Link href="/support/ground-level" className="font-semibold text-primary hover:underline">
+            ground level →
+          </Link>
+        </p>
       </section>
 
       {showStillWatersPreview && (

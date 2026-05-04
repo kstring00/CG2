@@ -22,6 +22,7 @@ import {
   Feather,
 } from 'lucide-react';
 import WellnessMirror from '@/components/WellnessMirror';
+import GroundLevelHomeNudge from '@/components/groundLevel/GroundLevelHomeNudge';
 
 const supportActions = [
   {
@@ -119,7 +120,10 @@ export default function SupportHome() {
         </div>
       </section>
 
-      <WellnessMirror />
+      <div>
+        <WellnessMirror />
+        <GroundLevelHomeNudge />
+      </div>
 
       {/* Pathfinder presence — above the fold, gentle indicator that there is
           a real human layer being built. Demo until matching is live. */}
