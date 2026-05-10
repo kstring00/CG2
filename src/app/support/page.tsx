@@ -9,8 +9,6 @@ import {
   Heart,
   HeartHandshake,
   Home,
-  MessageCircleHeart,
-  Sparkles,
   Users,
   Wallet,
   MapPin,
@@ -188,27 +186,7 @@ export default function SupportHome() {
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/60 p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-plum-700">Start small</p>
-          <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">When everything feels like too much</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              { label: 'Pause', icon: Wind },
-              { label: 'Pick one thing', icon: Sparkles },
-              { label: 'Reach out', icon: MessageCircleHeart },
-            ].map((step) => (
-              <div key={step.label} className="rounded-2xl bg-white/90 p-3 text-center">
-                <step.icon className="mx-auto h-4 w-4 text-brand-plum-700" />
-                <p className="mt-2 text-sm font-medium text-brand-muted-800">{step.label}</p>
-              </div>
-            ))}
-          </div>
-          <Link href="/support/hard-days" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-plum-700 hover:underline">
-            See calm-now support <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
+      <section>
         <div className="rounded-3xl border border-surface-border bg-white p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Support for your family</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
