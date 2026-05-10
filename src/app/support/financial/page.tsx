@@ -357,7 +357,7 @@ function MedicaidBody() {
           </span>
           <div className={styles.waiverMeta}>
             <span><strong>For</strong> Children with significant medical needs.</span>
-            <span><strong>Wait</strong> Months to about a year [verify].</span>
+            <span><strong>Wait</strong> Months to about a year.</span>
           </div>
         </li>
         <li className={styles.waiverItem}>
@@ -369,7 +369,7 @@ function MedicaidBody() {
           </span>
           <div className={styles.waiverMeta}>
             <span><strong>For</strong> Individuals with related conditions (autism qualifies).</span>
-            <span><strong>Wait</strong> Many years — often 5+ [verify].</span>
+            <span><strong>Wait</strong> Many years — often 5+.</span>
           </div>
         </li>
         <li className={styles.waiverItem}>
@@ -381,7 +381,7 @@ function MedicaidBody() {
           </span>
           <div className={styles.waiverMeta}>
             <span><strong>For</strong> Individuals with IDD (autism qualifies).</span>
-            <span><strong>Wait</strong> 10+ years in most parts of Texas [verify].</span>
+            <span><strong>Wait</strong> 10+ years in most parts of Texas.</span>
           </div>
         </li>
         <li className={styles.waiverItem}>
@@ -392,7 +392,7 @@ function MedicaidBody() {
           </span>
           <div className={styles.waiverMeta}>
             <span><strong>For</strong> Individuals with IDD living at home.</span>
-            <span><strong>Wait</strong> Multi-year, similar to HCS [verify].</span>
+            <span><strong>Wait</strong> Multi-year, similar to HCS.</span>
           </div>
         </li>
       </ul>
@@ -487,7 +487,7 @@ function AbleBody() {
         <li>
           <strong>Eligibility is the disability, not the diagnosis date.</strong> The disability
           must have begun before age 26. (The ABLE Age Adjustment Act raises this to age 46
-          starting in 2026 [verify effective date]; if your child&apos;s diagnosis came later, this
+          starting in 2026; if your child&apos;s diagnosis came later, this
           change matters.)
         </li>
       </ul>
@@ -498,18 +498,18 @@ function AbleBody() {
       <ul>
         <li>
           <strong>Annual contribution cap.</strong> The federal limit is tied to the gift-tax annual
-          exclusion — currently $18,000 / year per beneficiary [verify for current tax year]. This
+          exclusion — currently $18,000 / year per beneficiary. This
           is the total across all contributors combined.
         </li>
         <li>
           <strong>ABLE-to-Work.</strong> If the beneficiary works and is not enrolled in an employer
           retirement plan, an additional contribution is allowed up to the lesser of (a) their
           annual gross earnings or (b) the federal poverty line for a one-person household
-          (~$15,060 for 2024 [verify]). This stacks on top of the $18,000 base.
+          (~$15,060 for 2024). This stacks on top of the $18,000 base.
         </li>
         <li>
           <strong>Total balance cap.</strong> Each state sets its own ceiling — Texas&apos; cap is in the
-          $500K range [verify exact figure]. Most state caps fall between $300K and $550K. Hitting
+          $500K range. Most state caps fall between $300K and $550K. Hitting
           the cap is a good problem most families never face.
         </li>
         <li>
@@ -535,7 +535,7 @@ function AbleBody() {
           plans on annual fees, investment options, debit-card access, and minimum contribution at{' '}
           <span className={styles.kbd}>ablenrc.org</span> (the ABLE National Resource Center
           comparison tool). Texans default to the Texas ABLE plan; other strong national options
-          include Ohio STABLE and Oregon ABLE for State [verify].
+          include Ohio STABLE and Oregon ABLE.
         </li>
         <li>
           <strong>Gather your documents.</strong> Beneficiary&apos;s Social Security number, date of
@@ -588,8 +588,8 @@ function RespiteBody() {
           <div className={styles.resCardBody}>
             <p>
               Texas&apos;s Lifespan Respite program offering subsidized respite vouchers families can
-              redeem with approved providers. Annual allocation per family varies by funding cycle
-              [verify]. Apply through{' '}
+              redeem with approved providers. Annual allocation per family varies by funding cycle.
+              Apply through{' '}
               <span className={styles.kbd}>taketimetexas.org</span> — registration is the gating
               step; vouchers are released as funding allows.
             </p>
@@ -603,7 +603,7 @@ function RespiteBody() {
         <div className={styles.resCard}>
           <h4>Autism Cares Today</h4>
           <div className={styles.resCardMeta}>
-            <span><strong>Award</strong> $100 – $5,000 [verify range]</span>
+            <span><strong>Award</strong> $100 – $5,000</span>
             <span><strong>Best for</strong> Specific therapy, medical, or equipment needs</span>
           </div>
           <div className={styles.resCardBody}>
@@ -622,7 +622,7 @@ function RespiteBody() {
         <div className={styles.resCard}>
           <h4>UnitedHealthcare Children&apos;s Foundation</h4>
           <div className={styles.resCardMeta}>
-            <span><strong>Award</strong> Up to $5,000 [verify]</span>
+            <span><strong>Award</strong> Up to $5,000</span>
             <span><strong>Best for</strong> Medical bills, specialized equipment insurance won&apos;t cover</span>
           </div>
           <div className={styles.resCardBody}>
@@ -634,14 +634,14 @@ function RespiteBody() {
           </div>
           <div className={styles.resCardReach}>
             <strong>To reach:</strong> uhccf.org · application is online, decisions typically
-            within a few weeks [verify].
+            within a few weeks.
           </div>
         </div>
 
         <div className={styles.resCard}>
           <h4>ACT Today (Autism Care and Treatment Today)</h4>
           <div className={styles.resCardMeta}>
-            <span><strong>Award</strong> $100 – $5,000 [verify range]</span>
+            <span><strong>Award</strong> $100 – $5,000</span>
             <span><strong>Best for</strong> Bridge funding for therapy when waivers are pending</span>
           </div>
           <div className={styles.resCardBody}>
@@ -660,7 +660,7 @@ function RespiteBody() {
         <div className={styles.resCard}>
           <h4>MyGOAL Inc.</h4>
           <div className={styles.resCardMeta}>
-            <span><strong>Award</strong> Multi-thousand range, varies by program [verify]</span>
+            <span><strong>Award</strong> Multi-thousand range, varies by program</span>
             <span><strong>Best for</strong> Filling gaps in covered therapy and intervention</span>
           </div>
           <div className={styles.resCardBody}>
@@ -749,8 +749,8 @@ function TaxesBody() {
       </h3>
       <p>
         Federal credit for childcare or respite costs paid so you can work (or look for work). Up to
-        $3,000 in qualifying expenses for one dependent or $6,000 for two or more [verify for
-        current tax year]. The credit rate scales with income — between 20% and 35% of qualifying
+        $3,000 in qualifying expenses for one dependent or $6,000 for two or more. The credit rate
+        scales with income — between 20% and 35% of qualifying
         expenses. For an autism family, the under-used part is that:
       </p>
       <ul>
@@ -785,7 +785,7 @@ function TaxesBody() {
         </li>
         <li>
           <strong>Mileage to and from medical appointments.</strong> Track every drive at the
-          current IRS medical-mileage rate (21¢ per mile for 2024 [verify current year]). Over a
+          current IRS medical-mileage rate (21¢ per mile for 2024). Over a
           year of weekly therapy visits this adds up to real dollars.
         </li>
         <li>
@@ -834,7 +834,7 @@ function TaxesBody() {
         Federal credit on Form 8880 for retirement and ABLE-account contributions. ABLE beneficiaries
         who contribute to their own ABLE account from earned income can claim a credit of 10–50% of
         contributions, up to $2,000 in contributions ($4,000 if married filing jointly), based on
-        AGI [verify current-year income limits]. Often missed by working ABLE beneficiaries and the
+        AGI. Often missed by working ABLE beneficiaries and the
         families filing for them.
       </p>
 
@@ -895,7 +895,7 @@ function AdulthoodBody() {
           — things SSI/Medicaid won&apos;t cover); the trustee, not the beneficiary, controls
           distributions, which protects funds from creditors and from the beneficiary&apos;s own
           decisions when capacity varies. Setup costs from an attorney typically run $1,500–$3,500
-          for a third-party SNT [verify current-market range], with annual trustee fees if you use a
+          for a third-party SNT, with annual trustee fees if you use a
           professional trustee.
         </li>
         <li>
@@ -927,7 +927,7 @@ function AdulthoodBody() {
         <li>
           <strong>Full guardianship.</strong> A court legally removes some or all of the disabled
           adult&apos;s decision-making rights and assigns them to you. Setup typically costs $1,500–$5,000
-          in attorney and court fees [verify], with ongoing annual reporting to the court (often
+          in attorney and court fees, with ongoing annual reporting to the court (often
           requiring an annual attorney bill). The adult loses the legal right to enter contracts,
           choose where to live, marry, vote in some states, or make medical decisions independently.
         </li>
@@ -973,9 +973,9 @@ function AdulthoodBody() {
           <strong>The adult disability standard applies.</strong> Instead of the childhood
           &ldquo;marked and severe functional limitations&rdquo; test, the SSA evaluates inability
           to engage in substantial gainful activity (SGA) — essentially, can the person earn above
-          a defined monthly threshold ($1,550/month in 2024 [verify current-year SGA limit])?
+          a defined monthly threshold ($1,550/month in 2024)?
           Roughly a third of childhood SSI recipients are redetermined as ineligible at 18 under
-          adult standards [verify recent figure]; appeal rates are high and the disabled adult is
+          adult standards; appeal rates are high and the disabled adult is
           entitled to continued benefits during appeal.
         </li>
       </ul>
@@ -1214,7 +1214,7 @@ function ScriptsBody() {
           <p>
             FMLA is unpaid by federal default, but many employers run paid leave or short-term
             disability concurrent. Ask whether your company has a separate paid family leave
-            policy — some states (CA, NY, NJ, MA, WA, CT, OR, CO, RI, DC, and others [verify list])
+            policy — some states (CA, NY, NJ, MA, WA, CT, OR, CO, RI, DC, and others)
             have state-funded paid family leave that can stack with FMLA.
           </p>
         </div>
