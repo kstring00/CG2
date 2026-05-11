@@ -287,10 +287,6 @@ export default function HomePage() {
             <Link href="/support/siblings" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
               <Users className="h-3.5 w-3.5" /> My other kids are struggling
             </Link>
-            <span className="text-stone-300">·</span>
-            <Link href="/support/hard-days" className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-600 underline-offset-2 hover:underline">
-              <Wind className="h-3.5 w-3.5" /> I need support right now
-            </Link>
           </div>
         </div>
       </section>
