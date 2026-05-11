@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -37,7 +36,6 @@ export function ClientShell({
   children: React.ReactNode;
   clientName?: string;
 }) {
-  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const SidebarContent = () => (
@@ -62,28 +60,21 @@ export function ClientShell({
           Your care
         </p>
         <ul className="m-0 flex list-none flex-col gap-1 p-0">
-          {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (pathname.startsWith(item.href) && item.href !== '/client');
-            return (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
-                    isActive
-                      ? 'bg-accent text-white shadow-soft'
-                      : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-                  )}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  {item.label}
-                </a>
-              </li>
-            );
-          })}
+          {navItems.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                  'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
+                )}
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+                {item.label}
+              </a>
+            </li>
+          ))}
         </ul>
 
         {/* Cross-layer links */}

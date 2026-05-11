@@ -102,9 +102,6 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             </p>
             <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
               {group.items.map((item) => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== '/support' && pathname.startsWith(item.href));
                 const isHighlight = (item as { highlight?: boolean }).highlight;
                 return (
                   <li key={item.href}>
@@ -113,9 +110,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
-                        isActive
-                          ? 'bg-primary text-white shadow-soft'
-                          : isHighlight
+                        isHighlight
                           ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
                           : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
                       )}
