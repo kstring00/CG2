@@ -39,13 +39,6 @@ const supportActions = [
     icon: Home,
   },
   {
-    title: 'I feel overwhelmed',
-    desc: 'Use gentle tools when today feels too heavy.',
-    cta: 'Start small',
-    href: '/support/hard-days',
-    icon: Wind,
-  },
-  {
     title: 'I want to understand ABA',
     desc: 'Learn the basics in clear, parent-friendly language.',
     cta: 'ABA basics',
@@ -204,9 +197,6 @@ export default function SupportHome() {
               </div>
             ))}
           </div>
-          <Link href="/support/hard-days" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-plum-700 hover:underline">
-            See calm-now support <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
 
         <div className="rounded-3xl border border-surface-border bg-white p-6">
