@@ -41,13 +41,13 @@ export default function ReviewBanner() {
   return (
     <div
       role="region"
-      aria-label="site is in active review"
+      aria-label="Site is in active review"
       className="w-full border-b border-brand-warm-300 bg-brand-warm-100 text-brand-muted-700"
     >
       <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3 px-3 py-2 text-[12px] sm:px-6">
         <p className="leading-snug">
-          <span className="font-semibold text-brand-navy-700">common ground is in active review.</span>{' '}
-          some sections show example listings, demo profiles, and placeholder data while we partner with families and providers. look for{' '}
+          <span className="font-semibold text-brand-navy-700">Common Ground is in active review.</span>{' '}
+          Some sections show example listings, demo profiles, and placeholder data while we partner with families and providers. Look for{' '}
           <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-[11px] font-semibold text-amber-800">
             example
           </span>{' '}
@@ -56,13 +56,13 @@ export default function ReviewBanner() {
             href="/about/in-review"
             className="ml-1 inline-flex items-center gap-0.5 font-semibold text-primary underline-offset-2 hover:underline"
           >
-            learn more <ArrowRight className="h-3 w-3" />
+            Learn More <ArrowRight className="h-3 w-3" />
           </Link>
         </p>
         <button
           type="button"
           onClick={handleDismiss}
-          aria-label="dismiss review banner for this session"
+          aria-label="Dismiss review banner for this session"
           className="-mr-1 shrink-0 rounded-full p-1 text-brand-muted-400 hover:bg-brand-warm-200 hover:text-brand-muted-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-muted-400"
         >
           <X className="h-3.5 w-3.5" />
