@@ -54,11 +54,25 @@ export type CarePlanStep = {
   title: string;
   why: string;
   href: string;
+  /** Plain-language reason — e.g. "Because you said meltdowns are hardest right now." */
+  because?: string;
+  /** Internal score used for ordering. Higher = surfaced first. */
+  weight?: number;
 };
 
 export type CarePlanResource = {
   label: string;
   href: string;
+  /** Optional tag explaining why this resource was picked. */
+  because?: string;
+};
+
+/** Echoed phrase captured from the parent's free-text notes. */
+export type NoteEcho = {
+  /** The exact phrase or keyword we matched. */
+  phrase: string;
+  /** What we'll do with it on the plan page. */
+  reflection: string;
 };
 
 export type SavedCarePlan = {
@@ -70,6 +84,8 @@ export type SavedCarePlan = {
   steps: CarePlanStep[];
   resources: CarePlanResource[];
   weekMessage?: string;
+  /** Reflected phrases from the notes field. */
+  noteEchoes?: NoteEcho[];
 };
 
 const KEY = 'cg.carePlan.v1';
