@@ -25,7 +25,7 @@ function SupportPathfinderBlock() {
   return (
     <div>
       <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink-500, #6e727a)', marginBottom: 8 }}>
-        your pathfinder
+        Your Pathfinder
       </p>
       <PathfinderCard showSendAction />
     </div>
@@ -413,7 +413,7 @@ export default function MentalHealthCenter() {
                 cursor: 'pointer',
               }}
             >
-              view example data
+              View example data
             </button>
             <button
               type="button"
@@ -430,7 +430,7 @@ export default function MentalHealthCenter() {
                 cursor: 'pointer',
               }}
             >
-              start fresh
+              Start fresh
             </button>
           </div>
         </div>

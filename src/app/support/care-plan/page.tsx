@@ -129,7 +129,12 @@ function PopulatedPlan({
             <h3 className="mt-1 text-lg font-semibold text-brand-navy-700">
               {step.title}
             </h3>
-            <p className="mt-1.5 text-[14px] leading-relaxed text-brand-muted-700">
+            {step.because && (
+              <p className="mt-1 inline-block rounded-full bg-brand-plum-50 px-2.5 py-0.5 text-[12px] font-semibold text-brand-plum-700">
+                {step.because}
+              </p>
+            )}
+            <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
               {step.why}
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -170,6 +175,24 @@ function PopulatedPlan({
                   <span>{r.label}</span>
                   <ArrowRight className="h-3.5 w-3.5 text-brand-muted-400" />
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {plan.noteEchoes && plan.noteEchoes.length > 0 && (
+        <section className="mt-6 rounded-2xl border border-brand-warm-200 bg-brand-warm-50/60 p-5 sm:p-6">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-600">
+            What you wrote, reflected back
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {plan.noteEchoes.map((e) => (
+              <li key={e.phrase} className="flex items-start gap-2 text-[14px] leading-relaxed text-brand-muted-800">
+                <span className="mt-0.5 inline-flex shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-brand-plum-700 ring-1 ring-brand-plum-200">
+                  {e.phrase}
+                </span>
+                <span>{e.reflection}</span>
               </li>
             ))}
           </ul>

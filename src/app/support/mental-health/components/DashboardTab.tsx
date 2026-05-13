@@ -186,7 +186,7 @@ export function DashboardTab({
             }}
             onClick={() => onNavigate('checkin')}
           >
-            start your first check-in
+            Start your first check-in
           </button>
         </div>
       </div>

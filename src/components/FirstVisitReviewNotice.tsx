@@ -99,7 +99,7 @@ export default function FirstVisitReviewNotice() {
         >
           This site is currently in review with families and providers. Some sections show example listings, demo profiles, and placeholder data while we partner with real ones. Look for{' '}
           <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-[11.5px] font-semibold text-amber-800">
-            example
+            Example
           </span>{' '}
           tags throughout the site to know what&rsquo;s a placeholder.
         </p>
