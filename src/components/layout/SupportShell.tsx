@@ -36,9 +36,9 @@ const navGroups = [
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon, highlight: true },
-      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse, highlight: true },
-      { href: '/support/still-waters', label: 'Still Waters', icon: Feather, highlight: true },
+      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon },
+      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
+      { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
     ],
   },
   {
@@ -102,16 +102,19 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
             </p>
             <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
               {group.items.map((item) => {
-                const isHighlight = (item as { highlight?: boolean }).highlight;
+                const isCurrent =
+                  pathname === item.href ||
+                  (item.href !== '/support' && pathname?.startsWith(item.href + '/'));
                 return (
                   <li key={item.href}>
                     <a
                       href={item.href}
                       onClick={() => setSidebarOpen(false)}
+                      aria-current={isCurrent ? 'page' : undefined}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
-                        isHighlight
-                          ? 'border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-700 hover:bg-brand-plum-100'
+                        isCurrent
+                          ? 'bg-surface-subtle text-brand-muted-900'
                           : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
                       )}
                     >
