@@ -291,7 +291,7 @@ export default function CaregiverSupportPage() {
         </article>
         <article className="rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-slate-100 shadow-card sm:p-6">
           <div className="inline-flex items-center gap-2 rounded-full border border-slate-500/50 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200"><Droplets className="h-3.5 w-3.5" /> Help me process what I&apos;m carrying</div>
-          <h2 className="mt-3 text-2xl font-semibold">Still Waters</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-white">Still Waters</h2>
           <p className="mt-2 text-base text-slate-200">A private place to write what the day took out of you.</p>
           <p className="mt-3 text-sm leading-relaxed text-slate-300">Some days parents need resources. Some days they need somewhere quiet to put the weight down. Still Waters is a guided reflection space built for the parent, not the paperwork.</p>
           <p className="mt-3 text-xs text-slate-300/90">Still Waters is a private reflection tool. It is not therapy, crisis care, or clinical guidance.</p>
@@ -326,7 +326,7 @@ export default function CaregiverSupportPage() {
       {showStillWatersPreview && (
         <section className="mb-8 rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 p-5 text-slate-100 shadow-card sm:p-7">
           <div className="flex items-center justify-between gap-3">
-            <h3 className="text-xl font-semibold">Still Waters preview</h3>
+            <h3 className="text-xl font-semibold text-white">Still Waters preview</h3>
             <button onClick={() => { clearPreview(); setShowStillWatersPreview(false); }} className="inline-flex items-center gap-1 rounded-lg border border-slate-500/70 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/10"><X className="h-3.5 w-3.5" /> Close preview</button>
           </div>
           <p className="mt-3 text-sm text-slate-300">How are you walking in today?</p>
