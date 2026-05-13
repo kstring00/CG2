@@ -165,7 +165,7 @@ export default function SupportHome() {
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
               <Feather className="h-3.5 w-3.5" /> Still Waters
             </p>
-            <h2 className="mt-3 text-2xl leading-snug sm:text-[1.7rem]" style={{ fontFamily: 'Lora, Georgia, serif' }}>
+            <h2 className="mt-3 text-2xl leading-snug text-white sm:text-[1.7rem]" style={{ fontFamily: 'Lora, Georgia, serif' }}>
               A quiet place to write. One prompt at a time.
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-slate-300">
