@@ -49,8 +49,13 @@
     @apply text-brand-muted-800;
   }
 
+  /* Headings inherit color from their parent so dark backgrounds work
+     out of the box (e.g. cards with text-white). Body color is already
+     text-brand-muted-800, so headings on light backgrounds stay dark by
+     inheritance. Explicit text-* classes on individual headings still
+     win. */
   h1, h2, h3, h4 {
-    @apply font-display tracking-tight text-brand-muted-900;
+    @apply font-display tracking-tight;
   }
 
   p, span, li {

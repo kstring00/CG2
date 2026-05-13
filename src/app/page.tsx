@@ -8,9 +8,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
+  BookOpen,
   CheckCircle2,
+  Compass,
+  Droplets,
   ExternalLink,
   Heart,
+  HeartPulse,
   Lock,
   Phone,
   Sparkles,
@@ -36,6 +40,45 @@ const PATH_STEPS = [
   { n: '1', title: 'Understand where you are', desc: 'Quick guidance based on your situation — no jargon.' },
   { n: '2', title: 'Get your next steps', desc: 'Clear, simple actions. No guessing. No overwhelm.' },
   { n: '3', title: 'Find real support', desc: 'Local providers, parent connections, and help for you.' },
+] as const;
+
+const FEATURE_CARDS = [
+  {
+    href: '/support/care-plan',
+    icon: Compass,
+    eyebrow: 'My Care Plan',
+    title: 'A simple plan, built around your family.',
+    desc: 'A few questions, and you get clear, ordered next steps you can revisit anytime.',
+    cta: 'See how it works',
+    tone: 'navy',
+  },
+  {
+    href: '/support/caregiver',
+    icon: HeartPulse,
+    eyebrow: 'Parent Support',
+    title: 'Support for the parent, not just the plan.',
+    desc: 'Practical tools, caregiver resources, and reflection space for the weight you\u2019re carrying.',
+    cta: 'Explore Parent Support',
+    tone: 'plum',
+  },
+  {
+    href: '/support/still-waters',
+    icon: Droplets,
+    eyebrow: 'Still Waters',
+    title: 'A quiet place to put the day down.',
+    desc: 'A private, guided reflection space. No streaks, no scores \u2014 just somewhere to write.',
+    cta: 'Open Still Waters',
+    tone: 'slate',
+  },
+  {
+    href: '/support',
+    icon: BookOpen,
+    eyebrow: 'Learn & find help',
+    title: 'Guides, local help, and parent connections.',
+    desc: 'What ABA is, how to find verified providers, and ways to connect with other Texas parents.',
+    cta: 'Browse support',
+    tone: 'warm',
+  },
 ] as const;
 
 const GROUNDING_TOOLS = [
@@ -290,20 +333,23 @@ export default function HomePage() {
                       ))}
                     </div>
 
-                    <div className="mt-9 flex flex-col items-start gap-3">
-                      <Link
-                        href="/support/intake"
-                        className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-md transition hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-                      >
-                        Get your next steps <ArrowRight className="h-4 w-4" />
-                      </Link>
+                    <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                       <Link
                         href="/support"
-                        className="text-sm font-medium text-white/80 underline-offset-4 transition hover:text-white hover:underline"
+                        className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-md transition hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
-                        Or browse support directly →
+                        Explore Common Ground <ArrowRight className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href="/support/intake"
+                        className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+                      >
+                        <Sparkles className="h-4 w-4" /> Build my plan
                       </Link>
                     </div>
+                    <p className="mt-4 text-xs text-white/60">
+                      No sign-up. Free for every family in Texas.
+                    </p>
                   </motion.div>
                 )}
 
@@ -352,10 +398,72 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PATH PREVIEW — what to expect after clicking the CTA */}
-      <section className="border-y border-stone-100 bg-white px-6 py-10 sm:px-8">
+      {/* FEATURE GRID — what Common Ground offers, as discoverable cards */}
+      <section className="bg-white px-6 py-14 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-6 sm:grid-cols-3">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-plum-600">
+              What you’ll find here
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-stone-900 sm:text-3xl">
+              A few different doors. Pick the one that fits today.
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
+              Common Ground isn’t a single funnel. It’s a small set of tools you can use however you need — build a plan, find local help, or just take a breath.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+            {FEATURE_CARDS.map((card) => {
+              const Icon = card.icon;
+              const toneClasses =
+                card.tone === 'navy'
+                  ? 'border-brand-navy-100 bg-brand-navy-50/50 text-brand-navy-700'
+                  : card.tone === 'plum'
+                  ? 'border-brand-plum-200 bg-brand-plum-50/60 text-brand-plum-700'
+                  : card.tone === 'slate'
+                  ? 'border-stone-200 bg-stone-50 text-stone-700'
+                  : 'border-amber-200 bg-amber-50/60 text-amber-800';
+              return (
+                <Link
+                  key={card.href}
+                  href={card.href}
+                  className="group flex flex-col rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md sm:p-7"
+                >
+                  <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${toneClasses}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
+                    {card.eyebrow}
+                  </p>
+                  <h3 className="mt-1 text-lg font-bold text-stone-900 sm:text-xl">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                    {card.desc}
+                  </p>
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition group-hover:gap-2.5">
+                    {card.cta} <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* PATH PREVIEW — demoted to a secondary section that explains how the plan works */}
+      <section className="border-y border-stone-100 bg-stone-50 px-6 py-12 sm:px-8">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+              How the plan works
+            </p>
+            <h2 className="mt-2 text-xl font-bold text-stone-900 sm:text-2xl">
+              If you’d rather just see your next step, the plan is built for that.
+            </h2>
+          </div>
+          <div className="mt-7 grid gap-6 sm:grid-cols-3">
             {PATH_STEPS.map((step) => (
               <div key={step.n} className="flex items-start gap-4">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
@@ -367,6 +475,14 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="mt-7">
+            <Link
+              href="/support/intake"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
+            >
+              Build my plan <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
