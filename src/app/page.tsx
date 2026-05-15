@@ -23,12 +23,21 @@ import {
 } from 'lucide-react';
 import CrisisPill from '@/components/CrisisPill';
 import IntakeFlow, { type IntakeAnswers } from '@/components/IntakeFlow';
+import WelcomeBackPanel from '@/components/WelcomeBackPanel';
+import EmailPlanDialog from '@/components/EmailPlanDialog';
 import { useParentContext } from '@/lib/useParentContext';
 import {
   getRecommendedAction,
   isCalmSignal,
   type TodayAction,
 } from '@/lib/getRecommendedAction';
+import {
+  computeWeekNumber,
+  ensurePlanStarted,
+  loadCheckInState,
+  type WeeklyCheckInState,
+} from '@/lib/weeklyCheckIn';
+import { loadCarePlan, type SavedCarePlan } from '@/lib/carePlanStorage';
 
 const CREDIBILITY_CHECKS = [
   'Parent mental health tools & therapist referrals',
@@ -96,6 +105,18 @@ export default function HomePage() {
   const [recommendation, setRecommendation] = useState<TodayAction | null>(null);
   const [welcomeBackDismissed, setWelcomeBackDismissed] = useState(false);
   const [announcement, setAnnouncement] = useState('');
+  const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
+  const [savedPlan, setSavedPlan] = useState<SavedCarePlan | null>(null);
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const plan = loadCarePlan();
+    setSavedPlan(plan);
+    setCheckInState(plan ? ensurePlanStarted(plan.createdAt) : loadCheckInState());
+  }, []);
+
+  const hasSavedPlan = Boolean(savedPlan && checkInState?.planStartedAt);
+  const weekNumber = checkInState ? computeWeekNumber(checkInState.planStartedAt) : 1;
   const intakeContainerRef = useRef<HTMLDivElement>(null);
   const recommendCardRef = useRef<HTMLDivElement>(null);
 
@@ -398,6 +419,19 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* RETURNING PARENT — Welcome back panel (shows only when a plan has been started) */}
+      {hasSavedPlan && checkInState && (
+        <section className="bg-white px-6 pt-10 sm:px-8 sm:pt-12">
+          <div className="mx-auto max-w-6xl">
+            <WelcomeBackPanel
+              weekNumber={weekNumber}
+              state={checkInState}
+              onEmailPlan={() => setEmailDialogOpen(true)}
+            />
+          </div>
+        </section>
+      )}
+
       {/* FEATURE GRID — what Common Ground offers, as discoverable cards */}
       <section className="bg-white px-6 py-14 sm:px-8 sm:py-16">
         <div className="mx-auto max-w-6xl">
@@ -521,6 +555,13 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <EmailPlanDialog
+        open={emailDialogOpen}
+        onClose={() => setEmailDialogOpen(false)}
+        plan={savedPlan}
+        latestCheckIn={checkInState?.history.length ? checkInState.history[checkInState.history.length - 1] : null}
+      />
 
       <footer className="px-6 py-10 sm:px-8" style={{ backgroundColor: '#f4efe8' }}>
         <p className="mx-auto max-w-3xl text-center text-xs text-stone-400">

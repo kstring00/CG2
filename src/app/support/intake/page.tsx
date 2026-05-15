@@ -27,6 +27,7 @@ import {
   type Stage,
   type WeekMood,
 } from '@/lib/carePlanStorage';
+import { ensurePlanStarted } from '@/lib/weeklyCheckIn';
 import {
   generateNextSteps,
   generateNoteEchoes,
@@ -175,6 +176,7 @@ export default function IntakePage() {
       weekMessage: generateWeekMessage(weekMood),
       noteEchoes: generateNoteEchoes(notes || null),
     });
+    ensurePlanStarted();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
   }, [step, hardest, stage, childAge, helpKind, weekMood, notes, router]);
