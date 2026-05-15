@@ -2,14 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Compass, RefreshCcw, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowRight, CalendarCheck, Compass, Mail, RefreshCcw, Sparkles, Trash2 } from 'lucide-react';
 import {
   clearCarePlan,
   loadCarePlan,
   type SavedCarePlan,
 } from '@/lib/carePlanStorage';
 import PathfinderCard from '@/components/PathfinderCard';
+import EmailPlanDialog from '@/components/EmailPlanDialog';
 import { useWellnessState } from '@/lib/wellnessState';
+import {
+  computeWeekNumber,
+  ensurePlanStarted,
+  formatShortDate,
+  hasCheckedInThisWeek,
+  loadCheckInState,
+  type WeeklyCheckInState,
+} from '@/lib/weeklyCheckIn';
 
 /**
  * Persistent care plan view — the *result* of the intake flow.
@@ -76,6 +85,13 @@ function PopulatedPlan({
   onCleared: () => void;
 }) {
   const { state: wellness } = useWellnessState();
+  const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
+  const [emailOpen, setEmailOpen] = useState(false);
+
+  useEffect(() => {
+    setCheckInState(ensurePlanStarted(plan.createdAt));
+  }, [plan.createdAt]);
+
   const handleClear = () => {
     if (typeof window === 'undefined') return;
     const ok = window.confirm('Clear your saved plan? You can re-run the intake to build a new one.');
@@ -83,6 +99,13 @@ function PopulatedPlan({
     clearCarePlan();
     onCleared();
   };
+
+  const weekNumber = checkInState ? computeWeekNumber(checkInState.planStartedAt) : null;
+  const lastCheckIn = checkInState ? formatShortDate(checkInState.lastCheckInAt) : null;
+  const checkedInThisWeek = checkInState ? hasCheckedInThisWeek(checkInState) : false;
+  const latestCheckIn = checkInState && checkInState.history.length
+    ? checkInState.history[checkInState.history.length - 1]
+    : null;
 
   const updated = new Date(plan.updatedAt);
   const updatedDisplay = updated.toLocaleDateString(undefined, {
@@ -107,6 +130,43 @@ function PopulatedPlan({
           Last updated {updatedDisplay}
         </p>
       </header>
+
+      {weekNumber !== null && (
+        <section
+          aria-label={`You are in week ${weekNumber} of your plan.`}
+          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 px-5 py-4"
+        >
+          <div className="flex items-center gap-3">
+            <CalendarCheck className="h-5 w-5 shrink-0 text-brand-plum-700" aria-hidden />
+            <div>
+              <p className="text-sm font-semibold text-brand-plum-800">
+                Week {weekNumber}
+                {checkedInThisWeek && lastCheckIn ? ` · checked in ${lastCheckIn}` : ''}
+              </p>
+              <p className="text-[12.5px] text-brand-plum-700/80">
+                {checkedInThisWeek
+                  ? 'You’re up to date for this week. The plan adjusts as your check-ins build up.'
+                  : 'A short check-in keeps your plan honest. Takes about 2 minutes.'}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/support/check-in"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
+            >
+              {checkedInThisWeek ? 'Revisit check-in' : 'Start check-in'} <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setEmailOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-plum-300 bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
+            >
+              <Mail className="h-3.5 w-3.5" /> Email my plan
+            </button>
+          </div>
+        </section>
+      )}
 
       <section className="mt-8 rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
@@ -249,6 +309,18 @@ function PopulatedPlan({
           <Trash2 className="h-3.5 w-3.5" /> Clear plan
         </button>
       </footer>
+
+      <p className="mt-6 text-[11.5px] leading-relaxed text-brand-muted-500">
+        Plan saved on this device only. Clearing your browser data removes it.
+        Common Ground is parent support, not clinical care.
+      </p>
+
+      <EmailPlanDialog
+        open={emailOpen}
+        onClose={() => setEmailOpen(false)}
+        plan={plan}
+        latestCheckIn={latestCheckIn}
+      />
     </Shell>
   );
 }
