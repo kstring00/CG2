@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -37,6 +38,7 @@ export function ClientShell({
   clientName?: string;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   const SidebarContent = () => (
     <>
@@ -60,21 +62,28 @@ export function ClientShell({
           Your care
         </p>
         <ul className="m-0 flex list-none flex-col gap-1 p-0">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={cn(
-                  'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
-                  'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-                )}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {item.label}
-              </a>
-            </li>
-          ))}
+          {navItems.map((item) => {
+            const isCurrent =
+              pathname === item.href || pathname?.startsWith(item.href + '/');
+            return (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                    isCurrent
+                      ? 'bg-accent/10 text-accent'
+                      : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
+                  )}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {item.label}
+                </a>
+              </li>
+            );
+          })}
         </ul>
 
         {/* Cross-layer links */}
@@ -133,7 +142,8 @@ export function ClientShell({
       >
         <button
           onClick={() => setSidebarOpen(false)}
-          className="absolute right-4 top-4 rounded-lg p-1 hover:bg-surface-subtle"
+          aria-label="Close navigation"
+          className="absolute right-4 top-4 rounded-lg p-1 hover:bg-surface-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         >
           <X className="h-5 w-5 text-brand-muted-500" />
         </button>
@@ -160,7 +170,8 @@ export function ClientShell({
           <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="rounded-xl p-2 hover:bg-surface-subtle lg:hidden"
+              aria-label="Open navigation"
+              className="rounded-xl p-2 hover:bg-surface-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 lg:hidden"
             >
               <Menu className="h-5 w-5 text-brand-muted-600" />
             </button>

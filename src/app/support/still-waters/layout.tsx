@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Still Waters · Common Ground',
+  title: 'Still Waters',
   description: 'A quiet place to write. One prompt at a time.',
 };
 

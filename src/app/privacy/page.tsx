@@ -1,9 +1,10 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Shield, Bot, Eye, Lock, Mail, FileText, AlertTriangle, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy — Common Ground',
+  title: 'Privacy Policy',
   description: 'How Common Ground by Texas ABA Centers collects, uses, and protects your information.',
 };
 
@@ -18,13 +19,14 @@ export default function PrivacyPage() {
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
-            <img
+            <Image
+              src="/logos/cg2-lockup-final.png"
               alt="Texas ABA Centers | Common Ground"
               width={320}
               height={48}
+              priority
               className="h-8 w-auto sm:h-9"
               style={{ objectFit: 'contain' }}
-              src="/_next/image?url=%2Flogos%2Fcg2-lockup-final.png&w=640&q=100"
             />
           </Link>
           <Link

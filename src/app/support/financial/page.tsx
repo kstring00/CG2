@@ -28,7 +28,7 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: 'Financial pressure is mental health · Common Ground',
+  title: 'Financial pressure is mental health',
   description:
     'A working guide to therapy coverage, Medicaid waivers, ABLE accounts, respite funding, tax breaks, and adulthood planning for autism families.',
 };
