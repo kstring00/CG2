@@ -180,3 +180,44 @@
     z-index: 1;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Print styles — keeps the care plan readable when a parent saves it as PDF.
+ * Hides chrome that doesn't translate to paper (sidebars, nav, action rows),
+ * and forces a calm, single-column layout.
+ * ------------------------------------------------------------------------- */
+@media print {
+  /* Hide app shell scaffolding */
+  aside,
+  nav,
+  header,
+  .print\:hidden,
+  [aria-label="Plan actions"] {
+    display: none !important;
+  }
+
+  /* Reset page chrome to a printable canvas */
+  body,
+  html {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Keep content within the printable area */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Avoid awkward breaks inside cards */
+  section,
+  article {
+    page-break-inside: avoid;
+  }
+
+  /* Hide links' URLs since print readers add them noisily */
+  a[href]:after {
+    content: '';
+  }
+}

@@ -37,6 +37,8 @@ import {
   HARDEST_OPTIONS,
   parseNotes,
 } from '@/lib/generateNextSteps';
+import JourneyStepper from '@/components/JourneyStepper';
+import { inferJourneyStage } from '@/lib/journeyStage';
 
 // ---------------------------------------------------------------------------
 // Option data — labels, supporting copy, and icons for visual differentiation
@@ -193,6 +195,16 @@ export default function IntakePage() {
   return (
     <main className={cn('min-h-[calc(100vh-4rem)] transition-colors duration-500', STEP_HUE[step])}>
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
+        {/* Soft "where am I?" anchor at the entry of the flow. Hidden once
+            the parent is mid-question so it doesn't compete with the prompt. */}
+        {step === 'q-hardest' && (
+          <div className="mb-5">
+            <JourneyStepper
+              activeStage={inferJourneyStage({ hardest, stage, childAge, helpKind, weekMood })}
+              compact
+            />
+          </div>
+        )}
         <div className="rounded-3xl border border-surface-border bg-white p-6 shadow-soft sm:p-8">
           {/* Pinned summary chips — visible from step 2 onward */}
           {hasAnyAnswer && step !== 'building' && (

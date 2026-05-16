@@ -1,15 +1,40 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CalendarCheck, Compass, Mail, RefreshCcw, Sparkles, Trash2 } from 'lucide-react';
+import {
+  ArrowRight,
+  Bell,
+  CalendarCheck,
+  Check,
+  Compass,
+  Mail,
+  Printer,
+  RefreshCcw,
+  ShieldAlert,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 import {
   clearCarePlan,
   loadCarePlan,
   type SavedCarePlan,
+  type StepBucket,
 } from '@/lib/carePlanStorage';
+import {
+  BUCKET_BLURBS,
+  BUCKET_LABELS,
+  generateBucketSteps,
+} from '@/lib/generateNextSteps';
 import PathfinderCard from '@/components/PathfinderCard';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
+import JourneyStepper from '@/components/JourneyStepper';
+import { inferJourneyStage } from '@/lib/journeyStage';
+import {
+  clearRemindMeNextWeek,
+  isRemindMeSet,
+  setRemindMeNextWeek,
+} from '@/lib/remindMe';
 import { useWellnessState } from '@/lib/wellnessState';
 import {
   computeWeekNumber,
@@ -58,19 +83,20 @@ function EmptyState() {
           <Compass className="h-6 w-6" />
         </div>
         <h1 className="mt-5 text-2xl font-semibold text-brand-navy-700 sm:text-3xl">
-          You haven&rsquo;t built a plan yet.
+          You don&rsquo;t have a plan yet — that&rsquo;s okay.
         </h1>
         <p className="mt-3 text-[15px] leading-relaxed text-brand-muted-700">
-          It takes about 3 minutes. We&rsquo;ll keep it simple.
+          A few honest questions, and we&rsquo;ll put together a small starting point
+          for the week ahead. Three minutes, no sign-up, no clinical paperwork.
         </p>
         <Link
           href="/support/intake"
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
         >
-          Build my plan <ArrowRight className="h-4 w-4" />
+          <Sparkles className="h-4 w-4" /> Start Find My Next Step <ArrowRight className="h-4 w-4" />
         </Link>
         <p className="mt-4 text-[13px] text-brand-muted-500">
-          You can always come back and change it.
+          Saved privately on this device. You can change it anytime.
         </p>
       </div>
     </Shell>
@@ -87,10 +113,28 @@ function PopulatedPlan({
   const { state: wellness } = useWellnessState();
   const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
   const [emailOpen, setEmailOpen] = useState(false);
+  const [remindSet, setRemindSet] = useState(false);
 
   useEffect(() => {
     setCheckInState(ensurePlanStarted(plan.createdAt));
+    setRemindSet(isRemindMeSet());
   }, [plan.createdAt]);
+
+  const bucketSteps = useMemo(() => generateBucketSteps(plan.answers), [plan.answers]);
+
+  const handlePrint = () => {
+    if (typeof window !== 'undefined') window.print();
+  };
+
+  const handleToggleRemind = () => {
+    if (remindSet) {
+      clearRemindMeNextWeek();
+      setRemindSet(false);
+    } else {
+      setRemindMeNextWeek(7);
+      setRemindSet(true);
+    }
+  };
 
   const handleClear = () => {
     if (typeof window === 'undefined') return;
@@ -118,7 +162,7 @@ function PopulatedPlan({
     <Shell>
       <header>
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-          Your Care Plan
+          My Family Care Plan
         </p>
         <h1 className="mt-1 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
           Your plan, friend.
@@ -127,9 +171,14 @@ function PopulatedPlan({
           Built from what you told us. You can change it anytime.
         </p>
         <p className="mt-1 text-[12px] text-brand-muted-500">
-          Last updated {updatedDisplay}
+          Last updated {updatedDisplay} · saved privately on this device.
         </p>
       </header>
+
+      {/* Soft "where am I?" anchor — inferred from saved intake answers. */}
+      <div className="mt-5">
+        <JourneyStepper activeStage={inferJourneyStage(plan.answers)} compact />
+      </div>
 
       {weekNumber !== null && (
         <section
@@ -177,7 +226,73 @@ function PopulatedPlan({
         </p>
       </section>
 
-      <section className="mt-6 space-y-3">
+      {/* Gentle clinical-scope disclaimer requested by the CCO. Lives directly
+          above the recommended steps so it sets framing before any action. */}
+      <section className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 sm:p-5">
+        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
+        <p className="text-[13.5px] leading-relaxed text-amber-900">
+          Here is a simple starting point. Bring anything serious, unsafe, or
+          confusing to your BCBA or care team. Common Ground is parent support
+          — it does not diagnose, treat, or replace clinical care.
+        </p>
+      </section>
+
+      {/* Quick actions row — print/PDF + remind-me + email. All client-side; no
+          backend is wired up for email or push, so the email button opens the
+          existing dialog that handles the "not configured" path gracefully. */}
+      <section
+          className="mt-4 flex flex-wrap items-center gap-2 print:hidden"
+          aria-label="Plan actions"
+      >
+        <button
+          type="button"
+          onClick={handlePrint}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 transition hover:border-primary/40 hover:text-brand-navy-700"
+        >
+          <Printer className="h-3.5 w-3.5" /> Print or save as PDF
+        </button>
+        <button
+          type="button"
+          onClick={handleToggleRemind}
+          aria-pressed={remindSet}
+          className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-semibold transition ${
+            remindSet
+              ? 'border-brand-plum-300 bg-brand-plum-50 text-brand-plum-800'
+              : 'border-surface-border bg-white text-brand-muted-700 hover:border-primary/40 hover:text-brand-navy-700'
+          }`}
+        >
+          {remindSet ? <Check className="h-3.5 w-3.5" /> : <Bell className="h-3.5 w-3.5" />}
+          {remindSet ? 'Reminder set for next week' : 'Remind me next week'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setEmailOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 transition hover:border-primary/40 hover:text-brand-navy-700"
+        >
+          <Mail className="h-3.5 w-3.5" /> Email my plan
+        </button>
+      </section>
+
+      {/* 5-BUCKET PLAN — CCO-requested framing. Each bucket gets one suggested
+          step so a parent can scan today/BCBA/home/save/next-week in one pass. */}
+      <section className="mt-6" aria-label="Your plan in five small parts">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+          Your plan, in five small parts
+        </h2>
+        <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-600">
+          One thing per bucket. You don’t have to do all of them — pick what fits today.
+        </p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          {bucketSteps.map(({ bucket, step }) => (
+            <BucketCard key={bucket} bucket={bucket} step={step} />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-8 space-y-3">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+          Your priority steps
+        </h2>
         {plan.steps.map((step, i) => (
           <div
             key={step.title}
@@ -311,8 +426,9 @@ function PopulatedPlan({
       </footer>
 
       <p className="mt-6 text-[11.5px] leading-relaxed text-brand-muted-500">
-        Plan saved on this device only. Clearing your browser data removes it.
-        Common Ground is parent support, not clinical care.
+        Saved privately on this device. Clearing your browser data removes it.
+        Common Ground is parent support — it does not diagnose, treat, or
+        replace clinical care.
       </p>
 
       <EmailPlanDialog
@@ -322,5 +438,57 @@ function PopulatedPlan({
         latestCheckIn={latestCheckIn}
       />
     </Shell>
+  );
+}
+
+/** A single bucket tile in the 5-bucket plan grid. Renders an empty state
+ *  when no candidate filled this bucket so the framing is preserved. */
+function BucketCard({
+  bucket,
+  step,
+}: {
+  bucket: StepBucket;
+  step: { title: string; why: string; href: string; because?: string } | null;
+}) {
+  const label = BUCKET_LABELS[bucket];
+  const blurb = BUCKET_BLURBS[bucket];
+
+  return (
+    <div className="flex h-full flex-col rounded-2xl border border-surface-border bg-white p-4 shadow-soft sm:p-5">
+      <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-brand-plum-700">
+        {label}
+      </p>
+      <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-500">
+        {blurb}
+      </p>
+      {step ? (
+        <>
+          <h3 className="mt-3 text-[15px] font-semibold leading-snug text-brand-navy-700">
+            {step.title}
+          </h3>
+          {step.because && (
+            <p className="mt-1 inline-block self-start rounded-full bg-brand-plum-50 px-2 py-0.5 text-[11px] font-semibold text-brand-plum-700">
+              {step.because}
+            </p>
+          )}
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-700">
+            {step.why}
+          </p>
+          <div className="mt-auto pt-3">
+            <Link
+              href={step.href}
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:text-primary/80"
+            >
+              Open this step <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </>
+      ) : (
+        <p className="mt-3 text-[13px] leading-relaxed text-brand-muted-500">
+          Nothing pulled in for this one yet. That’s fine — it just means the
+          rest of the plan is enough for now.
+        </p>
+      )}
+    </div>
   );
 }

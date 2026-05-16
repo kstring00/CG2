@@ -31,30 +31,38 @@ import CrisisPill from '@/components/CrisisPill';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
+// Kyle's CCO-review label map: Start Here / Support / Learn / For Current Families.
+// Sidebar groups are flattened and renamed so a parent can scan once and know
+// where to go. Floating "Find My Next Step" CTA sits above as the primary path.
 const navGroups = [
   {
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon },
-      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
-      { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
+      { href: '/support/care-plan', label: 'My Family Care Plan', icon: CompassIcon },
     ],
   },
   {
-    label: 'Learn & Find Help',
+    label: 'Support',
+    items: [
+      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
+      { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+    ],
+  },
+  {
+    label: 'Learn',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
-      { href: '/support/connect', label: 'Connect With Parents', icon: Link2 },
+      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
     ],
   },
   {
-    label: 'Family Needs',
+    label: 'For Current Families',
     items: [
-      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
-      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+      { href: '/client', label: 'Client Portal Preview', icon: Lock },
     ],
   },
 ];
@@ -83,12 +91,12 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <Link
           href="/support/intake"
           onClick={() => setSidebarOpen(false)}
-          aria-label="Help me find my next step — start the guided care plan"
+          aria-label="Find my next step — start the guided care plan"
           className="group flex w-full items-center justify-between gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
         >
           <span className="inline-flex items-center gap-2">
             <CompassIcon className="h-4 w-4" />
-            Help Me Find My Next Step
+            Find My Next Step
           </span>
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
@@ -130,22 +138,12 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
 
       </nav>
 
-      {/* Cross-layer handoff — visually separate so parents understand it is for current Texas ABA clients only */}
-      <div className="border-t-2 border-accent/20 bg-accent/5 px-4 py-4">
-        <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent/80">
-          Texas ABA Families
+      {/* Quiet privacy footer — replaces the duplicate client-portal handoff,
+          which now lives in the nav under "For Current Families". */}
+      <div className="border-t border-surface-border px-4 py-3">
+        <p className="px-1 text-[11px] leading-relaxed text-brand-muted-500">
+          Saved privately on this device. Common Ground is parent support, not clinical care.
         </p>
-        <Link
-          href="/client"
-          aria-label="Go to client portal — for current Texas ABA clients"
-          className="group flex items-center justify-between gap-3 rounded-xl border border-accent/30 bg-white px-3 py-2.5 text-sm font-semibold text-accent shadow-soft transition-all hover:bg-accent/10"
-        >
-          <span className="inline-flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            Go to Client Portal
-          </span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
       </div>
     </>
   );
@@ -223,7 +221,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                 href="/client"
                 className="hidden text-[11px] font-semibold text-accent hover:underline sm:inline"
               >
-                Current client? Sign in →
+                Current family? Sign in →
               </Link>
             </div>
           </div>
