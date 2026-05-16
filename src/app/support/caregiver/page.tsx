@@ -1,9 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BreathingOrb from '@/components/BreathingOrb';
 import { PageTabs } from '@/components/ui/PageTabs';
+import JourneyStepper from '@/components/JourneyStepper';
+import { inferJourneyStage, type JourneyStageId } from '@/lib/journeyStage';
+import { loadCarePlan } from '@/lib/carePlanStorage';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -244,6 +247,12 @@ export default function CaregiverSupportPage() {
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [stillWatersText, setStillWatersText] = useState('');
   const [promptIdx, setPromptIdx] = useState(0);
+  const [journeyStage, setJourneyStage] = useState<JourneyStageId | null>(null);
+
+  useEffect(() => {
+    const plan = loadCarePlan();
+    setJourneyStage(inferJourneyStage(plan?.answers ?? null));
+  }, []);
 
   const toggleQuiz = (i: number) => {
     setQuizChecked((prev) => {
@@ -282,6 +291,11 @@ export default function CaregiverSupportPage() {
           Common Ground helps families find next steps, practical tools, and a quieter place to process the weight of the day.
         </p>
       </header>
+
+      {/* Soft "where am I?" anchor — inferred from saved intake if present. */}
+      <div className="mb-6">
+        <JourneyStepper activeStage={journeyStage} compact />
+      </div>
 
       <section className="mb-8 grid gap-4 lg:grid-cols-2" aria-label="Two-lane support">
         <article className="rounded-3xl border border-surface-border bg-white p-5 shadow-card sm:p-6">

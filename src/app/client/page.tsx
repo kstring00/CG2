@@ -156,11 +156,15 @@ export default function ClientSignInPage() {
             ))}
           </ul>
 
-          <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-            <p className="text-sm font-semibold text-amber-900">Prototype preview</p>
-            <p className="mt-1 text-sm leading-relaxed text-amber-800">
-              In production this connects to the Texas ABA Centers client sign-in.
-              For demo purposes, walk through as an example family below.
+          <div className="mt-6 rounded-2xl border-2 border-amber-300 bg-amber-50 p-4">
+            <p className="text-sm font-semibold uppercase tracking-wide text-amber-900">
+              Prototype preview — not connected to live clinical records yet
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-amber-900">
+              Everything inside the portal is demo data. Nothing here reflects a
+              real child, real BCBA notes, or real session records. In production
+              this will connect to the Texas ABA Centers client sign-in. For now,
+              walk through as an example family below.
             </p>
           </div>
 

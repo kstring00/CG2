@@ -50,6 +50,19 @@ export type CarePlanAnswers = {
   connected?: string | null;
 };
 
+/**
+ * 5-bucket framing requested by Texas ABA Centers' clinical director.
+ * Each saved step belongs in one bucket. The care plan page renders one
+ * suggested step per bucket so a parent can scan "what to do today vs. what
+ * to bring to the BCBA" in a single glance.
+ */
+export type StepBucket =
+  | 'do-today'
+  | 'ask-bcba'
+  | 'try-home'
+  | 'save-resource'
+  | 'next-week';
+
 export type CarePlanStep = {
   title: string;
   why: string;
@@ -58,6 +71,8 @@ export type CarePlanStep = {
   because?: string;
   /** Internal score used for ordering. Higher = surfaced first. */
   weight?: number;
+  /** Which CCO-review bucket this step belongs in (added in 2026-05 CCO pass). */
+  bucket?: StepBucket;
 };
 
 export type CarePlanResource = {

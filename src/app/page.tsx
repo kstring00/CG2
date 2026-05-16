@@ -38,6 +38,8 @@ import {
   type WeeklyCheckInState,
 } from '@/lib/weeklyCheckIn';
 import { loadCarePlan, type SavedCarePlan } from '@/lib/carePlanStorage';
+import JourneyStepper from '@/components/JourneyStepper';
+import { inferJourneyStage } from '@/lib/journeyStage';
 
 const CREDIBILITY_CHECKS = [
   'Parent mental health tools & therapist referrals',
@@ -237,7 +239,7 @@ export default function HomePage() {
               href="/support/intake"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
-              Help Me Find My Next Step <ArrowRight className="h-3.5 w-3.5" />
+              Find My Next Step <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
@@ -354,18 +356,21 @@ export default function HomePage() {
                       ))}
                     </div>
 
+                    {/* Single primary CTA per CCO review — "Find My Next Step" is the
+                        one path that always leads parents into the guided plan. The
+                        secondary glass button is the quieter "browse the rest" link. */}
                     <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                       <Link
-                        href="/support"
+                        href="/support/intake"
                         className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-md transition hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
-                        Explore Common Ground <ArrowRight className="h-4 w-4" />
+                        <Sparkles className="h-4 w-4" /> Find My Next Step <ArrowRight className="h-4 w-4" />
                       </Link>
                       <Link
-                        href="/support/intake"
+                        href="/support"
                         className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
-                        <Sparkles className="h-4 w-4" /> Build my plan
+                        Browse all support
                       </Link>
                     </div>
                     <p className="mt-4 text-xs text-white/60">
@@ -486,6 +491,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* JOURNEY STEPPER — the soft "where am I?" anchor. Inferred from saved
+          plan if we have one; otherwise renders all six stops dimmed. */}
+      <section className="px-6 py-10 sm:px-8 sm:py-12" style={{ backgroundColor: '#fbfaf7' }}>
+        <div className="mx-auto max-w-4xl">
+          <JourneyStepper activeStage={inferJourneyStage(savedPlan?.answers)} />
+        </div>
+      </section>
+
       {/* PATH PREVIEW — demoted to a secondary section that explains how the plan works */}
       <section className="border-y border-stone-100 bg-stone-50 px-6 py-12 sm:px-8">
         <div className="mx-auto max-w-6xl">
@@ -515,7 +528,7 @@ export default function HomePage() {
               href="/support/intake"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
-              Build my plan <ArrowRight className="h-4 w-4" />
+              Find My Next Step <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
