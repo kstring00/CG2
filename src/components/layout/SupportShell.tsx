@@ -31,15 +31,16 @@ import CrisisPill from '@/components/CrisisPill';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
-// Kyle's CCO-review label map: Start Here / Support / Learn / For Current Families.
-// Sidebar groups are flattened and renamed so a parent can scan once and know
-// where to go. Floating "Find My Next Step" CTA sits above as the primary path.
+// CCO-review label map (round 2): Start Here now surfaces Parent Connection so
+// it's no longer buried; Sibling Support moves to Learn (it's content, not
+// active support). Order within each group reflects parent priority.
 const navGroups = [
   {
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
       { href: '/support/care-plan', label: 'My Family Care Plan', icon: CompassIcon },
+      { href: '/support/connect', label: 'Parent Connection', icon: Users },
     ],
   },
   {
@@ -47,7 +48,6 @@ const navGroups = [
     items: [
       { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
       { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
-      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
     ],
   },
   {
@@ -55,6 +55,7 @@ const navGroups = [
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
       { href: '/support/financial', label: 'Financial Help', icon: Wallet },
     ],

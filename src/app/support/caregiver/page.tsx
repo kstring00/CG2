@@ -297,21 +297,48 @@ export default function CaregiverSupportPage() {
         <JourneyStepper activeStage={journeyStage} compact />
       </div>
 
-      <section className="mb-8 grid gap-4 lg:grid-cols-2" aria-label="Two-lane support">
-        <article className="rounded-3xl border border-surface-border bg-white p-5 shadow-card sm:p-6">
-          <h2 className="text-base font-semibold text-brand-muted-900 sm:text-lg">Help me handle what&apos;s happening</h2>
-          <p className="mt-2 text-sm text-brand-muted-600">Practical support, resources, caregiver tools, and next steps.</p>
-          <p className="mt-3 text-xs text-brand-muted-500">Use the quick actions below, then explore tabs for deeper support.</p>
-        </article>
-        <article className="rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-slate-100 shadow-card sm:p-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-500/50 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200"><Droplets className="h-3.5 w-3.5" /> Help me process what I&apos;m carrying</div>
-          <h2 className="mt-3 text-2xl font-semibold text-white">Still Waters</h2>
-          <p className="mt-2 text-base text-slate-200">A private place to write what the day took out of you.</p>
-          <p className="mt-3 text-sm leading-relaxed text-slate-300">Some days parents need resources. Some days they need somewhere quiet to put the weight down. Still Waters is a guided reflection space built for the parent, not the paperwork.</p>
-          <p className="mt-3 text-xs text-slate-300/90">Still Waters is a private reflection tool. It is not therapy, crisis care, or clinical guidance.</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button onClick={() => setShowStillWatersPreview(true)} className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-white">Preview Still Waters</button>
-            <button onClick={() => { setShowStillWatersPreview(true); setSelectedMood('Skip'); }} className="rounded-xl border border-slate-500/70 px-4 py-2 text-sm font-semibold text-slate-100 hover:bg-white/10">See reflection prompts</button>
+      {/* Still Waters is the calm doorway at the top of Parent Support. The previous left-
+          column "Help me handle what's happening" card was redundant filler (per CCO
+          feedback) — the tabs below are the actual handlers. Card is now a Link to the
+          full /support/still-waters page; the secondary buttons still let parents peek
+          without leaving. */}
+      <section className="mb-8" aria-label="Still Waters">
+        <article className="relative overflow-hidden rounded-3xl border border-slate-300 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-slate-100 shadow-card sm:p-6">
+          <Link
+            href="/support/still-waters"
+            aria-label="Open Still Waters — a private reflection space"
+            className="absolute inset-0 z-0 rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-200"
+          />
+          <div className="relative z-10 grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-slate-500/50 bg-white/5 px-3 py-1 text-xs font-semibold text-slate-200"><Droplets className="h-3.5 w-3.5" /> Help me process what I&apos;m carrying</div>
+              <h2 className="mt-3 text-2xl font-semibold text-white">Still Waters</h2>
+              <p className="mt-2 text-base text-slate-200">A private place to write what the day took out of you.</p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-300">Some days parents need resources. Some days they need somewhere quiet to put the weight down. Still Waters is a guided reflection space built for the parent, not the paperwork.</p>
+              <p className="mt-3 text-xs text-slate-300/90">Still Waters is a private reflection tool. It is not therapy, crisis care, or clinical guidance.</p>
+            </div>
+            <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap lg:flex-col">
+              <Link
+                href="/support/still-waters"
+                className="relative z-20 inline-flex items-center justify-between gap-2 rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-900 hover:bg-white"
+              >
+                Open Still Waters <ArrowRight className="h-4 w-4" />
+              </Link>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setShowStillWatersPreview(true); }}
+                className="relative z-20 rounded-xl border border-slate-500/70 px-4 py-2.5 text-sm font-semibold text-slate-100 hover:bg-white/10"
+              >
+                Preview without leaving
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setShowStillWatersPreview(true); setSelectedMood('Skip'); }}
+                className="relative z-20 rounded-xl border border-slate-500/70 px-4 py-2.5 text-sm font-semibold text-slate-100 hover:bg-white/10"
+              >
+                See reflection prompts
+              </button>
+            </div>
           </div>
         </article>
       </section>
@@ -393,10 +420,12 @@ export default function CaregiverSupportPage() {
             <span className="text-sm font-semibold text-brand-plum-800">Talk to my care team</span>
             <HeartHandshake className="h-4 w-4 shrink-0 text-brand-plum-700" />
           </Link>
+          {/* CCO fix: this used to be ?tab=get-help which just scrolled to top.
+              Now routes to the real Find Local Help feature page. */}
           <Link
-            href="?tab=get-help"
-            aria-label="Find local caregiver support - open support directory resources"
-            data-track-label="caregiver_start_here_find_local_support_directory_tab"
+            href="/support/find"
+            aria-label="Find local caregiver support — open the local help directory"
+            data-track-label="caregiver_start_here_find_local_help_route"
             className="inline-flex items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-left transition hover:bg-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
           >
             <span className="text-sm font-semibold text-sky-800">Find local caregiver support</span>
