@@ -33,10 +33,14 @@ const supportActions = [
     icon: Compass,
   },
   {
+    // CCO round 3: this used to point at /support/help (external referrals
+    // like therapists / hotlines). Parents need actual tactics for the hard
+    // moment in front of them, not phone numbers. Now routes to 10 ABA-
+    // grounded strategies they can try in the next minute.
     title: 'I need help at home',
-    desc: 'Try practical routines and home strategies.',
-    cta: 'Home strategies',
-    href: '/support/help',
+    desc: 'Real ABA strategies you can try in the next minute.',
+    cta: 'At-home strategies',
+    href: '/support/at-home',
     icon: Home,
   },
   {
