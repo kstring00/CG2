@@ -6,17 +6,10 @@ import {
   ArrowRight,
   BookOpen,
   Compass,
-  Heart,
-  HeartHandshake,
   Home,
-  MessageCircleHeart,
-  Sparkles,
   Users,
-  Wallet,
-  MapPin,
   HandHelping,
   CheckCircle2,
-  Wind,
   ChevronDown,
   ChevronUp,
   Feather,
@@ -193,48 +186,10 @@ export default function SupportHome() {
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/60 p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-plum-700">Start small</p>
-          <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">When everything feels like too much</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              { label: 'Pause', icon: Wind },
-              { label: 'Pick one thing', icon: Sparkles },
-              { label: 'Reach out', icon: MessageCircleHeart },
-            ].map((step) => (
-              <div key={step.label} className="rounded-2xl bg-white/90 p-3 text-center">
-                <step.icon className="mx-auto h-4 w-4 text-brand-plum-700" />
-                <p className="mt-2 text-sm font-medium text-brand-muted-800">{step.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-surface-border bg-white p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Support for your family</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {[
-              { title: 'Understanding ABA', href: '/support/what-is-aba', icon: BookOpen },
-              { title: 'Home strategies', href: '/support/help', icon: Home },
-              { title: 'Family resources', href: '/support/resources', icon: Wallet },
-              { title: 'Parent connection', href: '/support/connect', icon: Users },
-            ].map((item) => (
-              <Link key={item.title} href={item.href} className="rounded-2xl border border-surface-border bg-surface-muted p-3.5 transition hover:border-primary/30 hover:bg-white">
-                <p className="flex items-center gap-2 text-sm font-semibold text-brand-muted-800">
-                  <item.icon className="h-4 w-4 text-primary" /> {item.title}
-                </p>
-              </Link>
-            ))}
-          </div>
-          <div className="mt-4 grid gap-2 text-sm text-brand-muted-600 sm:grid-cols-2">
-            <Link href="/support/financial" className="flex items-center gap-1.5 hover:text-primary"><Wallet className="h-4 w-4" /> Financial Help</Link>
-            <Link href="/support/siblings" className="flex items-center gap-1.5 hover:text-primary"><Heart className="h-4 w-4" /> Sibling Support</Link>
-            <Link href="/support/find" className="flex items-center gap-1.5 hover:text-primary"><MapPin className="h-4 w-4" /> Local Help</Link>
-            <Link href="/support/connect" className="flex items-center gap-1.5 hover:text-primary"><HeartHandshake className="h-4 w-4" /> Connect With Parents</Link>
-          </div>
-        </div>
-      </section>
+      {/* CCO round 4: removed the "Start small" trio and "Support for your family"
+          link grid — Kyle's feedback was that they restate what the supportActions
+          grid above and the Learn nav already cover. Eliminating reduces visual
+          noise on Home Base without losing any reachable destination. */}
 
       <section className="rounded-2xl border border-surface-border bg-surface-muted/60 p-5">
         <button onClick={() => setCheckInOpen((v) => !v)} className="flex w-full items-center justify-between gap-3 text-left">
