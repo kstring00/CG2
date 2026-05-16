@@ -19,6 +19,7 @@ import type {
   StepBucket,
   WeekMood,
 } from './carePlanStorage';
+import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
 
 // ---------------------------------------------------------------------------
 // Labels (single source of truth for human-readable copy)
@@ -586,17 +587,28 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
   return scores;
 }
 
-/** Top 3 steps, ordered by weight, with stable tiebreak by title. */
-export function generateNextSteps(answers: CarePlanAnswers): CarePlanStep[] {
+/**
+ * Top N steps, ordered by weight, with stable tiebreak by title.
+ *
+ * The number of steps returned is gated by the parent's current bandwidth
+ * tier — a heavy day yields a shorter plan so we don't pile work on top of
+ * an already-strained parent. Defaults to the 'doing-well' plan size when
+ * no tier is supplied (e.g. legacy calls without a check-in result).
+ */
+export function generateNextSteps(
+  answers: CarePlanAnswers,
+  bandwidthTier?: BandwidthTier,
+): CarePlanStep[] {
   const scores = buildScores(answers);
-  if (scores.size === 0) return FALLBACK_STEPS;
+  const limit = TIER_STEP_LIMIT[bandwidthTier ?? 'doing-well'];
+  if (scores.size === 0) return FALLBACK_STEPS.slice(0, limit);
 
   const ranked = Array.from(scores.values()).sort((a, b) => {
     if (b.weight !== a.weight) return b.weight - a.weight;
     return a.candidate.title.localeCompare(b.candidate.title);
   });
 
-  return ranked.slice(0, 3).map(({ candidate, weight, reasons }) => ({
+  return ranked.slice(0, limit).map(({ candidate, weight, reasons }) => ({
     title: candidate.title,
     why: candidate.why,
     href: candidate.href,

@@ -39,6 +39,8 @@ import {
 } from '@/lib/generateNextSteps';
 import JourneyStepper from '@/components/JourneyStepper';
 import { inferJourneyStage } from '@/lib/journeyStage';
+import BandwidthCheck from '@/components/BandwidthCheck';
+import { loadBandwidth, type BandwidthResult } from '@/lib/bandwidth';
 
 // ---------------------------------------------------------------------------
 // Option data — labels, supporting copy, and icons for visual differentiation
@@ -98,8 +100,20 @@ const HARDEST_LABEL = Object.fromEntries(HARDEST_OPTIONS.map((o) => [o.value, o.
 // Step model — questions plus short "we hear you" interstitials in between
 // ---------------------------------------------------------------------------
 
-type StepKind = 'q-hardest' | 'r-hardest' | 'q-stage' | 'q-age' | 'q-help' | 'q-mood' | 'r-mood' | 'q-notes' | 'building';
+type StepKind =
+  | 'q-hardest'
+  | 'r-hardest'
+  | 'q-stage'
+  | 'q-age'
+  | 'q-help'
+  | 'q-mood'
+  | 'r-mood'
+  | 'q-bandwidth'
+  | 'q-notes'
+  | 'building';
 
+// Bandwidth check is inserted right before the freeform notes step. The plan
+// is then sized to match the parent's actual capacity — see generateNextSteps.
 const STEP_ORDER: StepKind[] = [
   'q-hardest',
   'r-hardest',
@@ -108,12 +122,21 @@ const STEP_ORDER: StepKind[] = [
   'q-help',
   'q-mood',
   'r-mood',
+  'q-bandwidth',
   'q-notes',
   'building',
 ];
 
 // Steps that count toward the parent-facing progress bar (questions only).
-const PROGRESS_STEPS: StepKind[] = ['q-hardest', 'q-stage', 'q-age', 'q-help', 'q-mood', 'q-notes'];
+const PROGRESS_STEPS: StepKind[] = [
+  'q-hardest',
+  'q-stage',
+  'q-age',
+  'q-help',
+  'q-mood',
+  'q-bandwidth',
+  'q-notes',
+];
 
 // Per-step background hue — soft, not loud. The form feels like walking through rooms.
 const STEP_HUE: Record<StepKind, string> = {
@@ -124,6 +147,7 @@ const STEP_HUE: Record<StepKind, string> = {
   'q-help': 'bg-brand-warm-100',
   'q-mood': 'bg-brand-warm-50',
   'r-mood': 'bg-brand-plum-50',
+  'q-bandwidth': 'bg-brand-plum-50',
   'q-notes': 'bg-brand-warm-100',
   'building': 'bg-brand-warm-50',
 };
@@ -142,6 +166,13 @@ export default function IntakePage() {
   const [helpKind, setHelpKind] = useState<HelpKind | null>(null);
   const [weekMood, setWeekMood] = useState<WeekMood | null>(null);
   const [notes, setNotes] = useState('');
+  // Bandwidth result — either freshly captured in the q-bandwidth step or
+  // pre-loaded from a prior session so the parent isn't forced to redo it.
+  const [bandwidth, setBandwidth] = useState<BandwidthResult | null>(null);
+  useEffect(() => {
+    const existing = loadBandwidth();
+    if (existing) setBandwidth(existing);
+  }, []);
 
   const step = STEP_ORDER[stepIdx];
   const progressIdx = PROGRESS_STEPS.indexOf(step);
@@ -154,10 +185,11 @@ export default function IntakePage() {
       case 'q-age': return childAge !== null;
       case 'q-help': return helpKind !== null;
       case 'q-mood': return weekMood !== null;
+      case 'q-bandwidth': return bandwidth !== null;
       case 'q-notes': return true; // optional
       default: return true; // interstitials and building auto-advance
     }
-  }, [step, hardest, stage, childAge, helpKind, weekMood]);
+  }, [step, hardest, stage, childAge, helpKind, weekMood, bandwidth]);
 
   const next = () => setStepIdx((i) => Math.min(i + 1, STEP_ORDER.length - 1));
   const back = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -166,14 +198,15 @@ export default function IntakePage() {
     setHardest((arr) => (arr.includes(h) ? arr.filter((x) => x !== h) : [...arr, h]));
   };
 
-  // Build & save on 'building' step.
+  // Build & save on 'building' step. Pass the bandwidth tier through so the
+  // plan generator can size the priority steps to today's capacity.
   useEffect(() => {
     if (step !== 'building') return;
     const answers = { hardest, stage, childAge, helpKind, weekMood, notes: notes || null };
     saveCarePlan({
       answers,
       summary: generateSummary(answers),
-      steps: generateNextSteps(answers),
+      steps: generateNextSteps(answers, bandwidth?.tier),
       resources: generateResources(answers),
       weekMessage: generateWeekMessage(weekMood),
       noteEchoes: generateNoteEchoes(notes || null),
@@ -181,7 +214,7 @@ export default function IntakePage() {
     ensurePlanStarted();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
-  }, [step, hardest, stage, childAge, helpKind, weekMood, notes, router]);
+  }, [step, hardest, stage, childAge, helpKind, weekMood, notes, bandwidth, router]);
 
   // Chip removers — let the parent edit a prior answer without going back step-by-step.
   const clearHardest = (h: Hardest) => setHardest((arr) => arr.filter((x) => x !== h));
@@ -347,6 +380,17 @@ export default function IntakePage() {
             />
           )}
 
+          {step === 'q-bandwidth' && (
+            <BandwidthCheck
+              initialInputs={bandwidth?.inputs}
+              onComplete={(result) => {
+                setBandwidth(result);
+                next();
+              }}
+              submitLabel="Continue"
+            />
+          )}
+
           {step === 'q-notes' && (
             <Question
               title="Anything you want us to know?"
@@ -372,7 +416,7 @@ export default function IntakePage() {
           )}
 
           {/* Footer — only on real questions, not on reflections or building */}
-          {progressIdx >= 0 && (
+          {progressIdx >= 0 && step !== 'q-bandwidth' && (
             <div className="mt-8 flex items-center justify-between">
               <button
                 type="button"
