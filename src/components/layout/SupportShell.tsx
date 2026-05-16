@@ -18,6 +18,7 @@ import {
   HeartPulse,
   Wallet,
   Feather,
+  Lightbulb,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -54,6 +55,7 @@ const navGroups = [
     label: 'Learn',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
+      { href: '/support/at-home', label: 'At-Home Strategies', icon: Lightbulb },
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
       { href: '/support/siblings', label: 'Sibling Support', icon: Users },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
