@@ -7,10 +7,19 @@
  * keeping the next stop visible without committing the parent to a path.
  *
  * Mounts on the homepage, intake top, care plan top, and parent support top.
- * Pure presentational — no localStorage, no side effects.
+ *
+ * CCO round 2: this component also carries the soft check-in nudge — a small
+ * pill in the header that surfaces "last checked in: X days ago · update" so
+ * the weekly check-in becomes part of the same companion that's already
+ * following the parent through the journey, instead of a hidden tab.
  */
 
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Activity } from 'lucide-react';
 import { JOURNEY_STAGES, stageIndex, type JourneyStageId } from '@/lib/journeyStage';
+import { loadCheckInState } from '@/lib/weeklyCheckIn';
+import { computePulse, daysAgoLabel } from '@/lib/pulse';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -44,11 +53,14 @@ export default function JourneyStepper({
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
           Your road, roughly
         </p>
-        {activeIdx >= 0 && (
-          <p className="text-[11px] font-medium text-brand-muted-500">
-            Step {activeIdx + 1} of {JOURNEY_STAGES.length}
-          </p>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <CheckInPill />
+          {activeIdx >= 0 && (
+            <p className="text-[11px] font-medium text-brand-muted-500">
+              Step {activeIdx + 1} of {JOURNEY_STAGES.length}
+            </p>
+          )}
+        </div>
       </div>
       <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-700">
         {reassurance}
@@ -95,5 +107,51 @@ export default function JourneyStepper({
         })}
       </ol>
     </section>
+  );
+}
+
+/**
+ * Soft inline link surfaced in the JourneyStepper header. Three states:
+ *   • no history       → "Take your first check-in"
+ *   • recent (<14 days) → "Checked in {label}"
+ *   • stale (≥14 days)  → "Check in this week" with amber tint
+ * Always hydrates client-side to avoid SSR mismatch.
+ */
+function CheckInPill() {
+  const [label, setLabel] = useState<string | null>(null);
+  const [tone, setTone] = useState<'neutral' | 'soft' | 'nudge'>('soft');
+
+  useEffect(() => {
+    const pulse = computePulse(loadCheckInState());
+    if (!pulse) {
+      setLabel('Take your first check-in');
+      setTone('soft');
+      return;
+    }
+    if (pulse.daysSince !== null && pulse.daysSince >= 14) {
+      setLabel('Check in this week');
+      setTone('nudge');
+      return;
+    }
+    setLabel(`Checked in ${daysAgoLabel(pulse.daysSince ?? 0)}`);
+    setTone('neutral');
+  }, []);
+
+  if (!label) return null;
+
+  return (
+    <Link
+      href="/support/check-in"
+      aria-label={`${label} — open weekly check-in`}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
+        tone === 'nudge' && 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100',
+        tone === 'soft' && 'border-brand-plum-200 bg-brand-plum-50/70 text-brand-plum-700 hover:bg-brand-plum-100',
+        tone === 'neutral' && 'border-surface-border bg-white text-brand-muted-700 hover:bg-surface-subtle',
+      )}
+    >
+      <Activity className="h-3 w-3" />
+      {label}
+    </Link>
   );
 }

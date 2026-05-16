@@ -22,6 +22,7 @@ import {
   Feather,
 } from 'lucide-react';
 import WellnessMirror from '@/components/WellnessMirror';
+import PulseCard from '@/components/PulseCard';
 
 const supportActions = [
   {
@@ -75,21 +76,24 @@ export default function SupportHome() {
         </div>
 
         <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          {/* CCO round 2: Home Base used to read as a second "Parent Support" landing.
+              Now it's framed as a map — a place where the parent picks a direction.
+              Parent Support itself lives at /support/caregiver as the deep page. */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Parent Support</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Home Base</p>
             <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-muted-900 sm:text-4xl">
-              You do not have to figure this out alone.
+              Pick a direction. We&rsquo;ll walk it with you.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-brand-muted-600 sm:text-base">
-              Start with what your family needs today. Common Ground will point you toward simple next steps,
-              helpful tools, and support options.
+              Home Base is your map of Common Ground. From here you can build your plan, find your people,
+              learn what ABA actually is, or just put the day down for a minute.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/support/intake" className="btn-primary px-5 py-2.5 text-sm">
-                Build My Family Care Plan
+                Find My Next Step
               </Link>
               <Link href="#support-actions" className="btn-secondary px-5 py-2.5 text-sm">
-                Find support for today
+                See everything available
               </Link>
             </div>
             <p className="mt-4 text-xs text-brand-muted-500">
@@ -111,6 +115,10 @@ export default function SupportHome() {
           </div>
         </div>
       </section>
+
+      {/* CCO round 2: surface the parent's weekly check-in score on Home Base
+          so the dashboard at /support/mental-health is no longer hidden. */}
+      <PulseCard />
 
       <WellnessMirror />
 
