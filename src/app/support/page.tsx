@@ -14,7 +14,6 @@ import {
   ChevronUp,
   Feather,
 } from 'lucide-react';
-import WellnessMirror from '@/components/WellnessMirror';
 import PulseCard from '@/components/PulseCard';
 
 const supportActions = [
@@ -113,11 +112,12 @@ export default function SupportHome() {
         </div>
       </section>
 
-      {/* CCO round 2: surface the parent's weekly check-in score on Home Base
-          so the dashboard at /support/mental-health is no longer hidden. */}
+      {/* Bandwidth consolidation pass: one canonical check-in surface on Home
+          Base. PulseCard now reads from the Quick Bandwidth Check result. The
+          old WellnessMirror tile was a duplicate measurement of the same idea
+          and has been removed per CCO direction (avoid multiple separate
+          versions of the check-in across the site). */}
       <PulseCard />
-
-      <WellnessMirror />
 
       {/* Pathfinder presence — above the fold, gentle indicator that there is
           a real human layer being built. Demo until matching is live. */}

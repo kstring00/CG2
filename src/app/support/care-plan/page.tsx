@@ -22,6 +22,18 @@ import {
   type StepBucket,
 } from '@/lib/carePlanStorage';
 import {
+  freshnessLabel,
+  loadBandwidth,
+  shouldShowCrisisCallout,
+  shouldShowSupportCard,
+  TIER_LABEL,
+  TIER_RESULT_COPY,
+  TIER_STEP_LIMIT,
+  TIER_THEME,
+  type BandwidthResult,
+} from '@/lib/bandwidth';
+import { cn } from '@/lib/utils';
+import {
   BUCKET_BLURBS,
   BUCKET_LABELS,
   generateBucketSteps,
@@ -54,10 +66,12 @@ import {
 export default function CarePlanPage() {
   const [hydrated, setHydrated] = useState(false);
   const [plan, setPlan] = useState<SavedCarePlan | null>(null);
+  const [bandwidth, setBandwidth] = useState<BandwidthResult | null>(null);
 
   useEffect(() => {
     setHydrated(true);
     setPlan(loadCarePlan());
+    setBandwidth(loadBandwidth());
   }, []);
 
   if (!hydrated) {
@@ -66,7 +80,13 @@ export default function CarePlanPage() {
 
   if (!plan) return <EmptyState />;
 
-  return <PopulatedPlan plan={plan} onCleared={() => setPlan(null)} />;
+  return (
+    <PopulatedPlan
+      plan={plan}
+      bandwidth={bandwidth}
+      onCleared={() => setPlan(null)}
+    />
+  );
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -105,9 +125,11 @@ function EmptyState() {
 
 function PopulatedPlan({
   plan,
+  bandwidth,
   onCleared,
 }: {
   plan: SavedCarePlan;
+  bandwidth: BandwidthResult | null;
   onCleared: () => void;
 }) {
   const { state: wellness } = useWellnessState();
@@ -121,6 +143,15 @@ function PopulatedPlan({
   }, [plan.createdAt]);
 
   const bucketSteps = useMemo(() => generateBucketSteps(plan.answers), [plan.answers]);
+
+  // Gate the rendered count of priority steps by current bandwidth tier so a
+  // heavy day shows a smaller plan even if the saved plan has more steps.
+  const tier = bandwidth?.tier ?? 'doing-well';
+  const stepLimit = TIER_STEP_LIMIT[tier];
+  const visibleSteps = useMemo(
+    () => plan.steps.slice(0, stepLimit),
+    [plan.steps, stepLimit],
+  );
 
   const handlePrint = () => {
     if (typeof window !== 'undefined') window.print();
@@ -179,6 +210,45 @@ function PopulatedPlan({
       <div className="mt-5">
         <JourneyStepper activeStage={inferJourneyStage(plan.answers)} compact />
       </div>
+
+      {/* Today's bandwidth — the single visible summary of the parent's most
+          recent check-in, with a low-friction way to update it. */}
+      <BandwidthSummaryCard bandwidth={bandwidth} />
+
+      {bandwidth && shouldShowCrisisCallout(bandwidth.tier) && (
+        <section
+          className="mt-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/70 p-4 sm:p-5"
+          aria-label="If today feels unsafe"
+        >
+          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-rose-700" aria-hidden />
+          <div className="text-[13.5px] leading-relaxed text-rose-900">
+            <p className="font-semibold">If today feels unsafe for you or your child, please reach out for live support.</p>
+            <p className="mt-1">
+              Call or text <a href="tel:988" className="underline">988</a> (Suicide &amp; Crisis Lifeline) or contact your BCBA or care team. Common Ground is parent support — not a crisis service.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {bandwidth && shouldShowSupportCard(bandwidth.tier) && (
+        <section
+          className="mt-4 rounded-2xl border border-brand-warm-200 bg-brand-warm-50/60 p-5 sm:p-6"
+          aria-label="Live support suggestion"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-warm-700">
+            A gentle suggestion
+          </p>
+          <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-800">
+            Today is heavy. Before you tackle anything from this plan, consider looping in your BCBA or someone on your care team — a 10-minute phone call can lift more weight than five tools combined.
+          </p>
+          <Link
+            href="/support/parent-connection"
+            className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-warm-800 hover:text-brand-warm-900"
+          >
+            Find a live support option <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </section>
+      )}
 
       {weekNumber !== null && (
         <section
@@ -290,10 +360,17 @@ function PopulatedPlan({
       </section>
 
       <section className="mt-8 space-y-3">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          Your priority steps
-        </h2>
-        {plan.steps.map((step, i) => (
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+            Your priority steps
+          </h2>
+          {bandwidth && (
+            <p className="text-[12px] text-brand-muted-500">
+              Sized for today &middot; {visibleSteps.length} of {plan.steps.length}
+            </p>
+          )}
+        </div>
+        {visibleSteps.map((step, i) => (
           <div
             key={step.title}
             className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6"
@@ -438,6 +515,69 @@ function PopulatedPlan({
         latestCheckIn={latestCheckIn}
       />
     </Shell>
+  );
+}
+
+/**
+ * Today's bandwidth summary — the one canonical surface on the care plan that
+ * shows the parent's last check-in and offers a low-friction way to update it.
+ * When no check-in has been taken yet, it nudges them into the standalone
+ * /support/check-in page.
+ */
+function BandwidthSummaryCard({ bandwidth }: { bandwidth: BandwidthResult | null }) {
+  if (!bandwidth) {
+    return (
+      <section
+        aria-label="Today's bandwidth check"
+        className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-surface-border bg-white px-5 py-4 shadow-soft"
+      >
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+            Today&rsquo;s bandwidth
+          </p>
+          <p className="mt-1 text-[14px] leading-relaxed text-brand-muted-700">
+            Take a quick 30-second check so we can size your plan to the day.
+          </p>
+        </div>
+        <Link
+          href="/support/check-in?from=/support/care-plan"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
+        >
+          Quick bandwidth check <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      </section>
+    );
+  }
+
+  const theme = TIER_THEME[bandwidth.tier];
+  const freshness = freshnessLabel(bandwidth);
+
+  return (
+    <section
+      aria-label={`Today's bandwidth: ${TIER_LABEL[bandwidth.tier]}`}
+      className={cn(
+        'mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-5 py-4',
+        theme.bg,
+        theme.border,
+      )}
+    >
+      <div className="min-w-0">
+        <p className={cn('text-[11px] font-semibold uppercase tracking-[0.18em]', theme.text)}>
+          <span aria-hidden className={cn('mr-1.5 inline-block h-2 w-2 rounded-full align-middle', theme.dot)} />
+          Today&rsquo;s bandwidth &middot; {TIER_LABEL[bandwidth.tier]}
+        </p>
+        <p className={cn('mt-1 text-[13.5px] leading-relaxed', theme.text)}>
+          {TIER_RESULT_COPY[bandwidth.tier]}
+        </p>
+        <p className="mt-1 text-[11.5px] text-brand-muted-500">{freshness}</p>
+      </div>
+      <Link
+        href="/support/check-in?from=/support/care-plan"
+        className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 transition hover:border-primary/40 hover:text-brand-navy-700"
+      >
+        <RefreshCcw className="h-3.5 w-3.5" /> Update check-in
+      </Link>
+    </section>
   );
 }
 

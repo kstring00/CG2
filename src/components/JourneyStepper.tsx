@@ -16,10 +16,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Activity } from 'lucide-react';
+import { Gauge } from 'lucide-react';
 import { JOURNEY_STAGES, stageIndex, type JourneyStageId } from '@/lib/journeyStage';
-import { loadCheckInState } from '@/lib/weeklyCheckIn';
-import { computePulse, daysAgoLabel } from '@/lib/pulse';
+import { freshnessLabel, isStale, loadBandwidth, TIER_LABEL } from '@/lib/bandwidth';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -111,10 +110,11 @@ export default function JourneyStepper({
 }
 
 /**
- * Soft inline link surfaced in the JourneyStepper header. Three states:
- *   • no history       → "Take your first check-in"
- *   • recent (<14 days) → "Checked in {label}"
- *   • stale (≥14 days)  → "Check in this week" with amber tint
+ * Soft inline link surfaced in the JourneyStepper header. Reflects the
+ * parent's most recent Quick Bandwidth Check. Three states:
+ *   • no history       → "Take your bandwidth check"
+ *   • fresh             → "{tier} • {freshness}"
+ *   • stale (≥14 days)  → "Update your check-in" with amber tint
  * Always hydrates client-side to avoid SSR mismatch.
  */
 function CheckInPill() {
@@ -122,18 +122,18 @@ function CheckInPill() {
   const [tone, setTone] = useState<'neutral' | 'soft' | 'nudge'>('soft');
 
   useEffect(() => {
-    const pulse = computePulse(loadCheckInState());
-    if (!pulse) {
-      setLabel('Take your first check-in');
+    const bw = loadBandwidth();
+    if (!bw) {
+      setLabel('Take your bandwidth check');
       setTone('soft');
       return;
     }
-    if (pulse.daysSince !== null && pulse.daysSince >= 14) {
-      setLabel('Check in this week');
+    if (isStale(bw)) {
+      setLabel('Update your check-in');
       setTone('nudge');
       return;
     }
-    setLabel(`Checked in ${daysAgoLabel(pulse.daysSince ?? 0)}`);
+    setLabel(`${TIER_LABEL[bw.tier]} · ${freshnessLabel(bw)}`);
     setTone('neutral');
   }, []);
 
@@ -142,7 +142,7 @@ function CheckInPill() {
   return (
     <Link
       href="/support/check-in"
-      aria-label={`${label} — open weekly check-in`}
+      aria-label={`${label} — open Quick Bandwidth Check`}
       className={cn(
         'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors',
         tone === 'nudge' && 'border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100',
@@ -150,7 +150,7 @@ function CheckInPill() {
         tone === 'neutral' && 'border-surface-border bg-white text-brand-muted-700 hover:bg-surface-subtle',
       )}
     >
-      <Activity className="h-3 w-3" />
+      <Gauge className="h-3 w-3" />
       {label}
     </Link>
   );
