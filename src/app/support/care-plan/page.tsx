@@ -11,6 +11,7 @@ import {
   Mail,
   Printer,
   RefreshCcw,
+  RotateCcw,
   ShieldAlert,
   Sparkles,
   Trash2,
@@ -41,6 +42,13 @@ import {
 import PathfinderCard from '@/components/PathfinderCard';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
 import JourneyStepper from '@/components/JourneyStepper';
+import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
+import {
+  getWeeklyProgressSummary,
+  markStepDone,
+  unmarkStepDone,
+  type WeeklyProgressSummary,
+} from '@/lib/weeklyProgress';
 import { inferJourneyStage } from '@/lib/journeyStage';
 import {
   clearRemindMeNextWeek,
@@ -136,11 +144,24 @@ function PopulatedPlan({
   const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
   const [emailOpen, setEmailOpen] = useState(false);
   const [remindSet, setRemindSet] = useState(false);
+  const [progress, setProgress] = useState<WeeklyProgressSummary | null>(null);
 
   useEffect(() => {
     setCheckInState(ensurePlanStarted(plan.createdAt));
     setRemindSet(isRemindMeSet());
+    setProgress(getWeeklyProgressSummary());
   }, [plan.createdAt]);
+
+  const refreshProgress = () => setProgress(getWeeklyProgressSummary());
+
+  const handleToggleStep = (href: string, currentlyDone: boolean) => {
+    if (currentlyDone) {
+      unmarkStepDone(href);
+    } else {
+      markStepDone(href);
+    }
+    refreshProgress();
+  };
 
   const bucketSteps = useMemo(() => generateBucketSteps(plan.answers), [plan.answers]);
 
@@ -205,6 +226,10 @@ function PopulatedPlan({
           Last updated {updatedDisplay} · saved privately on this device.
         </p>
       </header>
+
+      <div className="mt-6">
+        <WeeklyProgressMeter variant="panel" />
+      </div>
 
       {/* Soft "where am I?" anchor — inferred from saved intake answers. */}
       <div className="mt-5">
@@ -370,46 +395,69 @@ function PopulatedPlan({
             </p>
           )}
         </div>
-        {visibleSteps.map((step, i) => (
-          <div
-            key={step.title}
-            className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6"
-          >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-              Step {i + 1}
-            </p>
-            <h3 className="mt-1 text-lg font-semibold text-brand-navy-700">
-              {step.title}
-            </h3>
-            {step.because && (
-              <p className="mt-1 inline-block rounded-full bg-brand-plum-50 px-2.5 py-0.5 text-[12px] font-semibold text-brand-plum-700">
-                {step.because}
+        {visibleSteps.map((step, i) => {
+          const isDone = progress?.completedStepHrefs.includes(step.href) ?? false;
+          return (
+            <div
+              key={step.title}
+              className={
+                'rounded-2xl border bg-white p-5 shadow-soft sm:p-6 transition ' +
+                (isDone ? 'border-emerald-200 bg-emerald-50/40' : 'border-surface-border')
+              }
+            >
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+                  Step {i + 1}
+                </p>
+                {isDone && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700">
+                    <Check className="h-3 w-3" /> Done this week
+                  </span>
+                )}
+              </div>
+              <h3 className="mt-1 text-lg font-semibold text-brand-navy-700">
+                {step.title}
+              </h3>
+              {step.because && (
+                <p className="mt-1 inline-block rounded-full bg-brand-plum-50 px-2.5 py-0.5 text-[12px] font-semibold text-brand-plum-700">
+                  {step.because}
+                </p>
+              )}
+              <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
+                {step.why}
               </p>
-            )}
-            <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
-              {step.why}
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <Link
-                href={step.href}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-              >
-                Start this step <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-              <button
-                type="button"
-                className="text-[13px] font-medium text-brand-muted-500 hover:text-brand-muted-800"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.alert('Skipped for now. Nothing happens to your plan — pick this back up whenever you want.');
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <Link
+                  href={step.href}
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+                >
+                  {isDone ? 'Revisit step' : 'Start this step'} <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleToggleStep(step.href, isDone)}
+                  aria-pressed={isDone}
+                  className={
+                    'inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-semibold transition ' +
+                    (isDone
+                      ? 'border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50'
+                      : 'border-surface-border bg-white text-brand-muted-700 hover:bg-surface-muted')
                   }
-                }}
-              >
-                Skip for now
-              </button>
+                >
+                  {isDone ? (
+                    <>
+                      <RotateCcw className="h-3.5 w-3.5" /> Mark not done
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-3.5 w-3.5" /> Mark this step done
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {plan.resources.length > 0 && (

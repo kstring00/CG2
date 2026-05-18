@@ -31,6 +31,7 @@ import {
   type BandwidthResult,
 } from '@/lib/bandwidth';
 import { cn } from '@/lib/utils';
+import { markWeeklyIntakeDone } from '@/lib/weeklyProgress';
 
 export default function CheckInPage() {
   return (
@@ -65,7 +66,11 @@ function CheckInPageInner() {
       {!result ? (
         <BandwidthCheck
           initialInputs={existing?.inputs}
-          onComplete={(r) => setResult(r)}
+          onComplete={(r) => {
+            // Fill the first notch of this week's progress meter.
+            markWeeklyIntakeDone();
+            setResult(r);
+          }}
           submitLabel={existing ? 'Update my check-in' : 'See my result'}
         />
       ) : (

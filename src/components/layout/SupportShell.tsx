@@ -23,6 +23,7 @@ import {
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
+import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -266,6 +267,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <main className="flex-1">{children}</main>
         ) : (
           <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+            <WeeklyProgressMeter variant="rail" className="mb-5" />
             {children}
           </main>
         )}
