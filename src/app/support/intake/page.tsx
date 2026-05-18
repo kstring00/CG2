@@ -28,6 +28,7 @@ import {
   type WeekMood,
 } from '@/lib/carePlanStorage';
 import { ensurePlanStarted } from '@/lib/weeklyCheckIn';
+import { markWeeklyIntakeDone, resetWeeklyProgress } from '@/lib/weeklyProgress';
 import {
   generateNextSteps,
   generateNoteEchoes,
@@ -177,6 +178,10 @@ export default function IntakePage() {
       noteEchoes: generateNoteEchoes(notes || null),
     });
     ensurePlanStarted();
+    // Running intake refreshes the plan steps, so wipe this week's per-step
+    // progress (the old step hrefs are gone) and credit the first notch.
+    resetWeeklyProgress();
+    markWeeklyIntakeDone();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
   }, [step, hardest, stage, childAge, helpKind, weekMood, notes, router]);

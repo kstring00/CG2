@@ -23,6 +23,7 @@ import {
 } from '@/lib/weeklyCheckInSummary';
 import { loadCarePlan } from '@/lib/carePlanStorage';
 import type { WeekMood } from '@/lib/carePlanStorage';
+import { markWeeklyIntakeDone } from '@/lib/weeklyProgress';
 
 const STRESS_OPTIONS: { value: ParentStress; label: string; hint: string }[] = [
   { value: 'low', label: 'Low', hint: 'Mostly steady this week.' },
@@ -136,6 +137,8 @@ export default function WeeklyCheckInPage() {
         summary: sum,
         nextSteps: steps,
       });
+      // Fill the first notch of this week's progress meter.
+      markWeeklyIntakeDone();
       setSummary(sum);
       setNextSteps(steps);
       setResourceLinks(links);
