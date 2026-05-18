@@ -105,12 +105,21 @@ function readRaw(): WeeklyProgress | null {
   }
 }
 
+/** Same-tab event name. Components listening can subscribe to keep the meter
+ *  in sync without waiting for the cross-tab `storage` event. */
+export const WEEKLY_PROGRESS_EVENT = 'cg:weeklyProgress';
+
 function writeRaw(next: WeeklyProgress) {
   if (!isBrowser()) return;
   try {
     window.localStorage.setItem(KEY, JSON.stringify(next));
   } catch {
     /* quota / private mode — meter still functions in-memory for the page */
+  }
+  try {
+    window.dispatchEvent(new CustomEvent(WEEKLY_PROGRESS_EVENT));
+  } catch {
+    /* CustomEvent unsupported — fall back to storage event listeners */
   }
 }
 

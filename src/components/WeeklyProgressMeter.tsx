@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import {
   getWeeklyProgressSummary,
+  WEEKLY_PROGRESS_EVENT,
   type WeeklyProgressSummary,
 } from '@/lib/weeklyProgress';
 
@@ -53,6 +54,11 @@ function useWeeklySummary(): WeeklyProgressSummary | null {
     }
     window.addEventListener('storage', onStorage);
 
+    // Same-tab updates: any markStepDone/markWeeklyIntakeDone in the current
+    // tab dispatches this so every mounted meter (rail + panel) re-reads
+    // immediately.
+    window.addEventListener(WEEKLY_PROGRESS_EVENT, recompute);
+
     // Recompute when the tab regains focus — covers the case where a parent
     // came back to the tab on a new day / week and the meter needs to roll over.
     function onVisible() {
@@ -62,6 +68,7 @@ function useWeeklySummary(): WeeklyProgressSummary | null {
 
     return () => {
       window.removeEventListener('storage', onStorage);
+      window.removeEventListener(WEEKLY_PROGRESS_EVENT, recompute);
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
@@ -122,12 +129,21 @@ function RailMeter({
   summary: WeeklyProgressSummary;
   className?: string;
 }) {
-  const { filledNotches, totalNotches, nextLabel, nextHref, weekComplete, intakeDoneThisWeek } =
-    summary;
+  const {
+    filledNotches,
+    totalNotches,
+    nextLabel,
+    nextHref,
+    weekComplete,
+    intakeDoneThisWeek,
+    completedStepHrefs,
+  } = summary;
+  const planStepCount = Math.max(0, totalNotches - 1);
+  const stepsDone = completedStepHrefs.length;
 
   return (
     <section
-      aria-label="Weekly progress meter"
+      aria-label={`Weekly progress: ${filledNotches} of ${totalNotches} notches filled (1 weekly check-in + ${planStepCount} plan ${planStepCount === 1 ? 'step' : 'steps'})`}
       className={[
         'rounded-2xl border border-surface-border bg-white p-3 shadow-soft sm:p-4',
         className ?? '',
@@ -142,6 +158,9 @@ function RailMeter({
             <span className="text-[11px] font-semibold text-brand-muted-700">
               {filledNotches} of {totalNotches} done
             </span>
+            <span className="hidden text-[10.5px] text-brand-muted-500 sm:inline">
+              · check-in {intakeDoneThisWeek ? '✓' : '○'} + {stepsDone}/{planStepCount} plan {planStepCount === 1 ? 'step' : 'steps'}
+            </span>
             {weekComplete && (
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
                 <CheckCircle2 className="h-3 w-3" /> Week complete
@@ -154,12 +173,12 @@ function RailMeter({
           <p className="mt-2 truncate text-[12.5px] text-brand-muted-700">
             {weekComplete ? (
               <span>
-                You finished every step for this week. The meter resets Monday.
+                You finished this week&rsquo;s check-in and all {planStepCount} plan {planStepCount === 1 ? 'step' : 'steps'}. The meter resets Monday.
               </span>
             ) : !intakeDoneThisWeek ? (
               <span>
                 <span className="font-semibold text-brand-plum-700">Start here:</span>{' '}
-                this week’s intake is the first step.
+                this week&rsquo;s check-in is notch 1 of {totalNotches}.
               </span>
             ) : (
               <span>
@@ -196,11 +215,14 @@ function PanelMeter({
     weekComplete,
     intakeDoneThisWeek,
     noPlanYet,
+    completedStepHrefs,
   } = summary;
+  const planStepCount = Math.max(0, totalNotches - 1);
+  const stepsDone = completedStepHrefs.length;
 
   return (
     <section
-      aria-label="Weekly progress"
+      aria-label={`Weekly progress: ${filledNotches} of ${totalNotches} notches filled`}
       className={[
         'rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6',
         className ?? '',
@@ -215,12 +237,13 @@ function PanelMeter({
             {weekComplete
               ? 'You finished this week’s plan.'
               : !intakeDoneThisWeek
-              ? 'Start with this week’s intake.'
+              ? 'Start with this week’s check-in.'
               : 'Keep going — one step at a time.'}
           </h2>
           <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-700">
-            The meter empties every Monday. Finishing the weekly intake fills the first notch,
-            then each plan step you complete fills one more.
+            The meter has <span className="font-semibold text-brand-muted-900">{totalNotches}</span> notches this week:
+            {' '}1 for the weekly check-in + {planStepCount} for your plan {planStepCount === 1 ? 'step' : 'steps'}.
+            It empties every Monday.
           </p>
         </div>
         <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-brand-muted-700">
@@ -230,6 +253,24 @@ function PanelMeter({
 
       <div className="mt-4">
         <MeterTrack summary={summary} />
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-brand-muted-600">
+        <span className="inline-flex items-center gap-1">
+          <span
+            aria-hidden
+            className={
+              'inline-block h-2 w-2 rounded-full ' +
+              (intakeDoneThisWeek ? 'bg-brand-plum-600' : 'bg-stone-300')
+            }
+          />
+          Check-in {intakeDoneThisWeek ? 'done' : 'not yet'}
+        </span>
+        <span aria-hidden className="text-brand-muted-300">·</span>
+        <span className="inline-flex items-center gap-1">
+          <span aria-hidden className="inline-block h-2 w-2 rounded-full bg-primary" />
+          Plan steps: {stepsDone} of {planStepCount} done
+        </span>
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
@@ -243,12 +284,15 @@ function PanelMeter({
             </span>
           ) : !intakeDoneThisWeek ? (
             <span>
-              <span className="font-semibold text-brand-plum-700">Next:</span> this week’s
-              intake — it tells the plan what to surface.
+              <span className="font-semibold text-brand-plum-700">Next:</span> this week&rsquo;s
+              check-in — that&rsquo;s notch 1 of {totalNotches}.
             </span>
           ) : (
             <span>
-              <span className="font-semibold text-primary">Up next:</span> {nextLabel}
+              <span className="font-semibold text-primary">Up next:</span> {nextLabel}{' '}
+              <span className="text-brand-muted-500">
+                (notch {filledNotches + 1} of {totalNotches})
+              </span>
             </span>
           )}
         </p>
