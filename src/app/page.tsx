@@ -274,19 +274,19 @@ export default function HomePage() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className="max-w-[560px]"
+                    className="max-w-[600px]"
                   >
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
                       <Heart className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Common Ground
                     </span>
                     <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
-                      Autism support for Texas families — starting with your next step.
+                      Real autism support for real Texas families
                     </h1>
-                    <p className="mt-5 text-xl font-semibold leading-snug text-white sm:text-2xl">
-                      Not sure where to begin? Answer a few questions and we&apos;ll point you to exactly what you need.
+                    <p className="mt-5 max-w-xl text-lg font-semibold leading-snug text-white sm:text-xl">
+                      A free support hub that helps you find local providers, parent tools, and clear next steps for your family — whether you&apos;re newly diagnosed, already receiving services, or just exploring options.
                     </p>
-                    <p className="mt-3 max-w-md text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
-                      Whether you&apos;re new here, already using Common Ground, or still figuring things out, we meet you where you are — connecting you with the right tools, local providers, and real support for you, not just your child. Less figuring it out alone, so you can be more present for your family.
+                    <p className="mt-3 max-w-xl text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
+                      Common Ground meets you where you are with practical resources, trusted guidance, and support built for the whole family — so you can spend less energy searching and more energy being present.
                     </p>
 
                     <div className="mt-7 flex flex-col gap-2.5 text-sm text-white/80">
