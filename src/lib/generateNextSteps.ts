@@ -15,6 +15,7 @@ import type {
   CarePlanResource,
   CarePlanStep,
   Hardest,
+  HelpKind,
   NoteEcho,
   StepBucket,
   WeekMood,
@@ -529,44 +530,33 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
       break;
   }
 
-  // Help-kind track
-  switch (answers.helpKind) {
-    case 'practical-info':
-      add(scores, C.practicalGuides, W.helpKind, 'Because you said you want practical info.');
-      break;
-    case 'local-providers':
-      add(scores, C.findLocal, W.helpKind, 'Because you said you want local providers.');
-      break;
-    case 'someone-to-talk-to':
-      add(scores, C.parentMatch, W.helpKind, 'Because you said you want someone to talk to.');
-      break;
-    case 'time-for-me':
-      add(scores, C.fourMinutes, W.helpKind, 'Because you said you need time for yourself.');
-      add(scores, C.parentTherapist, W.helpKind - 1, 'Because you said you need time for yourself.');
-      break;
-    case 'not-sure':
-      add(scores, C.whatIsAba, W.helpKind - 2, 'A gentle starting point while you figure out what helps.');
-      break;
-  }
-
-  // Mood track
-  if (answers.weekMood === 'frayed' || answers.weekMood === 'heavy') {
-    add(scores, C.fourMinutes, W.mood, 'Because you said this week feels heavy.');
-    add(scores, C.meltdownNow, W.mood - 2, 'Because you said this week feels heavy.');
-  } else if (answers.weekMood === 'numb') {
-    add(scores, C.fourMinutes, W.mood, 'Because you said you’re feeling numb.');
-  } else if (answers.weekMood === 'steady') {
-    add(scores, C.practicalGuides, W.mood - 1, 'Because you said you’re feeling steadier.');
-  } else if (answers.weekMood === 'hopeful') {
-    add(scores, C.parentMatch, W.mood - 1, 'Because you said you’re feeling more hopeful.');
-  }
-
-  // Age band — light influence
-  if (answers.childAge === '0-2' || answers.childAge === '2-5') {
-    add(scores, C.whatIsAba, W.ageBand, 'Because of your child’s age, foundations come first.');
-  }
-  if (answers.childAge === '6-12' || answers.childAge === '13-17') {
-    add(scores, C.iepPrep, W.ageBand, 'Because of your child’s age, school support is often the lever.');
+  // Help-kind track — now multi-select. Falls back to the legacy single
+  // value so older saved plans still score correctly.
+  const helpKinds: HelpKind[] =
+    answers.helpKinds && answers.helpKinds.length
+      ? answers.helpKinds
+      : answers.helpKind
+        ? [answers.helpKind]
+        : [];
+  for (const help of helpKinds) {
+    switch (help) {
+      case 'practical-info':
+        add(scores, C.practicalGuides, W.helpKind, 'Because you said you want practical info.');
+        break;
+      case 'local-providers':
+        add(scores, C.findLocal, W.helpKind, 'Because you said you want local providers.');
+        break;
+      case 'someone-to-talk-to':
+        add(scores, C.parentMatch, W.helpKind, 'Because you said you want someone to talk to.');
+        break;
+      case 'time-for-me':
+        add(scores, C.fourMinutes, W.helpKind, 'Because you said you need time for yourself.');
+        add(scores, C.parentTherapist, W.helpKind - 1, 'Because you said you need time for yourself.');
+        break;
+      case 'not-sure':
+        add(scores, C.whatIsAba, W.helpKind - 2, 'A gentle starting point while you figure out what helps.');
+        break;
+    }
   }
 
   // Notes-driven
@@ -722,8 +712,13 @@ export function generateResources(answers: CarePlanAnswers): CarePlanResource[] 
   if (answers.stage === 'looking-for-aba' || answers.stage === 'newly-diagnosed') {
     add({ label: 'Find local help', href: '/support/find', because: 'Picked because of where you are right now.' });
   }
-  if (answers.helpKind === 'someone-to-talk-to') add({ label: 'Connect with parents', href: '/support/connect', because: 'Picked because you said you want someone to talk to.' });
-  if (answers.helpKind === 'time-for-me') add({ label: 'Parent support', href: '/support/caregiver', because: 'Picked because you said you need time for yourself.' });
+  const helpKinds = answers.helpKinds && answers.helpKinds.length
+    ? answers.helpKinds
+    : answers.helpKind
+      ? [answers.helpKind]
+      : [];
+  if (helpKinds.includes('someone-to-talk-to')) add({ label: 'Connect with parents', href: '/support/connect', because: 'Picked because you said you want someone to talk to.' });
+  if (helpKinds.includes('time-for-me')) add({ label: 'Parent support', href: '/support/caregiver', because: 'Picked because you said you need time for yourself.' });
 
   const { matches } = parseNotes(answers.notes ?? '');
   for (const m of matches) {

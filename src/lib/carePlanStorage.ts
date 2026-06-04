@@ -39,11 +39,13 @@ export type WeekMood = 'frayed' | 'heavy' | 'numb' | 'steady' | 'hopeful';
 export type CarePlanAnswers = {
   hardest?: Hardest[] | null;
   stage?: Stage | null;
-  childAge?: ChildAge | null;
-  helpKind?: HelpKind | null;
-  weekMood?: WeekMood | null;
-  notes?: string | null;
+  // What would help most — now multi-select (Week 1 intake).
+  helpKinds?: HelpKind[] | null;
   // Legacy fields — kept readable so older plans still load.
+  helpKind?: HelpKind | null; // pre-multiselect single value
+  childAge?: ChildAge | null; // age question removed from intake
+  weekMood?: WeekMood | null; // mood question removed from intake
+  notes?: string | null; // freeform notes removed from intake
   support?: string | null;
   confidence?: string | null;
   easier?: string | null;
