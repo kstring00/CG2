@@ -8,17 +8,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpen,
   CheckCircle2,
-  Compass,
-  Droplets,
   ExternalLink,
   Heart,
-  HeartPulse,
   Lock,
   Phone,
   Sparkles,
-  Wind,
   X,
 } from 'lucide-react';
 import CrisisPill from '@/components/CrisisPill';
@@ -40,60 +35,9 @@ import {
 import { loadCarePlan, type SavedCarePlan } from '@/lib/carePlanStorage';
 
 const CREDIBILITY_CHECKS = [
-  'Parent mental health tools & therapist referrals',
-  'Clinically reviewed by BCBAs at Texas ABA Centers',
-  'Free for every family — no sign-up required',
-] as const;
-
-const PATH_STEPS = [
-  { n: '1', title: 'Understand where you are', desc: 'Quick guidance based on your situation — no jargon.' },
-  { n: '2', title: 'Get your next steps', desc: 'Clear, simple actions. No guessing. No overwhelm.' },
-  { n: '3', title: 'Find real support', desc: 'Local providers, parent connections, and help for you.' },
-] as const;
-
-const FEATURE_CARDS = [
-  {
-    href: '/support/care-plan',
-    icon: Compass,
-    eyebrow: 'My Care Plan',
-    title: 'A simple plan, built around your family.',
-    desc: 'A few questions, and you get clear, ordered next steps you can revisit anytime.',
-    cta: 'See how it works',
-    tone: 'navy',
-  },
-  {
-    href: '/support/caregiver',
-    icon: HeartPulse,
-    eyebrow: 'Parent Support',
-    title: 'Support for the parent, not just the plan.',
-    desc: 'Practical tools, caregiver resources, and reflection space for the weight you\u2019re carrying.',
-    cta: 'Explore Parent Support',
-    tone: 'plum',
-  },
-  {
-    href: '/support/still-waters',
-    icon: Droplets,
-    eyebrow: 'Still Waters',
-    title: 'A quiet place to put the day down.',
-    desc: 'A private, guided reflection space. No streaks, no scores \u2014 just somewhere to write.',
-    cta: 'Open Still Waters',
-    tone: 'slate',
-  },
-  {
-    href: '/support',
-    icon: BookOpen,
-    eyebrow: 'Learn & find help',
-    title: 'Guides, local help, and parent connections.',
-    desc: 'What ABA is, how to find verified providers, and ways to connect with other Texas parents.',
-    cta: 'Browse support',
-    tone: 'warm',
-  },
-] as const;
-
-const GROUNDING_TOOLS = [
-  { label: '4-7-8 breathing', time: '2 min', desc: 'Inhale 4, hold 7, exhale 8. Repeat 4×.' },
-  { label: '5-4-3-2-1 grounding', time: '5 min', desc: 'Name 5 things you see, hear, feel, smell, taste.' },
-  { label: 'One permission', time: '10 sec', desc: '"I am allowed to do this. This is hard and I\'m still a good parent."' },
+  'Reduce the emotional and mental bandwidth this season demands',
+  'Equip you with the tools and guidance to feel confident, not overwhelmed',
+  'Connect you to local ABA providers and support built for parents, too',
 ] as const;
 
 type View = 'hero' | 'intake' | 'recommend';
@@ -336,13 +280,13 @@ export default function HomePage() {
                       <Heart className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Common Ground
                     </span>
                     <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
-                      You don&apos;t have to figure this out alone.
+                      Autism support for Texas families — starting with your next step.
                     </h1>
                     <p className="mt-5 text-xl font-semibold leading-snug text-white sm:text-2xl">
-                      Get your next steps now.
+                      Not sure where to begin? Answer a few questions and we&apos;ll point you to exactly what you need.
                     </p>
                     <p className="mt-3 max-w-md text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
-                      Common Ground helps parents understand what to do next — with clear guidance, local support, and real help for you, not just your child.
+                      Whether you&apos;re new here, already using Common Ground, or still trying things out, we meet you where you are — guiding you to the right tools, local providers, and real support for you, not just your child. Less figuring it out alone, so you can be present for your family.
                     </p>
 
                     <div className="mt-7 flex flex-col gap-2.5 text-sm text-white/80">
@@ -356,16 +300,16 @@ export default function HomePage() {
 
                     <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                       <Link
-                        href="/support"
+                        href="/support/intake"
                         className="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-semibold text-primary shadow-md transition hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
-                        Explore Common Ground <ArrowRight className="h-4 w-4" />
+                        <Sparkles className="h-4 w-4" /> Find My Next Step <ArrowRight className="h-4 w-4" />
                       </Link>
                       <Link
-                        href="/support/intake"
+                        href="/support"
                         className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
                       >
-                        <Sparkles className="h-4 w-4" /> Build my plan
+                        Browse all support
                       </Link>
                     </div>
                     <p className="mt-4 text-xs text-white/60">
@@ -431,130 +375,6 @@ export default function HomePage() {
           </div>
         </section>
       )}
-
-      {/* FEATURE GRID — what Common Ground offers, as discoverable cards */}
-      <section className="bg-white px-6 py-14 sm:px-8 sm:py-16">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-plum-600">
-              What you’ll find here
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-stone-900 sm:text-3xl">
-              A few different doors. Pick the one that fits today.
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
-              Common Ground isn’t a single funnel. It’s a small set of tools you can use however you need — build a plan, find local help, or just take a breath.
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            {FEATURE_CARDS.map((card) => {
-              const Icon = card.icon;
-              const toneClasses =
-                card.tone === 'navy'
-                  ? 'border-brand-navy-100 bg-brand-navy-50/50 text-brand-navy-700'
-                  : card.tone === 'plum'
-                  ? 'border-brand-plum-200 bg-brand-plum-50/60 text-brand-plum-700'
-                  : card.tone === 'slate'
-                  ? 'border-stone-200 bg-stone-50 text-stone-700'
-                  : 'border-amber-200 bg-amber-50/60 text-amber-800';
-              return (
-                <Link
-                  key={card.href}
-                  href={card.href}
-                  className="group flex flex-col rounded-3xl border border-stone-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-md sm:p-7"
-                >
-                  <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${toneClasses}`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400">
-                    {card.eyebrow}
-                  </p>
-                  <h3 className="mt-1 text-lg font-bold text-stone-900 sm:text-xl">
-                    {card.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-stone-600">
-                    {card.desc}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition group-hover:gap-2.5">
-                    {card.cta} <ArrowRight className="h-3.5 w-3.5" />
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* PATH PREVIEW — demoted to a secondary section that explains how the plan works */}
-      <section className="border-y border-stone-100 bg-stone-50 px-6 py-12 sm:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-              How the plan works
-            </p>
-            <h2 className="mt-2 text-xl font-bold text-stone-900 sm:text-2xl">
-              If you’d rather just see your next step, the plan is built for that.
-            </h2>
-          </div>
-          <div className="mt-7 grid gap-6 sm:grid-cols-3">
-            {PATH_STEPS.map((step) => (
-              <div key={step.n} className="flex items-start gap-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-                  {step.n}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-stone-900">{step.title}</p>
-                  <p className="mt-0.5 text-sm text-stone-500">{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-7">
-            <Link
-              href="/support/intake"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
-            >
-              Build my plan <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* QUIET WARMTH */}
-      <section className="px-6 py-12 sm:px-8 sm:py-14" style={{ backgroundColor: '#f4efe8' }}>
-        <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-plum-600">
-              You don&apos;t have to figure this out alone
-            </p>
-            <h2 className="mt-3 text-2xl font-bold text-stone-900 sm:text-3xl">
-              You are part of the plan, too.
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
-              Common Ground was built by Texas ABA Centers to support whole families — not just clients. The intake adapts to where you are today, so the next step you see is actually yours.
-            </p>
-          </div>
-
-          <div className="rounded-3xl border border-stone-200 bg-stone-50 p-6 sm:p-7">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">
-              <Wind className="h-3.5 w-3.5" /> If today is hard — right now
-            </p>
-            <h3 className="mt-2 text-lg font-bold text-stone-900">One breath. One step.</h3>
-            <div className="mt-4 space-y-2.5">
-              {GROUNDING_TOOLS.map((tool) => (
-                <div key={tool.label} className="rounded-2xl border border-stone-200 bg-white p-3.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-stone-900">{tool.label}</span>
-                    <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-[11px] text-stone-500">{tool.time}</span>
-                  </div>
-                  <p className="mt-1 text-xs leading-relaxed text-stone-500">{tool.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
 
       <EmailPlanDialog
         open={emailDialogOpen}
