@@ -54,7 +54,7 @@ const RESOURCE_LABEL: Record<ResourceNeed, string> = {
 const RESOURCE_LINK: Partial<Record<ResourceNeed, { label: string; href: string }>> = {
   'practical-info': { label: 'Browse the resource library', href: '/support/resources' },
   'local-providers': { label: 'Find providers near you', href: '/support/providers' },
-  'someone-to-talk-to': { label: 'Open Still Waters', href: '/support/still-waters' },
+  'someone-to-talk-to': { label: 'Connect with other parents', href: '/support/connect' },
   'time-for-me': { label: 'Visit Parent Support', href: '/support/caregiver' },
   'school-iep': { label: 'Open the school & IEP guide', href: '/support/resources' },
   'financial': { label: 'See financial help', href: '/support/financial' },

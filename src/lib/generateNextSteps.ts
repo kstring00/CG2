@@ -143,14 +143,6 @@ const C: Record<string, Candidate> = {
     href: '/support/connect',
     bucket: 'next-week',
   },
-  stillWaters: {
-    id: 'stillWaters',
-    title: 'Try one Still Waters entry',
-    why: 'Sometimes writing helps before talking.',
-    href: '/support/still-waters',
-    bucket: 'try-home',
-    altBuckets: ['do-today'],
-  },
 
   // School / IEP
   iepPrep: {
@@ -172,7 +164,7 @@ const C: Record<string, Candidate> = {
     id: 'documentHard',
     title: 'Document what is hard right now',
     why: 'Three specific examples beat a long story every time.',
-    href: '/support/still-waters',
+    href: '/support/caregiver',
     bucket: 'ask-bcba',
     altBuckets: ['try-home'],
   },
@@ -521,7 +513,6 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
     case 'waiting-diagnosis':
       add(scores, C.mchat, W.stage, 'Because you said you’re waiting on a diagnosis.');
       add(scores, C.devPed, W.stage - 1, 'Because you said you’re waiting on a diagnosis.');
-      add(scores, C.stillWaters, W.stage - 2, 'Because you said you’re waiting on a diagnosis.');
       break;
     case 'looking-for-aba':
       add(scores, C.compareThree, W.stage, 'Because you said you’re looking for ABA.');
@@ -563,7 +554,7 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
     add(scores, C.fourMinutes, W.mood, 'Because you said this week feels heavy.');
     add(scores, C.meltdownNow, W.mood - 2, 'Because you said this week feels heavy.');
   } else if (answers.weekMood === 'numb') {
-    add(scores, C.stillWaters, W.mood, 'Because you said you’re feeling numb.');
+    add(scores, C.fourMinutes, W.mood, 'Because you said you’re feeling numb.');
   } else if (answers.weekMood === 'steady') {
     add(scores, C.practicalGuides, W.mood - 1, 'Because you said you’re feeling steadier.');
   } else if (answers.weekMood === 'hopeful') {
@@ -759,7 +750,7 @@ export function generateWeekMessage(mood: WeekMood | null | undefined): string {
     case 'numb':
       return 'Numb is also a signal — not a flaw. One small thing today is enough.';
     case 'steady':
-      return 'You said you’re feeling steadier. That’s worth marking. Want to write it down? Still Waters is a quiet place to put it.';
+      return 'You said you’re feeling steadier. That’s worth marking. Keep doing whatever helped this week.';
     case 'hopeful':
       return 'You’re feeling a little more hopeful. Good time to plan one small thing for the week ahead.';
     default:

@@ -9,7 +9,6 @@ const realToday = [
   'The resource library',
   'The intake flow',
   'The wellness check-in tool',
-  'Still Waters journaling',
   'Crisis access (988, Harris Center, 911)',
 ];
 

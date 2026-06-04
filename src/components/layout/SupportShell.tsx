@@ -17,7 +17,6 @@ import {
   HelpCircle,
   HeartPulse,
   Wallet,
-  Feather,
   Lightbulb,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -49,7 +48,6 @@ const navGroups = [
     label: 'Support',
     items: [
       { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
-      { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
     ],
   },
   {

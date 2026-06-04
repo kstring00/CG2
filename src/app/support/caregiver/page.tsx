@@ -5,11 +5,10 @@
  *
  * Per Kyle's direction (May 2026), this page has been rebuilt as a focused
  * mental-health toolbox for the parent. Earlier versions tried to do too
- * many jobs at once — Still Waters preview, a check-in dashboard pointer,
+ * many jobs at once — a check-in dashboard pointer,
  * a four-button "Start here" grid, and a four-tab PageTabs structure on
  * top of all of that. Those surfaces are now reachable elsewhere:
  *
- *   • Still Waters       → /support/still-waters (own nav tab + Home Base)
  *   • Bandwidth check-in → /support/check-in (own canonical flow)
  *   • Local help & care team → /support/find, /support/connect (nav)
  *

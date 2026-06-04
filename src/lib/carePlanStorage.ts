@@ -33,7 +33,7 @@ export type HelpKind =
   | 'time-for-me'
   | 'not-sure';
 
-/** Reuses Still Waters mood vocabulary for consistency across the app. */
+/** Shared mood vocabulary for consistency across the app. */
 export type WeekMood = 'frayed' | 'heavy' | 'numb' | 'steady' | 'hopeful';
 
 export type CarePlanAnswers = {

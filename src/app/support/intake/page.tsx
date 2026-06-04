@@ -361,7 +361,7 @@ export default function IntakePage() {
           )}
 
           {step === 'q-mood' && (
-            <Question title="How are you doing this week?" hint="Honest beats polished. Same words we use in Still Waters.">
+            <Question title="How are you doing this week?" hint="Honest beats polished.">
               <div className="grid grid-cols-5 gap-2">
                 {MOOD_OPTIONS.map((opt) => (
                   <MoodSwatch
