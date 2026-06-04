@@ -700,6 +700,21 @@ export default function ConnectPage() {
         </div>
       </div>
 
+      {/* CCO-review pass: parent matching is preview-only today. Make that
+          unambiguous at the top of the page so a parent never thinks they are
+          signing up for an active service. */}
+      <div className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-3 sm:px-5 sm:py-4">
+        <p className="text-[12px] font-semibold uppercase tracking-wide text-amber-900">
+          Parent matching is coming soon
+        </p>
+        <p className="mt-1 text-[13.5px] leading-relaxed text-amber-900">
+          We&rsquo;re still building the parent matching pool. Joining the waitlist
+          below tells us where you are on the journey so we can reach out when
+          we have parents matched to your stage. No clinical records, no inbox
+          of strangers — just a real person, when the timing is right.
+        </p>
+      </div>
+
       {/* Hero — headline (the whole page in one line), subhead, two CTAs,
           trust strip, and a parent-voice testimonial card on the right. */}
       <header className="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-center">

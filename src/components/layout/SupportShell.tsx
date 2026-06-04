@@ -18,10 +18,12 @@ import {
   HeartPulse,
   Wallet,
   Feather,
+  Lightbulb,
 } from 'lucide-react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
+import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -31,30 +33,40 @@ import CrisisPill from '@/components/CrisisPill';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
+// CCO-review label map (round 2): Start Here now surfaces Parent Connection so
+// it's no longer buried; Sibling Support moves to Learn (it's content, not
+// active support). Order within each group reflects parent priority.
 const navGroups = [
   {
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/care-plan', label: 'My Care Plan', icon: CompassIcon },
+      { href: '/support/care-plan', label: 'My Family Care Plan', icon: CompassIcon },
+      { href: '/support/connect', label: 'Parent Connection', icon: Users },
+    ],
+  },
+  {
+    label: 'Support',
+    items: [
       { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
       { href: '/support/still-waters', label: 'Still Waters', icon: Feather },
     ],
   },
   {
-    label: 'Learn & Find Help',
+    label: 'Learn',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
+      { href: '/support/at-home', label: 'At-Home Strategies', icon: Lightbulb },
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
-      { href: '/support/connect', label: 'Connect With Parents', icon: Link2 },
+      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
     ],
   },
   {
-    label: 'Family Needs',
+    label: 'For Current Families',
     items: [
-      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
-      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+      { href: '/client', label: 'Client Portal Preview', icon: Lock },
     ],
   },
 ];
@@ -83,12 +95,12 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <Link
           href="/support/intake"
           onClick={() => setSidebarOpen(false)}
-          aria-label="Help me find my next step — start the guided care plan"
+          aria-label="Find my next step — start the guided care plan"
           className="group flex w-full items-center justify-between gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
         >
           <span className="inline-flex items-center gap-2">
             <CompassIcon className="h-4 w-4" />
-            Help Me Find My Next Step
+            Find My Next Step
           </span>
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
@@ -130,22 +142,12 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
 
       </nav>
 
-      {/* Cross-layer handoff — visually separate so parents understand it is for current Texas ABA clients only */}
-      <div className="border-t-2 border-accent/20 bg-accent/5 px-4 py-4">
-        <p className="px-1 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent/80">
-          Texas ABA Families
+      {/* Quiet privacy footer — replaces the duplicate client-portal handoff,
+          which now lives in the nav under "For Current Families". */}
+      <div className="border-t border-surface-border px-4 py-3">
+        <p className="px-1 text-[11px] leading-relaxed text-brand-muted-500">
+          Saved privately on this device. Common Ground is parent support, not clinical care.
         </p>
-        <Link
-          href="/client"
-          aria-label="Go to client portal — for current Texas ABA clients"
-          className="group flex items-center justify-between gap-3 rounded-xl border border-accent/30 bg-white px-3 py-2.5 text-sm font-semibold text-accent shadow-soft transition-all hover:bg-accent/10"
-        >
-          <span className="inline-flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            Go to Client Portal
-          </span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
       </div>
     </>
   );
@@ -223,7 +225,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                 href="/client"
                 className="hidden text-[11px] font-semibold text-accent hover:underline sm:inline"
               >
-                Current client? Sign in →
+                Current family? Sign in →
               </Link>
             </div>
           </div>
@@ -265,6 +267,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <main className="flex-1">{children}</main>
         ) : (
           <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+            <WeeklyProgressMeter variant="rail" className="mb-5" />
             {children}
           </main>
         )}

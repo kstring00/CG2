@@ -181,7 +181,7 @@ export default function HomePage() {
               href="/support/intake"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90"
             >
-              Help Me Find My Next Step <ArrowRight className="h-3.5 w-3.5" />
+              Find My Next Step <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
@@ -298,6 +298,9 @@ export default function HomePage() {
                       ))}
                     </div>
 
+                    {/* Single primary CTA per CCO review — "Find My Next Step" is the
+                        one path that always leads parents into the guided plan. The
+                        secondary glass button is the quieter "browse the rest" link. */}
                     <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
                       <Link
                         href="/support/intake"

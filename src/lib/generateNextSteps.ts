@@ -16,8 +16,10 @@ import type {
   CarePlanStep,
   Hardest,
   NoteEcho,
+  StepBucket,
   WeekMood,
 } from './carePlanStorage';
+import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
 
 // ---------------------------------------------------------------------------
 // Labels (single source of truth for human-readable copy)
@@ -60,6 +62,10 @@ type Candidate = {
   title: string;
   why: string;
   href: string;
+  /** Primary CCO-review bucket. Some candidates are valid in multiple buckets;
+   *  the secondary list is used as fallback during bucket assignment. */
+  bucket: StepBucket;
+  altBuckets?: StepBucket[];
 };
 
 const C: Record<string, Candidate> = {
@@ -69,24 +75,30 @@ const C: Record<string, Candidate> = {
     title: 'Get on the Medicaid Waiver waitlist',
     why: 'The list is long — getting on it is the single most consequential first move.',
     href: '/support/financial',
+    bucket: 'do-today',
+    altBuckets: ['save-resource'],
   },
   insuranceCall: {
     id: 'insuranceCall',
     title: 'Check your private insurance ABA coverage',
     why: 'Call the number on the back of your card and ask about ABA + outpatient behavioral health.',
     href: '/support/financial',
+    bucket: 'do-today',
+    altBuckets: ['ask-bcba'],
   },
   hopeForThree: {
     id: 'hopeForThree',
     title: 'Apply to Hope For Three for short-term help',
     why: 'Quick Assist can move funds to your provider in 3–5 business days.',
     href: '/support/find',
+    bucket: 'do-today',
   },
   financialGuide: {
     id: 'financialGuide',
     title: 'Review the financial help guide',
     why: 'Insurance, Medicaid waiver, and short-term grant options in one place.',
     href: '/support/financial',
+    bucket: 'save-resource',
   },
 
   // Hard-days / parent care
@@ -95,18 +107,24 @@ const C: Record<string, Candidate> = {
     title: 'Take four minutes for yourself',
     why: 'Before anything else. The rest of the plan can wait that long.',
     href: '/support/hard-days',
+    bucket: 'do-today',
+    altBuckets: ['try-home'],
   },
   parentTherapist: {
     id: 'parentTherapist',
     title: 'Find a parent therapist',
     why: 'You spend every day advocating for your child. This is how you advocate for yourself.',
     href: '/support/caregiver',
+    bucket: 'save-resource',
+    altBuckets: ['ask-bcba'],
   },
   meltdownNow: {
     id: 'meltdownNow',
     title: 'If a meltdown is happening now',
     why: 'A two-minute calming page for the moment, not the strategy.',
     href: '/support/hard-days',
+    bucket: 'save-resource',
+    altBuckets: ['try-home'],
   },
 
   // Connection
@@ -115,18 +133,23 @@ const C: Record<string, Candidate> = {
     title: 'Build a parent match',
     why: 'A real person who has walked a similar road. Low-pressure, on your timing.',
     href: '/support/connect',
+    bucket: 'next-week',
+    altBuckets: ['save-resource'],
   },
   smallGroups: {
     id: 'smallGroups',
     title: 'Browse small groups',
     why: 'Some weeks a group is easier than a 1:1 conversation.',
     href: '/support/connect',
+    bucket: 'next-week',
   },
   stillWaters: {
     id: 'stillWaters',
     title: 'Try one Still Waters entry',
     why: 'Sometimes writing helps before talking.',
     href: '/support/still-waters',
+    bucket: 'try-home',
+    altBuckets: ['do-today'],
   },
 
   // School / IEP
@@ -135,18 +158,23 @@ const C: Record<string, Candidate> = {
     title: 'Open the IEP / ARD prep guide',
     why: 'A short, plain-language walkthrough so you walk in prepared.',
     href: '/support/resources',
+    bucket: 'save-resource',
+    altBuckets: ['ask-bcba'],
   },
   parentAdvocate: {
     id: 'parentAdvocate',
     title: 'Bring a parent advocate to your next meeting',
     why: 'You don’t have to do this alone.',
     href: '/support/help',
+    bucket: 'next-week',
   },
   documentHard: {
     id: 'documentHard',
     title: 'Document what is hard right now',
     why: 'Three specific examples beat a long story every time.',
     href: '/support/still-waters',
+    bucket: 'ask-bcba',
+    altBuckets: ['try-home'],
   },
 
   // ABA understanding / newly diagnosed
@@ -155,24 +183,30 @@ const C: Record<string, Candidate> = {
     title: 'Read the “What is ABA?” quick guide',
     why: 'A plain-language foundation so the next conversations land easier.',
     href: '/support/what-is-aba',
+    bucket: 'save-resource',
   },
   callOneProvider: {
     id: 'callOneProvider',
     title: 'Pick one local provider to call this week',
     why: 'You don’t have to call all of them. One.',
     href: '/support/find',
+    bucket: 'next-week',
+    altBuckets: ['do-today'],
   },
   mchat: {
     id: 'mchat',
     title: 'Ask your pediatrician for an M-CHAT screening',
     why: 'Bring written examples of what you’ve seen — specific beats general.',
     href: '/support/what-is-aba',
+    bucket: 'ask-bcba',
+    altBuckets: ['do-today'],
   },
   devPed: {
     id: 'devPed',
     title: 'Find a local developmental pediatrician',
     why: 'Many have long wait times — call now even if you’re not sure yet.',
     href: '/support/find',
+    bucket: 'do-today',
   },
 
   // Looking-for / comparing providers
@@ -181,18 +215,23 @@ const C: Record<string, Candidate> = {
     title: 'Compare three local ABA providers',
     why: 'Filter by insurance and waitlist so the list is realistic.',
     href: '/support/find',
+    bucket: 'next-week',
+    altBuckets: ['save-resource'],
   },
   firstCallQuestions: {
     id: 'firstCallQuestions',
     title: 'Prepare what to ask on the first call',
     why: 'Five specific questions that protect your time.',
     href: '/support/resources',
+    bucket: 'ask-bcba',
+    altBuckets: ['save-resource'],
   },
   trackNotes: {
     id: 'trackNotes',
     title: 'Open your care plan with notes',
     why: 'Track what you hear from each provider so they don’t blur together.',
     href: '/support/care-plan',
+    bucket: 'try-home',
   },
 
   // Siblings
@@ -201,12 +240,15 @@ const C: Record<string, Candidate> = {
     title: 'Read the sibling support guide',
     why: 'Practical, written by parents who have been there.',
     href: '/support/siblings',
+    bucket: 'save-resource',
   },
   siblingOneThing: {
     id: 'siblingOneThing',
     title: 'Pick one sibling thing to try this week',
     why: 'Pick one. Small.',
     href: '/support/siblings',
+    bucket: 'try-home',
+    altBuckets: ['next-week'],
   },
 
   // Behavior at home
@@ -215,12 +257,15 @@ const C: Record<string, Candidate> = {
     title: 'Try one short home strategy today',
     why: 'One. Not all of them. Something that fits today’s capacity.',
     href: '/support/help',
+    bucket: 'try-home',
+    altBuckets: ['do-today'],
   },
   practicalGuides: {
     id: 'practicalGuides',
     title: 'Open the practical guides library',
     why: 'Filtered by what families actually use, not what sounds good on paper.',
     href: '/support/resources',
+    bucket: 'save-resource',
   },
 
   // Finding resources
@@ -229,12 +274,15 @@ const C: Record<string, Candidate> = {
     title: 'Use Find Local Help',
     why: 'Pick two nearby support options that match your insurance.',
     href: '/support/find',
+    bucket: 'next-week',
+    altBuckets: ['save-resource'],
   },
   saveShortlist: {
     id: 'saveShortlist',
     title: 'Save the ones that look promising',
     why: 'A short list now beats a long search later.',
     href: '/support/resources',
+    bucket: 'save-resource',
   },
 
   // Sleep (notes-driven)
@@ -243,6 +291,8 @@ const C: Record<string, Candidate> = {
     title: 'Read the sleep & bedtime guide',
     why: 'Small, layered changes work better than a single overhaul.',
     href: '/support/resources',
+    bucket: 'try-home',
+    altBuckets: ['ask-bcba'],
   },
 
   // Marriage / partner (notes-driven)
@@ -251,6 +301,8 @@ const C: Record<string, Candidate> = {
     title: 'Set up one short partner check-in',
     why: 'Fifteen minutes, same time each week. That’s the whole bar.',
     href: '/support/caregiver',
+    bucket: 'next-week',
+    altBuckets: ['try-home'],
   },
 };
 
@@ -535,23 +587,103 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
   return scores;
 }
 
-/** Top 3 steps, ordered by weight, with stable tiebreak by title. */
-export function generateNextSteps(answers: CarePlanAnswers): CarePlanStep[] {
+/**
+ * Top N steps, ordered by weight, with stable tiebreak by title.
+ *
+ * The number of steps returned is gated by the parent's current bandwidth
+ * tier — a heavy day yields a shorter plan so we don't pile work on top of
+ * an already-strained parent. Defaults to the 'doing-well' plan size when
+ * no tier is supplied (e.g. legacy calls without a check-in result).
+ */
+export function generateNextSteps(
+  answers: CarePlanAnswers,
+  bandwidthTier?: BandwidthTier,
+): CarePlanStep[] {
   const scores = buildScores(answers);
-  if (scores.size === 0) return FALLBACK_STEPS;
+  const limit = TIER_STEP_LIMIT[bandwidthTier ?? 'doing-well'];
+  if (scores.size === 0) return FALLBACK_STEPS.slice(0, limit);
 
   const ranked = Array.from(scores.values()).sort((a, b) => {
     if (b.weight !== a.weight) return b.weight - a.weight;
     return a.candidate.title.localeCompare(b.candidate.title);
   });
 
-  return ranked.slice(0, 3).map(({ candidate, weight, reasons }) => ({
+  return ranked.slice(0, limit).map(({ candidate, weight, reasons }) => ({
     title: candidate.title,
     why: candidate.why,
     href: candidate.href,
     because: reasons[0], // surface the strongest reason
     weight,
+    bucket: candidate.bucket,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// 5-bucket plan (CCO review, May 2026)
+// ---------------------------------------------------------------------------
+
+/** The 5 buckets, in the display order Texas ABA Centers' CCO asked for. */
+export const BUCKET_ORDER: StepBucket[] = [
+  'do-today',
+  'ask-bcba',
+  'try-home',
+  'save-resource',
+  'next-week',
+];
+
+export const BUCKET_LABELS: Record<StepBucket, string> = {
+  'do-today': 'Do this today',
+  'ask-bcba': 'Ask your BCBA this',
+  'try-home': 'Try this at home',
+  'save-resource': 'Save this resource',
+  'next-week': 'Come back next week for this',
+};
+
+/** One-line companion copy for each bucket, parent-facing. */
+export const BUCKET_BLURBS: Record<StepBucket, string> = {
+  'do-today': 'A small move you can make in the next 24 hours.',
+  'ask-bcba': 'Something to bring up at your next session or coaching call.',
+  'try-home': 'A low-stakes thing to try in your normal routine.',
+  'save-resource': 'Worth bookmarking — not urgent, just useful.',
+  'next-week': 'Park this for the next check-in, not now.',
+};
+
+/**
+ * Build a single recommended step per bucket. Reuses the same scoring engine
+ * as `generateNextSteps`, then assigns each ranked candidate into its primary
+ * bucket (falling back to altBuckets if the primary is already filled).
+ * Buckets without a match are returned with `step: null` so the page can
+ * render a gentle empty state instead of a missing section.
+ */
+export function generateBucketSteps(
+  answers: CarePlanAnswers,
+): { bucket: StepBucket; step: CarePlanStep | null }[] {
+  const scores = buildScores(answers);
+  const ranked = Array.from(scores.values()).sort((a, b) => {
+    if (b.weight !== a.weight) return b.weight - a.weight;
+    return a.candidate.title.localeCompare(b.candidate.title);
+  });
+
+  const filled = new Map<StepBucket, CarePlanStep>();
+
+  for (const { candidate, weight, reasons } of ranked) {
+    const buckets: StepBucket[] = [candidate.bucket, ...(candidate.altBuckets ?? [])];
+    for (const b of buckets) {
+      if (filled.has(b)) continue;
+      filled.set(b, {
+        title: candidate.title,
+        why: candidate.why,
+        href: candidate.href,
+        because: reasons[0],
+        weight,
+        bucket: b,
+      });
+      break; // each candidate fills at most one bucket
+    }
+    if (filled.size === BUCKET_ORDER.length) break;
+  }
+
+  return BUCKET_ORDER.map((bucket) => ({ bucket, step: filled.get(bucket) ?? null }));
 }
 
 // ---------------------------------------------------------------------------

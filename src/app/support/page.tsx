@@ -6,22 +6,15 @@ import {
   ArrowRight,
   BookOpen,
   Compass,
-  Heart,
-  HeartHandshake,
   Home,
-  MessageCircleHeart,
-  Sparkles,
   Users,
-  Wallet,
-  MapPin,
   HandHelping,
   CheckCircle2,
-  Wind,
   ChevronDown,
   ChevronUp,
   Feather,
 } from 'lucide-react';
-import WellnessMirror from '@/components/WellnessMirror';
+import PulseCard from '@/components/PulseCard';
 
 const supportActions = [
   {
@@ -32,10 +25,14 @@ const supportActions = [
     icon: Compass,
   },
   {
+    // CCO round 3: this used to point at /support/help (external referrals
+    // like therapists / hotlines). Parents need actual tactics for the hard
+    // moment in front of them, not phone numbers. Now routes to 10 ABA-
+    // grounded strategies they can try in the next minute.
     title: 'I need help at home',
-    desc: 'Try practical routines and home strategies.',
-    cta: 'Home strategies',
-    href: '/support/help',
+    desc: 'Real ABA strategies you can try in the next minute.',
+    cta: 'At-home strategies',
+    href: '/support/at-home',
     icon: Home,
   },
   {
@@ -75,21 +72,24 @@ export default function SupportHome() {
         </div>
 
         <div className="relative grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+          {/* CCO round 2: Home Base used to read as a second "Parent Support" landing.
+              Now it's framed as a map — a place where the parent picks a direction.
+              Parent Support itself lives at /support/caregiver as the deep page. */}
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Parent Support</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Home Base</p>
             <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-muted-900 sm:text-4xl">
-              You do not have to figure this out alone.
+              Pick a direction. We&rsquo;ll walk it with you.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-brand-muted-600 sm:text-base">
-              Start with what your family needs today. Common Ground will point you toward simple next steps,
-              helpful tools, and support options.
+              Home Base is your map of Common Ground. From here you can build your plan, find your people,
+              learn what ABA actually is, or just put the day down for a minute.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/support/intake" className="btn-primary px-5 py-2.5 text-sm">
-                Build My Family Care Plan
+                Find My Next Step
               </Link>
               <Link href="#support-actions" className="btn-secondary px-5 py-2.5 text-sm">
-                Find support for today
+                See everything available
               </Link>
             </div>
             <p className="mt-4 text-xs text-brand-muted-500">
@@ -112,7 +112,12 @@ export default function SupportHome() {
         </div>
       </section>
 
-      <WellnessMirror />
+      {/* Bandwidth consolidation pass: one canonical check-in surface on Home
+          Base. PulseCard now reads from the Quick Bandwidth Check result. The
+          old WellnessMirror tile was a duplicate measurement of the same idea
+          and has been removed per CCO direction (avoid multiple separate
+          versions of the check-in across the site). */}
+      <PulseCard />
 
       {/* Pathfinder presence — above the fold, gentle indicator that there is
           a real human layer being built. Demo until matching is live. */}
@@ -181,48 +186,10 @@ export default function SupportHome() {
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-3xl border border-brand-plum-100 bg-brand-plum-50/60 p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-plum-700">Start small</p>
-          <h2 className="mt-2 text-xl font-semibold text-brand-muted-900">When everything feels like too much</h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {[
-              { label: 'Pause', icon: Wind },
-              { label: 'Pick one thing', icon: Sparkles },
-              { label: 'Reach out', icon: MessageCircleHeart },
-            ].map((step) => (
-              <div key={step.label} className="rounded-2xl bg-white/90 p-3 text-center">
-                <step.icon className="mx-auto h-4 w-4 text-brand-plum-700" />
-                <p className="mt-2 text-sm font-medium text-brand-muted-800">{step.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-3xl border border-surface-border bg-white p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Support for your family</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {[
-              { title: 'Understanding ABA', href: '/support/what-is-aba', icon: BookOpen },
-              { title: 'Home strategies', href: '/support/help', icon: Home },
-              { title: 'Family resources', href: '/support/resources', icon: Wallet },
-              { title: 'Parent connection', href: '/support/connect', icon: Users },
-            ].map((item) => (
-              <Link key={item.title} href={item.href} className="rounded-2xl border border-surface-border bg-surface-muted p-3.5 transition hover:border-primary/30 hover:bg-white">
-                <p className="flex items-center gap-2 text-sm font-semibold text-brand-muted-800">
-                  <item.icon className="h-4 w-4 text-primary" /> {item.title}
-                </p>
-              </Link>
-            ))}
-          </div>
-          <div className="mt-4 grid gap-2 text-sm text-brand-muted-600 sm:grid-cols-2">
-            <Link href="/support/financial" className="flex items-center gap-1.5 hover:text-primary"><Wallet className="h-4 w-4" /> Financial Help</Link>
-            <Link href="/support/siblings" className="flex items-center gap-1.5 hover:text-primary"><Heart className="h-4 w-4" /> Sibling Support</Link>
-            <Link href="/support/find" className="flex items-center gap-1.5 hover:text-primary"><MapPin className="h-4 w-4" /> Local Help</Link>
-            <Link href="/support/connect" className="flex items-center gap-1.5 hover:text-primary"><HeartHandshake className="h-4 w-4" /> Connect With Parents</Link>
-          </div>
-        </div>
-      </section>
+      {/* CCO round 4: removed the "Start small" trio and "Support for your family"
+          link grid — Kyle's feedback was that they restate what the supportActions
+          grid above and the Learn nav already cover. Eliminating reduces visual
+          noise on Home Base without losing any reachable destination. */}
 
       <section className="rounded-2xl border border-surface-border bg-surface-muted/60 p-5">
         <button onClick={() => setCheckInOpen((v) => !v)} className="flex w-full items-center justify-between gap-3 text-left">
