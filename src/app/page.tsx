@@ -35,9 +35,9 @@ import {
 import { loadCarePlan, type SavedCarePlan } from '@/lib/carePlanStorage';
 
 const CREDIBILITY_CHECKS = [
-  'Reduce the emotional and mental bandwidth this season demands',
-  'Equip you with the tools and guidance to feel confident, not overwhelmed',
-  'Connect you to local ABA providers and support built for parents, too',
+  'Ease the mental and emotional load of caregiving',
+  'Build your confidence with clear tools and guidance',
+  'Connect you to local ABA providers and support made for parents, too',
 ] as const;
 
 type View = 'hero' | 'intake' | 'recommend';
@@ -286,7 +286,7 @@ export default function HomePage() {
                       Not sure where to begin? Answer a few questions and we&apos;ll point you to exactly what you need.
                     </p>
                     <p className="mt-3 max-w-md text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
-                      Whether you&apos;re new here, already using Common Ground, or still trying things out, we meet you where you are — guiding you to the right tools, local providers, and real support for you, not just your child. Less figuring it out alone, so you can be present for your family.
+                      Whether you&apos;re new here, already using Common Ground, or still figuring things out, we meet you where you are — connecting you with the right tools, local providers, and real support for you, not just your child. Less figuring it out alone, so you can be more present for your family.
                     </p>
 
                     <div className="mt-7 flex flex-col gap-2.5 text-sm text-white/80">
