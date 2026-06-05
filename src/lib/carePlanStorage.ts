@@ -153,3 +153,48 @@ export function clearCarePlan() {
     // ignore
   }
 }
+
+// ---------------------------------------------------------------------------
+// Intake draft autosave
+//
+// The intake answers only become a saved plan on the final "building" screen.
+// If a parent leaves mid-flow (taps a link, closes the tab), their in-progress
+// answers would be lost — which feels like the site "threw away" their work.
+// We persist a lightweight draft on every answer change and restore it when
+// they return, then clear it once the plan is committed.
+// ---------------------------------------------------------------------------
+
+const DRAFT_KEY = 'cg.carePlanDraft.v1';
+
+export type CarePlanDraft = Partial<CarePlanAnswers>;
+
+export function loadCarePlanDraft(): CarePlanDraft | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') return parsed as CarePlanDraft;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveCarePlanDraft(draft: CarePlanDraft) {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+export function clearCarePlanDraft() {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // ignore
+  }
+}

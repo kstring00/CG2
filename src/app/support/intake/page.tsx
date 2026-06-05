@@ -21,6 +21,9 @@ import {
 import { cn } from '@/lib/utils';
 import {
   saveCarePlan,
+  loadCarePlanDraft,
+  saveCarePlanDraft,
+  clearCarePlanDraft,
   type Hardest,
   type HelpKind,
   type Stage,
@@ -132,10 +135,32 @@ export default function IntakePage() {
   // Bandwidth result — either freshly captured in the q-bandwidth step or
   // pre-loaded from a prior session so the parent isn't forced to redo it.
   const [bandwidth, setBandwidth] = useState<BandwidthResult | null>(null);
+
+  // Tracks whether we've finished restoring any saved draft. We must not
+  // autosave until the restore pass runs, or the initial empty state would
+  // overwrite a real draft on first render.
+  const [draftLoaded, setDraftLoaded] = useState(false);
+
   useEffect(() => {
     const existing = loadBandwidth();
     if (existing) setBandwidth(existing);
+
+    // Restore any in-progress answers from a prior visit so leaving the flow
+    // (or an accidental tap) never throws away what the parent already typed.
+    const draft = loadCarePlanDraft();
+    if (draft) {
+      if (draft.stage) setStage(draft.stage);
+      if (Array.isArray(draft.hardest)) setHardest(draft.hardest);
+      if (Array.isArray(draft.helpKinds)) setHelpKinds(draft.helpKinds);
+    }
+    setDraftLoaded(true);
   }, []);
+
+  // Autosave the draft on every answer change once restore has run.
+  useEffect(() => {
+    if (!draftLoaded) return;
+    saveCarePlanDraft({ stage, hardest, helpKinds });
+  }, [draftLoaded, stage, hardest, helpKinds]);
 
   const step = STEP_ORDER[stepIdx];
   const progressIdx = PROGRESS_STEPS.indexOf(step);
@@ -180,6 +205,8 @@ export default function IntakePage() {
     // the first notch for completing the intake/check-in flow.
     resetWeeklyProgress();
     markWeeklyIntakeDone();
+    // The plan is now committed — drop the in-progress draft.
+    clearCarePlanDraft();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
   }, [step, hardest, stage, helpKinds, bandwidth, router]);

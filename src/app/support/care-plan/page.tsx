@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   ArrowRight,
   Bell,
-  CalendarCheck,
   Check,
   Compass,
   Mail,
@@ -26,7 +25,6 @@ import {
   TIER_STEP_LIMIT,
   type BandwidthResult,
 } from '@/lib/bandwidth';
-import { cn } from '@/lib/utils';
 import {
   BUCKET_BLURBS,
   BUCKET_LABELS,
@@ -48,11 +46,7 @@ import {
 } from '@/lib/remindMe';
 import { useWellnessState } from '@/lib/wellnessState';
 import {
-  computeWeekNumber,
   ensurePlanStarted,
-  formatShortDate,
-  hasCheckedInThisWeek,
-  loadCheckInState,
   type WeeklyCheckInState,
 } from '@/lib/weeklyCheckIn';
 
@@ -187,9 +181,6 @@ function PopulatedPlan({
     onCleared();
   };
 
-  const weekNumber = checkInState ? computeWeekNumber(checkInState.planStartedAt) : null;
-  const lastCheckIn = checkInState ? formatShortDate(checkInState.lastCheckInAt) : null;
-  const checkedInThisWeek = checkInState ? hasCheckedInThisWeek(checkInState) : false;
   const latestCheckIn = checkInState && checkInState.history.length
     ? checkInState.history[checkInState.history.length - 1]
     : null;
@@ -201,6 +192,12 @@ function PopulatedPlan({
     year: 'numeric',
   });
 
+  // Only render plan cards that actually have a step. Empty buckets used to
+  // show "nothing pulled in yet" filler, which made the plan feel padded.
+  const filledBuckets = bucketSteps.filter(
+    (b): b is { bucket: StepBucket; step: NonNullable<typeof b.step> } => b.step !== null,
+  );
+
   return (
     <Shell>
       <header>
@@ -211,7 +208,7 @@ function PopulatedPlan({
           Your plan, friend.
         </h1>
         <p className="mt-2 text-[15px] leading-relaxed text-brand-muted-700">
-          Built from what you told us. You can change it anytime.
+          {plan.summary}
         </p>
         <p className="mt-1 text-[12px] text-brand-muted-500">
           Last updated {updatedDisplay} · saved privately on this device.
@@ -222,46 +219,32 @@ function PopulatedPlan({
         <WeeklyProgressMeter variant="panel" />
       </div>
 
-      {weekNumber !== null && (
-        <section
-          aria-label={`You are in week ${weekNumber} of your plan.`}
-          className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 px-5 py-4"
-        >
-          <div className="flex items-center gap-3">
-            <CalendarCheck className="h-5 w-5 shrink-0 text-brand-plum-700" aria-hidden />
+      {/* THE PLAN — the hero of this page. Big, warm cards a parent can scan in
+          one pass. Empty buckets are hidden so it always feels full. */}
+      <section className="mt-7" aria-label="Your plan this week">
+        <div className="rounded-3xl border border-brand-plum-200 bg-gradient-to-b from-brand-plum-50/80 to-white p-5 shadow-soft sm:p-7">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Compass className="h-5 w-5" aria-hidden />
+            </span>
             <div>
-              <p className="text-sm font-semibold text-brand-plum-800">
-                Week {weekNumber}
-                {checkedInThisWeek && lastCheckIn ? ` · checked in ${lastCheckIn}` : ''}
-              </p>
-              <p className="text-[12.5px] text-brand-plum-700/80">
-                {checkedInThisWeek
-                  ? 'You’re up to date for this week. The plan adjusts as your check-ins build up.'
-                  : 'A short check-in keeps your plan honest. Takes about 2 minutes.'}
+              <h2 className="text-xl font-semibold leading-tight text-brand-navy-700 sm:text-2xl">
+                Here&rsquo;s your week, made simple
+              </h2>
+              <p className="text-[13.5px] leading-relaxed text-brand-muted-600">
+                A few real moves — pick whatever fits today. Nothing is required.
               </p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Link
-              href="/support/check-in"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-            >
-              {checkedInThisWeek ? 'Revisit check-in' : 'Start check-in'} <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-            <button
-              type="button"
-              onClick={() => setEmailOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-brand-plum-300 bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
-            >
-              <Mail className="h-3.5 w-3.5" /> Email my plan
-            </button>
+          <div className="mt-5 grid gap-3.5 sm:grid-cols-2">
+            {filledBuckets.map(({ bucket, step }) => (
+              <BucketCard key={bucket} bucket={bucket} step={step} />
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
-      {/* Quick actions row — print/PDF + remind-me + email. All client-side; no
-          backend is wired up for email or push, so the email button opens the
-          existing dialog that handles the "not configured" path gracefully. */}
+      {/* Quick actions row — print/PDF + remind-me + email. */}
       <section
           className="mt-4 flex flex-wrap items-center gap-2 print:hidden"
           aria-label="Plan actions"
@@ -295,23 +278,7 @@ function PopulatedPlan({
         </button>
       </section>
 
-      {/* 5-BUCKET PLAN — CCO-requested framing. Each bucket gets one suggested
-          step so a parent can scan today/BCBA/home/save/next-week in one pass. */}
-      <section className="mt-6" aria-label="Your plan in five small parts">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          Your plan, in five small parts
-        </h2>
-        <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-600">
-          One thing per bucket. You don’t have to do all of them — pick what fits today.
-        </p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          {bucketSteps.map(({ bucket, step }) => (
-            <BucketCard key={bucket} bucket={bucket} step={step} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-8 space-y-3">
+      <section className="mt-9 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
             Your priority steps
@@ -482,54 +449,45 @@ function PopulatedPlan({
   );
 }
 
-/** A single bucket tile in the 5-bucket plan grid. Renders an empty state
- *  when no candidate filled this bucket so the framing is preserved. */
+/** A single bucket tile in the plan grid. Whole card is a link to the step. */
 function BucketCard({
   bucket,
   step,
 }: {
   bucket: StepBucket;
-  step: { title: string; why: string; href: string; because?: string } | null;
+  step: { title: string; why: string; href: string; because?: string };
 }) {
   const label = BUCKET_LABELS[bucket];
   const blurb = BUCKET_BLURBS[bucket];
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-surface-border bg-white p-4 shadow-soft sm:p-5">
+    <Link
+      href={step.href}
+      className="group flex h-full flex-col rounded-2xl border border-surface-border bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md sm:p-6"
+    >
       <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-brand-plum-700">
         {label}
       </p>
       <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-500">
         {blurb}
       </p>
-      {step ? (
-        <>
-          <h3 className="mt-3 text-[15px] font-semibold leading-snug text-brand-navy-700">
-            {step.title}
-          </h3>
-          {step.because && (
-            <p className="mt-1 inline-block self-start rounded-full bg-brand-plum-50 px-2 py-0.5 text-[11px] font-semibold text-brand-plum-700">
-              {step.because}
-            </p>
-          )}
-          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-700">
-            {step.why}
-          </p>
-          <div className="mt-auto pt-3">
-            <Link
-              href={step.href}
-              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:text-primary/80"
-            >
-              Open this step <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </>
-      ) : (
-        <p className="mt-3 text-[13px] leading-relaxed text-brand-muted-500">
-          Nothing pulled in for this one yet. That’s fine — it just means the
-          rest of the plan is enough for now.
+      <h3 className="mt-3 text-[17px] font-semibold leading-snug text-brand-navy-700 group-hover:text-primary">
+        {step.title}
+      </h3>
+      {step.because && (
+        <p className="mt-1.5 inline-block self-start rounded-full bg-brand-plum-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-brand-plum-700">
+          {step.because}
         </p>
       )}
-    </div>
+      <p className="mt-2 text-[13.5px] leading-relaxed text-brand-muted-700">
+        {step.why}
+      </p>
+      <div className="mt-auto pt-4">
+        <span className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-primary">
+          Open this step
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </div>
+    </Link>
   );
 }
