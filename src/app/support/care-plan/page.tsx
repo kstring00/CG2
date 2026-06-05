@@ -41,7 +41,6 @@ import {
 } from '@/lib/generateNextSteps';
 import PathfinderCard from '@/components/PathfinderCard';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
-import JourneyStepper from '@/components/JourneyStepper';
 import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 import {
   getWeeklyProgressSummary,
@@ -49,7 +48,6 @@ import {
   unmarkStepDone,
   type WeeklyProgressSummary,
 } from '@/lib/weeklyProgress';
-import { inferJourneyStage } from '@/lib/journeyStage';
 import {
   clearRemindMeNextWeek,
   isRemindMeSet,
@@ -229,11 +227,6 @@ function PopulatedPlan({
 
       <div className="mt-6">
         <WeeklyProgressMeter variant="panel" />
-      </div>
-
-      {/* Soft "where am I?" anchor — inferred from saved intake answers. */}
-      <div className="mt-5">
-        <JourneyStepper activeStage={inferJourneyStage(plan.answers)} compact />
       </div>
 
       {/* Today's bandwidth — the single visible summary of the parent's most

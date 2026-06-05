@@ -126,7 +126,7 @@ export function computePulse(state: WeeklyCheckInState, now: Date = new Date()):
 
 /**
  * Friendly "X days ago" string. Returns "today" / "yesterday" for small
- * deltas and "X days ago" otherwise. Used in the JourneyStepper pill.
+ * deltas and "X days ago" otherwise.
  */
 export function daysAgoLabel(daysSince: number): string {
   if (daysSince <= 0) return 'today';

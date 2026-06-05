@@ -34,8 +34,6 @@ import {
   generateWeekMessage,
   HARDEST_OPTIONS,
 } from '@/lib/generateNextSteps';
-import JourneyStepper from '@/components/JourneyStepper';
-import { inferJourneyStage } from '@/lib/journeyStage';
 import BandwidthCheck from '@/components/BandwidthCheck';
 import { loadBandwidth, type BandwidthResult } from '@/lib/bandwidth';
 
@@ -196,16 +194,6 @@ export default function IntakePage() {
   return (
     <main className={cn('min-h-[calc(100vh-4rem)] transition-colors duration-500', STEP_HUE[step])}>
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-10">
-        {/* Soft "where am I?" anchor at the entry of the flow. Hidden once
-            the parent is mid-question so it doesn't compete with the prompt. */}
-        {step === 'q-stage' && (
-          <div className="mb-5">
-            <JourneyStepper
-              activeStage={inferJourneyStage({ hardest, stage, helpKinds })}
-              compact
-            />
-          </div>
-        )}
         <div className="rounded-3xl border border-surface-border bg-white p-6 shadow-soft sm:p-8">
           {/* Week 1 marker — frames the intake as the first week of the plan. */}
           <p className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-brand-plum-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
