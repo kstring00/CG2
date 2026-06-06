@@ -12,7 +12,6 @@ import {
   Compass as CompassIcon,
   Home,
   Lock,
-  ArrowRight,
   Users,
   HelpCircle,
   HeartPulse,
@@ -22,6 +21,7 @@ import {
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
+import NextStepButton from '@/components/layout/NextStepButton';
 
 /**
  * SupportShell — the layout for the public-facing Care Navigation experience.
@@ -46,7 +46,7 @@ const navGroups = [
   {
     label: 'Support',
     items: [
-      { href: '/support/caregiver', label: 'Parent Support', icon: HeartPulse },
+      { href: '/support/caregiver', label: 'Mental Health Toolbox', icon: HeartPulse },
     ],
   },
   {
@@ -89,18 +89,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="px-4 pt-4">
-        <Link
-          href="/support/intake"
-          onClick={() => setSidebarOpen(false)}
-          aria-label="Find my next step — start the guided care plan"
-          className="group flex w-full items-center justify-between gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-        >
-          <span className="inline-flex items-center gap-2">
-            <CompassIcon className="h-4 w-4" />
-            Find My Next Step
-          </span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        <NextStepButton onNavigate={() => setSidebarOpen(false)} />
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Common Ground parent support navigation">
