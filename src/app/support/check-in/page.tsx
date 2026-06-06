@@ -8,7 +8,6 @@
  * site. This page is the standalone home for it — entered from:
  *
  *   • "Update check-in" on /support/care-plan
- *   • The soft CheckInPill in the JourneyStepper header
  *   • Direct nav (only surfaced after the parent has a plan)
  *
  * The intake flow uses the same <BandwidthCheck /> component inline as a

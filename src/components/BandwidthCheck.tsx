@@ -5,7 +5,7 @@
  *
  * Used in two places:
  *   1. /support/check-in — the standalone page (entered from "Update check-in"
- *      on the care plan, or from the soft CheckInPill in the JourneyStepper).
+ *      on the care plan).
  *   2. Inside the intake flow as the step before plan generation.
  *
  * The component is intentionally framework-light. No animation libs, no chart
