@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const CRISIS_NUMBER_DISPLAY = '988';
 const CRISIS_TEL = 'tel:988';
-const CRISIS_RESOURCES_HREF = '/support/hard-days';
+const CRISIS_RESOURCES_HREF = '/support/caregiver';
 
 type Props = {
   className?: string;

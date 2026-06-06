@@ -987,7 +987,7 @@ export default function ConnectPage() {
           <ul className="mt-4 space-y-2">
             {[
               { label: t.pillarMoreLinkFind, href: '/support/find', icon: Users },
-              { label: t.pillarMoreLinkMental, href: '/support/mental-health', icon: Heart },
+              { label: t.pillarMoreLinkMental, href: '/support/caregiver', icon: Heart },
               { label: t.pillarMoreLinkCrisis, href: 'tel:988', icon: Phone, accent: true },
             ].map((row) => (
               <li key={row.label}>
@@ -1394,7 +1394,7 @@ export default function ConnectPage() {
 
           {/* Mental health for caregivers */}
           <a
-            href="/support/mental-health"
+            href="/support/caregiver"
             className="group/exit flex flex-col rounded-2xl border border-surface-border bg-white p-4 text-left transition-colors hover:border-brand-plum-300 hover:bg-brand-plum-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-plum-400 focus-visible:ring-offset-2"
           >
             <div className="flex items-start justify-between gap-2">

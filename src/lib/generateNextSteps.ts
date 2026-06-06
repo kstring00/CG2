@@ -107,7 +107,7 @@ const C: Record<string, Candidate> = {
     id: 'fourMinutes',
     title: 'Take four minutes for yourself',
     why: 'Before anything else. The rest of the plan can wait that long.',
-    href: '/support/hard-days',
+    href: '/support/caregiver',
     bucket: 'do-today',
     altBuckets: ['try-home'],
   },
@@ -123,7 +123,7 @@ const C: Record<string, Candidate> = {
     id: 'meltdownNow',
     title: 'If a meltdown is happening now',
     why: 'A two-minute calming page for the moment, not the strategy.',
-    href: '/support/hard-days',
+    href: '/support/caregiver',
     bucket: 'save-resource',
     altBuckets: ['try-home'],
   },
@@ -158,7 +158,7 @@ const C: Record<string, Candidate> = {
     id: 'parentAdvocate',
     title: 'Bring a parent advocate to your next meeting',
     why: 'You don’t have to do this alone.',
-    href: '/support/help',
+    href: '/support/connect',
     bucket: 'next-week',
   },
   documentHard: {
@@ -249,7 +249,7 @@ const C: Record<string, Candidate> = {
     id: 'homeStrategy',
     title: 'Try one short home strategy today',
     why: 'One. Not all of them. Something that fits today’s capacity.',
-    href: '/support/help',
+    href: '/support/at-home',
     bucket: 'try-home',
     altBuckets: ['do-today'],
   },
@@ -704,7 +704,7 @@ export function generateResources(answers: CarePlanAnswers): CarePlanResource[] 
 
   const hardest = answers.hardest ?? [];
   if (hardest.includes('financial-insurance')) add({ label: 'Financial help', href: '/support/financial', because: 'Picked because financial pressure is on your list.' });
-  if (hardest.includes('overwhelmed')) add({ label: 'Hard days — start here', href: '/support/hard-days', because: 'Picked because you said you’re overwhelmed.' });
+  if (hardest.includes('overwhelmed')) add({ label: 'Parent support — start here', href: '/support/caregiver', because: 'Picked because you said you’re overwhelmed.' });
   if (hardest.includes('connecting-parents')) add({ label: 'Connect with parents', href: '/support/connect', because: 'Picked because connection is on your list.' });
   if (hardest.includes('siblings')) add({ label: 'Sibling support', href: '/support/siblings', because: 'Picked because siblings are on your list.' });
   if (hardest.includes('school-iep')) add({ label: 'IEP / school guides', href: '/support/resources', because: 'Picked because school is on your list.' });
@@ -725,8 +725,8 @@ export function generateResources(answers: CarePlanAnswers): CarePlanResource[] 
     add({ label: m.candidate.title, href: m.candidate.href, because: m.because });
   }
 
-  // Always include Pathfinders so the relationship layer is visible.
-  add({ label: 'Meet your Pathfinder', href: '/support/pathfinders' });
+  // Surface parent connection so the relationship layer stays visible.
+  add({ label: 'Connect with other parents', href: '/support/connect' });
 
   // Pad with sensible fallbacks if the parent picked very little.
   for (const r of FALLBACK_RESOURCES) {
@@ -741,7 +741,7 @@ export function generateWeekMessage(mood: WeekMood | null | undefined): string {
   switch (mood) {
     case 'frayed':
     case 'heavy':
-      return 'This week sounds heavy. Before anything else: open the Hard Days page and take four minutes for yourself. The rest of the plan can wait.';
+      return 'This week sounds heavy. Before anything else: take four minutes for yourself. The rest of the plan can wait.';
     case 'numb':
       return 'Numb is also a signal — not a flaw. One small thing today is enough.';
     case 'steady':

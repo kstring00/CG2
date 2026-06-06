@@ -73,7 +73,7 @@ export default function PulseCard() {
             </p>
           </div>
           <Link
-            href="/support/check-in"
+            href="/support/intake"
             className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-4 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-100"
           >
             Start the check-in <ArrowRight className="h-4 w-4" />
@@ -113,7 +113,7 @@ export default function PulseCard() {
         </div>
         <div className="flex flex-col items-end gap-2">
           <Link
-            href="/support/check-in"
+            href="/support/intake"
             className="inline-flex items-center gap-2 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10"
           >
             Update my check-in <ArrowRight className="h-4 w-4" />

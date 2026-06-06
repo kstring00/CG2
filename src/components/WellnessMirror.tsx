@@ -66,7 +66,7 @@ export default function WellnessMirror({ className }: { className?: string }) {
           this space will reflect what you&rsquo;ve been carrying — once you&rsquo;ve done a check-in or two. no streaks, no scores. just a quiet mirror.
         </p>
         <Link
-          href="/support/mental-health"
+          href="/support/caregiver"
           className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
         >
           try a check-in <ArrowRight className="h-3.5 w-3.5" />
@@ -112,7 +112,7 @@ export default function WellnessMirror({ className }: { className?: string }) {
           />
           {zone === 'at-risk' && (
             <Link
-              href="/support/hard-days"
+              href="/support/caregiver"
               className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-rose-800 hover:underline"
             >
               open hard days <ArrowRight className="h-3.5 w-3.5" />

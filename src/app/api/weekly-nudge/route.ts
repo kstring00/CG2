@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       "It's a new week. Your Common Ground progress meter has reset — the easiest place to start is the short weekly check-in. It tells your plan what's heaviest this week and unlocks the next step.",
       '',
       'Start this week’s check-in:',
-      'https://commonground.local/support/check-in',
+      'https://commonground.local/support/intake',
       '',
       'No pressure. Come back when you can.',
       '',
