@@ -240,7 +240,7 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
     nextHref = '/support/intake';
   } else if (!intakeDoneThisWeek) {
     nextLabel = 'Start this week’s check-in';
-    nextHref = '/support/check-in';
+    nextHref = '/support/connect';
   } else {
     const remaining = visibleSteps.find((s) => !completedStepHrefs.includes(s.href));
     if (remaining) {

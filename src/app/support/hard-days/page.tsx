@@ -840,7 +840,7 @@ export default function HardDaysPage() {
                 Caregiver support tools <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/support/community"
+                href="/support/resources"
                 className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
               >
                 <Users className="h-4 w-4" /> Find your community

@@ -646,7 +646,7 @@ export default function SleepPage() {
                 Caregiver support hub <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/support/caregiver/identity"
+                href="/support/caregiver"
                 className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
               >
                 <Heart className="h-4 w-4" /> Caregiver identity

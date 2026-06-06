@@ -134,7 +134,7 @@ export default function SupportHome() {
             </p>
           </div>
           <Link
-            href="/support/pathfinders"
+            href="/support/connect"
             className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-4 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-100"
           >
             Learn what a Pathfinder does <ArrowRight className="h-4 w-4" />
@@ -178,7 +178,7 @@ export default function SupportHome() {
         </button>
         {checkInOpen && (
           <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-surface-border pt-4">
-            <Link href="/support/mental-health" className="btn-secondary px-4 py-2 text-sm">Start quick check-in</Link>
+            <Link href="/support/caregiver" className="btn-secondary px-4 py-2 text-sm">Start quick check-in</Link>
             <p className="text-xs text-brand-muted-500">Optional and private to this device.</p>
           </div>
         )}
