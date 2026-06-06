@@ -183,16 +183,6 @@ export default function SupportHome() {
           </div>
         )}
       </section>
-
-      <section className="rounded-3xl border border-primary/10 bg-white p-6 sm:p-8 shadow-soft">
-        <h2 className="text-xl font-semibold text-brand-muted-900">You are doing more than you think.</h2>
-        <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-          Common Ground is a support guide, not clinical care. For urgent safety concerns, call or text 988.
-        </p>
-        <div className="mt-5">
-          <Link href="/support/intake" className="btn-primary px-5 py-2.5 text-sm">Build My Family Care Plan</Link>
-        </div>
-      </section>
     </div>
   );
 }
