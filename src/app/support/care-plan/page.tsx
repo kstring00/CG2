@@ -32,7 +32,6 @@ import {
 } from '@/lib/generateNextSteps';
 import PathfinderCard from '@/components/PathfinderCard';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
-import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 import {
   getWeeklyProgressSummary,
   markStepDone,
@@ -214,10 +213,6 @@ function PopulatedPlan({
           Last updated {updatedDisplay} · saved privately on this device.
         </p>
       </header>
-
-      <div className="mt-6">
-        <WeeklyProgressMeter variant="panel" />
-      </div>
 
       {/* THE PLAN — the hero of this page. Big, warm cards a parent can scan in
           one pass. Empty buckets are hidden so it always feels full. */}
