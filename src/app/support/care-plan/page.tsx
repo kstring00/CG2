@@ -12,7 +12,6 @@ import {
   Printer,
   RefreshCcw,
   RotateCcw,
-  ShieldAlert,
   Sparkles,
   Trash2,
 } from 'lucide-react';
@@ -23,14 +22,8 @@ import {
   type StepBucket,
 } from '@/lib/carePlanStorage';
 import {
-  freshnessLabel,
   loadBandwidth,
-  shouldShowCrisisCallout,
-  shouldShowSupportCard,
-  TIER_LABEL,
-  TIER_RESULT_COPY,
   TIER_STEP_LIMIT,
-  TIER_THEME,
   type BandwidthResult,
 } from '@/lib/bandwidth';
 import { cn } from '@/lib/utils';
@@ -229,45 +222,6 @@ function PopulatedPlan({
         <WeeklyProgressMeter variant="panel" />
       </div>
 
-      {/* Today's bandwidth — the single visible summary of the parent's most
-          recent check-in, with a low-friction way to update it. */}
-      <BandwidthSummaryCard bandwidth={bandwidth} />
-
-      {bandwidth && shouldShowCrisisCallout(bandwidth.tier) && (
-        <section
-          className="mt-4 flex items-start gap-3 rounded-2xl border border-rose-200 bg-rose-50/70 p-4 sm:p-5"
-          aria-label="If today feels unsafe"
-        >
-          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-rose-700" aria-hidden />
-          <div className="text-[13.5px] leading-relaxed text-rose-900">
-            <p className="font-semibold">If today feels unsafe for you or your child, please reach out for live support.</p>
-            <p className="mt-1">
-              Call or text <a href="tel:988" className="underline">988</a> (Suicide &amp; Crisis Lifeline) or contact your BCBA or care team. Common Ground is parent support — not a crisis service.
-            </p>
-          </div>
-        </section>
-      )}
-
-      {bandwidth && shouldShowSupportCard(bandwidth.tier) && (
-        <section
-          className="mt-4 rounded-2xl border border-brand-warm-200 bg-brand-warm-50/60 p-5 sm:p-6"
-          aria-label="Live support suggestion"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-warm-700">
-            A gentle suggestion
-          </p>
-          <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-800">
-            Today is heavy. Before you tackle anything from this plan, consider looping in your BCBA or someone on your care team — a 10-minute phone call can lift more weight than five tools combined.
-          </p>
-          <Link
-            href="/support/parent-connection"
-            className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-warm-800 hover:text-brand-warm-900"
-          >
-            Find a live support option <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </section>
-      )}
-
       {weekNumber !== null && (
         <section
           aria-label={`You are in week ${weekNumber} of your plan.`}
@@ -304,26 +258,6 @@ function PopulatedPlan({
           </div>
         </section>
       )}
-
-      <section className="mt-8 rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          Start Here
-        </h2>
-        <p className="mt-2 text-[15px] leading-relaxed text-brand-muted-800">
-          {plan.summary}
-        </p>
-      </section>
-
-      {/* Gentle clinical-scope disclaimer requested by the CCO. Lives directly
-          above the recommended steps so it sets framing before any action. */}
-      <section className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50/70 p-4 sm:p-5">
-        <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
-        <p className="text-[13.5px] leading-relaxed text-amber-900">
-          Here is a simple starting point. Bring anything serious, unsafe, or
-          confusing to your BCBA or care team. Common Ground is parent support
-          — it does not diagnose, treat, or replace clinical care.
-        </p>
-      </section>
 
       {/* Quick actions row — print/PDF + remind-me + email. All client-side; no
           backend is wired up for email or push, so the email button opens the
@@ -492,17 +426,6 @@ function PopulatedPlan({
         </section>
       )}
 
-      {plan.weekMessage && (
-        <section className="mt-6 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 p-5 sm:p-6">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-            For You, This Week
-          </h2>
-          <p className="mt-2 text-[14.5px] leading-relaxed text-brand-plum-800">
-            {plan.weekMessage}
-          </p>
-        </section>
-      )}
-
       <section className="mt-8">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
           Your Pathfinder
@@ -556,69 +479,6 @@ function PopulatedPlan({
         latestCheckIn={latestCheckIn}
       />
     </Shell>
-  );
-}
-
-/**
- * Today's bandwidth summary — the one canonical surface on the care plan that
- * shows the parent's last check-in and offers a low-friction way to update it.
- * When no check-in has been taken yet, it nudges them into the standalone
- * /support/check-in page.
- */
-function BandwidthSummaryCard({ bandwidth }: { bandwidth: BandwidthResult | null }) {
-  if (!bandwidth) {
-    return (
-      <section
-        aria-label="Today's bandwidth check"
-        className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-surface-border bg-white px-5 py-4 shadow-soft"
-      >
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-            Today&rsquo;s bandwidth
-          </p>
-          <p className="mt-1 text-[14px] leading-relaxed text-brand-muted-700">
-            Take a quick 30-second check so we can size your plan to the day.
-          </p>
-        </div>
-        <Link
-          href="/support/check-in?from=/support/care-plan"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-        >
-          Quick bandwidth check <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </section>
-    );
-  }
-
-  const theme = TIER_THEME[bandwidth.tier];
-  const freshness = freshnessLabel(bandwidth);
-
-  return (
-    <section
-      aria-label={`Today's bandwidth: ${TIER_LABEL[bandwidth.tier]}`}
-      className={cn(
-        'mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-5 py-4',
-        theme.bg,
-        theme.border,
-      )}
-    >
-      <div className="min-w-0">
-        <p className={cn('text-[11px] font-semibold uppercase tracking-[0.18em]', theme.text)}>
-          <span aria-hidden className={cn('mr-1.5 inline-block h-2 w-2 rounded-full align-middle', theme.dot)} />
-          Today&rsquo;s bandwidth &middot; {TIER_LABEL[bandwidth.tier]}
-        </p>
-        <p className={cn('mt-1 text-[13.5px] leading-relaxed', theme.text)}>
-          {TIER_RESULT_COPY[bandwidth.tier]}
-        </p>
-        <p className="mt-1 text-[11.5px] text-brand-muted-500">{freshness}</p>
-      </div>
-      <Link
-        href="/support/check-in?from=/support/care-plan"
-        className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 transition hover:border-primary/40 hover:text-brand-navy-700"
-      >
-        <RefreshCcw className="h-3.5 w-3.5" /> Update check-in
-      </Link>
-    </section>
   );
 }
 
