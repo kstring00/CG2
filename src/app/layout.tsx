@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import ChatWidget from '@/components/ChatWidget';
-import CrisisButton from '@/components/CrisisButton';
 import FirstVisitReviewNotice from '@/components/FirstVisitReviewNotice';
 import SiteFooter from '@/components/SiteFooter';
 
@@ -56,7 +55,6 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col bg-surface font-body antialiased">
         {children}
         <SiteFooter />
-        <CrisisButton />
         <FirstVisitReviewNotice />
         <ChatWidget />
       </body>
