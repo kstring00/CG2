@@ -53,7 +53,7 @@ export default function WelcomeBackPanel({ weekNumber, state, onEmailPlan }: Pro
 
       <div className="mt-5 grid gap-2 sm:grid-cols-2">
         <Link
-          href="/support/connect"
+          href="/support/intake"
           className="group flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-left transition hover:border-primary/40 hover:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
         >
           <span>
