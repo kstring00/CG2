@@ -4,33 +4,39 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
-  Bell,
+  BookOpen,
+  Brain,
+  CalendarDays,
   Check,
+  ChevronRight,
+  Circle,
   Compass,
+  DollarSign,
+  Flag,
+  GraduationCap,
+  Heart,
+  HeartHandshake,
+  Home,
   Mail,
+  Pencil,
   Printer,
-  RefreshCcw,
-  RotateCcw,
+  Search,
   Sparkles,
-  Trash2,
+  Users,
+  Wrench,
 } from 'lucide-react';
 import {
-  clearCarePlan,
   loadCarePlan,
+  type CarePlanStep,
+  type Hardest,
   type SavedCarePlan,
   type StepBucket,
 } from '@/lib/carePlanStorage';
 import {
-  loadBandwidth,
-  TIER_STEP_LIMIT,
-  type BandwidthResult,
-} from '@/lib/bandwidth';
-import {
-  BUCKET_BLURBS,
   BUCKET_LABELS,
   generateBucketSteps,
+  HARDEST_OPTIONS,
 } from '@/lib/generateNextSteps';
-import PathfinderCard from '@/components/PathfinderCard';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
 import {
   getWeeklyProgressSummary,
@@ -38,12 +44,6 @@ import {
   unmarkStepDone,
   type WeeklyProgressSummary,
 } from '@/lib/weeklyProgress';
-import {
-  clearRemindMeNextWeek,
-  isRemindMeSet,
-  setRemindMeNextWeek,
-} from '@/lib/remindMe';
-import { useWellnessState } from '@/lib/wellnessState';
 import {
   ensurePlanStarted,
   type WeeklyCheckInState,
@@ -54,16 +54,18 @@ import {
  *
  *   /support/intake     → on-ramp (the questions)
  *   /support/care-plan  → outcome (saved + revisitable)
+ *
+ * Presentation only. All recommendations come from the saved plan; this page
+ * never recomputes scoring. Where it limits how many items show, it slices the
+ * already-computed arrays for display.
  */
 export default function CarePlanPage() {
   const [hydrated, setHydrated] = useState(false);
   const [plan, setPlan] = useState<SavedCarePlan | null>(null);
-  const [bandwidth, setBandwidth] = useState<BandwidthResult | null>(null);
 
   useEffect(() => {
     setHydrated(true);
     setPlan(loadCarePlan());
-    setBandwidth(loadBandwidth());
   }, []);
 
   if (!hydrated) {
@@ -72,18 +74,12 @@ export default function CarePlanPage() {
 
   if (!plan) return <EmptyState />;
 
-  return (
-    <PopulatedPlan
-      plan={plan}
-      bandwidth={bandwidth}
-      onCleared={() => setPlan(null)}
-    />
-  );
+  return <PopulatedPlan plan={plan} />;
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
+    <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
   );
 }
 
@@ -115,24 +111,87 @@ function EmptyState() {
   );
 }
 
-function PopulatedPlan({
-  plan,
-  bandwidth,
-  onCleared,
+// ---------------------------------------------------------------------------
+// Presentation helpers (no scoring/logic — display only)
+// ---------------------------------------------------------------------------
+
+const INTAKE_HREF = '/support/intake';
+const STEPS_TO_SHOW = 5;
+
+/** Icon per key-concern, mirroring the intake page so the two stay in sync. */
+const HARDEST_ICONS: Record<Hardest, React.ComponentType<{ className?: string }>> = {
+  'understanding-aba': Brain,
+  'behavior-home': Home,
+  'overwhelmed': Heart,
+  'finding-resources': Search,
+  'financial-insurance': DollarSign,
+  'siblings': Users,
+  'connecting-parents': HeartHandshake,
+  'school-iep': GraduationCap,
+};
+
+const HARDEST_LABEL_BY_VALUE: Record<string, string> = Object.fromEntries(
+  HARDEST_OPTIONS.map((o) => [o.value, o.label]),
+);
+
+/** Soft color tint per bucket for the small category pill. */
+const BUCKET_PILL: Record<StepBucket, string> = {
+  'do-today': 'bg-brand-plum-50 text-brand-plum-700',
+  'ask-bcba': 'bg-brand-purple-50 text-brand-purple-500',
+  'try-home': 'bg-emerald-50 text-emerald-700',
+  'save-resource': 'bg-brand-warm-100 text-brand-muted-700',
+  'next-week': 'bg-sky-50 text-sky-700',
+};
+
+/** Link-style CTA verb per bucket — reuses the bucket's intent. */
+const BUCKET_CTA: Record<StepBucket, string> = {
+  'do-today': 'Start here',
+  'ask-bcba': 'Find help',
+  'try-home': 'Open guide',
+  'save-resource': 'Browse guides',
+  'next-week': 'Open guide',
+};
+
+function SectionHeader({
+  icon: Icon,
+  title,
+  subtitle,
+  right,
 }: {
-  plan: SavedCarePlan;
-  bandwidth: BandwidthResult | null;
-  onCleared: () => void;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  subtitle?: string;
+  right?: React.ReactNode;
 }) {
-  const { state: wellness } = useWellnessState();
+  return (
+    <div className="border-b border-brand-plum-100 pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Icon className="h-4 w-4" aria-hidden />
+          </span>
+          <h2 className="text-lg font-bold leading-tight text-brand-navy-700 sm:text-xl">
+            {title}
+          </h2>
+        </div>
+        {right}
+      </div>
+      {subtitle && (
+        <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
+          {subtitle}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
   const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
   const [emailOpen, setEmailOpen] = useState(false);
-  const [remindSet, setRemindSet] = useState(false);
   const [progress, setProgress] = useState<WeeklyProgressSummary | null>(null);
 
   useEffect(() => {
     setCheckInState(ensurePlanStarted(plan.createdAt));
-    setRemindSet(isRemindMeSet());
     setProgress(getWeeklyProgressSummary());
   }, [plan.createdAt]);
 
@@ -147,38 +206,37 @@ function PopulatedPlan({
     refreshProgress();
   };
 
-  const bucketSteps = useMemo(() => generateBucketSteps(plan.answers), [plan.answers]);
-
-  // Gate the rendered count of priority steps by current bandwidth tier so a
-  // heavy day shows a smaller plan even if the saved plan has more steps.
-  const tier = bandwidth?.tier ?? 'doing-well';
-  const stepLimit = TIER_STEP_LIMIT[tier];
-  const visibleSteps = useMemo(
-    () => plan.steps.slice(0, stepLimit),
-    [plan.steps, stepLimit],
-  );
-
   const handlePrint = () => {
     if (typeof window !== 'undefined') window.print();
   };
 
-  const handleToggleRemind = () => {
-    if (remindSet) {
-      clearRemindMeNextWeek();
-      setRemindSet(false);
-    } else {
-      setRemindMeNextWeek(7);
-      setRemindSet(true);
-    }
-  };
+  // Display-only: build the numbered "Start here" list. The saved plan.steps
+  // are tier-limited (often 3), so to surface up to 5 ordered priority steps we
+  // reuse the same display helper the page has always used — generateBucketSteps
+  // — which assigns the already-scored candidates across the 5 review buckets.
+  // No scoring or weights change here; this only arranges existing results.
+  const topSteps = useMemo<CarePlanStep[]>(() => {
+    const fromBuckets = generateBucketSteps(plan.answers)
+      .map((b) => b.step)
+      .filter((s): s is CarePlanStep => s !== null);
+    const source = fromBuckets.length ? fromBuckets : plan.steps;
+    return source.slice(0, STEPS_TO_SHOW);
+  }, [plan.answers, plan.steps]);
 
-  const handleClear = () => {
-    if (typeof window === 'undefined') return;
-    const ok = window.confirm('Clear your saved plan? You can re-run the intake to build a new one.');
-    if (!ok) return;
-    clearCarePlan();
-    onCleared();
-  };
+  const doneHrefs = progress?.completedStepHrefs ?? [];
+  const doneCount = topSteps.filter((s) => doneHrefs.includes(s.href)).length;
+
+  // The page computes one resources array; split it for the two lower cards
+  // and the resources strip. There is no dedicated "tools" source, so the
+  // left/right split is a presentational slice of the same resource list.
+  const resources = plan.resources;
+  const weekActions = resources.slice(0, 3);
+  const toolItems = resources.slice(3, 6).length
+    ? resources.slice(3, 6)
+    : resources.slice(0, 3);
+  const recommended = resources.slice(0, 3);
+
+  const concerns = (plan.answers.hardest ?? []) as Hardest[];
 
   const latestCheckIn = checkInState && checkInState.history.length
     ? checkInState.history[checkInState.history.length - 1]
@@ -191,242 +249,292 @@ function PopulatedPlan({
     year: 'numeric',
   });
 
-  // Only render plan cards that actually have a step. Empty buckets used to
-  // show "nothing pulled in yet" filler, which made the plan feel padded.
-  const filledBuckets = bucketSteps.filter(
-    (b): b is { bucket: StepBucket; step: NonNullable<typeof b.step> } => b.step !== null,
-  );
-
   return (
     <Shell>
-      <header>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
-          My Family Care Plan
-        </p>
-        <h1 className="mt-1 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
-          Your plan, friend.
+      {/* 1) TOP — breadcrumb, title, subtitle, saved note */}
+      <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
+        <ol className="flex items-center gap-1.5">
+          <li>
+            <Link href="/support" className="hover:text-brand-navy-700">Home</Link>
+          </li>
+          <li aria-hidden><ChevronRight className="h-3 w-3" /></li>
+          <li className="font-medium text-brand-muted-700">My Family Care Plan</li>
+        </ol>
+      </nav>
+
+      <header className="mt-3">
+        <h1 className="text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">
+          <span className="inline-block border-b-[3px] border-brand-plum-300 pb-0.5">Your plan</span>,
+          simplified
         </h1>
-        <p className="mt-2 text-[15px] leading-relaxed text-brand-muted-700">
-          {plan.summary}
+        <p className="mt-3 text-[15px] leading-relaxed text-brand-muted-700">
+          {plan.summary || 'A clear, step-by-step plan that fits your life. You can change it anytime.'}
         </p>
-        <p className="mt-1 text-[12px] text-brand-muted-500">
-          Last updated {updatedDisplay} · saved privately on this device.
+        <p className="mt-1.5 text-[12px] text-brand-muted-500">
+          Last updated {updatedDisplay} · Saved privately on this device
         </p>
       </header>
 
-      {/* THE PLAN — the hero of this page. Big, warm cards a parent can scan in
-          one pass. Empty buckets are hidden so it always feels full. */}
-      <section className="mt-7" aria-label="Your plan this week">
-        <div className="rounded-3xl border border-brand-plum-200 bg-gradient-to-b from-brand-plum-50/80 to-white p-5 shadow-soft sm:p-7">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Compass className="h-5 w-5" aria-hidden />
-            </span>
-            <div>
-              <h2 className="text-xl font-semibold leading-tight text-brand-navy-700 sm:text-2xl">
-                Here&rsquo;s your week, made simple
-              </h2>
-              <p className="text-[13.5px] leading-relaxed text-brand-muted-600">
-                A few real moves — pick whatever fits today. Nothing is required.
+      {/* 2) KEY CONCERNS STRIP */}
+      {concerns.length > 0 && (
+        <section
+          aria-label="Your key concerns"
+          className="mt-5 rounded-2xl bg-brand-plum-50 px-4 py-3 sm:px-5"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
+                Your key concerns
               </p>
+              <ul className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                {concerns.map((c) => {
+                  const Icon = HARDEST_ICONS[c];
+                  return (
+                    <li
+                      key={c}
+                      className="inline-flex items-center gap-1.5 text-[13px] font-medium text-brand-navy-700"
+                    >
+                      {Icon && <Icon className="h-3.5 w-3.5 text-brand-plum-600" />}
+                      {HARDEST_LABEL_BY_VALUE[c] ?? c}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
+            <Link
+              href={INTAKE_HREF}
+              className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-800"
+            >
+              Edit my concerns <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
-          <div className="mt-5 grid gap-3.5 sm:grid-cols-2">
-            {filledBuckets.map(({ bucket, step }) => (
-              <BucketCard key={bucket} bucket={bucket} step={step} />
-            ))}
-          </div>
-        </div>
+        </section>
+      )}
+
+      {/* 3) START HERE — the strongest section, numbered list */}
+      <section aria-label="Start here" className="mt-8">
+        <SectionHeader
+          icon={Flag}
+          title="Start here"
+          subtitle="Your top priority steps, in order."
+          right={
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
+                1
+              </span>
+              <span className="text-[12px] font-semibold text-brand-muted-600">
+                {doneCount} of {topSteps.length} steps done
+              </span>
+            </div>
+          }
+        />
+
+        <ol className="mt-1 divide-y divide-surface-border">
+          {topSteps.map((step, i) => {
+            const isDone = doneHrefs.includes(step.href);
+            const bucket = step.bucket;
+            const ctaVerb = bucket ? BUCKET_CTA[bucket] : 'Open guide';
+            return (
+              <li
+                key={step.title}
+                className={
+                  'flex gap-3 py-4 transition ' + (isDone ? 'opacity-70' : '')
+                }
+              >
+                <span
+                  className={
+                    'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold ' +
+                    (isDone
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-primary/10 text-primary')
+                  }
+                >
+                  {isDone ? <Check className="h-3.5 w-3.5" /> : i + 1}
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+                    <h3
+                      className={
+                        'text-[15px] font-semibold text-brand-navy-700 ' +
+                        (isDone ? 'line-through decoration-brand-muted-300' : '')
+                      }
+                    >
+                      {step.title}
+                    </h3>
+                    <Link
+                      href={step.href}
+                      className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80"
+                    >
+                      {ctaVerb} <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+
+                  <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
+                    {step.because ?? step.why}
+                  </p>
+
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    {bucket && (
+                      <span
+                        className={
+                          'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ' +
+                          BUCKET_PILL[bucket]
+                        }
+                      >
+                        {BUCKET_LABELS[bucket]}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStep(step.href, isDone)}
+                      aria-pressed={isDone}
+                      className={
+                        'inline-flex items-center gap-1.5 text-[12px] font-semibold transition ' +
+                        (isDone
+                          ? 'text-emerald-700 hover:text-emerald-800'
+                          : 'text-brand-muted-500 hover:text-brand-navy-700')
+                      }
+                    >
+                      {isDone ? (
+                        <>
+                          <Check className="h-3.5 w-3.5" /> Done
+                        </>
+                      ) : (
+                        <>
+                          <Circle className="h-3.5 w-3.5" /> Mark done
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
       </section>
 
-      {/* Quick actions row — print/PDF + remind-me + email. */}
+      {/* 4) LOWER — two compact columns */}
+      {resources.length > 0 && (
+        <section aria-label="This week and tools" className="mt-9 grid gap-5 lg:grid-cols-2">
+          <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
+            <SectionHeader
+              icon={CalendarDays}
+              title="Do this this week"
+              subtitle="Helpful actions to make progress."
+            />
+            <ul className="mt-1 divide-y divide-surface-border">
+              {weekActions.map((r) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className="flex items-center justify-between gap-3 py-3 text-[14px] font-medium text-brand-navy-700 hover:text-primary"
+                  >
+                    <span className="min-w-0 truncate">{r.label}</span>
+                    <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
+                      Open <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
+            <SectionHeader
+              icon={Wrench}
+              title="Helpful tools"
+              subtitle="Calculators, templates & checklists."
+            />
+            <ul className="mt-1 divide-y divide-surface-border">
+              {toolItems.map((r) => (
+                <li key={r.href}>
+                  <Link
+                    href={r.href}
+                    className="flex items-center justify-between gap-3 py-3 text-[14px] font-medium text-brand-navy-700 hover:text-primary"
+                  >
+                    <span className="min-w-0 truncate">{r.label}</span>
+                    <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
+                      Use tool <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/support/resources"
+              className="mt-2 inline-flex items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-800"
+            >
+              See all tools <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </section>
+      )}
+
+      {/* 5) RECOMMENDED RESOURCES — short list, not cards */}
+      {recommended.length > 0 && (
+        <section aria-label="Recommended resources" className="mt-9">
+          <SectionHeader
+            icon={BookOpen}
+            title="Recommended resources"
+            subtitle="Curated reads and videos from our team."
+            right={
+              <Link
+                href="/support/resources"
+                className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-800"
+              >
+                See all resources <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            }
+          />
+          <ul className="mt-1 divide-y divide-surface-border">
+            {recommended.map((r, i) => (
+              <li key={r.href}>
+                <Link
+                  href={r.href}
+                  className="flex items-center justify-between gap-3 py-3 hover:text-primary"
+                >
+                  <span className="min-w-0 truncate text-[14px] font-medium text-brand-navy-700">
+                    {r.label}
+                  </span>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-warm-100 px-2.5 py-0.5 text-[11px] font-semibold text-brand-muted-700">
+                    {i === 1 ? 'Video (3 min)' : 'Article'}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* 6) BOTTOM — slim action bar */}
       <section
-          className="mt-4 flex flex-wrap items-center gap-2 print:hidden"
-          aria-label="Plan actions"
+        aria-label="Plan actions"
+        className="mt-9 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 rounded-2xl bg-brand-plum-50 px-4 py-3 text-[13px] font-semibold text-brand-plum-700 print:hidden sm:gap-x-4"
       >
         <button
           type="button"
           onClick={handlePrint}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 transition hover:border-primary/40 hover:text-brand-navy-700"
+          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
         >
-          <Printer className="h-3.5 w-3.5" /> Print or save as PDF
+          <Printer className="h-4 w-4" /> Print my plan
         </button>
-        <button
-          type="button"
-          onClick={handleToggleRemind}
-          aria-pressed={remindSet}
-          className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-semibold transition ${
-            remindSet
-              ? 'border-brand-plum-300 bg-brand-plum-50 text-brand-plum-800'
-              : 'border-surface-border bg-white text-brand-muted-700 hover:border-primary/40 hover:text-brand-navy-700'
-          }`}
-        >
-          {remindSet ? <Check className="h-3.5 w-3.5" /> : <Bell className="h-3.5 w-3.5" />}
-          {remindSet ? 'Reminder set for next week' : 'Remind me next week'}
-        </button>
+        <span aria-hidden className="text-brand-plum-200">|</span>
         <button
           type="button"
           onClick={() => setEmailOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 transition hover:border-primary/40 hover:text-brand-navy-700"
+          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
         >
-          <Mail className="h-3.5 w-3.5" /> Email my plan
+          <Mail className="h-4 w-4" /> Email my plan
         </button>
-      </section>
-
-      <section className="mt-9 space-y-3">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            Your priority steps
-          </h2>
-          {bandwidth && (
-            <p className="text-[12px] text-brand-muted-500">
-              Sized for today &middot; {visibleSteps.length} of {plan.steps.length}
-            </p>
-          )}
-        </div>
-        {visibleSteps.map((step, i) => {
-          const isDone = progress?.completedStepHrefs.includes(step.href) ?? false;
-          return (
-            <div
-              key={step.title}
-              className={
-                'rounded-2xl border bg-white p-5 shadow-soft sm:p-6 transition ' +
-                (isDone ? 'border-emerald-200 bg-emerald-50/40' : 'border-surface-border')
-              }
-            >
-              <div className="flex items-start justify-between gap-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-                  Step {i + 1}
-                </p>
-                {isDone && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700">
-                    <Check className="h-3 w-3" /> Done this week
-                  </span>
-                )}
-              </div>
-              <h3 className="mt-1 text-lg font-semibold text-brand-navy-700">
-                {step.title}
-              </h3>
-              {step.because && (
-                <p className="mt-1 inline-block rounded-full bg-brand-plum-50 px-2.5 py-0.5 text-[12px] font-semibold text-brand-plum-700">
-                  {step.because}
-                </p>
-              )}
-              <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
-                {step.why}
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <Link
-                  href={step.href}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-                >
-                  {isDone ? 'Revisit step' : 'Start this step'} <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => handleToggleStep(step.href, isDone)}
-                  aria-pressed={isDone}
-                  className={
-                    'inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-semibold transition ' +
-                    (isDone
-                      ? 'border-emerald-300 bg-white text-emerald-700 hover:bg-emerald-50'
-                      : 'border-surface-border bg-white text-brand-muted-700 hover:bg-surface-muted')
-                  }
-                >
-                  {isDone ? (
-                    <>
-                      <RotateCcw className="h-3.5 w-3.5" /> Mark not done
-                    </>
-                  ) : (
-                    <>
-                      <Check className="h-3.5 w-3.5" /> Mark this step done
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </section>
-
-      {plan.resources.length > 0 && (
-        <section className="mt-8 rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
-          <h2 className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            <Sparkles className="h-3.5 w-3.5 text-primary" /> Tools we picked for you
-          </h2>
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            {plan.resources.map((r) => (
-              <li key={r.href}>
-                <Link
-                  href={r.href}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-surface-border bg-surface-muted/40 px-4 py-3 text-[14px] font-medium text-brand-muted-800 transition hover:border-primary/40 hover:bg-primary/5 hover:text-brand-navy-700"
-                >
-                  <span>{r.label}</span>
-                  <ArrowRight className="h-3.5 w-3.5 text-brand-muted-400" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {plan.noteEchoes && plan.noteEchoes.length > 0 && (
-        <section className="mt-6 rounded-2xl border border-brand-warm-200 bg-brand-warm-50/60 p-5 sm:p-6">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-600">
-            What you wrote, reflected back
-          </h2>
-          <ul className="mt-3 space-y-2">
-            {plan.noteEchoes.map((e) => (
-              <li key={e.phrase} className="flex items-start gap-2 text-[14px] leading-relaxed text-brand-muted-800">
-                <span className="mt-0.5 inline-flex shrink-0 rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-brand-plum-700 ring-1 ring-brand-plum-200">
-                  {e.phrase}
-                </span>
-                <span>{e.reflection}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section className="mt-8">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-          Your Pathfinder
-        </h2>
-        <div className="mt-3">
-          <PathfinderCard />
-        </div>
-      </section>
-
-      {wellness.hasData && wellness.historyLen >= 3 && (
-        <section className="mt-8 rounded-2xl border border-surface-border bg-surface-muted/40 p-5 sm:p-6">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            From Your Check-Ins
-          </p>
-          <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">
-            {wellness.trend === 'declining'
-              ? 'Your check-ins from the last few weeks suggest things have felt heavier. We ordered your steps to start with the lighter ones.'
-              : wellness.trend === 'improving'
-              ? 'Your check-ins suggest things have steadied a little. These next steps build on that — they don’t replace it.'
-              : 'Your check-ins look fairly steady. These steps are a way to keep momentum without adding load.'}
-          </p>
-        </section>
-      )}
-
-      <footer className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-surface-border pt-6">
+        <span aria-hidden className="text-brand-plum-200">|</span>
         <Link
-          href="/support/intake"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80"
+          href={INTAKE_HREF}
+          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
         >
-          <RefreshCcw className="h-4 w-4" /> Update my plan
+          <Pencil className="h-4 w-4" /> Update my plan
         </Link>
-        <button
-          type="button"
-          onClick={handleClear}
-          className="inline-flex items-center gap-2 text-[13px] font-medium text-brand-muted-500 hover:text-accent"
-        >
-          <Trash2 className="h-3.5 w-3.5" /> Clear plan
-        </button>
-      </footer>
+      </section>
 
       <p className="mt-6 text-[11.5px] leading-relaxed text-brand-muted-500">
         Saved privately on this device. Clearing your browser data removes it.
@@ -441,48 +549,5 @@ function PopulatedPlan({
         latestCheckIn={latestCheckIn}
       />
     </Shell>
-  );
-}
-
-/** A single bucket tile in the plan grid. Whole card is a link to the step. */
-function BucketCard({
-  bucket,
-  step,
-}: {
-  bucket: StepBucket;
-  step: { title: string; why: string; href: string; because?: string };
-}) {
-  const label = BUCKET_LABELS[bucket];
-  const blurb = BUCKET_BLURBS[bucket];
-
-  return (
-    <Link
-      href={step.href}
-      className="group flex h-full flex-col rounded-2xl border border-surface-border bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md sm:p-6"
-    >
-      <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-brand-plum-700">
-        {label}
-      </p>
-      <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-500">
-        {blurb}
-      </p>
-      <h3 className="mt-3 text-[17px] font-semibold leading-snug text-brand-navy-700 group-hover:text-primary">
-        {step.title}
-      </h3>
-      {step.because && (
-        <p className="mt-1.5 inline-block self-start rounded-full bg-brand-plum-50 px-2.5 py-0.5 text-[11.5px] font-semibold text-brand-plum-700">
-          {step.because}
-        </p>
-      )}
-      <p className="mt-2 text-[13.5px] leading-relaxed text-brand-muted-700">
-        {step.why}
-      </p>
-      <div className="mt-auto pt-4">
-        <span className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-primary">
-          Open this step
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </span>
-      </div>
-    </Link>
   );
 }
