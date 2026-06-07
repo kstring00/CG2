@@ -74,7 +74,7 @@ const C: Record<string, Candidate> = {
   medicaidWaiver: {
     id: 'medicaidWaiver',
     title: 'Get on the Medicaid Waiver waitlist',
-    why: 'The list is long — getting on it is the single most consequential first move.',
+    why: 'Start here if cost is your worry. This page walks you through enrolling on the Texas Medicaid Waiver list, which can take years — so adding your child today protects future funding for ABA even before you need it.',
     href: '/support/financial',
     bucket: 'do-today',
     altBuckets: ['save-resource'],
@@ -82,7 +82,7 @@ const C: Record<string, Candidate> = {
   insuranceCall: {
     id: 'insuranceCall',
     title: 'Check your private insurance ABA coverage',
-    why: 'Call the number on the back of your card and ask about ABA + outpatient behavioral health.',
+    why: 'Use this when you have private insurance. It tells you exactly what to ask when you call the number on your card — the words "ABA" and "outpatient behavioral health" — so you learn what is covered before a bill surprises you.',
     href: '/support/financial',
     bucket: 'do-today',
     altBuckets: ['ask-bcba'],
@@ -90,14 +90,14 @@ const C: Record<string, Candidate> = {
   hopeForThree: {
     id: 'hopeForThree',
     title: 'Apply to Hope For Three for short-term help',
-    why: 'Quick Assist can move funds to your provider in 3–5 business days.',
+    why: 'Go here if you need money sooner than insurance moves. Hope For Three’s Quick Assist can send funds straight to your provider in 3–5 business days — this page shows who qualifies and how to apply.',
     href: '/support/find',
     bucket: 'do-today',
   },
   financialGuide: {
     id: 'financialGuide',
     title: 'Review the financial help guide',
-    why: 'Insurance, Medicaid waiver, and short-term grant options in one place.',
+    why: 'Read this when you want the full picture of what pays for ABA. It lays out private insurance, the Medicaid waiver, and short-term grants side by side, so you can see every option in one place instead of hunting.',
     href: '/support/financial',
     bucket: 'save-resource',
   },
@@ -106,7 +106,7 @@ const C: Record<string, Candidate> = {
   fourMinutes: {
     id: 'fourMinutes',
     title: 'Take four minutes for yourself',
-    why: 'Before anything else. The rest of the plan can wait that long.',
+    why: 'Open this when you are running on empty. It’s a short, guided four-minute reset you can do right now — picked first because the rest of the plan is easier to face once you’ve caught your breath.',
     href: '/support/caregiver',
     bucket: 'do-today',
     altBuckets: ['try-home'],
@@ -114,7 +114,7 @@ const C: Record<string, Candidate> = {
   parentTherapist: {
     id: 'parentTherapist',
     title: 'Find a parent therapist',
-    why: 'You spend every day advocating for your child. This is how you advocate for yourself.',
+    why: 'Use this if the weight is becoming too much to carry alone. The page explains how to find a therapist for yourself — the parent — and why your own support makes you better able to keep advocating for your child.',
     href: '/support/caregiver',
     bucket: 'save-resource',
     altBuckets: ['ask-bcba'],
@@ -122,7 +122,7 @@ const C: Record<string, Candidate> = {
   meltdownNow: {
     id: 'meltdownNow',
     title: 'If a meltdown is happening now',
-    why: 'A two-minute calming page for the moment, not the strategy.',
+    why: 'Bookmark this for the hard moments. It’s a two-minute, in-the-moment calming guide for when a meltdown is happening — fast steps to get through it, not a long strategy to study later.',
     href: '/support/caregiver',
     bucket: 'save-resource',
     altBuckets: ['try-home'],
@@ -132,7 +132,7 @@ const C: Record<string, Candidate> = {
   parentMatch: {
     id: 'parentMatch',
     title: 'Build a parent match',
-    why: 'A real person who has walked a similar road. Low-pressure, on your timing.',
+    why: 'Start here if you feel alone in this. It pairs you with another Texas parent who has raised a child through ABA — a real person to message on your own timing, so the next hard week has someone in it who gets it.',
     href: '/support/connect',
     bucket: 'next-week',
     altBuckets: ['save-resource'],
@@ -140,7 +140,7 @@ const C: Record<string, Candidate> = {
   smallGroups: {
     id: 'smallGroups',
     title: 'Browse small groups',
-    why: 'Some weeks a group is easier than a 1:1 conversation.',
+    why: 'Look here if one-on-one feels like too much right now. These are small parent groups you can join to listen or share — an easier first step into connection than a solo conversation.',
     href: '/support/connect',
     bucket: 'next-week',
   },
@@ -149,7 +149,7 @@ const C: Record<string, Candidate> = {
   iepPrep: {
     id: 'iepPrep',
     title: 'Open the IEP / ARD prep guide',
-    why: 'A short, plain-language walkthrough so you walk in prepared.',
+    why: 'Read this before your next school meeting. It’s a plain-language walkthrough of the IEP / ARD process — what the terms mean, what to ask for, and what to bring — so you walk in knowing your rights instead of guessing.',
     href: '/support/resources',
     bucket: 'save-resource',
     altBuckets: ['ask-bcba'],
@@ -157,14 +157,14 @@ const C: Record<string, Candidate> = {
   parentAdvocate: {
     id: 'parentAdvocate',
     title: 'Bring a parent advocate to your next meeting',
-    why: 'You don’t have to do this alone.',
+    why: 'Use this if school meetings feel one-sided. It explains how to bring an experienced parent advocate with you to an IEP/ARD meeting, so you have someone in your corner who knows the system.',
     href: '/support/connect',
     bucket: 'next-week',
   },
   documentHard: {
     id: 'documentHard',
     title: 'Document what is hard right now',
-    why: 'Three specific examples beat a long story every time.',
+    why: 'Do this before any clinical or school meeting. It shows you how to write down three specific recent examples of what’s hard — concrete notes that help a BCBA or school team act faster than a general description would.',
     href: '/support/caregiver',
     bucket: 'ask-bcba',
     altBuckets: ['try-home'],
@@ -174,14 +174,14 @@ const C: Record<string, Candidate> = {
   whatIsAba: {
     id: 'whatIsAba',
     title: 'Read the “What is ABA?” quick guide',
-    why: 'A plain-language foundation so the next conversations land easier.',
+    why: 'Start here if ABA is still a confusing term. It explains in plain language what ABA therapy actually is, what a typical week looks like, and what to expect — so the conversations ahead with providers make sense.',
     href: '/support/what-is-aba',
     bucket: 'save-resource',
   },
   callOneProvider: {
     id: 'callOneProvider',
     title: 'Pick one local provider to call this week',
-    why: 'You don’t have to call all of them. One.',
+    why: 'Use this to take the first real step. It’s a list of local ABA providers with a simple goal — call just one this week, not all of them — so getting started feels doable instead of overwhelming.',
     href: '/support/find',
     bucket: 'next-week',
     altBuckets: ['do-today'],
@@ -189,7 +189,7 @@ const C: Record<string, Candidate> = {
   mchat: {
     id: 'mchat',
     title: 'Ask your pediatrician for an M-CHAT screening',
-    why: 'Bring written examples of what you’ve seen — specific beats general.',
+    why: 'Do this while you’re waiting on a diagnosis. The page explains the M-CHAT autism screening and how to ask your pediatrician for it, with examples to bring — a concrete way to move the evaluation forward.',
     href: '/support/what-is-aba',
     bucket: 'ask-bcba',
     altBuckets: ['do-today'],
@@ -197,7 +197,7 @@ const C: Record<string, Candidate> = {
   devPed: {
     id: 'devPed',
     title: 'Find a local developmental pediatrician',
-    why: 'Many have long wait times — call now even if you’re not sure yet.',
+    why: 'Go here if you’re seeking an official diagnosis. It helps you find a developmental pediatrician near you — and because their waitlists are often months long, it’s worth calling now even before you feel ready.',
     href: '/support/find',
     bucket: 'do-today',
   },
@@ -206,7 +206,7 @@ const C: Record<string, Candidate> = {
   compareThree: {
     id: 'compareThree',
     title: 'Compare three local ABA providers',
-    why: 'Filter by insurance and waitlist so the list is realistic.',
+    why: 'Use this when you’re choosing a provider. It lets you filter local ABA centers by insurance accepted and waitlist length, so the three you compare are ones that could realistically take your child.',
     href: '/support/find',
     bucket: 'next-week',
     altBuckets: ['save-resource'],
@@ -214,7 +214,7 @@ const C: Record<string, Candidate> = {
   firstCallQuestions: {
     id: 'firstCallQuestions',
     title: 'Prepare what to ask on the first call',
-    why: 'Five specific questions that protect your time.',
+    why: 'Read this right before you call a provider. It gives you five specific questions to ask on a first call — about waitlists, insurance, and approach — so you get real answers fast and don’t waste a callback.',
     href: '/support/resources',
     bucket: 'ask-bcba',
     altBuckets: ['save-resource'],
@@ -222,7 +222,7 @@ const C: Record<string, Candidate> = {
   trackNotes: {
     id: 'trackNotes',
     title: 'Open your care plan with notes',
-    why: 'Track what you hear from each provider so they don’t blur together.',
+    why: 'Use this while you’re shopping around. It’s a simple place to jot what each provider told you, so when you’re comparing several at once their details don’t blur together.',
     href: '/support/care-plan',
     bucket: 'try-home',
   },
@@ -231,14 +231,14 @@ const C: Record<string, Candidate> = {
   siblingGuide: {
     id: 'siblingGuide',
     title: 'Read the sibling support guide',
-    why: 'Practical, written by parents who have been there.',
+    why: 'Read this if a brother or sister is feeling the strain too. It’s a practical guide, written by parents, on how to support siblings of a child in ABA — what they often feel and concrete ways to help them feel seen.',
     href: '/support/siblings',
     bucket: 'save-resource',
   },
   siblingOneThing: {
     id: 'siblingOneThing',
     title: 'Pick one sibling thing to try this week',
-    why: 'Pick one. Small.',
+    why: 'Start here if the guide feels like a lot. It suggests one small thing to try with a sibling this week — a single, low-effort step instead of a whole plan to take on.',
     href: '/support/siblings',
     bucket: 'try-home',
     altBuckets: ['next-week'],
@@ -248,7 +248,7 @@ const C: Record<string, Candidate> = {
   homeStrategy: {
     id: 'homeStrategy',
     title: 'Try one short home strategy today',
-    why: 'One. Not all of them. Something that fits today’s capacity.',
+    why: 'Use this when behavior at home is the hard part. It’s a set of short, at-home strategies for things like transitions and meltdowns — pick just one to try today rather than overhauling your whole routine.',
     href: '/support/at-home',
     bucket: 'try-home',
     altBuckets: ['do-today'],
@@ -256,7 +256,7 @@ const C: Record<string, Candidate> = {
   practicalGuides: {
     id: 'practicalGuides',
     title: 'Open the practical guides library',
-    why: 'Filtered by what families actually use, not what sounds good on paper.',
+    why: 'Browse this when you want how-to help you can use now. It’s a library of practical guides chosen for what families actually use day to day — routines, communication, behavior — not theory.',
     href: '/support/resources',
     bucket: 'save-resource',
   },
@@ -265,7 +265,7 @@ const C: Record<string, Candidate> = {
   findLocal: {
     id: 'findLocal',
     title: 'Use Find Local Help',
-    why: 'Pick two nearby support options that match your insurance.',
+    why: 'Start here when you don’t know what’s near you. It searches local ABA centers and support services and filters them by your insurance, so you can pick two real, nearby options to look into.',
     href: '/support/find',
     bucket: 'next-week',
     altBuckets: ['save-resource'],
@@ -273,7 +273,7 @@ const C: Record<string, Candidate> = {
   saveShortlist: {
     id: 'saveShortlist',
     title: 'Save the ones that look promising',
-    why: 'A short list now beats a long search later.',
+    why: 'Use this once you’ve found a few options. It lets you save a short list of the providers or resources worth a second look, so you don’t have to start the search over next time.',
     href: '/support/resources',
     bucket: 'save-resource',
   },
@@ -282,7 +282,7 @@ const C: Record<string, Candidate> = {
   sleepGuide: {
     id: 'sleepGuide',
     title: 'Read the sleep & bedtime guide',
-    why: 'Small, layered changes work better than a single overhaul.',
+    why: 'Open this if bedtime or night waking is wearing you down. It’s a guide to building a calmer bedtime routine through small, layered changes — picked because better sleep often makes everything else more manageable.',
     href: '/support/resources',
     bucket: 'try-home',
     altBuckets: ['ask-bcba'],
@@ -292,7 +292,7 @@ const C: Record<string, Candidate> = {
   partnerTalk: {
     id: 'partnerTalk',
     title: 'Set up one short partner check-in',
-    why: 'Fifteen minutes, same time each week. That’s the whole bar.',
+    why: 'Use this if the strain is showing up between you and your partner. It’s a simple structure for one fifteen-minute weekly check-in together — a small, repeatable habit to stay a team through a hard stretch.',
     href: '/support/caregiver',
     bucket: 'next-week',
     altBuckets: ['try-home'],
@@ -674,17 +674,17 @@ export function generateBucketSteps(
 const FALLBACK_STEPS: CarePlanStep[] = [
   {
     title: 'Build a parent match',
-    why: 'A real person who has walked a similar road. Low-pressure, on your timing.',
+    why: 'A good place to start: it pairs you with another Texas parent who has been through ABA, someone to message on your own timing so you’re not navigating this alone.',
     href: '/support/connect',
   },
   {
     title: 'Pick one small thing to try at home',
-    why: 'Pick one — not a list. Something that fits today.',
+    why: 'Browse practical, at-home guides and choose just one thing to try this week — a single small step rather than a long list to tackle.',
     href: '/support/resources',
   },
   {
     title: 'Find local help in your area',
-    why: 'Filtered for what your family actually needs.',
+    why: 'Search local ABA centers and support services filtered by your insurance, so you can see what’s actually available near you.',
     href: '/support/find',
   },
 ];
