@@ -135,10 +135,10 @@ function RailMeter({
     nextHref,
     weekComplete,
     intakeDoneThisWeek,
-    completedStepHrefs,
+    completedStepKeys,
   } = summary;
   const planStepCount = Math.max(0, totalNotches - 1);
-  const stepsDone = completedStepHrefs.length;
+  const stepsDone = completedStepKeys.length;
 
   return (
     <section
@@ -214,10 +214,10 @@ function PanelMeter({
     weekComplete,
     intakeDoneThisWeek,
     noPlanYet,
-    completedStepHrefs,
+    completedStepKeys,
   } = summary;
   const planStepCount = Math.max(0, totalNotches - 1);
-  const stepsDone = completedStepHrefs.length;
+  const stepsDone = completedStepKeys.length;
 
   return (
     <section

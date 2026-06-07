@@ -20,7 +20,11 @@
  */
 
 import { loadBandwidth } from './bandwidth';
-import { loadCarePlan } from './carePlanStorage';
+import {
+  getStepCompletionKey,
+  loadCarePlan,
+  type CarePlanStep,
+} from './carePlanStorage';
 import { TIER_STEP_LIMIT } from './bandwidth';
 
 const KEY = 'cg.weeklyProgress.v1';
@@ -33,8 +37,10 @@ export type WeeklyProgress = {
   weekStart: string;
   /** ISO timestamp when the weekly intake/check-in was explicitly marked done. */
   intakeDoneAt: string | null;
-  /** Hrefs (or titles) of plan steps marked done this week. Order = completion order. */
-  completedStepHrefs: string[];
+  /** Stable per-step keys marked done this week. Order = completion order. */
+  completedStepKeys: string[];
+  /** @deprecated Legacy href-based completion — read for backward compat only. */
+  completedStepHrefs?: string[];
 };
 
 export type WeeklyProgressSummary = {
@@ -42,8 +48,8 @@ export type WeeklyProgressSummary = {
   weekStart: string;
   /** Has the weekly bandwidth/intake check-in been completed this week? */
   intakeDoneThisWeek: boolean;
-  /** Plan steps the parent has marked complete this week. */
-  completedStepHrefs: string[];
+  /** Plan step keys the parent has marked complete this week. */
+  completedStepKeys: string[];
   /** Total notches in the meter (1 intake + N plan steps). */
   totalNotches: number;
   /** How many notches are filled right now. */
@@ -82,8 +88,36 @@ function emptyProgress(now: Date = new Date()): WeeklyProgress {
     version: 1,
     weekStart: weekStartISO(now),
     intakeDoneAt: null,
-    completedStepHrefs: [],
+    completedStepKeys: [],
   };
+}
+
+/** True when this step is marked done — key-based, with legacy href fallback. */
+export function isStepComplete(
+  step: CarePlanStep,
+  completedKeys: string[],
+  legacyHrefs: string[],
+  visibleSteps: CarePlanStep[],
+): boolean {
+  const key = getStepCompletionKey(step);
+  if (completedKeys.includes(key)) return true;
+  const hrefDupes = visibleSteps.filter((s) => s.href === step.href).length;
+  if (hrefDupes === 1 && legacyHrefs.includes(step.href)) return true;
+  return false;
+}
+
+/** Merge key-based progress with legacy href completions (unique hrefs only). */
+function resolveCompletedKeys(
+  progress: WeeklyProgress,
+  visibleSteps: CarePlanStep[],
+): string[] {
+  const keys = new Set(progress.completedStepKeys ?? []);
+  const legacyHrefs = progress.completedStepHrefs ?? [];
+  for (const href of legacyHrefs) {
+    const matches = visibleSteps.filter((s) => s.href === href);
+    if (matches.length === 1) keys.add(getStepCompletionKey(matches[0]));
+  }
+  return [...keys];
 }
 
 function readRaw(): WeeklyProgress | null {
@@ -94,13 +128,18 @@ function readRaw(): WeeklyProgress | null {
     const parsed = JSON.parse(raw) as Partial<WeeklyProgress> | null;
     if (!parsed || typeof parsed !== 'object') return null;
     if (typeof parsed.weekStart !== 'string') return null;
+    const legacyHrefs = Array.isArray(parsed.completedStepHrefs)
+      ? parsed.completedStepHrefs.filter((s): s is string => typeof s === 'string')
+      : [];
+    const completedStepKeys = Array.isArray(parsed.completedStepKeys)
+      ? parsed.completedStepKeys.filter((s): s is string => typeof s === 'string')
+      : [];
     return {
       version: 1,
       weekStart: parsed.weekStart,
       intakeDoneAt: typeof parsed.intakeDoneAt === 'string' ? parsed.intakeDoneAt : null,
-      completedStepHrefs: Array.isArray(parsed.completedStepHrefs)
-        ? parsed.completedStepHrefs.filter((s): s is string => typeof s === 'string')
-        : [],
+      completedStepKeys,
+      ...(legacyHrefs.length ? { completedStepHrefs: legacyHrefs } : {}),
     };
   } catch {
     return null;
@@ -160,25 +199,25 @@ export function markWeeklyIntakeDone(now: Date = new Date()): WeeklyProgress {
   return next;
 }
 
-/** Mark a plan step done. Idempotent — same href won't tick twice. */
-export function markStepDone(href: string, now: Date = new Date()): WeeklyProgress {
+/** Mark a plan step done. Idempotent — same step key won't tick twice. */
+export function markStepDone(stepKey: string, now: Date = new Date()): WeeklyProgress {
   const current = loadWeeklyProgress(now);
-  if (current.completedStepHrefs.includes(href)) return current;
+  if (current.completedStepKeys.includes(stepKey)) return current;
   const next: WeeklyProgress = {
     ...current,
-    completedStepHrefs: [...current.completedStepHrefs, href],
+    completedStepKeys: [...current.completedStepKeys, stepKey],
   };
   writeRaw(next);
   return next;
 }
 
 /** Unmark a plan step (parent changed their mind). */
-export function unmarkStepDone(href: string, now: Date = new Date()): WeeklyProgress {
+export function unmarkStepDone(stepKey: string, now: Date = new Date()): WeeklyProgress {
   const current = loadWeeklyProgress(now);
-  if (!current.completedStepHrefs.includes(href)) return current;
+  if (!current.completedStepKeys.includes(stepKey)) return current;
   const next: WeeklyProgress = {
     ...current,
-    completedStepHrefs: current.completedStepHrefs.filter((h) => h !== href),
+    completedStepKeys: current.completedStepKeys.filter((k) => k !== stepKey),
   };
   writeRaw(next);
   return next;
@@ -224,11 +263,15 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
   const stepCount = visibleSteps.length;
   const totalNotches = 1 + stepCount; // intake + each visible plan step
 
-  // Only count completed steps that still exist in the current visible plan,
-  // so editing the intake (which rewrites steps) doesn't leave ghost notches.
-  const validStepHrefs = new Set(visibleSteps.map((s) => s.href));
-  const completedStepHrefs = progress.completedStepHrefs.filter((h) => validStepHrefs.has(h));
-  const filledNotches = (intakeDoneThisWeek ? 1 : 0) + completedStepHrefs.length;
+  const legacyHrefs = progress.completedStepHrefs ?? [];
+  const resolvedKeys = resolveCompletedKeys(progress, visibleSteps);
+  const validStepKeys = new Set(visibleSteps.map(getStepCompletionKey));
+  const completedStepKeys = resolvedKeys.filter((k) => validStepKeys.has(k));
+  const filledNotches =
+    (intakeDoneThisWeek ? 1 : 0) +
+    visibleSteps.filter((s) =>
+      isStepComplete(s, completedStepKeys, legacyHrefs, visibleSteps),
+    ).length;
   const fraction = totalNotches === 0 ? 0 : filledNotches / totalNotches;
 
   let nextLabel: string;
@@ -242,7 +285,9 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
     nextLabel = 'Start this week’s check-in';
     nextHref = '/support/intake';
   } else {
-    const remaining = visibleSteps.find((s) => !completedStepHrefs.includes(s.href));
+    const remaining = visibleSteps.find(
+      (s) => !isStepComplete(s, completedStepKeys, legacyHrefs, visibleSteps),
+    );
     if (remaining) {
       nextLabel = remaining.title;
       nextHref = remaining.href;
@@ -260,7 +305,7 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
   return {
     weekStart: progress.weekStart,
     intakeDoneThisWeek,
-    completedStepHrefs,
+    completedStepKeys,
     totalNotches,
     filledNotches,
     fraction,

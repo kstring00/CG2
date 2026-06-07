@@ -538,7 +538,7 @@ export const providers: Provider[] = [
     waitlist_status: 'Varies by therapist — many have current openings',
     languages_offered: ['English', 'Spanish', 'others — filter in directory'],
     service_type: ['in-person', 'virtual'],
-    website: 'https://www.psychologytoday.com/us/groups/tx/houston?category=autism',
+    website: 'https://www.psychologytoday.com/us/therapists/tx/houston',
     phone: 'Varies by therapist',
     why_it_may_help: 'Caring for an autistic child is one of the most emotionally demanding jobs there is, and parents deserve their own support. Use Psychology Today\'s directory to find Houston-area therapists who specialize in supporting autism caregivers — filtered by your insurance and location.',
     helpful_to_know: 'Filter by "insurance accepted," "telehealth available," and "autism" to narrow results quickly. Many therapists have weekend and evening availability. This is for your mental health as a caregiver — separate from your child\'s therapy services.',

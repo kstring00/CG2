@@ -18,6 +18,7 @@ import type {
   HelpKind,
   NoteEcho,
   StepBucket,
+  StepEvidence,
   WeekMood,
 } from './carePlanStorage';
 import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
@@ -67,7 +68,13 @@ type Candidate = {
    *  the secondary list is used as fallback during bucket assignment. */
   bucket: StepBucket;
   altBuckets?: StepBucket[];
+  /** Compact research note — shown on the care plan when present. */
+  evidence?: StepEvidence;
 };
+
+/** Psychology Today therapist directory — direct search, not the mental-health toolbox. */
+const PSYCHOLOGY_TODAY_THERAPISTS =
+  'https://www.psychologytoday.com/us/therapists/tx/houston';
 
 const C: Record<string, Candidate> = {
   // Financial track
@@ -110,14 +117,22 @@ const C: Record<string, Candidate> = {
     href: '/support/caregiver',
     bucket: 'do-today',
     altBuckets: ['try-home'],
+    evidence: {
+      text: 'Slow, paced breathing activates the parasympathetic nervous system and can lower acute stress within minutes — one of the most studied rapid calming tools in DBT and trauma-informed care.',
+      source: 'Zaccaro et al., Frontiers in Human Neuroscience (2018) — breathwork & HRV review',
+    },
   },
   parentTherapist: {
     id: 'parentTherapist',
     title: 'Find a parent therapist',
-    why: 'Use this if the weight is becoming too much to carry alone. The page explains how to find a therapist for yourself — the parent — and why your own support makes you better able to keep advocating for your child.',
-    href: '/support/caregiver',
-    bucket: 'save-resource',
-    altBuckets: ['ask-bcba'],
+    why: 'Use this if the weight is becoming too much to carry alone. Search Houston-area therapists who work with caregivers — your own support makes you better able to keep advocating for your child.',
+    href: PSYCHOLOGY_TODAY_THERAPISTS,
+    bucket: 'ask-bcba',
+    altBuckets: ['save-resource'],
+    evidence: {
+      text: 'Parents of autistic children report significantly higher stress and depression. Therapy focused on caregiver wellbeing has been shown in multiple studies to reduce those symptoms — which often helps you show up steadier for your child.',
+      source: 'Samson & Ievers, Journal of Autism & Developmental Disorders (2020) — caregiver mental health meta-analysis',
+    },
   },
   meltdownNow: {
     id: 'meltdownNow',
@@ -126,6 +141,10 @@ const C: Record<string, Candidate> = {
     href: '/support/caregiver',
     bucket: 'save-resource',
     altBuckets: ['try-home'],
+    evidence: {
+      text: 'Brief grounding and breath techniques taught in distress-tolerance protocols can interrupt an acute stress spike in under two minutes — useful when you need to stay regulated in the moment.',
+      source: 'Linehan, DBT Skills Training Manual — distress tolerance module',
+    },
   },
 
   // Connection
@@ -136,6 +155,10 @@ const C: Record<string, Candidate> = {
     href: '/support/connect',
     bucket: 'next-week',
     altBuckets: ['save-resource'],
+    evidence: {
+      text: 'Peer support and connection with other parents consistently links to lower caregiver stress and loneliness in research on autism families — even when the support is online or asynchronous.',
+      source: 'DaWalt et al., Journal of Autism & Developmental Disorders (2019) — caregiver social support review',
+    },
   },
   smallGroups: {
     id: 'smallGroups',
@@ -143,6 +166,10 @@ const C: Record<string, Candidate> = {
     why: 'Look here if one-on-one feels like too much right now. These are small parent groups you can join to listen or share — an easier first step into connection than a solo conversation.',
     href: '/support/connect',
     bucket: 'next-week',
+    evidence: {
+      text: 'Parent support groups are associated with reduced isolation and improved coping in caregivers of children with developmental disabilities — a low-pressure way to feel less alone.',
+      source: 'Singer, Journal of Policy & Practice in Intellectual Disabilities (2006) — parent support group outcomes',
+    },
   },
 
   // School / IEP
@@ -590,12 +617,14 @@ export function generateNextSteps(
   });
 
   return ranked.slice(0, limit).map(({ candidate, weight, reasons }) => ({
+    id: candidate.id,
     title: candidate.title,
     why: candidate.why,
     href: candidate.href,
     because: reasons[0], // surface the strongest reason
     weight,
     bucket: candidate.bucket,
+    evidence: candidate.evidence,
   }));
 }
 
@@ -652,12 +681,14 @@ export function generateBucketSteps(
     for (const b of buckets) {
       if (filled.has(b)) continue;
       filled.set(b, {
+        id: candidate.id,
         title: candidate.title,
         why: candidate.why,
         href: candidate.href,
         because: reasons[0],
         weight,
         bucket: b,
+        evidence: candidate.evidence,
       });
       break; // each candidate fills at most one bucket
     }
@@ -673,16 +704,20 @@ export function generateBucketSteps(
 
 const FALLBACK_STEPS: CarePlanStep[] = [
   {
+    id: 'parentMatch',
     title: 'Build a parent match',
     why: 'A good place to start: it pairs you with another Texas parent who has been through ABA, someone to message on your own timing so you’re not navigating this alone.',
     href: '/support/connect',
+    evidence: C.parentMatch.evidence,
   },
   {
+    id: 'practicalGuides',
     title: 'Pick one small thing to try at home',
     why: 'Browse practical, at-home guides and choose just one thing to try this week — a single small step rather than a long list to tackle.',
     href: '/support/resources',
   },
   {
+    id: 'findLocal',
     title: 'Find local help in your area',
     why: 'Search local ABA centers and support services filtered by your insurance, so you can see what’s actually available near you.',
     href: '/support/find',
@@ -771,4 +806,18 @@ export function generateSummary(answers: CarePlanAnswers): string {
 /** Echo-back phrases for the care plan page. */
 export function generateNoteEchoes(notes: string | null | undefined): NoteEcho[] {
   return parseNotes(notes).echoes;
+}
+
+/** Fill in generator fields missing from older saved plans (evidence, therapist URL). */
+export function enrichCarePlanStep(step: CarePlanStep): CarePlanStep {
+  const candidate = Object.values(C).find(
+    (c) => c.id === step.id || c.title === step.title,
+  );
+  if (!candidate) return step;
+  return {
+    ...step,
+    id: step.id ?? candidate.id,
+    href: candidate.id === 'parentTherapist' ? candidate.href : step.href,
+    evidence: step.evidence ?? candidate.evidence,
+  };
 }

@@ -26,14 +26,17 @@ import {
   Wrench,
 } from 'lucide-react';
 import {
+  getStepCompletionKey,
   loadCarePlan,
   type CarePlanStep,
   type Hardest,
   type SavedCarePlan,
   type StepBucket,
+  type StepEvidence,
 } from '@/lib/carePlanStorage';
 import {
   BUCKET_LABELS,
+  enrichCarePlanStep,
   generateBucketSteps,
   HARDEST_OPTIONS,
 } from '@/lib/generateNextSteps';
@@ -152,6 +155,41 @@ const BUCKET_CTA: Record<StepBucket, string> = {
   'next-week': 'Open guide',
 };
 
+function StepLink({
+  href,
+  className,
+  children,
+}: {
+  href: string;
+  className: string;
+  children: React.ReactNode;
+}) {
+  if (href.startsWith('http')) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+function EvidenceStrip({ evidence }: { evidence: StepEvidence }) {
+  return (
+    <p className="mt-2 rounded-xl border border-brand-plum-100 bg-brand-plum-50/60 px-3 py-2 text-[12px] leading-relaxed text-brand-muted-700">
+      <span className="font-semibold text-brand-plum-800">Why this is worth trying: </span>
+      {evidence.text}
+      <span className="mt-1 block text-[11px] text-brand-muted-500">
+        Source: {evidence.source}
+      </span>
+    </p>
+  );
+}
+
 function SectionHeader({
   icon: Icon,
   title,
@@ -197,11 +235,11 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
 
   const refreshProgress = () => setProgress(getWeeklyProgressSummary());
 
-  const handleToggleStep = (href: string, currentlyDone: boolean) => {
+  const handleToggleStep = (stepKey: string, currentlyDone: boolean) => {
     if (currentlyDone) {
-      unmarkStepDone(href);
+      unmarkStepDone(stepKey);
     } else {
-      markStepDone(href);
+      markStepDone(stepKey);
     }
     refreshProgress();
   };
@@ -220,11 +258,13 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
       .map((b) => b.step)
       .filter((s): s is CarePlanStep => s !== null);
     const source = fromBuckets.length ? fromBuckets : plan.steps;
-    return source.slice(0, STEPS_TO_SHOW);
+    return source.slice(0, STEPS_TO_SHOW).map(enrichCarePlanStep);
   }, [plan.answers, plan.steps]);
 
-  const doneHrefs = progress?.completedStepHrefs ?? [];
-  const doneCount = topSteps.filter((s) => doneHrefs.includes(s.href)).length;
+  const completedKeys = progress?.completedStepKeys ?? [];
+  const isStepDone = (step: CarePlanStep) =>
+    completedKeys.includes(getStepCompletionKey(step));
+  const doneCount = topSteps.filter(isStepDone).length;
 
   // The page computes one resources array; split it for the two lower cards
   // and the resources strip. There is no dedicated "tools" source, so the
@@ -331,12 +371,19 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
 
         <ol className="mt-1 divide-y divide-surface-border">
           {topSteps.map((step, i) => {
-            const isDone = doneHrefs.includes(step.href);
+            const isDone = isStepDone(step);
+            const stepKey = getStepCompletionKey(step);
             const bucket = step.bucket;
-            const ctaVerb = bucket ? BUCKET_CTA[bucket] : 'Open guide';
+            const isExternal = step.href.startsWith('http');
+            const ctaVerb =
+              step.id === 'parentTherapist'
+                ? 'Find a therapist'
+                : bucket
+                  ? BUCKET_CTA[bucket]
+                  : 'Open guide';
             return (
               <li
-                key={step.title}
+                key={stepKey}
                 className={
                   'flex gap-3 py-4 transition ' + (isDone ? 'opacity-70' : '')
                 }
@@ -362,17 +409,20 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
                     >
                       {step.title}
                     </h3>
-                    <Link
+                    <StepLink
                       href={step.href}
                       className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80"
                     >
                       {ctaVerb} <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
+                      {isExternal && <span className="sr-only"> (opens in new tab)</span>}
+                    </StepLink>
                   </div>
 
                   <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
                     {step.because ?? step.why}
                   </p>
+
+                  {step.evidence && <EvidenceStrip evidence={step.evidence} />}
 
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
                     {bucket && (
@@ -387,7 +437,7 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
                     )}
                     <button
                       type="button"
-                      onClick={() => handleToggleStep(step.href, isDone)}
+                      onClick={() => handleToggleStep(stepKey, isDone)}
                       aria-pressed={isDone}
                       className={
                         'inline-flex items-center gap-1.5 text-[12px] font-semibold transition ' +

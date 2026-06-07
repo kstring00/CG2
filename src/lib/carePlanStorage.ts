@@ -65,7 +65,15 @@ export type StepBucket =
   | 'save-resource'
   | 'next-week';
 
+/** Compact research note shown on the care plan — "worth trying," not a guarantee. */
+export type StepEvidence = {
+  text: string;
+  source: string;
+};
+
 export type CarePlanStep = {
+  /** Stable id from the generator — used for per-step completion tracking. */
+  id?: string;
   title: string;
   why: string;
   href: string;
@@ -75,7 +83,14 @@ export type CarePlanStep = {
   weight?: number;
   /** Which CCO-review bucket this step belongs in (added in 2026-05 CCO pass). */
   bucket?: StepBucket;
+  /** Optional one-line research context for why this step is worth trying. */
+  evidence?: StepEvidence;
 };
+
+/** Unique key for weekly progress — stable across href collisions. */
+export function getStepCompletionKey(step: CarePlanStep): string {
+  return step.id ?? step.title;
+}
 
 export type CarePlanResource = {
   label: string;
