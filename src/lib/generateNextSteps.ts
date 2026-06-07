@@ -334,6 +334,32 @@ const W = {
   ageBand: 3,
 };
 
+// Topic-level priority, layered ON TOP OF tap order.
+//
+// Tap order alone says "the first thing you tapped matters most." But some
+// concerns are simply more foundational or more urgent than others, no matter
+// when a caregiver happens to tap them. This map adds that topic urgency as a
+// bonus on top of the tap-order weight, so a genuinely urgent concern reliably
+// rises even when it was tapped 2nd or 3rd (e.g. a caregiver taps "Understanding
+// ABA" first out of curiosity, then "Financial or insurance stress" second —
+// the financial concern should still surface first because it can block access
+// to care entirely).
+//
+// Scale is 0–8; higher = more foundational/urgent. Ranking approved by the site
+// owner. Note: 'behavior-home' is intentionally ranked ABOVE 'overwhelmed' —
+// the immediate daily behavior crisis is usually the concrete reason a family
+// reaches out, and addressing it is what relieves the overwhelm.
+const TOPIC_PRIORITY: Record<Hardest, number> = {
+  'financial-insurance': 8, // can block access to ABA entirely
+  'behavior-home': 7, // the immediate daily crisis; often the reason families seek ABA
+  'overwhelmed': 6, // if caregiver is in crisis they can't follow through
+  'finding-resources': 5, // moves families toward action and local support
+  'understanding-aba': 4, // foundational education, but not as urgent as access/behavior/crisis
+  'school-iep': 3, // important but adjacent to ABA, often tied to scheduled meetings
+  'connecting-parents': 2, // belonging/retention, rarely the first urgent intake need
+  'siblings': 1, // valuable family support, longer-horizon
+};
+
 // Map a hardest pick to one or two candidate steps + a reason fragment.
 function applyHardest(scores: Map<string, Score>, hardest: Hardest, weight: number) {
   const because = `Because you said ${HARDEST_FRAGMENT[hardest]} is hard right now.`;
@@ -500,7 +526,11 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
   const picks = (answers.hardest ?? []) as Hardest[];
 
   picks.forEach((h, idx) => {
-    const weight = idx === 0 ? W.hardestPrimary : W.hardestSecondary;
+    // Tap-order weight (first pick weighed heavier than later picks)...
+    const tapOrderWeight = idx === 0 ? W.hardestPrimary : W.hardestSecondary;
+    // ...plus a topic-priority bonus, so foundational/urgent concerns rise even
+    // when tapped 2nd or 3rd. The bonus is purely additive on top of tap order.
+    const weight = tapOrderWeight + TOPIC_PRIORITY[h];
     applyHardest(scores, h, weight);
   });
 
