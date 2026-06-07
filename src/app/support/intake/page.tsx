@@ -16,7 +16,6 @@ import {
   Search,
   Sparkles,
   Users,
-  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -37,8 +36,6 @@ import {
   generateWeekMessage,
   HARDEST_OPTIONS,
 } from '@/lib/generateNextSteps';
-import BandwidthCheck from '@/components/BandwidthCheck';
-import { loadBandwidth, type BandwidthResult } from '@/lib/bandwidth';
 
 // ---------------------------------------------------------------------------
 // Option data — labels, supporting copy, and icons for visual differentiation
@@ -73,33 +70,24 @@ const HELP_OPTIONS: HelpOption[] = [
   { value: 'not-sure', label: 'Not sure yet', hint: 'That’s a real answer. We’ll show you a gentle starting point.' },
 ];
 
-const STAGE_LABEL = Object.fromEntries(STAGE_OPTIONS.map((o) => [o.value, o.label])) as Record<Stage, string>;
-const HELP_LABEL = Object.fromEntries(HELP_OPTIONS.map((o) => [o.value, o.label])) as Record<HelpKind, string>;
-const HARDEST_LABEL = Object.fromEntries(HARDEST_OPTIONS.map((o) => [o.value, o.label])) as Record<Hardest, string>;
 
 // ---------------------------------------------------------------------------
 // Step model — Week 1 intake. A short, focused flow:
 //   1. Where are you in this right now?  (stage)
 //   2. What's hardest right now?         (hardest, multi)
 //   3. What would help most?             (help, multi)
-//   4. Bandwidth check
-// Interstitials ("we hear you") sit between key questions.
 // ---------------------------------------------------------------------------
 
 type StepKind =
   | 'q-stage'
   | 'q-hardest'
-  | 'r-hardest'
   | 'q-help'
-  | 'q-bandwidth'
   | 'building';
 
 const STEP_ORDER: StepKind[] = [
   'q-stage',
   'q-hardest',
-  'r-hardest',
   'q-help',
-  'q-bandwidth',
   'building',
 ];
 
@@ -108,16 +96,13 @@ const PROGRESS_STEPS: StepKind[] = [
   'q-stage',
   'q-hardest',
   'q-help',
-  'q-bandwidth',
 ];
 
 // Per-step background hue — soft, not loud. The form feels like walking through rooms.
 const STEP_HUE: Record<StepKind, string> = {
   'q-stage': 'bg-brand-warm-50',
   'q-hardest': 'bg-brand-warm-100',
-  'r-hardest': 'bg-brand-plum-50',
   'q-help': 'bg-brand-warm-100',
-  'q-bandwidth': 'bg-brand-plum-50',
   'building': 'bg-brand-warm-50',
 };
 
@@ -132,9 +117,6 @@ export default function IntakePage() {
   const [stage, setStage] = useState<Stage | null>(null);
   const [hardest, setHardest] = useState<Hardest[]>([]);
   const [helpKinds, setHelpKinds] = useState<HelpKind[]>([]);
-  // Bandwidth result — either freshly captured in the q-bandwidth step or
-  // pre-loaded from a prior session so the parent isn't forced to redo it.
-  const [bandwidth, setBandwidth] = useState<BandwidthResult | null>(null);
 
   // Tracks whether we've finished restoring any saved draft. We must not
   // autosave until the restore pass runs, or the initial empty state would
@@ -142,9 +124,6 @@ export default function IntakePage() {
   const [draftLoaded, setDraftLoaded] = useState(false);
 
   useEffect(() => {
-    const existing = loadBandwidth();
-    if (existing) setBandwidth(existing);
-
     // Restore any in-progress answers from a prior visit so leaving the flow
     // (or an accidental tap) never throws away what the parent already typed.
     const draft = loadCarePlanDraft();
@@ -171,10 +150,9 @@ export default function IntakePage() {
       case 'q-stage': return stage !== null;
       case 'q-hardest': return hardest.length > 0;
       case 'q-help': return helpKinds.length > 0;
-      case 'q-bandwidth': return bandwidth !== null;
-      default: return true; // interstitials and building auto-advance
+      default: return true; // building auto-advances
     }
-  }, [step, stage, hardest, helpKinds, bandwidth]);
+  }, [step, stage, hardest, helpKinds]);
 
   const next = () => setStepIdx((i) => Math.min(i + 1, STEP_ORDER.length - 1));
   const back = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -187,15 +165,14 @@ export default function IntakePage() {
     setHelpKinds((arr) => (arr.includes(h) ? arr.filter((x) => x !== h) : [...arr, h]));
   };
 
-  // Build & save on 'building' step. Pass the bandwidth tier through so the
-  // plan generator can size the priority steps to today's capacity.
+  // Build & save on 'building' step.
   useEffect(() => {
     if (step !== 'building') return;
     const answers = { hardest, stage, helpKinds };
     saveCarePlan({
       answers,
       summary: generateSummary(answers),
-      steps: generateNextSteps(answers, bandwidth?.tier),
+      steps: generateNextSteps(answers),
       resources: generateResources(answers),
       weekMessage: generateWeekMessage(null),
     });
@@ -209,14 +186,7 @@ export default function IntakePage() {
     clearCarePlanDraft();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
-  }, [step, hardest, stage, helpKinds, bandwidth, router]);
-
-  // Chip removers — let the parent edit a prior answer without going back step-by-step.
-  const clearHardest = (h: Hardest) => setHardest((arr) => arr.filter((x) => x !== h));
-  const clearStage = () => setStage(null);
-  const clearHelp = (h: HelpKind) => setHelpKinds((arr) => arr.filter((x) => x !== h));
-
-  const hasAnyAnswer = stage !== null || hardest.length > 0 || helpKinds.length > 0;
+  }, [step, hardest, stage, helpKinds, router]);
 
   return (
     <main className={cn('min-h-[calc(100vh-4rem)] transition-colors duration-500', STEP_HUE[step])}>
@@ -226,18 +196,6 @@ export default function IntakePage() {
           <p className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-brand-plum-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
             Week 1
           </p>
-
-          {/* Pinned summary chips — visible once the parent has answered something */}
-          {hasAnyAnswer && step !== 'building' && (
-            <SummaryChips
-              stage={stage}
-              hardest={hardest}
-              helpKinds={helpKinds}
-              onClearStage={clearStage}
-              onClearHardest={clearHardest}
-              onClearHelp={clearHelp}
-            />
-          )}
 
           {progressIdx >= 0 && (
             <header className="mb-6">
@@ -297,15 +255,6 @@ export default function IntakePage() {
             </Question>
           )}
 
-          {step === 'r-hardest' && (
-            <Reflection
-              eyebrow="We hear you."
-              title={reflectionForHardest(hardest)}
-              body="That’s a lot to carry. One more question, then we’ll build your plan around your week — not a general one."
-              onContinue={next}
-            />
-          )}
-
           {step === 'q-help' && (
             <Question
               title="What would help most?"
@@ -330,17 +279,6 @@ export default function IntakePage() {
             </Question>
           )}
 
-          {step === 'q-bandwidth' && (
-            <BandwidthCheck
-              initialInputs={bandwidth?.inputs}
-              onComplete={(result) => {
-                setBandwidth(result);
-                next();
-              }}
-              submitLabel="Build my plan"
-            />
-          )}
-
           {step === 'building' && (
             <BuildingScreen
               hardestCount={hardest.length}
@@ -348,9 +286,8 @@ export default function IntakePage() {
             />
           )}
 
-          {/* Footer — only on real questions, not on reflections or building.
-              Bandwidth has its own submit button. */}
-          {progressIdx >= 0 && step !== 'q-bandwidth' && (
+          {/* Footer — only on real questions, not on the building screen. */}
+          {progressIdx >= 0 && (
             <div className="mt-8 flex items-center justify-between">
               <button
                 type="button"
@@ -385,22 +322,6 @@ export default function IntakePage() {
 }
 
 // ---------------------------------------------------------------------------
-// Reflections — short validations between key questions
-// ---------------------------------------------------------------------------
-
-function reflectionForHardest(picks: Hardest[]): string {
-  if (picks.length === 0) return 'We’ll start small.';
-  if (picks.length === 1) {
-    const only = picks[0];
-    return `So ${HARDEST_LABEL[only].toLowerCase()} is what’s loudest right now.`;
-  }
-  if (picks.length === 2) {
-    return `${HARDEST_LABEL[picks[0]]} and ${HARDEST_LABEL[picks[1]].toLowerCase()} — both are real, and both shape your plan.`;
-  }
-  return `That’s ${picks.length} hard things at once. We’ll order your plan so the heaviest one is first.`;
-}
-
-// ---------------------------------------------------------------------------
 // Subcomponents
 // ---------------------------------------------------------------------------
 
@@ -418,37 +339,6 @@ function Question({
       <h1 className="text-2xl font-semibold leading-snug text-brand-navy-700">{title}</h1>
       {hint && <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-600">{hint}</p>}
       <div className="mt-5">{children}</div>
-    </section>
-  );
-}
-
-function Reflection({
-  eyebrow,
-  title,
-  body,
-  onContinue,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  onContinue: () => void;
-}) {
-  return (
-    <section className="py-2">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-plum-700">
-        {eyebrow}
-      </p>
-      <h2 className="mt-2 text-xl font-semibold leading-snug text-brand-navy-700 sm:text-2xl">
-        {title}
-      </h2>
-      <p className="mt-3 text-[14.5px] leading-relaxed text-brand-muted-700">{body}</p>
-      <button
-        type="button"
-        onClick={onContinue}
-        className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-      >
-        Keep going <ArrowRight className="h-4 w-4" />
-      </button>
     </section>
   );
 }
@@ -503,56 +393,6 @@ function Toggle({
         <Check className={cn('h-4 w-4 shrink-0 text-primary transition-opacity', active ? 'opacity-100' : 'opacity-0')} />
       )}
     </button>
-  );
-}
-
-// Pinned, editable summary of answers so far.
-function SummaryChips({
-  stage,
-  hardest,
-  helpKinds,
-  onClearStage,
-  onClearHardest,
-  onClearHelp,
-}: {
-  stage: Stage | null;
-  hardest: Hardest[];
-  helpKinds: HelpKind[];
-  onClearStage: () => void;
-  onClearHardest: (h: Hardest) => void;
-  onClearHelp: (h: HelpKind) => void;
-}) {
-  return (
-    <div className="mb-5 rounded-2xl border border-brand-warm-200 bg-brand-warm-50/70 px-4 py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-600">
-        So far
-      </p>
-      <ul className="mt-2 flex flex-wrap gap-1.5">
-        {stage && <Chip label={STAGE_LABEL[stage]} onRemove={onClearStage} />}
-        {hardest.map((h) => (
-          <Chip key={h} label={HARDEST_LABEL[h]} onRemove={() => onClearHardest(h)} />
-        ))}
-        {helpKinds.map((h) => (
-          <Chip key={h} label={HELP_LABEL[h]} onRemove={() => onClearHelp(h)} />
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function Chip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <li className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[12px] font-semibold text-brand-navy-700 shadow-sm ring-1 ring-surface-border">
-      <span>{label}</span>
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={`Remove ${label}`}
-        className="rounded-full p-0.5 text-brand-muted-400 transition hover:bg-surface-subtle hover:text-brand-muted-800"
-      >
-        <X className="h-3 w-3" />
-      </button>
-    </li>
   );
 }
 
