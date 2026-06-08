@@ -10,7 +10,6 @@ import {
   Globe,
   HeartHandshake,
   Keyboard,
-  Languages,
   List,
   Mail,
   MapPin,
@@ -1436,7 +1435,7 @@ function LeftFilters({ locale, filters, setFilters }: LeftFiltersProps) {
 }
 
 export default function FindSupportPage() {
-  const [locale, setLocale] = useState<Locale>('en');
+  const locale = 'en' as const;
   const [activeIntent, setActiveIntent] = useState<Intent | null>(null);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [query, setQuery] = useState('');
@@ -1645,16 +1644,6 @@ export default function FindSupportPage() {
               >
                 <Keyboard className="h-4 w-4" />
                 <span>?</span>
-              </button>
-              <button
-                onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
-                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
-                aria-label="Toggle language"
-              >
-                <Languages className="h-4 w-4" />
-                <span>{locale === 'en' ? 'EN' : 'ES'}</span>
-                <span className="text-brand-muted-400">·</span>
-                <span>{t.languageToggle}</span>
               </button>
             </div>
           </div>
