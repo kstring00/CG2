@@ -13,10 +13,8 @@ import { StickyToc, type TocItem } from '@/components/ui/StickyToc';
 /* Order of categories down the page (mirrors the TOC). */
 const CATEGORY_ORDER: ResourceCategory[] = [
   'understanding-autism',
-  'therapy-options',
   'daily-life',
   'education-iep',
-  'caregiver-wellness',
   'community',
 ];
 
