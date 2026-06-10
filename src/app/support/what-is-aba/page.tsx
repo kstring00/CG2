@@ -2,40 +2,34 @@
 
 import { useState } from 'react';
 import {
-  BookOpen,
-  CheckCircle2,
-  XCircle,
-  HelpCircle,
-  Brain,
+  ArrowLeft,
   ArrowRight,
+  BookOpen,
+  Brain,
+  CheckCircle2,
   ChevronDown,
   Compass,
+  HelpCircle,
   Lightbulb,
+  Search,
   Users,
+  XCircle,
 } from 'lucide-react';
-import { StickyToc, type TocItem } from '@/components/ui/StickyToc';
 import { cn } from '@/lib/utils';
 import {
   BadgePill,
   GuideCard,
   GuideSectionHeading,
-  QuickIntroCard,
   SupportActionCard,
   SupportCalloutBand,
   TagPill,
 } from '@/components/support/GuideCards';
+import {
+  SectionChooser,
+  type ChooserSection,
+} from '@/components/support/SectionChooser';
 
 /* ─── data ─────────────────────────────────────────────────── */
-
-const ABA_TOC: TocItem[] = [
-  { num: '01', id: 'study',       label: 'What BCBAs actually study' },
-  { num: '02', id: 'experience',  label: 'What your child is experiencing' },
-  { num: '03', id: 'myths',       label: 'Myths vs reality' },
-  { num: '04', id: 'green-flags', label: 'How to know therapy is going well' },
-  { num: '05', id: 'questions',   label: 'Questions you can ask' },
-  { num: '06', id: 'outcomes',    label: 'Parent involvement and outcomes' },
-  { num: '07', id: 'glossary',    label: '10 ABA terms in plain English' },
-];
 
 const myths = [
   {
@@ -157,23 +151,471 @@ const glossary = [
   { term: 'Mastery criterion', def: 'The data threshold that means a skill has been learned. For example, "80% accuracy across 3 sessions with 2 different therapists."' },
 ];
 
-/* ─── component ────────────────────────────────────────────── */
+/* ─── section panels ───────────────────────────────────────── */
+
+function DefinitionPanel() {
+  return (
+    <div>
+      <GuideSectionHeading icon={Brain} title="What behavior analysts actually study" />
+      <GuideCard as="div">
+        <div className="mb-3">
+          <BadgePill className={ACCENT.sky.badge}>The honest definition</BadgePill>
+        </div>
+        <div className="space-y-3">
+          <p className="text-[14px] leading-relaxed text-brand-muted-700">
+            Applied Behavior Analysis is the scientific study of how behavior works — specifically, how the
+            environment (everything around a person: people, settings, events, consequences) shapes what a person
+            does. Behavior analysts study the relationship between a behavior and its causes and consequences,
+            and use that understanding to help people build skills they need.
+          </p>
+          <p className="text-[14px] leading-relaxed text-brand-muted-700">
+            For children with autism, this means: figuring out <em>why</em> your child does what they do — what need
+            is being communicated, what is reinforcing the behavior, what is making learning hard — and then
+            systematically teaching skills that help them communicate, connect, and navigate the world more effectively.
+          </p>
+          <p className="text-[14px] leading-relaxed text-brand-muted-700">
+            The &ldquo;applied&rdquo; part is important. This is not laboratory science. It is science in real rooms with real
+            children, adapting constantly to what is actually working for this specific person.
+          </p>
+        </div>
+      </GuideCard>
+    </div>
+  );
+}
+
+function SessionStepper() {
+  const [step, setStep] = useState(0);
+  const phase = sessionPhases[step];
+  const accent = ACCENT[phase.color];
+  const isFirst = step === 0;
+  const isLast = step === sessionPhases.length - 1;
+
+  return (
+    <div>
+      <GuideSectionHeading
+        icon={Lightbulb}
+        title="What your child is actually experiencing"
+        meta={`Step ${step + 1} of ${sessionPhases.length}`}
+      />
+      <p className="-mt-2 mb-4 text-[13px] italic text-brand-muted-500">
+        Walk through a typical session — not as a checklist, but as it actually feels.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {sessionPhases.map((p, i) => (
+          <button
+            key={p.phase}
+            type="button"
+            onClick={() => setStep(i)}
+            aria-current={i === step ? 'step' : undefined}
+            className={cn(
+              'rounded-full border px-3 py-1.5 text-[12px] font-semibold transition duration-200',
+              i === step
+                ? 'border-primary bg-primary text-white shadow-soft'
+                : 'border-surface-border bg-white text-brand-muted-600 hover:border-brand-plum-200 hover:text-brand-plum-700',
+            )}
+          >
+            {i + 1}. {p.phase}
+          </button>
+        ))}
+      </div>
+      <GuideCard as="div" className="mt-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <BadgePill className={accent.badge}>{phase.phase}</BadgePill>
+          <TagPill>{phase.time}</TagPill>
+        </div>
+        <p className="text-[13px] leading-relaxed text-brand-muted-700">{phase.story}</p>
+      </GuideCard>
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setStep((s) => Math.max(0, s - 1))}
+          disabled={isFirst}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3.5 py-2 text-[13px] font-semibold text-brand-muted-700 shadow-soft transition hover:border-brand-plum-200 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> Back
+        </button>
+        <button
+          type="button"
+          onClick={() => setStep((s) => Math.min(sessionPhases.length - 1, s + 1))}
+          disabled={isLast}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next <ArrowRight className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MythsPanel() {
+  const [openMyth, setOpenMyth] = useState<number | null>(null);
+  return (
+    <div>
+      <GuideSectionHeading
+        icon={HelpCircle}
+        title="What you may have heard — and what is actually true"
+        meta="5 myths"
+      />
+      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
+        Every one of these concerns is valid to bring. Click each one to see the reality.
+      </p>
+      <div className="space-y-3">
+        {myths.map((item, i) => {
+          const accent = ACCENT[item.color];
+          const isOpen = openMyth === i;
+          return (
+            <GuideCard as="div" key={i} className="overflow-hidden p-0 sm:p-0">
+              <button
+                type="button"
+                aria-expanded={isOpen}
+                onClick={() => setOpenMyth(isOpen ? null : i)}
+                className={cn(
+                  'flex w-full items-center gap-3 px-4 py-4 text-left transition duration-200 sm:px-5',
+                  isOpen ? 'bg-surface-subtle/50' : 'hover:bg-surface-subtle/40',
+                )}
+              >
+                <XCircle
+                  className={cn(
+                    'h-4 w-4 shrink-0',
+                    isOpen ? accent.icon : 'text-brand-muted-300',
+                  )}
+                />
+                <span className="min-w-0 flex-1 text-[14px] font-semibold text-brand-navy-700">
+                  {item.myth}
+                </span>
+                <BadgePill className={cn('hidden sm:inline-flex', accent.badge)}>
+                  Myth
+                </BadgePill>
+                <ChevronDown
+                  className={cn(
+                    'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                    isOpen && 'rotate-180',
+                  )}
+                />
+              </button>
+              <div className="toolbox-reveal grid" data-open={isOpen ? 'true' : 'false'}>
+                <div className="toolbox-reveal-inner min-h-0">
+                  <div className="toolbox-reveal-content border-t border-surface-border bg-surface-subtle/30 px-4 py-4 sm:px-5">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle2 className={cn('mt-0.5 h-4 w-4 shrink-0', accent.icon)} />
+                      <div>
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-brand-muted-500">
+                          The reality
+                        </p>
+                        <p className="text-[13px] leading-relaxed text-brand-muted-700">
+                          {item.reality}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </GuideCard>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function GoingWellPanel() {
+  const [showWhy, setShowWhy] = useState(false);
+  return (
+    <div>
+      <GuideSectionHeading
+        icon={CheckCircle2}
+        title="How to know if therapy is going well"
+        meta="5 + 5 signs"
+      />
+      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
+        Progress isn&apos;t always visible in the way parents expect. Here are the real signs — and what to
+        bring to your BCBA if something doesn&apos;t feel right.
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <GuideCard as="div">
+          <div className="mb-3">
+            <BadgePill className={ACCENT.emerald.badge}>5 green flags</BadgePill>
+          </div>
+          <ul className="divide-y divide-surface-border">
+            {greenFlags.map((flag, i) => (
+              <li key={i} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
+                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
+                <span className="text-[13px] leading-relaxed text-brand-muted-700">{flag}</span>
+              </li>
+            ))}
+          </ul>
+        </GuideCard>
+        <GuideCard as="div">
+          <div className="mb-3">
+            <BadgePill className={ACCENT.amber.badge}>5 things to bring to your BCBA</BadgePill>
+          </div>
+          <ul className="divide-y divide-surface-border">
+            {thingsToBringToBCBA.map((item, i) => (
+              <li key={i} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
+                <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                <span className="text-[13px] leading-relaxed text-brand-muted-700">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </GuideCard>
+      </div>
+
+      {/* Parent involvement & outcomes — merged here, collapsed by default */}
+      <GuideCard as="div" className="mt-4 overflow-hidden p-0 sm:p-0">
+        <button
+          type="button"
+          aria-expanded={showWhy}
+          onClick={() => setShowWhy(!showWhy)}
+          className={cn(
+            'flex w-full items-center gap-3 px-4 py-4 text-left transition duration-200 sm:px-5',
+            showWhy ? 'bg-brand-plum-50/50' : 'hover:bg-surface-subtle/40',
+          )}
+        >
+          <span
+            className={cn(
+              'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition',
+              showWhy
+                ? 'border-brand-plum-200 bg-brand-plum-100 text-brand-plum-700'
+                : 'border-surface-border bg-primary/5 text-primary',
+            )}
+          >
+            <Users className="h-4 w-4" aria-hidden />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-semibold text-brand-navy-700">
+              Why your involvement matters
+            </span>
+            <span className="mt-0.5 block text-[13px] text-brand-muted-600">
+              Parent involvement and outcomes — what the research shows
+            </span>
+          </span>
+          <span className="hidden shrink-0 text-[12px] font-medium text-brand-muted-500 sm:block">
+            4 findings
+          </span>
+          <ChevronDown
+            className={cn(
+              'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+              showWhy && 'rotate-180',
+            )}
+          />
+        </button>
+        <div className="toolbox-reveal grid" data-open={showWhy ? 'true' : 'false'}>
+          <div className="toolbox-reveal-inner min-h-0">
+            <div className="toolbox-reveal-content border-t border-surface-border bg-surface-subtle/30 px-4 py-4 sm:px-5">
+              <p className="mb-4 text-[13px] leading-relaxed text-brand-muted-600">
+                The research on this is consistent and significant: children whose parents are actively involved
+                in ABA therapy make faster progress, generalize skills more effectively, and maintain gains over time.
+                This is not about pressure on you — it is about explaining why your BCBA keeps inviting you into sessions
+                and asking about what happens at home.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {involvementFindings.map((item, i) => (
+                  <div key={i} className="rounded-xl border border-surface-border bg-white p-4">
+                    <h3 className="text-[14px] font-bold leading-snug text-brand-navy-700">{item.title}</h3>
+                    <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">{item.body}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </GuideCard>
+    </div>
+  );
+}
+
+function QuestionsPanel() {
+  const [openQ, setOpenQ] = useState<number | null>(null);
+  return (
+    <div>
+      <GuideSectionHeading
+        icon={HelpCircle}
+        title="Questions you are allowed — and encouraged — to ask"
+        meta="6 questions"
+      />
+      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
+        You are not bothering your BCBA. This is your child&apos;s program. You deserve to understand it.
+        Tap a question to see why it matters.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {questionsYouCanAsk.map((item, i) => {
+          const isOpen = openQ === i;
+          return (
+            <button
+              key={i}
+              type="button"
+              aria-expanded={isOpen}
+              onClick={() => setOpenQ(isOpen ? null : i)}
+              className={cn(
+                'rounded-full border px-3.5 py-2 text-left text-[13px] font-semibold italic transition duration-200',
+                isOpen
+                  ? 'border-brand-plum-300 bg-brand-plum-50 text-brand-plum-700 shadow-soft'
+                  : 'border-surface-border bg-white text-brand-muted-700 hover:border-brand-plum-200 hover:text-brand-plum-700',
+              )}
+            >
+              {item.q}
+            </button>
+          );
+        })}
+      </div>
+      {openQ !== null && (
+        <GuideCard as="div" className="mt-4">
+          <p className="text-[14px] font-semibold italic text-brand-navy-700">
+            {questionsYouCanAsk[openQ].q}
+          </p>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
+            {questionsYouCanAsk[openQ].note}
+          </p>
+        </GuideCard>
+      )}
+    </div>
+  );
+}
+
+function GlossaryPanel() {
+  const [query, setQuery] = useState('');
+  const [openTerm, setOpenTerm] = useState<string | null>(null);
+  const q = query.trim().toLowerCase();
+  const items = glossary.filter(
+    (entry) =>
+      !q ||
+      entry.term.toLowerCase().includes(q) ||
+      entry.def.toLowerCase().includes(q),
+  );
+
+  return (
+    <div>
+      <GuideSectionHeading
+        icon={BookOpen}
+        title="10 ABA terms you will hear — in plain English"
+        meta={`${items.length} of ${glossary.length} terms`}
+      />
+      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
+        You should not need a degree to understand your child&apos;s therapy. These are the words you will
+        hear most often, and what they actually mean.
+      </p>
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Filter terms"
+          aria-label="Filter glossary terms"
+          className="w-full rounded-xl border border-surface-border bg-white py-2.5 pl-10 pr-4 text-[14px] text-brand-navy-700 shadow-soft outline-none transition placeholder:text-brand-muted-400 focus:border-brand-plum-300 focus:ring-2 focus:ring-brand-plum-100"
+        />
+      </div>
+      <GuideCard as="div" className="mt-4 overflow-hidden p-0 sm:p-0">
+        <ul className="divide-y divide-surface-border">
+          {items.map((entry) => {
+            const isOpen = openTerm === entry.term;
+            return (
+              <li key={entry.term}>
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpenTerm(isOpen ? null : entry.term)}
+                  className={cn(
+                    'flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition duration-200 sm:px-5',
+                    isOpen ? 'bg-surface-subtle/50' : 'hover:bg-surface-subtle/40',
+                  )}
+                >
+                  <span className="text-[14px] font-bold text-primary">{entry.term}</span>
+                  <ChevronDown
+                    className={cn(
+                      'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                      isOpen && 'rotate-180',
+                    )}
+                  />
+                </button>
+                <div className="toolbox-reveal grid" data-open={isOpen ? 'true' : 'false'}>
+                  <div className="toolbox-reveal-inner min-h-0">
+                    <div className="toolbox-reveal-content px-4 pb-3.5 sm:px-5">
+                      <p className="text-[13px] leading-relaxed text-brand-muted-600">{entry.def}</p>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+          {items.length === 0 && (
+            <li className="px-4 py-4 text-[13px] text-brand-muted-500 sm:px-5">
+              No terms match &ldquo;{query}&rdquo;.
+            </li>
+          )}
+        </ul>
+      </GuideCard>
+    </div>
+  );
+}
+
+/* ─── page ─────────────────────────────────────────────────── */
+
+const ABA_SECTIONS: ChooserSection[] = [
+  {
+    id: 'study',
+    label: 'What ABA is',
+    description: 'The honest definition, in plain language.',
+    cardClass: 'border-sky-200/80 bg-gradient-to-br from-sky-50 to-white',
+    accentClass: 'text-sky-700',
+    content: <DefinitionPanel />,
+  },
+  {
+    id: 'experience',
+    label: 'A real session',
+    description: 'Five phases, from arrival to wrap-up.',
+    cardClass: 'border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white',
+    accentClass: 'text-emerald-700',
+    content: <SessionStepper />,
+  },
+  {
+    id: 'myths',
+    label: 'Myths vs reality',
+    description: 'Five concerns — and what is actually true.',
+    cardClass: 'border-rose-200/80 bg-gradient-to-br from-rose-50 to-white',
+    accentClass: 'text-rose-700',
+    content: <MythsPanel />,
+  },
+  {
+    id: 'green-flags',
+    label: "Signs it's going well",
+    description: 'Green flags — and what to bring to your BCBA.',
+    cardClass: 'border-amber-200/80 bg-gradient-to-br from-amber-50 to-white',
+    accentClass: 'text-amber-700',
+    aliases: ['outcomes'],
+    content: <GoingWellPanel />,
+  },
+  {
+    id: 'questions',
+    label: 'Questions to ask',
+    description: 'Six questions you are encouraged to ask.',
+    cardClass: 'border-brand-plum-200/80 bg-gradient-to-br from-brand-plum-50 to-white',
+    accentClass: 'text-brand-plum-700',
+    content: <QuestionsPanel />,
+  },
+  {
+    id: 'glossary',
+    label: 'Plain-English glossary',
+    description: '10 terms, filterable, no jargon.',
+    cardClass: 'border-violet-200/80 bg-gradient-to-br from-violet-50 to-white',
+    accentClass: 'text-violet-700',
+    content: <GlossaryPanel />,
+  },
+];
 
 export default function WhatIsABAPage() {
-  const [openMyth, setOpenMyth] = useState<number | null>(null);
-  const [openGlossary, setOpenGlossary] = useState(false);
-  const [openQuestions, setOpenQuestions] = useState(false);
-
   return (
     <div className="page-shell pb-10">
 
-      {/* Header — same treatment as Guides & Strategies */}
+      {/* Compact hero */}
       <header className="page-header max-w-3xl">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-          Understanding ABA
-        </p>
-        <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700">
-          <BookOpen className="h-3.5 w-3.5" /> Plain English. No jargon.
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Understanding ABA
+          </p>
+          <span className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+            <BookOpen className="h-3.5 w-3.5" /> Plain English. No jargon.
+          </span>
         </div>
         <h1 className="page-title text-brand-navy-700">
           What ABA actually is — and what it isn&apos;t.
@@ -184,329 +626,10 @@ export default function WhatIsABAPage() {
         </p>
       </header>
 
-      {/* 3-up intro row — anchors to the page's key sections */}
-      <section aria-label="Jump to a section" className="grid gap-3 sm:grid-cols-3">
-        <QuickIntroCard
-          label="A real session"
-          description="Walk through what your child actually experiences, phase by phase."
-          href="#experience"
-          cardClass="border-sky-200/80 bg-gradient-to-br from-sky-50 to-white"
-          accentClass="text-sky-700"
-        />
-        <QuickIntroCard
-          label="Myths vs reality"
-          description="What you may have heard — and what is actually true."
-          href="#myths"
-          cardClass="border-rose-200/80 bg-gradient-to-br from-rose-50 to-white"
-          accentClass="text-rose-700"
-        />
-        <QuickIntroCard
-          label="Questions to ask"
-          description="What you are allowed — and encouraged — to ask your BCBA."
-          href="#questions"
-          cardClass="border-brand-plum-200/80 bg-gradient-to-br from-brand-plum-50 to-white"
-          accentClass="text-brand-plum-700"
-        />
-      </section>
-
-      <div className="lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
-        <StickyToc items={ABA_TOC} />
-        <div className="space-y-8 md:space-y-10">
-
-      {/* 01 — The honest definition */}
-      <section id="study" className="scroll-mt-24">
-        <GuideSectionHeading icon={Brain} title="What behavior analysts actually study" />
-        <GuideCard as="div">
-          <div className="mb-3">
-            <BadgePill className={ACCENT.sky.badge}>The honest definition</BadgePill>
-          </div>
-          <div className="space-y-3">
-            <p className="text-[14px] leading-relaxed text-brand-muted-700">
-              Applied Behavior Analysis is the scientific study of how behavior works — specifically, how the
-              environment (everything around a person: people, settings, events, consequences) shapes what a person
-              does. Behavior analysts study the relationship between a behavior and its causes and consequences,
-              and use that understanding to help people build skills they need.
-            </p>
-            <p className="text-[14px] leading-relaxed text-brand-muted-700">
-              For children with autism, this means: figuring out <em>why</em> your child does what they do — what need
-              is being communicated, what is reinforcing the behavior, what is making learning hard — and then
-              systematically teaching skills that help them communicate, connect, and navigate the world more effectively.
-            </p>
-            <p className="text-[14px] leading-relaxed text-brand-muted-700">
-              The &ldquo;applied&rdquo; part is important. This is not laboratory science. It is science in real rooms with real
-              children, adapting constantly to what is actually working for this specific person.
-            </p>
-          </div>
-        </GuideCard>
-      </section>
-
-      {/* 02 — A real session */}
-      <section id="experience" className="scroll-mt-24">
-        <GuideSectionHeading
-          icon={Lightbulb}
-          title="What your child is actually experiencing"
-          meta="5 phases"
-        />
-        <p className="-mt-2 mb-4 text-[13px] italic text-brand-muted-500">
-          Walk through a typical session — not as a checklist, but as it actually feels.
-        </p>
-        <div className="space-y-4">
-          {sessionPhases.map((phase) => (
-            <GuideCard as="div" key={phase.phase}>
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <BadgePill className={ACCENT[phase.color].badge}>{phase.phase}</BadgePill>
-                <TagPill>{phase.time}</TagPill>
-              </div>
-              <p className="text-[13px] leading-relaxed text-brand-muted-700">{phase.story}</p>
-            </GuideCard>
-          ))}
-        </div>
-      </section>
-
-      {/* 03 — Myths vs reality (accordion cards) */}
-      <section id="myths" className="scroll-mt-24">
-        <GuideSectionHeading
-          icon={HelpCircle}
-          title="What you may have heard — and what is actually true"
-          meta="5 myths"
-        />
-        <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-          Every one of these concerns is valid to bring. Click each one to see the reality.
-        </p>
-        <div className="space-y-3">
-          {myths.map((item, i) => {
-            const accent = ACCENT[item.color];
-            const isOpen = openMyth === i;
-            return (
-              <GuideCard as="div" key={i} className="overflow-hidden p-0 sm:p-0">
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  onClick={() => setOpenMyth(isOpen ? null : i)}
-                  className={cn(
-                    'flex w-full items-center gap-3 px-4 py-4 text-left transition duration-200 sm:px-5',
-                    isOpen ? 'bg-surface-subtle/50' : 'hover:bg-surface-subtle/40',
-                  )}
-                >
-                  <XCircle
-                    className={cn(
-                      'h-4 w-4 shrink-0',
-                      isOpen ? accent.icon : 'text-brand-muted-300',
-                    )}
-                  />
-                  <span className="min-w-0 flex-1 text-[14px] font-semibold text-brand-navy-700">
-                    {item.myth}
-                  </span>
-                  <BadgePill className={cn('hidden sm:inline-flex', accent.badge)}>
-                    Myth
-                  </BadgePill>
-                  <ChevronDown
-                    className={cn(
-                      'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
-                      isOpen && 'rotate-180',
-                    )}
-                  />
-                </button>
-                <div className="toolbox-reveal grid" data-open={isOpen ? 'true' : 'false'}>
-                  <div className="toolbox-reveal-inner min-h-0">
-                    <div className="toolbox-reveal-content border-t border-surface-border bg-surface-subtle/30 px-4 py-4 sm:px-5">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle2 className={cn('mt-0.5 h-4 w-4 shrink-0', accent.icon)} />
-                        <div>
-                          <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-brand-muted-500">
-                            The reality
-                          </p>
-                          <p className="text-[13px] leading-relaxed text-brand-muted-700">
-                            {item.reality}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </GuideCard>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 04 — Green flags + things to bring to BCBA */}
-      <section id="green-flags" className="scroll-mt-24">
-        <GuideSectionHeading
-          icon={CheckCircle2}
-          title="How to know if therapy is going well"
-          meta="5 + 5 signs"
-        />
-        <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-          Progress isn&apos;t always visible in the way parents expect. Here are the real signs — and what to
-          bring to your BCBA if something doesn&apos;t feel right.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <GuideCard as="div">
-            <div className="mb-3">
-              <BadgePill className={ACCENT.emerald.badge}>5 green flags</BadgePill>
-            </div>
-            <ul className="divide-y divide-surface-border">
-              {greenFlags.map((flag, i) => (
-                <li key={i} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" />
-                  <span className="text-[13px] leading-relaxed text-brand-muted-700">{flag}</span>
-                </li>
-              ))}
-            </ul>
-          </GuideCard>
-          <GuideCard as="div">
-            <div className="mb-3">
-              <BadgePill className={ACCENT.amber.badge}>5 things to bring to your BCBA</BadgePill>
-            </div>
-            <ul className="divide-y divide-surface-border">
-              {thingsToBringToBCBA.map((item, i) => (
-                <li key={i} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
-                  <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                  <span className="text-[13px] leading-relaxed text-brand-muted-700">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </GuideCard>
-        </div>
-      </section>
-
-      {/* 05 — Questions you can ask (collapsible) */}
-      <section id="questions" className="scroll-mt-24">
-        <GuideCard as="div" className="overflow-hidden p-0 sm:p-0">
-          <button
-            type="button"
-            aria-expanded={openQuestions}
-            onClick={() => setOpenQuestions(!openQuestions)}
-            className={cn(
-              'flex w-full items-center gap-3 px-4 py-4 text-left transition duration-200 sm:px-5',
-              openQuestions ? 'bg-brand-plum-50/50' : 'hover:bg-surface-subtle/40',
-            )}
-          >
-            <span
-              className={cn(
-                'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition',
-                openQuestions
-                  ? 'border-brand-plum-200 bg-brand-plum-100 text-brand-plum-700'
-                  : 'border-surface-border bg-primary/5 text-primary',
-              )}
-            >
-              <HelpCircle className="h-4 w-4" aria-hidden />
-            </span>
-            <span className="min-w-0 flex-1">
-              <h2 className="text-[15px] font-semibold text-brand-navy-700">
-                Questions you are allowed — and encouraged — to ask
-              </h2>
-              <span className="mt-0.5 block text-[13px] text-brand-muted-600">
-                You are not bothering your BCBA. This is your child&apos;s program. You deserve to understand it.
-              </span>
-            </span>
-            <span className="hidden shrink-0 text-[12px] font-medium text-brand-muted-500 sm:block">
-              6 questions
-            </span>
-            <ChevronDown
-              className={cn(
-                'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
-                openQuestions && 'rotate-180',
-              )}
-            />
-          </button>
-          <div className="toolbox-reveal grid" data-open={openQuestions ? 'true' : 'false'}>
-            <div className="toolbox-reveal-inner min-h-0">
-              <div className="toolbox-reveal-content border-t border-surface-border bg-surface-subtle/30 px-4 py-4 sm:px-5">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {questionsYouCanAsk.map((item, i) => (
-                    <div key={i} className="rounded-xl border border-surface-border bg-white p-4">
-                      <p className="text-[14px] font-semibold italic text-brand-navy-700">{item.q}</p>
-                      <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">{item.note}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </GuideCard>
-      </section>
-
-      {/* 06 — Parent involvement and outcomes */}
-      <section id="outcomes" className="scroll-mt-24">
-        <GuideSectionHeading
-          icon={Users}
-          title="Parent involvement and outcomes — what the research shows"
-          meta="4 findings"
-        />
-        <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-          The research on this is consistent and significant: children whose parents are actively involved
-          in ABA therapy make faster progress, generalize skills more effectively, and maintain gains over time.
-          This is not about pressure on you — it is about explaining why your BCBA keeps inviting you into sessions
-          and asking about what happens at home.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {involvementFindings.map((item, i) => (
-            <GuideCard as="div" key={i}>
-              <h3 className="text-[15px] font-bold leading-snug text-brand-navy-700">{item.title}</h3>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">{item.body}</p>
-            </GuideCard>
-          ))}
-        </div>
-      </section>
-
-      {/* 07 — Glossary (collapsible) */}
-      <section id="glossary" className="scroll-mt-24">
-        <GuideCard as="div" className="overflow-hidden p-0 sm:p-0">
-          <button
-            type="button"
-            aria-expanded={openGlossary}
-            onClick={() => setOpenGlossary(!openGlossary)}
-            className={cn(
-              'flex w-full items-center gap-3 px-4 py-4 text-left transition duration-200 sm:px-5',
-              openGlossary ? 'bg-brand-plum-50/50' : 'hover:bg-surface-subtle/40',
-            )}
-          >
-            <span
-              className={cn(
-                'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border transition',
-                openGlossary
-                  ? 'border-brand-plum-200 bg-brand-plum-100 text-brand-plum-700'
-                  : 'border-surface-border bg-primary/5 text-primary',
-              )}
-            >
-              <BookOpen className="h-4 w-4" aria-hidden />
-            </span>
-            <span className="min-w-0 flex-1">
-              <h2 className="text-[15px] font-semibold text-brand-navy-700">
-                10 ABA terms you will hear — in plain English
-              </h2>
-              <span className="mt-0.5 block text-[13px] text-brand-muted-600">
-                You should not need a degree to understand your child&apos;s therapy. These are the words you will
-                hear most often, and what they actually mean.
-              </span>
-            </span>
-            <span className="hidden shrink-0 text-[12px] font-medium text-brand-muted-500 sm:block">
-              10 terms
-            </span>
-            <ChevronDown
-              className={cn(
-                'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
-                openGlossary && 'rotate-180',
-              )}
-            />
-          </button>
-          <div className="toolbox-reveal grid" data-open={openGlossary ? 'true' : 'false'}>
-            <div className="toolbox-reveal-inner min-h-0">
-              <div className="toolbox-reveal-content border-t border-surface-border bg-surface-subtle/30 px-4 py-4 sm:px-5">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {glossary.map((entry, i) => (
-                    <div key={i} className="rounded-xl border border-surface-border bg-white p-4">
-                      <p className="text-[14px] font-bold text-primary">{entry.term}</p>
-                      <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">{entry.def}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </GuideCard>
+      {/* "What do you need?" chooser */}
+      <section aria-label="What do you need?">
+        <GuideSectionHeading title="What do you need?" meta="Pick a topic" />
+        <SectionChooser ariaLabel="What Is ABA topics" sections={ABA_SECTIONS} />
       </section>
 
       {/* Closing — styled like the resources closing band */}
@@ -529,9 +652,6 @@ export default function WhatIsABAPage() {
           detail="Mental health toolbox"
         />
       </SupportCalloutBand>
-
-        </div>
-      </div>
 
     </div>
   );

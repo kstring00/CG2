@@ -7,21 +7,12 @@
  */
 
 import Link from 'next/link';
+import { forwardRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-/* ── Hero 3-up intro card ──────────────────────────────────────
-   On /support/resources these toggle need filters (onClick);
-   on guide pages they can anchor to sections (href). */
-export function QuickIntroCard({
-  label,
-  description,
-  cardClass,
-  accentClass,
-  href,
-  onClick,
-  active,
-}: {
+interface QuickIntroCardProps
+  extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   label: string;
   description: string;
   /** Border + gradient background classes */
@@ -31,42 +22,54 @@ export function QuickIntroCard({
   href?: string;
   onClick?: () => void;
   active?: boolean;
-}) {
-  const className = cn(
-    'group rounded-2xl border p-4 text-left shadow-soft transition duration-200',
-    cardClass,
-    active && 'ring-2 ring-primary/20',
-  );
-  const content = (
-    <>
-      <div className="flex items-start justify-between gap-2">
-        <p className={cn('text-sm font-bold', accentClass)}>{label}</p>
-        <ArrowRight
-          className={cn(
-            'h-4 w-4 shrink-0 transition group-hover:translate-x-0.5',
-            accentClass,
-          )}
-        />
-      </div>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
-        {description}
-      </p>
-    </>
-  );
-
-  if (href) {
-    return (
-      <a href={href} className={cn(className, 'block')}>
-        {content}
-      </a>
-    );
-  }
-  return (
-    <button type="button" onClick={onClick} className={className}>
-      {content}
-    </button>
-  );
 }
+
+/* ── Hero 3-up intro card / chooser card ───────────────────────
+   On /support/resources these toggle need filters (onClick);
+   on guide pages they anchor to sections (href) or act as
+   tabs/accordion triggers (ref + ARIA attrs pass through). */
+export const QuickIntroCard = forwardRef<HTMLButtonElement, QuickIntroCardProps>(
+  function QuickIntroCard(
+    { label, description, cardClass, accentClass, href, onClick, active, className, ...rest },
+    ref,
+  ) {
+    const classes = cn(
+      'group rounded-2xl border p-4 text-left shadow-soft transition duration-200',
+      cardClass,
+      active && 'ring-2 ring-primary/20',
+      className,
+    );
+    const content = (
+      <>
+        <div className="flex items-start justify-between gap-2">
+          <p className={cn('text-sm font-bold', accentClass)}>{label}</p>
+          <ArrowRight
+            className={cn(
+              'h-4 w-4 shrink-0 transition group-hover:translate-x-0.5',
+              accentClass,
+            )}
+          />
+        </div>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
+          {description}
+        </p>
+      </>
+    );
+
+    if (href) {
+      return (
+        <a href={href} className={cn(classes, 'block')}>
+          {content}
+        </a>
+      );
+    }
+    return (
+      <button ref={ref} type="button" onClick={onClick} className={classes} {...rest}>
+        {content}
+      </button>
+    );
+  },
+);
 
 /* ── Section heading: title + optional icon chip + meta line ── */
 export function GuideSectionHeading({
