@@ -26,6 +26,15 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
+  BadgePill,
+  GuideCard,
+  GuideSectionHeading,
+  QuickIntroCard,
+  SupportActionCard,
+  SupportCalloutBand,
+  TagPill,
+} from '@/components/support/GuideCards';
+import {
   GUIDE_NEED_OPTIONS,
   QUICK_FILTER_NEEDS,
   getDefaultFeatured,
@@ -224,34 +233,17 @@ export default function ResourcesPage() {
         aria-label="Quick filters"
         className="mt-5 grid gap-3 sm:grid-cols-3"
       >
-        {QUICK_FILTERS.map((filter) => {
-          const active = isQuickFilterActive(filter.id);
-          return (
-            <button
-              key={filter.id}
-              type="button"
-              onClick={() => toggleQuickFilter(filter.id)}
-              className={cn(
-                'group rounded-2xl border p-4 text-left shadow-soft transition duration-200',
-                filter.className,
-                active && 'ring-2 ring-primary/20',
-              )}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <p className={cn('text-sm font-bold', filter.accent)}>{filter.label}</p>
-                <ArrowRight
-                  className={cn(
-                    'h-4 w-4 shrink-0 transition group-hover:translate-x-0.5',
-                    filter.accent,
-                  )}
-                />
-              </div>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
-                {filter.description}
-              </p>
-            </button>
-          );
-        })}
+        {QUICK_FILTERS.map((filter) => (
+          <QuickIntroCard
+            key={filter.id}
+            label={filter.label}
+            description={filter.description}
+            cardClass={filter.className}
+            accentClass={filter.accent}
+            onClick={() => toggleQuickFilter(filter.id)}
+            active={isQuickFilterActive(filter.id)}
+          />
+        ))}
       </section>
 
       {/* Need matcher */}
@@ -297,12 +289,10 @@ export default function ResourcesPage() {
 
       {/* Best place to start */}
       <section aria-label="Best place to start" className="mt-10">
-        <div className="mb-4 flex items-end justify-between gap-3">
-          <h2 className="text-xl font-bold text-brand-navy-700">Best place to start</h2>
-          {(hasNeeds || hasSearch) && (
-            <p className="text-[12px] font-medium text-brand-muted-500">Updated for you</p>
-          )}
-        </div>
+        <GuideSectionHeading
+          title="Best place to start"
+          meta={hasNeeds || hasSearch ? 'Updated for you' : undefined}
+        />
         <div className="grid gap-4 sm:grid-cols-3">
           {starters.map((resource) => (
             <StarterCard key={resource.id} resource={resource} />
@@ -312,12 +302,10 @@ export default function ResourcesPage() {
 
       {/* Featured resources */}
       <section aria-label="Featured resources" className="mt-10">
-        <div className="mb-4 flex items-end justify-between gap-3">
-          <h2 className="text-xl font-bold text-brand-navy-700">Featured resources</h2>
-          <span className="text-[12px] font-medium text-brand-muted-500">
-            {featured.length} curated
-          </span>
-        </div>
+        <GuideSectionHeading
+          title="Featured resources"
+          meta={`${featured.length} curated`}
+        />
         {featured.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {featured.map((resource) => (
@@ -337,7 +325,7 @@ export default function ResourcesPage() {
 
       {/* Browse by category */}
       <section aria-label="Browse by category" className="mt-10">
-        <h2 className="mb-4 text-xl font-bold text-brand-navy-700">Browse by category</h2>
+        <GuideSectionHeading title="Browse by category" />
         <div className="rounded-2xl border border-surface-border bg-white shadow-soft">
           {browseOrder.map((category) => {
             const Icon = CATEGORY_ICONS[category.id];
@@ -429,33 +417,30 @@ export default function ResourcesPage() {
       </section>
 
       {/* Bottom callout */}
-      <section className="mt-10 rounded-3xl border border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 via-rose-50/40 to-white p-6 shadow-soft sm:p-8">
-        <h2 className="text-xl font-bold text-brand-navy-700">Need help right now?</h2>
-        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-brand-muted-700">
-          You are not alone. Get support that fits what you need today.
-        </p>
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <SupportActionCard
-            href="/support/caregiver"
-            icon={Heart}
-            title="Mental health for caregivers"
-            detail="Quick resets & tools"
-          />
-          <SupportActionCard
-            href="/support/find"
-            icon={MapPin}
-            title="Find local help"
-            detail="Therapists, groups, resources"
-          />
-          <SupportActionCard
-            href="tel:988"
-            icon={Phone}
-            title="Crisis support"
-            detail="Call or text 988 — 24/7"
-            crisis
-          />
-        </div>
-      </section>
+      <SupportCalloutBand
+        title="Need help right now?"
+        text="You are not alone. Get support that fits what you need today."
+      >
+        <SupportActionCard
+          href="/support/caregiver"
+          icon={Heart}
+          title="Mental health for caregivers"
+          detail="Quick resets & tools"
+        />
+        <SupportActionCard
+          href="/support/find"
+          icon={MapPin}
+          title="Find local help"
+          detail="Therapists, groups, resources"
+        />
+        <SupportActionCard
+          href="tel:988"
+          icon={Phone}
+          title="Crisis support"
+          detail="Call or text 988 — 24/7"
+          crisis
+        />
+      </SupportCalloutBand>
 
       {demoModalOpen && (
         <DemoModal onClose={() => setDemoModalOpen(null)} />
@@ -509,16 +494,11 @@ function FeaturedResourceCard({
   onDemoClick: () => void;
 }) {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-surface-border bg-white p-4 shadow-soft transition duration-200 hover:border-brand-plum-100 hover:shadow-card sm:p-5">
+    <GuideCard>
       <div className="mb-3 flex items-start justify-between gap-2">
-        <span
-          className={cn(
-            'inline-flex rounded-lg border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide',
-            resource.categoryPillClass,
-          )}
-        >
+        <BadgePill className={resource.categoryPillClass}>
           {resource.categoryLabel}
-        </span>
+        </BadgePill>
         <button
           type="button"
           onClick={onToggleSave}
@@ -541,12 +521,7 @@ function FeaturedResourceCard({
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {resource.tags.slice(0, 3).map((tag) => (
-          <span
-            key={tag}
-            className="rounded-md bg-surface-muted px-2 py-0.5 text-[10px] font-medium text-brand-muted-500"
-          >
-            {tag}
-          </span>
+          <TagPill key={tag}>{tag}</TagPill>
         ))}
       </div>
       <div className="mt-auto border-t border-surface-border pt-3">
@@ -561,7 +536,7 @@ function FeaturedResourceCard({
           View resource <ArrowUpRight className="h-3.5 w-3.5" />
         </ResourceCta>
       </div>
-    </article>
+    </GuideCard>
   );
 }
 
@@ -646,55 +621,6 @@ function ResourceCta({
   return (
     <Link href={resource.href} className={className}>
       {children}
-    </Link>
-  );
-}
-
-function SupportActionCard({
-  href,
-  icon: Icon,
-  title,
-  detail,
-  crisis,
-}: {
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  detail: string;
-  crisis?: boolean;
-}) {
-  const className = cn(
-    'group flex items-center gap-3 rounded-2xl border bg-white p-4 shadow-soft transition hover:shadow-card',
-    crisis ? 'border-rose-200 hover:border-rose-300' : 'border-surface-border hover:border-brand-plum-200',
-  );
-  const inner = (
-    <>
-      <span
-        className={cn(
-          'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
-          crisis ? 'bg-rose-50 text-rose-600' : 'bg-brand-plum-50 text-brand-plum-600',
-        )}
-      >
-        <Icon className="h-4 w-4" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-semibold text-brand-navy-700">{title}</p>
-        <p className="text-[12px] text-brand-muted-600">{detail}</p>
-      </div>
-      <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400 transition group-hover:translate-x-0.5 group-hover:text-primary" />
-    </>
-  );
-
-  if (href.startsWith('tel:')) {
-    return (
-      <a href={href} className={className}>
-        {inner}
-      </a>
-    );
-  }
-  return (
-    <Link href={href} className={className}>
-      {inner}
     </Link>
   );
 }
