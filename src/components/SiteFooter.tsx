@@ -17,7 +17,7 @@ export default function SiteFooter() {
             href="/about/in-review"
             className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-wide text-amber-800 transition hover:bg-amber-100"
           >
-            In Review &middot; Learn More
+            In Review &middot; Being built in the open
           </Link>
           <Link href="/privacy" className="hover:text-brand-muted-700">
             Privacy
