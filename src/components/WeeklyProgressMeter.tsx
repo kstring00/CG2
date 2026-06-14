@@ -88,7 +88,13 @@ export default function WeeklyProgressMeter({
   return <RailMeter summary={summary} className={className} />;
 }
 
-function MeterTrack({ summary }: { summary: WeeklyProgressSummary }) {
+function MeterTrack({
+  summary,
+  compact,
+}: {
+  summary: WeeklyProgressSummary;
+  compact?: boolean;
+}) {
   const { totalNotches, filledNotches } = summary;
   return (
     <div
@@ -97,7 +103,7 @@ function MeterTrack({ summary }: { summary: WeeklyProgressSummary }) {
       aria-valuemax={totalNotches}
       aria-valuenow={filledNotches}
       aria-label={`Week progress: ${filledNotches} of ${totalNotches} steps complete`}
-      className="flex w-full items-center gap-1.5"
+      className="flex w-full items-center gap-1"
     >
       {Array.from({ length: totalNotches }).map((_, i) => {
         const filled = i < filledNotches;
@@ -106,12 +112,13 @@ function MeterTrack({ summary }: { summary: WeeklyProgressSummary }) {
           <span
             key={i}
             className={[
-              'h-2 flex-1 rounded-full transition-colors duration-300',
+              compact ? 'h-1' : 'h-2',
+              'flex-1 rounded-full transition-colors duration-300',
               filled
                 ? isIntake
                   ? 'bg-brand-plum-600'
                   : 'bg-primary'
-                : 'bg-stone-200',
+                : 'bg-stone-200/90',
             ].join(' ')}
             aria-hidden
           />
@@ -206,109 +213,51 @@ function PanelMeter({
   summary: WeeklyProgressSummary;
   className?: string;
 }) {
-  const {
-    filledNotches,
-    totalNotches,
-    nextLabel,
-    nextHref,
-    weekComplete,
-    intakeDoneThisWeek,
-    noPlanYet,
-    completedStepKeys,
-  } = summary;
-  const planStepCount = Math.max(0, totalNotches - 1);
-  const stepsDone = completedStepKeys.length;
+  const { filledNotches, totalNotches, nextLabel, nextHref, weekComplete, noPlanYet, intakeDoneThisWeek } =
+    summary;
+
+  const nextText = weekComplete
+    ? 'Week complete'
+    : noPlanYet
+      ? 'Build a plan'
+      : !intakeDoneThisWeek
+        ? 'Start check-in'
+        : nextLabel;
 
   return (
     <section
-      aria-label={`Weekly progress: ${filledNotches} of ${totalNotches} notches filled`}
+      aria-label={`Weekly progress: ${filledNotches} of ${totalNotches} steps done`}
       className={[
-        'rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6',
+        'rounded-xl border border-surface-border/70 bg-surface-muted/25 px-4 py-3',
         className ?? '',
       ].join(' ')}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-500">
-            Where you are this week
-          </p>
-          <h2 className="mt-1 text-xl font-semibold text-brand-navy-700 sm:text-2xl">
-            {weekComplete
-              ? 'You finished this week’s plan.'
-              : !intakeDoneThisWeek
-              ? 'Start with this week’s check-in.'
-              : 'Keep going — one step at a time.'}
-          </h2>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-700">
-            The meter has <span className="font-semibold text-brand-muted-900">{totalNotches}</span> notches this week:
-            {' '}1 for the weekly check-in + {planStepCount} for your priority plan {planStepCount === 1 ? 'step' : 'steps'}.
-            It empties every Monday.
-          </p>
-        </div>
-        <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-brand-muted-700">
-          {filledNotches} / {totalNotches}
-        </span>
-      </div>
-
-      <div className="mt-4">
-        <MeterTrack summary={summary} />
-      </div>
-
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-brand-muted-600">
-        <span className="inline-flex items-center gap-1">
-          <span
-            aria-hidden
-            className={
-              'inline-block h-2 w-2 rounded-full ' +
-              (intakeDoneThisWeek ? 'bg-brand-plum-600' : 'bg-stone-300')
-            }
-          />
-          Check-in {intakeDoneThisWeek ? 'done' : 'not yet'}
-        </span>
-        <span aria-hidden className="text-brand-muted-300">·</span>
-        <span className="inline-flex items-center gap-1">
-          <span aria-hidden className="inline-block h-2 w-2 rounded-full bg-primary" />
-          Plan steps: {stepsDone} of {planStepCount} done
-        </span>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[13px] text-brand-muted-700">
-          {weekComplete ? (
-            <span>Lovely. Come back Monday for a fresh check-in.</span>
-          ) : noPlanYet ? (
-            <span>
-              <span className="font-semibold text-brand-plum-700">Next:</span> build a plan so
-              the meter has steps to track.
-            </span>
-          ) : !intakeDoneThisWeek ? (
-            <span>
-              <span className="font-semibold text-brand-plum-700">Next:</span> this week&rsquo;s
-              check-in — that&rsquo;s notch 1 of {totalNotches}.
-            </span>
-          ) : (
-            <span>
-              <span className="font-semibold text-primary">Up next:</span> {nextLabel}{' '}
-              <span className="text-brand-muted-500">
-                (notch {filledNotches + 1} of {totalNotches})
-              </span>
-            </span>
-          )}
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[11px] font-medium text-brand-muted-500">
+          This week
         </p>
-        <Link
-          href={nextHref}
-          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3.5 py-2 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-        >
-          {weekComplete
-            ? 'Open my plan'
-            : noPlanYet
-            ? 'Build my plan'
-            : !intakeDoneThisWeek
-            ? 'Start check-in'
-            : 'Open next step'}{' '}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        <span className="text-[11px] tabular-nums text-brand-muted-600">
+          {filledNotches}/{totalNotches}
+        </span>
       </div>
+
+      <div className="mt-2">
+        <MeterTrack summary={summary} compact />
+      </div>
+
+      <Link
+        href={nextHref}
+        className="mt-2.5 inline-flex max-w-full items-center gap-1 text-[12.5px] font-medium text-brand-muted-700 transition hover:text-primary"
+      >
+        <span className="truncate">
+          {weekComplete ? (
+            <span className="text-emerald-700">{nextText}</span>
+          ) : (
+            nextText
+          )}
+        </span>
+        <ArrowRight className="h-3.5 w-3.5 shrink-0 opacity-60" aria-hidden />
+      </Link>
     </section>
   );
 }
