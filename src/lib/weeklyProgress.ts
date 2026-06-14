@@ -19,13 +19,18 @@
  * what would be required to send a real Monday email or run a scheduled job.
  */
 
-import { loadBandwidth } from './bandwidth';
 import {
   getStepCompletionKey,
   loadCarePlan,
   type CarePlanStep,
 } from './carePlanStorage';
-import { TIER_STEP_LIMIT } from './bandwidth';
+import { loadBandwidth } from './bandwidth';
+import {
+  getCarePlanBucketSteps,
+  getCarePlanWeekView,
+  resolvedCompletionKeys,
+} from './carePlanDisplay';
+import { computeWeekNumber, loadCheckInState } from './weeklyCheckIn';
 
 const KEY = 'cg.weeklyProgress.v1';
 const PREV_KEY = 'cg.weeklyProgress.prev.v1';
@@ -190,6 +195,34 @@ export function loadWeeklyProgress(now: Date = new Date()): WeeklyProgress {
   return fresh;
 }
 
+/** Last week's archived progress (after Monday rollover), if any. */
+export function loadPreviousWeeklyProgress(): WeeklyProgress | null {
+  if (!isBrowser()) return null;
+  try {
+    const raw = window.localStorage.getItem(PREV_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<WeeklyProgress> | null;
+    if (!parsed || typeof parsed.weekStart !== 'string') return null;
+    return {
+      version: 1,
+      weekStart: parsed.weekStart,
+      intakeDoneAt: typeof parsed.intakeDoneAt === 'string' ? parsed.intakeDoneAt : null,
+      completedStepKeys: Array.isArray(parsed.completedStepKeys)
+        ? parsed.completedStepKeys.filter((s): s is string => typeof s === 'string')
+        : [],
+      ...(Array.isArray(parsed.completedStepHrefs)
+        ? {
+            completedStepHrefs: parsed.completedStepHrefs.filter(
+              (s): s is string => typeof s === 'string',
+            ),
+          }
+        : {}),
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** Mark this week's intake/check-in as done. Idempotent. */
 export function markWeeklyIntakeDone(now: Date = new Date()): WeeklyProgress {
   const current = loadWeeklyProgress(now);
@@ -235,14 +268,14 @@ export function resetWeeklyProgress(now: Date = new Date()): WeeklyProgress {
  *   - the current week's progress object
  *   - the bandwidth result (so a fresh BandwidthCheck this week implicitly
  *     fills the intake notch — the parent doesn't have to do it twice)
- *   - the saved care plan, which provides the *list* of steps. The plan
- *     today is sized by the parent's bandwidth tier (TIER_STEP_LIMIT), so
- *     the meter uses the same visible-step count to stay honest.
+ *   - the saved care plan's bucket steps (same list as /support/care-plan)
  */
 export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgressSummary {
   const progress = loadWeeklyProgress(now);
   const plan = loadCarePlan();
   const bandwidth = loadBandwidth();
+  const checkIn = loadCheckInState();
+  const weekNumber = computeWeekNumber(checkIn.planStartedAt ?? plan?.createdAt ?? null, now);
 
   // Bandwidth recorded inside this calendar week counts as this week's check-in.
   const bandwidthThisWeek = (() => {
@@ -253,18 +286,18 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
   })();
   const intakeDoneThisWeek = Boolean(progress.intakeDoneAt) || bandwidthThisWeek;
 
-  // Care plan steps gated by current tier — that's what the parent actually
-  // sees on /support/care-plan, so the meter shouldn't promise more notches
-  // than steps shown.
-  const tier = bandwidth?.tier ?? 'doing-well';
-  const stepLimit = TIER_STEP_LIMIT[tier];
-  const allSteps = plan?.steps ?? [];
-  const visibleSteps = allSteps.slice(0, stepLimit);
-  const stepCount = visibleSteps.length;
-  const totalNotches = 1 + stepCount; // intake + each visible plan step
-
   const legacyHrefs = progress.completedStepHrefs ?? [];
-  const resolvedKeys = resolveCompletedKeys(progress, visibleSteps);
+  const resolvedKeys = plan
+    ? resolvedCompletionKeys(getCarePlanBucketSteps(plan), progress)
+    : resolveCompletedKeys(progress, []);
+
+  const weekView = plan
+    ? getCarePlanWeekView(plan, weekNumber, resolvedKeys, legacyHrefs)
+    : null;
+  const visibleSteps = weekView?.activeSteps ?? plan?.steps ?? [];
+  const stepCount = visibleSteps.length;
+  const totalNotches = 1 + stepCount; // intake + each active plan step
+
   const validStepKeys = new Set(visibleSteps.map(getStepCompletionKey));
   const completedStepKeys = resolvedKeys.filter((k) => validStepKeys.has(k));
   const filledNotches =

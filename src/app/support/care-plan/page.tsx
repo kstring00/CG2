@@ -36,18 +36,27 @@ import {
 } from '@/lib/carePlanStorage';
 import {
   BUCKET_LABELS,
-  enrichCarePlanStep,
-  generateBucketSteps,
+  getWeekTwoGuideIntro,
   HARDEST_OPTIONS,
 } from '@/lib/generateNextSteps';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
+import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 import {
-  getWeeklyProgressSummary,
+  completedStepTitles,
+  getCarePlanBucketSteps,
+  getCarePlanWeekView,
+  resolvedCompletionKeys,
+} from '@/lib/carePlanDisplay';
+import {
+  isStepComplete,
+  loadPreviousWeeklyProgress,
+  loadWeeklyProgress,
   markStepDone,
   unmarkStepDone,
-  type WeeklyProgressSummary,
+  WEEKLY_PROGRESS_EVENT,
 } from '@/lib/weeklyProgress';
 import {
+  computeWeekNumber,
   ensurePlanStarted,
   type WeeklyCheckInState,
 } from '@/lib/weeklyCheckIn';
@@ -119,7 +128,7 @@ function EmptyState() {
 // ---------------------------------------------------------------------------
 
 const INTAKE_HREF = '/support/intake';
-const STEPS_TO_SHOW = 5;
+const CHECK_IN_HREF = '/support/check-in';
 
 /** Icon per key-concern, mirroring the intake page so the two stay in sync. */
 const HARDEST_ICONS: Record<Hardest, React.ComponentType<{ className?: string }>> = {
@@ -226,14 +235,43 @@ function SectionHeader({
 function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
   const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
   const [emailOpen, setEmailOpen] = useState(false);
-  const [progress, setProgress] = useState<WeeklyProgressSummary | null>(null);
+  const [completedKeys, setCompletedKeys] = useState<string[]>([]);
+  const [legacyHrefs, setLegacyHrefs] = useState<string[]>([]);
+
+  const allBucketSteps = useMemo(() => getCarePlanBucketSteps(plan), [plan]);
+  const weekNumber = checkInState
+    ? computeWeekNumber(checkInState.planStartedAt)
+    : 1;
+
+  const weekView = useMemo(
+    () => getCarePlanWeekView(plan, weekNumber, completedKeys, legacyHrefs),
+    [plan, weekNumber, completedKeys, legacyHrefs],
+  );
+
+  const topSteps = weekView.activeSteps;
+  const weekTwoIntro = useMemo(
+    () => (weekView.weekTwoUnlocked ? getWeekTwoGuideIntro(plan.answers) : null),
+    [plan.answers, weekView.weekTwoUnlocked],
+  );
+  const prevWeekProgress = useMemo(() => loadPreviousWeeklyProgress(), [completedKeys]);
+  const lastWeekDone = useMemo(
+    () => completedStepTitles(allBucketSteps, prevWeekProgress),
+    [allBucketSteps, prevWeekProgress],
+  );
+
+  const refreshProgress = () => {
+    const raw = loadWeeklyProgress();
+    setCompletedKeys(resolvedCompletionKeys(allBucketSteps, raw));
+    setLegacyHrefs(raw.completedStepHrefs ?? []);
+  };
 
   useEffect(() => {
     setCheckInState(ensurePlanStarted(plan.createdAt));
-    setProgress(getWeeklyProgressSummary());
-  }, [plan.createdAt]);
-
-  const refreshProgress = () => setProgress(getWeeklyProgressSummary());
+    refreshProgress();
+    const onUpdate = () => refreshProgress();
+    window.addEventListener(WEEKLY_PROGRESS_EVENT, onUpdate);
+    return () => window.removeEventListener(WEEKLY_PROGRESS_EVENT, onUpdate);
+  }, [plan.createdAt, allBucketSteps]);
 
   const handleToggleStep = (stepKey: string, currentlyDone: boolean) => {
     if (currentlyDone) {
@@ -248,22 +286,8 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
     if (typeof window !== 'undefined') window.print();
   };
 
-  // Display-only: build the numbered "Start here" list. The saved plan.steps
-  // are tier-limited (often 3), so to surface up to 5 ordered priority steps we
-  // reuse the same display helper the page has always used — generateBucketSteps
-  // — which assigns the already-scored candidates across the 5 review buckets.
-  // No scoring or weights change here; this only arranges existing results.
-  const topSteps = useMemo<CarePlanStep[]>(() => {
-    const fromBuckets = generateBucketSteps(plan.answers)
-      .map((b) => b.step)
-      .filter((s): s is CarePlanStep => s !== null);
-    const source = fromBuckets.length ? fromBuckets : plan.steps;
-    return source.slice(0, STEPS_TO_SHOW).map(enrichCarePlanStep);
-  }, [plan.answers, plan.steps]);
-
-  const completedKeys = progress?.completedStepKeys ?? [];
   const isStepDone = (step: CarePlanStep) =>
-    completedKeys.includes(getStepCompletionKey(step));
+    isStepComplete(step, completedKeys, legacyHrefs, allBucketSteps);
   const doneCount = topSteps.filter(isStepDone).length;
 
   // The page computes one resources array; split it for the two lower cards
@@ -351,12 +375,63 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
+      {/* Weekly progress — same meter logic as the layout rail */}
+      <WeeklyProgressMeter variant="panel" className="mt-6" />
+
+      {lastWeekDone.length > 0 && (
+        <section
+          aria-label="Last week recap"
+          className="mt-5 rounded-2xl border border-surface-border bg-surface-muted/40 px-4 py-3 sm:px-5"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+            Last week you finished
+          </p>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {lastWeekDone.map((title) => (
+              <li
+                key={title}
+                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[12px] font-medium text-emerald-800"
+              >
+                <Check className="h-3 w-3" aria-hidden /> {title}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {weekView.weekOneComplete && weekView.weekTwoUnlocked && weekTwoIntro && (
+        <section
+          aria-label="Week two guide"
+          className="mt-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-white p-5 sm:p-6"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            {weekNumber >= 2 ? `Week ${weekNumber}` : 'Ready for week 2'}
+          </p>
+          <h2 className="mt-1 text-lg font-bold text-brand-navy-700">
+            {weekTwoIntro.title}
+          </h2>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-700">
+            {weekTwoIntro.body}
+          </p>
+          <Link
+            href={CHECK_IN_HREF}
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+          >
+            Start your next check-in <ArrowRight className="h-4 w-4" />
+          </Link>
+        </section>
+      )}
+
       {/* 3) START HERE — the strongest section, numbered list */}
       <section aria-label="Start here" className="mt-8">
         <SectionHeader
           icon={Flag}
           title="Start here"
-          subtitle="Your top priority steps, in order."
+          subtitle={
+            weekView.weekTwoUnlocked
+              ? `Week ${Math.max(weekNumber, 2)} — steps built from your intake and what you finished last week.`
+              : 'Your top priority steps for this week.'
+          }
           right={
             <div className="flex items-center gap-2">
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
@@ -385,7 +460,10 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
               <li
                 key={stepKey}
                 className={
-                  'flex gap-3 py-4 transition ' + (isDone ? 'opacity-70' : '')
+                  'flex gap-3 rounded-xl py-4 transition ' +
+                  (isDone
+                    ? 'bg-emerald-50/50 px-3 -mx-3 opacity-90'
+                    : '')
                 }
               >
                 <span
@@ -463,6 +541,40 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
           })}
         </ol>
       </section>
+
+      {!weekView.weekTwoUnlocked && weekView.nextWeekSteps.length > 0 && (
+        <aside
+          aria-label="Saved for next week"
+          className="mt-6 rounded-2xl border border-dashed border-sky-200 bg-sky-50/40 p-5"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
+            Saved for next week
+          </p>
+          <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
+            These become your week-two guide once you finish the steps above.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {weekView.nextWeekSteps.map((step) => (
+              <li
+                key={getStepCompletionKey(step)}
+                className="flex items-start gap-2 rounded-xl border border-sky-100 bg-white/80 px-3 py-2.5"
+              >
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[10px] font-bold text-sky-700">
+                  →
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13px] font-semibold text-brand-navy-700">
+                    {step.title}
+                  </span>
+                  <span className="mt-0.5 block text-[12px] text-brand-muted-500">
+                    {step.because ?? step.why}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )}
 
       {/* 4) LOWER — two compact columns */}
       {resources.length > 0 && (

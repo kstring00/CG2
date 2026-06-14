@@ -23,6 +23,7 @@ import {
   loadCarePlanDraft,
   saveCarePlanDraft,
   clearCarePlanDraft,
+  type CoverageStatus,
   type Hardest,
   type HelpKind,
   type Stage,
@@ -52,6 +53,30 @@ const HARDEST_ICONS: Record<Hardest, React.ComponentType<{ className?: string }>
   'school-iep': GraduationCap,
 };
 
+type CoverageOption = { value: CoverageStatus; label: string; hint: string };
+const COVERAGE_OPTIONS: CoverageOption[] = [
+  {
+    value: 'private-insurance',
+    label: 'Private insurance',
+    hint: 'Employer plan, marketplace, or other commercial coverage.',
+  },
+  {
+    value: 'medicaid-waiver',
+    label: 'Medicaid, CHIP, or waiver',
+    hint: 'Already enrolled or working toward Texas Medicaid / waiver lists.',
+  },
+  {
+    value: 'uninsured-self-pay',
+    label: 'No insurance / paying out of pocket',
+    hint: 'Grants, sliding scale, school services, and nonprofit help — we will not assume a card on file.',
+  },
+  {
+    value: 'not-sure',
+    label: 'Not sure yet',
+    hint: 'We will show every path — nothing that requires insurance first.',
+  },
+];
+
 type StageOption = { value: Stage; label: string; hint: string };
 const STAGE_OPTIONS: StageOption[] = [
   { value: 'newly-diagnosed', label: 'Newly diagnosed', hint: 'A name was just given to something you’ve been seeing.' },
@@ -80,12 +105,14 @@ const HELP_OPTIONS: HelpOption[] = [
 
 type StepKind =
   | 'q-stage'
+  | 'q-coverage'
   | 'q-hardest'
   | 'q-help'
   | 'building';
 
 const STEP_ORDER: StepKind[] = [
   'q-stage',
+  'q-coverage',
   'q-hardest',
   'q-help',
   'building',
@@ -94,6 +121,7 @@ const STEP_ORDER: StepKind[] = [
 // Steps that count toward the parent-facing progress bar (questions only).
 const PROGRESS_STEPS: StepKind[] = [
   'q-stage',
+  'q-coverage',
   'q-hardest',
   'q-help',
 ];
@@ -101,6 +129,7 @@ const PROGRESS_STEPS: StepKind[] = [
 // Per-step background hue — soft, not loud. The form feels like walking through rooms.
 const STEP_HUE: Record<StepKind, string> = {
   'q-stage': 'bg-brand-warm-50',
+  'q-coverage': 'bg-brand-warm-50',
   'q-hardest': 'bg-brand-warm-100',
   'q-help': 'bg-brand-warm-100',
   'building': 'bg-brand-warm-50',
@@ -115,6 +144,7 @@ export default function IntakePage() {
 
   const [stepIdx, setStepIdx] = useState(0);
   const [stage, setStage] = useState<Stage | null>(null);
+  const [coverageStatus, setCoverageStatus] = useState<CoverageStatus | null>(null);
   const [hardest, setHardest] = useState<Hardest[]>([]);
   const [helpKinds, setHelpKinds] = useState<HelpKind[]>([]);
 
@@ -129,6 +159,7 @@ export default function IntakePage() {
     const draft = loadCarePlanDraft();
     if (draft) {
       if (draft.stage) setStage(draft.stage);
+      if (draft.coverageStatus) setCoverageStatus(draft.coverageStatus);
       if (Array.isArray(draft.hardest)) setHardest(draft.hardest);
       if (Array.isArray(draft.helpKinds)) setHelpKinds(draft.helpKinds);
     }
@@ -138,8 +169,8 @@ export default function IntakePage() {
   // Autosave the draft on every answer change once restore has run.
   useEffect(() => {
     if (!draftLoaded) return;
-    saveCarePlanDraft({ stage, hardest, helpKinds });
-  }, [draftLoaded, stage, hardest, helpKinds]);
+    saveCarePlanDraft({ stage, coverageStatus, hardest, helpKinds });
+  }, [draftLoaded, stage, coverageStatus, hardest, helpKinds]);
 
   const step = STEP_ORDER[stepIdx];
   const progressIdx = PROGRESS_STEPS.indexOf(step);
@@ -148,11 +179,12 @@ export default function IntakePage() {
   const canAdvance = useMemo(() => {
     switch (step) {
       case 'q-stage': return stage !== null;
+      case 'q-coverage': return coverageStatus !== null;
       case 'q-hardest': return hardest.length > 0;
       case 'q-help': return helpKinds.length > 0;
       default: return true; // building auto-advances
     }
-  }, [step, stage, hardest, helpKinds]);
+  }, [step, stage, coverageStatus, hardest, helpKinds]);
 
   const next = () => setStepIdx((i) => Math.min(i + 1, STEP_ORDER.length - 1));
   const back = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -168,7 +200,7 @@ export default function IntakePage() {
   // Build & save on 'building' step.
   useEffect(() => {
     if (step !== 'building') return;
-    const answers = { hardest, stage, helpKinds };
+    const answers = { hardest, stage, coverageStatus, helpKinds };
     saveCarePlan({
       answers,
       summary: generateSummary(answers),
@@ -186,7 +218,7 @@ export default function IntakePage() {
     clearCarePlanDraft();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
-  }, [step, hardest, stage, helpKinds, router]);
+  }, [step, hardest, stage, coverageStatus, helpKinds, router]);
 
   return (
     <main className={cn('min-h-[calc(100vh-4rem)] transition-colors duration-500', STEP_HUE[step])}>
@@ -220,6 +252,25 @@ export default function IntakePage() {
                     key={opt.value}
                     active={stage === opt.value}
                     onClick={() => setStage(opt.value)}
+                    label={opt.label}
+                    sublabel={opt.hint}
+                  />
+                ))}
+              </div>
+            </Question>
+          )}
+
+          {step === 'q-coverage' && (
+            <Question
+              title="How is care paid for right now?"
+              hint="This shapes week two — we will never assume you have private insurance."
+            >
+              <div className="grid gap-2">
+                {COVERAGE_OPTIONS.map((opt) => (
+                  <Toggle
+                    key={opt.value}
+                    active={coverageStatus === opt.value}
+                    onClick={() => setCoverageStatus(opt.value)}
                     label={opt.label}
                     sublabel={opt.hint}
                   />

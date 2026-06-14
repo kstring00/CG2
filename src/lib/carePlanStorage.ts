@@ -36,9 +36,18 @@ export type HelpKind =
 /** Shared mood vocabulary for consistency across the app. */
 export type WeekMood = 'frayed' | 'heavy' | 'numb' | 'steady' | 'hopeful';
 
+/** How the family pays for care — drives week-2 financial steps (never assume insurance). */
+export type CoverageStatus =
+  | 'private-insurance'
+  | 'medicaid-waiver'
+  | 'uninsured-self-pay'
+  | 'not-sure';
+
 export type CarePlanAnswers = {
   hardest?: Hardest[] | null;
   stage?: Stage | null;
+  /** Week 1 intake — how care is paid for. Legacy plans without this default to `not-sure`. */
+  coverageStatus?: CoverageStatus | null;
   // What would help most — now multi-select (Week 1 intake).
   helpKinds?: HelpKind[] | null;
   // Legacy fields — kept readable so older plans still load.
