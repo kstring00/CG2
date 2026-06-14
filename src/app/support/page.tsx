@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -10,10 +9,7 @@ import {
   Users,
   HandHelping,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
 } from 'lucide-react';
-import PulseCard from '@/components/PulseCard';
 
 const supportActions = [
   {
@@ -58,8 +54,6 @@ const supportActions = [
 ];
 
 export default function SupportHome() {
-  const [checkInOpen, setCheckInOpen] = useState(false);
-
   return (
     <div className="page-shell gap-8">
       <section className="relative overflow-hidden rounded-[2rem] border border-primary/15 bg-gradient-to-br from-[#f8f2ea] via-white to-[#fdf7f2] p-7 sm:p-9">
@@ -77,11 +71,10 @@ export default function SupportHome() {
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">Home Base</p>
             <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-muted-900 sm:text-4xl">
-              Pick a direction. We&rsquo;ll walk it with you.
+              Everything in Common Ground, one step away.
             </h1>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-brand-muted-600 sm:text-base">
-              Home Base is your map of Common Ground. From here you can build your plan, find your people,
-              learn what ABA actually is, or just put the day down for a minute.
+              Build your plan, find local help, learn what ABA actually is, or connect with other parents — pick what fits today.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/support/intake" className="btn-primary px-5 py-2.5 text-sm">
@@ -111,37 +104,6 @@ export default function SupportHome() {
         </div>
       </section>
 
-      {/* Bandwidth consolidation pass: one canonical check-in surface on Home
-          Base. PulseCard now reads from the Quick Bandwidth Check result. The
-          old WellnessMirror tile was a duplicate measurement of the same idea
-          and has been removed per CCO direction (avoid multiple separate
-          versions of the check-in across the site). */}
-      <PulseCard />
-
-      {/* Pathfinder presence — above the fold, gentle indicator that there is
-          a real human layer being built. Demo until matching is live. */}
-      <section className="rounded-2xl border border-brand-plum-200 bg-brand-plum-50/40 p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 max-w-xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-              Your Pathfinder
-            </p>
-            <h2 className="mt-1 text-base font-semibold text-brand-navy-700 sm:text-lg">
-              Your Pathfinder will appear here once we&rsquo;re matched.
-            </h2>
-            <p className="mt-1.5 text-[13.5px] leading-relaxed text-brand-muted-600">
-              Pathfinders are real human navigators. They sort the next step, sit in on school meetings, and check in when the weeks get heavy.
-            </p>
-          </div>
-          <Link
-            href="/support/connect"
-            className="inline-flex shrink-0 items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-4 py-2.5 text-sm font-semibold text-brand-plum-700 transition hover:bg-brand-plum-100"
-          >
-            Learn what a Pathfinder does <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
       <section id="support-actions" className="space-y-4">
         <div>
           <h2 className="text-2xl font-semibold text-brand-muted-900">What do you need today?</h2>
@@ -161,27 +123,6 @@ export default function SupportHome() {
             </article>
           ))}
         </div>
-      </section>
-
-      {/* CCO round 4: removed the "Start small" trio and "Support for your family"
-          link grid — Kyle's feedback was that they restate what the supportActions
-          grid above and the Learn nav already cover. Eliminating reduces visual
-          noise on Home Base without losing any reachable destination. */}
-
-      <section className="rounded-2xl border border-surface-border bg-surface-muted/60 p-5">
-        <button onClick={() => setCheckInOpen((v) => !v)} className="flex w-full items-center justify-between gap-3 text-left">
-          <div>
-            <h3 className="text-lg font-semibold text-brand-muted-900">Want to check in with yourself for a minute?</h3>
-            <p className="mt-1 text-sm text-brand-muted-600">A quick check-in can help you pause and notice what you need today.</p>
-          </div>
-          {checkInOpen ? <ChevronUp className="h-5 w-5 text-brand-muted-500" /> : <ChevronDown className="h-5 w-5 text-brand-muted-500" />}
-        </button>
-        {checkInOpen && (
-          <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-surface-border pt-4">
-            <Link href="/support/caregiver" className="btn-secondary px-4 py-2 text-sm">Start quick check-in</Link>
-            <p className="text-xs text-brand-muted-500">Optional and private to this device.</p>
-          </div>
-        )}
       </section>
     </div>
   );
