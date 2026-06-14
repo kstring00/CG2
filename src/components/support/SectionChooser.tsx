@@ -67,16 +67,37 @@ export function SectionChooser({
     syncViewport();
     mq.addEventListener('change', syncViewport);
 
-    const fromHash = resolveHash(window.location.hash);
-    if (fromHash) {
-      setActiveId(fromHash);
-      requestAnimationFrame(() => {
-        containerRef.current?.scrollIntoView({ block: 'start' });
-      });
-    } else if (!mq.matches) {
-      // Mobile starts fully collapsed so the page stays short.
+    // Mobile starts fully collapsed so the page stays short — unless a deep
+    // link targets a section, which the loop below opens.
+    if (!mq.matches && !resolveHash(window.location.hash)) {
       setActiveId(null);
     }
+
+    // Open the deep-linked section on load. We retry across the next few
+    // frames/ticks instead of reading once: when this chooser is a client
+    // island inside a server component (e.g. the financial page), the URL hash
+    // can be momentarily unreadable at the first effect run during hydration,
+    // so a single synchronous read intermittently misses it and the section
+    // would stay collapsed. Retrying makes the deep link reliable.
+    let resolved = false;
+    const rafIds: number[] = [];
+    const timeoutIds: ReturnType<typeof setTimeout>[] = [];
+    const openFromHash = () => {
+      if (resolved) return;
+      const id = resolveHash(window.location.hash);
+      if (!id) return;
+      resolved = true;
+      setActiveId(id);
+      rafIds.push(
+        requestAnimationFrame(() => {
+          containerRef.current?.scrollIntoView({ block: 'start' });
+        }),
+      );
+    };
+    openFromHash();
+    rafIds.push(requestAnimationFrame(openFromHash));
+    timeoutIds.push(setTimeout(openFromHash, 80));
+    timeoutIds.push(setTimeout(openFromHash, 250));
 
     const onHashChange = () => {
       const id = resolveHash(window.location.hash);
@@ -86,6 +107,8 @@ export function SectionChooser({
     return () => {
       mq.removeEventListener('change', syncViewport);
       window.removeEventListener('hashchange', onHashChange);
+      rafIds.forEach((r) => cancelAnimationFrame(r));
+      timeoutIds.forEach((t) => clearTimeout(t));
     };
     // Sections are static per page; run once.
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -81,6 +81,9 @@ export default function WeeklyProgressMeter({
 }: Props) {
   const summary = useWeeklySummary();
   if (!summary) return null;
+  // Gate on plan existence: a brand-new visitor with no plan should never see
+  // an empty/zero progress bar.
+  if (summary.noPlanYet) return null;
 
   if (variant === 'panel') {
     return <PanelMeter summary={summary} className={className} />;

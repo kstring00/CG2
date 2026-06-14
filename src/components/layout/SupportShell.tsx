@@ -57,7 +57,7 @@ const navGroups = [
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
       { href: '/support/siblings', label: 'Sibling Support', icon: Users },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
-      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
+      { href: '/support/financial', label: 'Paying for Care', icon: Wallet },
     ],
   },
   {
@@ -167,30 +167,37 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <SidebarContent />
       </aside>
 
-      <div className="flex min-h-screen flex-1 flex-col lg:ml-64">
+      <div
+        className="flex min-h-screen flex-1 flex-col lg:ml-64"
+        // Single source of truth for the find-page sticky offset. The crisis bar
+        // (the only sticky chrome above the directory toolbar) is pinned to this
+        // exact height on desktop, and the toolbar / rails stick to the same
+        // token — so they stay flush even if the height changes later.
+        style={{ ['--find-sticky-top' as string]: '2.75rem' }}
+      >
         {isFindPage && (
           <div
-            className="sticky top-0 z-40 border-b border-red-700/40 bg-gradient-to-r from-red-700 via-red-600 to-orange-600 text-white shadow-md"
+            className="sticky top-0 z-40 border-b border-surface-border bg-white text-brand-muted-700 shadow-sm lg:flex lg:h-[var(--find-sticky-top)] lg:items-center"
             role="region"
             aria-label="Crisis support"
           >
             <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 text-[12px] font-semibold sm:px-6 lg:px-8">
               <p className="inline-flex items-center gap-2">
-                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-rose-700">
                   Need help now?
                 </span>
               </p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                <a href="tel:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                <a href="tel:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
                   <span aria-hidden>📞</span> Call 988
                 </a>
-                <a href="sms:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                <a href="sms:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
                   <span aria-hidden>💬</span> Text 988
                 </a>
-                <a href="tel:+17139707000" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                <a href="tel:+17139707000" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
                   <span aria-hidden>📞</span> Harris Center (713) 970-7000
                 </a>
-                <a href="tel:911" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
+                <a href="tel:911" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
                   <span aria-hidden>🚨</span> Emergency 911
                 </a>
               </div>

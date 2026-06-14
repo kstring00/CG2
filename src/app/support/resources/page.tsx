@@ -29,14 +29,12 @@ import {
   BadgePill,
   GuideCard,
   GuideSectionHeading,
-  QuickIntroCard,
   SupportActionCard,
   SupportCalloutBand,
   TagPill,
 } from '@/components/support/GuideCards';
 import {
   GUIDE_NEED_OPTIONS,
-  QUICK_FILTER_NEEDS,
   getDefaultFeatured,
   getDefaultStarters,
   orderedBrowseCategories,
@@ -100,30 +98,6 @@ const CATEGORY_ICONS: Record<
   community: Users,
 };
 
-const QUICK_FILTERS = [
-  {
-    id: 'right-now' as const,
-    label: 'Right now',
-    description: 'Grounding tools, crisis lines, quick relief.',
-    className: 'border-rose-200/80 bg-gradient-to-br from-rose-50 to-white',
-    accent: 'text-rose-700',
-  },
-  {
-    id: 'understanding' as const,
-    label: 'Understanding',
-    description: 'ABA, diagnosis, IEPs, insurance, therapy terms.',
-    className: 'border-sky-200/80 bg-gradient-to-br from-sky-50 to-white',
-    accent: 'text-sky-700',
-  },
-  {
-    id: 'support-for-you' as const,
-    label: 'Support for you',
-    description: 'Burnout, mental health, community, parent connection.',
-    className: 'border-brand-plum-200/80 bg-gradient-to-br from-brand-plum-50 to-white',
-    accent: 'text-brand-plum-700',
-  },
-];
-
 function starterVisual(id: string) {
   return (
     STARTER_VISUALS[id] ?? {
@@ -171,20 +145,6 @@ export default function ResourcesPage() {
     );
   };
 
-  const toggleQuickFilter = (filterId: keyof typeof QUICK_FILTER_NEEDS) => {
-    const filterNeeds = QUICK_FILTER_NEEDS[filterId];
-    setSelectedNeeds((current) => {
-      const allSelected = filterNeeds.every((n) => current.includes(n));
-      if (allSelected) return current.filter((n) => !filterNeeds.includes(n));
-      const next = new Set(current);
-      filterNeeds.forEach((n) => next.add(n));
-      return [...next];
-    });
-  };
-
-  const isQuickFilterActive = (filterId: keyof typeof QUICK_FILTER_NEEDS) =>
-    QUICK_FILTER_NEEDS[filterId].every((n) => selectedNeeds.includes(n));
-
   const toggleSave = (id: string) => {
     setSavedIds((prev) => {
       const next = new Set(prev);
@@ -226,24 +186,6 @@ export default function ResourcesPage() {
             className="w-full rounded-2xl border border-surface-border bg-white py-4 pl-14 pr-5 text-[15px] shadow-soft transition focus:border-primary/30 focus:outline-none focus:ring-2 focus:ring-primary/10"
           />
         </div>
-      </section>
-
-      {/* Quick-filter cards */}
-      <section
-        aria-label="Quick filters"
-        className="mt-5 grid gap-3 sm:grid-cols-3"
-      >
-        {QUICK_FILTERS.map((filter) => (
-          <QuickIntroCard
-            key={filter.id}
-            label={filter.label}
-            description={filter.description}
-            cardClass={filter.className}
-            accentClass={filter.accent}
-            onClick={() => toggleQuickFilter(filter.id)}
-            active={isQuickFilterActive(filter.id)}
-          />
-        ))}
       </section>
 
       {/* Need matcher */}

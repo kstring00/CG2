@@ -9,7 +9,6 @@ import {
   ExternalLink,
   Globe,
   HeartHandshake,
-  Keyboard,
   List,
   Mail,
   MapPin,
@@ -100,7 +99,7 @@ const copy = {
     mapHint: 'Hover a city to highlight its resources.',
     rightDefaultTitle: 'Your saved resources',
     rightDefaultEmpty: 'Save anything you want to come back to. They\'ll live here, in your browser, no login required.',
-    rightDefaultEmptyHint: 'Tip: hover a card to preview · click to pin · ⌘/Ctrl+S to save the focused one.',
+    rightDefaultEmptyHint: 'Tip: hover a card to preview, then click to pin it here.',
     rightSavedCount: (n: number) => (n === 1 ? '1 saved' : `${n} saved`),
     rightEmailLabel: 'Email this list to myself',
     rightEmailPlaceholder: 'you@example.com',
@@ -191,7 +190,7 @@ const copy = {
     mapHint: 'Pasa el cursor sobre una ciudad para resaltar sus recursos.',
     rightDefaultTitle: 'Tus recursos guardados',
     rightDefaultEmpty: 'Guarda lo que quieras revisar después. Vivirá aquí, en tu navegador, sin necesidad de cuenta.',
-    rightDefaultEmptyHint: 'Tip: pasa el cursor para previsualizar · clic para fijar · ⌘/Ctrl+S para guardar el seleccionado.',
+    rightDefaultEmptyHint: 'Tip: pasa el cursor para previsualizar y haz clic para fijarlo aquí.',
     rightSavedCount: (n: number) => (n === 1 ? '1 guardado' : `${n} guardados`),
     rightEmailLabel: 'Enviarme esta lista por email',
     rightEmailPlaceholder: 'tu@ejemplo.com',
@@ -1444,7 +1443,6 @@ export default function FindSupportPage() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
-  const [helpOpen, setHelpOpen] = useState(false);
   const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
   const [savedDrawerOpen, setSavedDrawerOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -1559,15 +1557,8 @@ export default function FindSupportPage() {
         return;
       }
 
-      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
-        e.preventDefault();
-        setHelpOpen((p) => !p);
-        return;
-      }
-
       if (e.key === 'Escape') {
-        if (helpOpen) setHelpOpen(false);
-        else if (filtersDrawerOpen) setFiltersDrawerOpen(false);
+        if (filtersDrawerOpen) setFiltersDrawerOpen(false);
         else if (savedDrawerOpen) setSavedDrawerOpen(false);
         else if (pinnedId) setPinnedId(null);
         else if (hoveredId) setHoveredId(null);
@@ -1600,7 +1591,7 @@ export default function FindSupportPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [filteredResources, hoveredId, pinnedId, helpOpen]);
+  }, [filteredResources, hoveredId, pinnedId, filtersDrawerOpen, savedDrawerOpen]);
 
   const toggleSave = (id: string) => {
     setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -1635,16 +1626,13 @@ export default function FindSupportPage() {
               </p>
               <h1 className="mt-1.5 text-2xl font-bold text-brand-muted-900 sm:text-[28px]">{t.title}</h1>
               <p className="mt-1.5 max-w-2xl text-sm text-brand-muted-600">{t.description}</p>
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <button
-                onClick={() => setHelpOpen(true)}
-                className="hidden items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary md:inline-flex"
-                aria-label={t.keyboardButton}
-              >
-                <Keyboard className="h-4 w-4" />
-                <span>?</span>
-              </button>
+              <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-brand-muted-500">
+                Local provider listings currently cover the greater Houston metros — Katy, Pearland,
+                Sugar Land, and nearby. Statewide and virtual resources — Medicaid &amp; ECI guidance,
+                financial help, the Autism Society of Texas, and 988 — are here for{' '}
+                <span className="font-semibold text-brand-muted-700">every Texas family</span>,
+                wherever you live.
+              </p>
             </div>
           </div>
         </div>
@@ -1714,14 +1702,18 @@ export default function FindSupportPage() {
         <div className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)_320px] xl:grid-cols-[280px_minmax(0,1fr)_360px]">
             {/* Left rail (hidden < lg; opens as a drawer instead) */}
-            <aside className="hidden lg:sticky lg:top-[104px] lg:block lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto lg:pr-1">
+            <aside className="hidden lg:sticky lg:top-[calc(var(--find-sticky-top)+1rem)] lg:block lg:max-h-[calc(100vh-var(--find-sticky-top)-2rem)] lg:overflow-y-auto lg:pr-1">
               <LeftFilters locale={locale} filters={filters} setFilters={setFilters} />
             </aside>
 
             {/* Center column */}
             <div className="min-w-0">
-              {/* Sticky toolbar */}
-              <div className="sticky top-[88px] z-10 -mx-1 flex flex-col gap-3 rounded-2xl border border-surface-border bg-white/95 p-3 shadow-soft backdrop-blur-md">
+              {/* Sticky toolbar — solid neutral surface so page content (incl. the
+                  crisis bar) never bleeds through as it scrolls beneath. Sticks on
+                  desktop flush under the fixed-height crisis bar (--find-sticky-top);
+                  on mobile the crisis bar wraps to a variable height, so the toolbar
+                  is non-sticky there to avoid an offset that can't be known. */}
+              <div className="z-10 flex flex-col gap-3 rounded-2xl border border-surface-border bg-white p-3 shadow-soft lg:sticky lg:top-[var(--find-sticky-top)]">
                 <div className="flex flex-wrap items-center gap-2">
                   <label className="relative min-w-0 flex-1">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
@@ -1731,12 +1723,8 @@ export default function FindSupportPage() {
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={t.searchPlaceholder}
-                      className="w-full rounded-xl border border-surface-border bg-white py-2 pl-9 pr-24 text-sm outline-none ring-primary/20 transition focus:ring-2"
+                      className="w-full rounded-xl border border-surface-border bg-white py-2 pl-9 pr-3 text-sm outline-none ring-primary/20 transition focus:ring-2"
                     />
-                    <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-400 lg:flex">
-                      <kbd className="rounded border border-surface-border bg-surface-muted px-1 py-0.5 text-[10px] font-mono text-brand-muted-500">/</kbd>
-                      <span>{t.searchShortcut}</span>
-                    </span>
                   </label>
 
                   <button
@@ -1879,7 +1867,7 @@ export default function FindSupportPage() {
             </div>
 
             {/* Right rail — context panel */}
-            <aside className="hidden lg:flex lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:flex-col lg:gap-3 lg:overflow-y-auto lg:pr-1">
+            <aside className="hidden lg:flex lg:sticky lg:top-[calc(var(--find-sticky-top)+1rem)] lg:max-h-[calc(100vh-var(--find-sticky-top)-2rem)] lg:flex-col lg:gap-3 lg:overflow-y-auto lg:pr-1">
               {(() => {
                 const focusedId = pinnedId ?? hoveredId;
                 const focused = focusedId ? findResources.find((r) => r.id === focusedId) ?? null : null;
@@ -2039,51 +2027,6 @@ export default function FindSupportPage() {
         </div>
       )}
 
-      {helpOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label={t.helpTitle}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setHelpOpen(false);
-          }}
-        >
-          <div className="w-full max-w-md rounded-2xl border border-surface-border bg-white p-5 shadow-card-hover">
-            <div className="flex items-start justify-between gap-3">
-              <p className="inline-flex items-center gap-2 text-base font-semibold text-brand-muted-900">
-                <Keyboard className="h-4 w-4 text-primary" />
-                {t.helpTitle}
-              </p>
-              <button
-                onClick={() => setHelpOpen(false)}
-                className="rounded-md p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
-                aria-label={t.helpClose}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <ul className="mt-4 flex flex-col gap-2">
-              {t.helpRows.map(([keys, label]) => (
-                <li
-                  key={keys}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-surface-border bg-surface-muted/40 px-3 py-2"
-                >
-                  <span className="text-[12.5px] text-brand-muted-700">{label}</span>
-                  <span className="rounded-md border border-surface-border bg-white px-2 py-0.5 text-[11px] font-mono font-semibold text-brand-muted-700">
-                    {keys}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 text-[11px] text-brand-muted-500">
-              {locale === 'en'
-                ? 'Filtered URLs are shareable — copy this tab\'s link to send a co-parent the same view.'
-                : 'Las URLs filtradas se pueden compartir — copia el enlace para que tu copadre vea la misma vista.'}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

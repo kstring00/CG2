@@ -332,6 +332,9 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
 
   return (
     <Shell>
+      {/* Weekly progress — top of the care-plan area, only when a plan exists */}
+      <WeeklyProgressMeter variant="panel" className="mb-5" />
+
       {/* 1) TOP — breadcrumb, title, subtitle, saved note */}
       <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
         <ol className="flex items-center gap-1.5">
@@ -391,9 +394,6 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
           </div>
         </section>
       )}
-
-      {/* Weekly progress — same meter logic as the layout rail */}
-      <WeeklyProgressMeter variant="panel" className="mt-6" />
 
       {lastWeekDone.length > 0 && (
         <section

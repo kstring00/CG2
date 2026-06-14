@@ -10,6 +10,7 @@ import {
   HandHelping,
   CheckCircle2,
 } from 'lucide-react';
+import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 
 const supportActions = [
   {
@@ -56,6 +57,9 @@ const supportActions = [
 export default function SupportHome() {
   return (
     <div className="page-shell gap-8">
+      {/* Weekly progress — top of Home Base, only when a plan exists */}
+      <WeeklyProgressMeter variant="panel" />
+
       <section className="relative overflow-hidden rounded-[2rem] border border-primary/15 bg-gradient-to-br from-[#f8f2ea] via-white to-[#fdf7f2] p-7 sm:p-9">
         <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-70">
           <div className="absolute right-10 top-10 h-28 w-28 rounded-full bg-brand-plum-100/80" />

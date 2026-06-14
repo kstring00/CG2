@@ -27,6 +27,7 @@ import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
 import type { ArcWeek } from './arcs';
 import { getArcWeek, isResolvableCandidateId } from './arcs';
 import {
+  ADMISSIONS_CTA_LABEL,
   getSupportNudgeCandidateId,
   getSupportNudgeCopy,
   pickSupportNudgeThread,
@@ -303,7 +304,7 @@ const C: Record<string, Candidate> = {
   },
   admissionsConsult: {
     id: 'admissionsConsult',
-    title: 'Talk to admissions — free consultation',
+    title: ADMISSIONS_CTA_LABEL,
     why: 'One universal door: a free consultation with our admissions team. They walk through coverage and next steps with you — no eligibility decision on this site.',
     href: 'tel:+18777715725',
     bucket: 'do-today',

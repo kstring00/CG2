@@ -280,8 +280,11 @@ export default function ProvidersPage() {
       <header className="page-header">
         <h1 className="page-title">Providers & Community Resources</h1>
         <p className="page-description">
-          Every provider on this list is real, verifiable, and relevant to autism families in the Houston and Fort Bend area.
-          We removed anything we couldn't confirm. Start with the section below if you're not sure where to begin.
+          Every provider on this list is real, verifiable, and relevant to autism families. Local
+          listings currently cover the greater Houston metros — Katy, Pearland, Sugar Land, and
+          nearby — and we removed anything we couldn't confirm. Statewide and virtual resources are
+          included for every Texas family, wherever you live. Start with the section below if you're
+          not sure where to begin.
         </p>
       </header>
 
