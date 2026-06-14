@@ -27,6 +27,7 @@ import {
 import { loadBandwidth } from './bandwidth';
 import type { SupportThreadId } from './carePlanSupport';
 import {
+  formatArcWeekLabel,
   getCarePlanBucketSteps,
   getCarePlanWeekView,
   resolvedCompletionKeys,
@@ -72,6 +73,12 @@ export type WeeklyProgressSummary = {
   weekComplete: boolean;
   /** True when no plan exists yet — meter still renders, intake is the only step. */
   noPlanYet: boolean;
+  /** Arc week the parent is on (when a plan exists). */
+  arcWeekNumber?: number;
+  /** Arc theme for the current week. */
+  arcTheme?: string;
+  /** Human-readable stage-named week — e.g. "Week 3 — sort how care is paid for". */
+  arcWeekLabel?: string;
 };
 
 function isBrowser(): boolean {
@@ -373,5 +380,12 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
     nextHref,
     weekComplete,
     noPlanYet: !plan,
+    ...(weekView
+      ? {
+          arcWeekNumber: weekView.arcWeekNumber,
+          arcTheme: weekView.arcTheme,
+          arcWeekLabel: formatArcWeekLabel(weekView.arcWeekNumber, weekView.arcTheme),
+        }
+      : {}),
   };
 }

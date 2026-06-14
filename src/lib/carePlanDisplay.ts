@@ -36,6 +36,11 @@ export function getCarePlanBucketSteps(
   return source.map(enrichCarePlanStep);
 }
 
+/** Stage-named week label — e.g. "Week 3 — sort how care is paid for". */
+export function formatArcWeekLabel(arcWeekNumber: number, arcTheme: string): string {
+  return `Week ${arcWeekNumber} — ${arcTheme.toLowerCase()}`;
+}
+
 export type CarePlanWeekView = {
   /** Steps the parent should focus on right now. */
   activeSteps: CarePlanStep[];

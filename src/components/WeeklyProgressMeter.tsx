@@ -25,6 +25,8 @@ type Variant = 'rail' | 'panel';
 
 type Props = {
   variant?: Variant;
+  /** Home Base tone — stage-named week headline, no completion counts. */
+  calm?: boolean;
   className?: string;
 };
 
@@ -77,6 +79,7 @@ function useWeeklySummary(): WeeklyProgressSummary | null {
 
 export default function WeeklyProgressMeter({
   variant = 'rail',
+  calm,
   className,
 }: Props) {
   const summary = useWeeklySummary();
@@ -86,7 +89,7 @@ export default function WeeklyProgressMeter({
   if (summary.noPlanYet) return null;
 
   if (variant === 'panel') {
-    return <PanelMeter summary={summary} className={className} />;
+    return <PanelMeter summary={summary} calm={calm} className={className} />;
   }
   return <RailMeter summary={summary} className={className} />;
 }
@@ -211,56 +214,84 @@ function RailMeter({
 
 function PanelMeter({
   summary,
+  calm,
   className,
 }: {
   summary: WeeklyProgressSummary;
+  calm?: boolean;
   className?: string;
 }) {
-  const { filledNotches, totalNotches, nextLabel, nextHref, weekComplete, noPlanYet, intakeDoneThisWeek } =
-    summary;
+  const {
+    filledNotches,
+    totalNotches,
+    nextLabel,
+    nextHref,
+    weekComplete,
+    intakeDoneThisWeek,
+    arcWeekLabel,
+  } = summary;
 
   const nextText = weekComplete
-    ? 'Week complete'
-    : noPlanYet
-      ? 'Build a plan'
-      : !intakeDoneThisWeek
-        ? 'Start check-in'
-        : nextLabel;
+    ? 'You are caught up for this week'
+    : !intakeDoneThisWeek
+      ? 'Start this week’s check-in'
+      : nextLabel;
 
   return (
     <section
-      aria-label={`Weekly progress: ${filledNotches} of ${totalNotches} steps done`}
+      aria-label={
+        arcWeekLabel
+          ? `Where you are: ${arcWeekLabel}`
+          : `Weekly progress: ${filledNotches} of ${totalNotches} steps done`
+      }
       className={[
-        'rounded-xl border border-surface-border/70 bg-surface-muted/25 px-4 py-3',
+        calm
+          ? 'rounded-2xl border border-surface-border/70 bg-surface-muted/20 px-4 py-4 sm:px-5'
+          : 'rounded-xl border border-surface-border/70 bg-surface-muted/25 px-4 py-3',
         className ?? '',
       ].join(' ')}
     >
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-medium text-brand-muted-500">
-          This week
-        </p>
-        <span className="text-[11px] tabular-nums text-brand-muted-600">
-          {filledNotches}/{totalNotches}
-        </span>
-      </div>
-
-      <div className="mt-2">
-        <MeterTrack summary={summary} compact />
-      </div>
-
-      <Link
-        href={nextHref}
-        className="mt-2.5 inline-flex max-w-full items-center gap-1 text-[12.5px] font-medium text-brand-muted-700 transition hover:text-primary"
-      >
-        <span className="truncate">
-          {weekComplete ? (
-            <span className="text-emerald-700">{nextText}</span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+            Where you are
+          </p>
+          {arcWeekLabel ? (
+            <p className="mt-1 text-[15px] font-semibold leading-snug text-brand-navy-700">
+              {arcWeekLabel}
+            </p>
           ) : (
-            nextText
+            <p className="mt-1 text-[11px] font-medium text-brand-muted-500">This week</p>
           )}
-        </span>
-        <ArrowRight className="h-3.5 w-3.5 shrink-0 opacity-60" aria-hidden />
-      </Link>
+        </div>
+        {!calm && (
+          <span className="text-[11px] tabular-nums text-brand-muted-600">
+            {filledNotches}/{totalNotches}
+          </span>
+        )}
+      </div>
+
+      {!calm && (
+        <div className="mt-2">
+          <MeterTrack summary={summary} compact />
+        </div>
+      )}
+
+      {!calm && (
+        <Link
+          href={nextHref}
+          className="mt-2.5 inline-flex max-w-full items-center gap-1 text-[12.5px] font-medium text-brand-muted-700 transition hover:text-primary"
+        >
+          <span className="truncate">
+            {weekComplete ? (
+              <span className="text-emerald-700">{nextText}</span>
+            ) : (
+              nextText
+            )}
+          </span>
+          <ArrowRight className="h-3.5 w-3.5 shrink-0 opacity-60" aria-hidden />
+        </Link>
+      )}
     </section>
   );
 }
