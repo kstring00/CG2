@@ -48,6 +48,11 @@ export type CarePlanAnswers = {
   stage?: Stage | null;
   /** Week 1 intake — how care is paid for. Legacy plans without this default to `not-sure`. */
   coverageStatus?: CoverageStatus | null;
+  /** Intake — unknown/null is treated as false (conditional threads hidden). */
+  hasOtherChildren?: boolean | null;
+  /** Intake — unknown/null is treated as false (conditional threads hidden). */
+  hasPartner?: boolean | null;
+  // TODO (product decision): child age-band (ECI birth–3 vs school-age) for school theme placement — not built yet.
   // What would help most — now multi-select (Week 1 intake).
   helpKinds?: HelpKind[] | null;
   // Legacy fields — kept readable so older plans still load.

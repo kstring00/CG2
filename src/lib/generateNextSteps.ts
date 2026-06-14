@@ -24,6 +24,14 @@ import type {
   WeekMood,
 } from './carePlanStorage';
 import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
+import type { ArcWeek } from './arcs';
+import { getArcWeek, isResolvableCandidateId } from './arcs';
+import {
+  getSupportNudgeCandidateId,
+  getSupportNudgeCopy,
+  pickSupportNudgeThread,
+  type SupportThreadId,
+} from './carePlanSupport';
 
 // ---------------------------------------------------------------------------
 // Labels (single source of truth for human-readable copy)
@@ -293,6 +301,14 @@ const C: Record<string, Candidate> = {
     href: '/support/find',
     bucket: 'do-today',
   },
+  admissionsConsult: {
+    id: 'admissionsConsult',
+    title: 'Talk to admissions — free consultation',
+    why: 'One universal door: a free consultation with our admissions team. They walk through coverage and next steps with you — no eligibility decision on this site.',
+    href: 'tel:+18777715725',
+    bucket: 'do-today',
+    altBuckets: ['ask-bcba'],
+  },
   schoolServicesPath: {
     id: 'schoolServicesPath',
     title: 'Explore school-based services (no insurance required)',
@@ -409,23 +425,42 @@ const W = {
   ageBand: 3,
 };
 
-/** Private-insurance-only steps — never surfaced unless coverage is private. */
+/** Private-insurance-only financial resources — never surfaced unless coverage is private. */
 const PRIVATE_INSURANCE_ONLY = new Set(['verifyCoverage', 'insuranceCall']);
+
+/** Financial-resource ids — coverage may only filter these (never gates arc, support, or admissions). */
+export const FINANCIAL_CANDIDATE_IDS = new Set([
+  'verifyCoverage',
+  'insuranceCall',
+  'medicaidWaiver',
+  'hopeForThree',
+  'financialGuide',
+  'checkCoverageStatus',
+  'slidingScaleFind',
+]);
+
+export function isFinancialCandidate(id: string): boolean {
+  return FINANCIAL_CANDIDATE_IDS.has(id);
+}
+
+/** Coverage personalizes financial resources only — all other steps always allowed. */
+export function isCandidateAllowed(id: string, coverage: CoverageStatus): boolean {
+  if (!isFinancialCandidate(id)) return true;
+  if (!PRIVATE_INSURANCE_ONLY.has(id)) return true;
+  return coverage === 'private-insurance';
+}
+
+/** @deprecated Use isCandidateAllowed — kept for callers during migration. */
+export function isAllowedForCoverage(candidateId: string, coverage: CoverageStatus): boolean {
+  return isCandidateAllowed(candidateId, coverage);
+}
 
 /** Resolve coverage — legacy plans without `coverageStatus` never assume private insurance. */
 export function resolveCoverageStatus(answers: CarePlanAnswers): CoverageStatus {
   return answers.coverageStatus ?? 'not-sure';
 }
 
-export function isAllowedForCoverage(
-  candidateId: string,
-  coverage: CoverageStatus,
-): boolean {
-  if (!PRIVATE_INSURANCE_ONLY.has(candidateId)) return true;
-  return coverage === 'private-insurance';
-}
-
-/** Financial / access steps by coverage — uninsured-safe by default. */
+/** Financial / access steps by coverage — resources only, not eligibility. */
 export function coverageFinancialStepIds(coverage: CoverageStatus): string[] {
   switch (coverage) {
     case 'private-insurance':
@@ -776,7 +811,24 @@ function filterRankedForCoverage(
   answers: CarePlanAnswers,
 ): Score[] {
   const coverage = resolveCoverageStatus(answers);
-  return ranked.filter(({ candidate }) => isAllowedForCoverage(candidate.id, coverage));
+  return ranked.filter(({ candidate }) => isCandidateAllowed(candidate.id, coverage));
+}
+
+function boostArcPool(scores: Map<string, Score>, arcWeek: ArcWeek): void {
+  arcWeek.candidateStepIds.forEach((id, idx) => {
+    if (!isResolvableCandidateId(id) || !C[id]) return;
+    const existing = scores.get(id);
+    if (existing) {
+      existing.weight += 12 - idx;
+    } else {
+      add(
+        scores,
+        C[id],
+        12 - idx,
+        `Because this week focuses on ${arcWeek.theme.toLowerCase()}.`,
+      );
+    }
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -818,17 +870,30 @@ export const BUCKET_BLURBS: Record<StepBucket, string> = {
  */
 export function generateBucketSteps(
   answers: CarePlanAnswers,
+  arcWeek?: ArcWeek,
 ): { bucket: StepBucket; step: CarePlanStep | null }[] {
+  const weekArc = arcWeek ?? getArcWeek(answers.stage, 1);
   const scores = buildScores(answers);
-  const ranked = Array.from(scores.values()).sort((a, b) => {
-    if (b.weight !== a.weight) return b.weight - a.weight;
-    return a.candidate.title.localeCompare(b.candidate.title);
-  });
+  boostArcPool(scores, weekArc);
+
+  const pool = new Set(
+    weekArc.candidateStepIds.filter((id) => isResolvableCandidateId(id) && C[id]),
+  );
+
+  const ranked = Array.from(scores.values())
+    .filter(({ candidate }) => pool.has(candidate.id))
+    .sort((a, b) => {
+      const ai = weekArc.candidateStepIds.indexOf(a.candidate.id);
+      const bi = weekArc.candidateStepIds.indexOf(b.candidate.id);
+      if (ai !== bi) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+      if (b.weight !== a.weight) return b.weight - a.weight;
+      return a.candidate.title.localeCompare(b.candidate.title);
+    });
 
   const filled = new Map<StepBucket, CarePlanStep>();
 
   for (const { candidate, weight, reasons } of ranked) {
-    if (!isAllowedForCoverage(candidate.id, resolveCoverageStatus(answers))) continue;
+    if (!isCandidateAllowed(candidate.id, resolveCoverageStatus(answers))) continue;
     const buckets: StepBucket[] = [candidate.bucket, ...(candidate.altBuckets ?? [])];
     for (const b of buckets) {
       if (filled.has(b)) continue;
@@ -854,26 +919,33 @@ export function generateBucketSteps(
 // Week 2 guide — continuation of week 1 (not a fresh path)
 // ---------------------------------------------------------------------------
 
+export type ArcWeekGenerationInput = {
+  answers: CarePlanAnswers;
+  /** Current arc week — supplies theme and candidate pool for sparse fallback. */
+  arcWeek: ArcWeek;
+  /** Prior week's active steps (week 1 bucket view, or prior generated week). */
+  priorWeekSteps: CarePlanStep[];
+  /** Candidate ids marked done in the prior week. */
+  completedPriorWeekIds: string[];
+  /** Rotate support-panel nudge away from last week's thread when possible. */
+  lastSupportNudgeThread?: SupportThreadId | null;
+};
+
+export type ArcWeekGenerationResult = {
+  steps: CarePlanStep[];
+  supportNudgeThread: SupportThreadId | null;
+};
+
+/** @deprecated Use ArcWeekGenerationInput — week-one field names kept for scripts. */
 export type WeekTwoInput = {
   answers: CarePlanAnswers;
-  /** Week-one bucket steps (excludes `next-week`). */
   weekOneSteps: CarePlanStep[];
-  /** Candidate ids marked done in week 1. */
   completedWeekOneIds: string[];
+  arcWeek?: ArcWeek;
+  lastSupportNudgeThread?: SupportThreadId | null;
 };
 
 const WEEK2_TARGET = 5;
-
-const CAREGIVER_STEP_IDS = new Set([
-  'fourMinutes',
-  'parentTherapist',
-  'meltdownNow',
-  'homeStrategy',
-  'siblingGuide',
-  'siblingOneThing',
-  'parentMatch',
-  'practicalGuides',
-]);
 
 type ContinuationRule = { next: string | string[]; tail: string };
 
@@ -977,49 +1049,6 @@ const WEEK1_CONTINUATION: Record<string, ContinuationRule> = {
   },
 };
 
-const STAGE_WEEK2_BACKBONE: Record<Stage, string[]> = {
-  'newly-diagnosed': [
-    'questionsForBCBA',
-    'firstCallQuestions',
-    'shortlistProviders',
-    'callOneProvider',
-    'findLocal',
-    'documentHard',
-  ],
-  'waiting-diagnosis': [
-    'mchat',
-    'devPed',
-    'whatIsAba',
-    'questionsForBCBA',
-    'shortlistProviders',
-    'findLocal',
-  ],
-  'looking-for-aba': [
-    'firstCallQuestions',
-    'questionsForBCBA',
-    'shortlistProviders',
-    'compareThree',
-    'callOneProvider',
-    'trackNotes',
-    'findLocal',
-  ],
-  'in-aba': [
-    'questionsForBCBA',
-    'documentHard',
-    'homeStrategy',
-    'iepPrep',
-    'parentMatch',
-    'practicalGuides',
-  ],
-  'past-aba': [
-    'practicalGuides',
-    'parentMatch',
-    'homeStrategy',
-    'siblingGuide',
-    'smallGroups',
-  ],
-};
-
 const WEEK2_BUCKETS: StepBucket[] = [
   'do-today',
   'ask-bcba',
@@ -1028,24 +1057,15 @@ const WEEK2_BUCKETS: StepBucket[] = [
   'ask-bcba',
 ];
 
-const BALANCE_BECAUSE: Partial<Record<string, string>> = {
-  homeStrategy:
-    'A small home strategy to try this week — caregiving is the long game, not just logistics.',
-  siblingGuide:
-    'One step for siblings this week — the whole family is on this path, not just paperwork.',
-  siblingOneThing:
-    'One small thing for your other child this week — siblings need care too.',
-  fourMinutes:
-    'Four minutes for you this week — you cannot pour from an empty cup.',
-  parentMatch:
-    'Connection with another parent this week — you do not have to navigate this alone.',
-  parentTherapist:
-    'Your own support this week — caregiving is the long game, not just logistics.',
-  meltdownNow:
-    'A bookmark for hard moments — caregiving is the long game, not just logistics.',
-  practicalGuides:
-    'One practical guide to try at home — small wins count while you work the bigger steps.',
-};
+/** Sparse fallback — current arc week's pool (coverage filters financial ids only). */
+function buildArcBackbone(arcWeek: ArcWeek, coverage: CoverageStatus): string[] {
+  return arcWeek.candidateStepIds.filter(
+    (id) =>
+      isResolvableCandidateId(id) &&
+      C[id] &&
+      isCandidateAllowed(id, coverage),
+  );
+}
 
 /** Completion ids that exist in this plan's week-one steps AND were marked done. */
 export function verifiedCompletedWeekOneIds(
@@ -1171,43 +1191,26 @@ function adaptCarryForwardStep(step: CarePlanStep, coverage: CoverageStatus): Ca
   );
 }
 
-function pickCaregiverStepId(answers: CarePlanAnswers): string {
-  const hardest = (answers.hardest ?? []) as Hardest[];
-  if (hardest.includes('siblings')) return 'siblingGuide';
-  if (hardest.includes('behavior-home')) return 'homeStrategy';
-  if (hardest.includes('overwhelmed')) return 'fourMinutes';
-  if (hardest.includes('connecting-parents')) return 'parentMatch';
-  return 'homeStrategy';
-}
-
-function buildStageBackbone(answers: CarePlanAnswers): string[] {
-  const stage = answers.stage ?? 'newly-diagnosed';
-  const coverage = resolveCoverageStatus(answers);
-  const financial = coverageFinancialStepIds(coverage);
-  const stagePath = STAGE_WEEK2_BACKBONE[stage] ?? STAGE_WEEK2_BACKBONE['newly-diagnosed'];
-  return [...financial, ...stagePath];
-}
-
 /**
- * Week 2 assembly:
- *   Layer 1 — carry forward incomplete week-1 steps (swap insurance-only when needed)
+ * Arc week assembly (week 2+):
+ *   Layer 1 — carry forward incomplete prior-week steps (swap insurance-only when needed)
  *   Layer 2 — unlocked continuations (verified completions only; "Because you finished…")
- *   Layer 3 — one caregiver / at-home / sibling balance step (non-completion copy)
- *   Layer 4 — sparse-fallback backbone (coverage + stage)
+ *   Layer 3 — rotating support-panel nudge (non-completion copy; eligible threads only)
+ *   Layer 4 — sparse-fallback from current arc week's candidate pool
  *
  * 5-step cap retention priority (what survives when space runs out):
- *   (a) ≥1 continuation when any verified week-1 completion exists
+ *   (a) ≥1 continuation when any verified prior-week completion exists
  *   (b) carry-forward incomplete steps
- *   (c) balance step
+ *   (c) support nudge
  *   (d) remaining continuations
- *   (e) sparse-fallback backbone
+ *   (e) sparse-fallback from arc pool
  *
- * Display order after merge: carry → continuations → balance → fallback.
+ * Display order after merge: carry → continuations → nudge → fallback.
  */
 function mergeWeekTwoWithCap(
   carry: CarePlanStep[],
   continuations: CarePlanStep[],
-  balance: CarePlanStep | null,
+  nudge: CarePlanStep | null,
   fallback: CarePlanStep[],
   hasVerifiedCompletions: boolean,
 ): CarePlanStep[] {
@@ -1228,20 +1231,20 @@ function mergeWeekTwoWithCap(
     addSteps([continuations[0]]);
   }
   addSteps(carry);
-  if (balance) addSteps([balance]);
+  if (nudge) addSteps([nudge]);
   addSteps(hasVerifiedCompletions ? continuations.slice(1) : continuations);
   addSteps(fallback);
 
   const carryIds = new Set(carry.map(stepId));
   const contIds = new Set(continuations.map(stepId));
-  const balanceId = balance ? stepId(balance) : null;
+  const nudgeId = nudge ? stepId(nudge) : null;
   const fallbackIds = new Set(fallback.map(stepId));
 
   const displayRank = (step: CarePlanStep): number => {
     const id = stepId(step);
     if (carryIds.has(id)) return 0;
     if (contIds.has(id)) return 1;
-    if (balanceId === id) return 2;
+    if (nudgeId === id) return 2;
     if (fallbackIds.has(id)) return 3;
     return 4;
   };
@@ -1249,17 +1252,19 @@ function mergeWeekTwoWithCap(
   return selected.sort((a, b) => displayRank(a) - displayRank(b));
 }
 
-export function generateWeekTwoSteps(input: WeekTwoInput): CarePlanStep[] {
-  const completed = new Set(input.completedWeekOneIds);
+export function generateArcWeekSteps(
+  input: ArcWeekGenerationInput,
+): ArcWeekGenerationResult {
+  const completed = new Set(input.completedPriorWeekIds);
   const verifiedIds = verifiedCompletedWeekOneIds(
-    input.weekOneSteps,
-    input.completedWeekOneIds,
+    input.priorWeekSteps,
+    input.completedPriorWeekIds,
   );
   const coverage = resolveCoverageStatus(input.answers);
   const buildSeen = new Set<string>();
 
   const carry: CarePlanStep[] = [];
-  for (const step of input.weekOneSteps) {
+  for (const step of input.priorWeekSteps) {
     const id = stepId(step);
     if (completed.has(id)) continue;
     const adapted = adaptCarryForwardStep(step, coverage);
@@ -1278,8 +1283,8 @@ export function generateWeekTwoSteps(input: WeekTwoInput): CarePlanStep[] {
     if (!nextId || !isAllowedForCoverage(nextId, coverage)) continue;
     const because = formatContinuationBecause(
       completedId,
-      input.weekOneSteps,
-      input.completedWeekOneIds,
+      input.priorWeekSteps,
+      input.completedPriorWeekIds,
       rule.tail,
     );
     if (!because) continue;
@@ -1295,35 +1300,37 @@ export function generateWeekTwoSteps(input: WeekTwoInput): CarePlanStep[] {
     );
   }
 
-  let balance: CarePlanStep | null = null;
+  let supportNudgeThread: SupportThreadId | null = null;
+  let nudge: CarePlanStep | null = null;
   const previewIds = new Set([...carry, ...continuations].map(stepId));
-  const hasCaregiverPreview = [...previewIds].some((id) => CAREGIVER_STEP_IDS.has(id));
-  if (!hasCaregiverPreview) {
-    const caregiverId = pickCaregiverStepId(input.answers);
-    if (
-      !completed.has(caregiverId) &&
-      !buildSeen.has(caregiverId) &&
-      isAllowedForCoverage(caregiverId, coverage) &&
-      C[caregiverId]
-    ) {
-      balance = candidateToWeekTwoStep(
-        C[caregiverId],
-        BALANCE_BECAUSE[caregiverId] ??
-          'A small home strategy to try this week — caregiving is the long game, not just logistics.',
-        'try-home',
-      );
-      buildSeen.add(caregiverId);
-    }
+  const nudgeThread = pickSupportNudgeThread(
+    input.answers,
+    input.lastSupportNudgeThread,
+  );
+  const nudgeCandidateId = getSupportNudgeCandidateId(nudgeThread);
+  if (
+    !previewIds.has(nudgeCandidateId) &&
+    !completed.has(nudgeCandidateId) &&
+    !buildSeen.has(nudgeCandidateId) &&
+    C[nudgeCandidateId]
+  ) {
+    supportNudgeThread = nudgeThread;
+    nudge = candidateToWeekTwoStep(
+      C[nudgeCandidateId],
+      getSupportNudgeCopy(nudgeThread),
+      'try-home',
+    );
+    buildSeen.add(nudgeCandidateId);
   }
 
   const sparse =
     verifiedIds.length < 2 ||
     continuations.length < 2 ||
-    carry.length + continuations.length + (balance ? 1 : 0) < 3;
+    carry.length + continuations.length + (nudge ? 1 : 0) < 3;
 
   const fallback: CarePlanStep[] = [];
   if (sparse) {
-    for (const candidateId of buildStageBackbone(input.answers)) {
+    for (const candidateId of buildArcBackbone(input.arcWeek, coverage)) {
       if (completed.has(candidateId) || buildSeen.has(candidateId)) continue;
       if (!isAllowedForCoverage(candidateId, coverage)) continue;
       const candidate = C[candidateId];
@@ -1332,7 +1339,7 @@ export function generateWeekTwoSteps(input: WeekTwoInput): CarePlanStep[] {
       fallback.push(
         candidateToWeekTwoStep(
           candidate,
-          'Because week two picks up where you left off — your next move on the path into ABA.',
+          `Because this week focuses on ${input.arcWeek.theme.toLowerCase()}.`,
           WEEK2_BUCKETS[fallback.length % WEEK2_BUCKETS.length],
         ),
       );
@@ -1342,12 +1349,41 @@ export function generateWeekTwoSteps(input: WeekTwoInput): CarePlanStep[] {
   const merged = mergeWeekTwoWithCap(
     carry,
     continuations,
-    balance,
+    nudge,
     fallback,
     verifiedIds.length > 0,
   );
 
-  return merged;
+  // Dev-only regression guard: every "Because you finished …" line on real
+  // generated output must cite a verified prior-week completion. Stripped in
+  // production (process.env.NODE_ENV) so it can never throw for a parent.
+  if (process.env.NODE_ENV !== 'production') {
+    const errors = validateWeekTwoBecauseCopy(
+      merged,
+      input.priorWeekSteps,
+      input.completedPriorWeekIds,
+    );
+    if (errors.length) {
+      throw new Error(
+        `generateArcWeekSteps emitted false "Because you finished …" copy:\n  - ${errors.join('\n  - ')}`,
+      );
+    }
+  }
+
+  return { steps: merged, supportNudgeThread };
+}
+
+/** Week 2+ steps — continuation engine on the current arc week's pool. */
+export function generateWeekTwoSteps(input: WeekTwoInput): CarePlanStep[] {
+  const arcWeek =
+    input.arcWeek ?? getArcWeek(input.answers.stage, 2);
+  return generateArcWeekSteps({
+    answers: input.answers,
+    arcWeek,
+    priorWeekSteps: input.weekOneSteps,
+    completedPriorWeekIds: input.completedWeekOneIds,
+    lastSupportNudgeThread: input.lastSupportNudgeThread,
+  }).steps;
 }
 
 /** Intro copy for the week-two unlock banner on the care plan page. */

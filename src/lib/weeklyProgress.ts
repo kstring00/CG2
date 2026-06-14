@@ -25,6 +25,7 @@ import {
   type CarePlanStep,
 } from './carePlanStorage';
 import { loadBandwidth } from './bandwidth';
+import type { SupportThreadId } from './carePlanSupport';
 import {
   getCarePlanBucketSteps,
   getCarePlanWeekView,
@@ -46,6 +47,8 @@ export type WeeklyProgress = {
   completedStepKeys: string[];
   /** @deprecated Legacy href-based completion — read for backward compat only. */
   completedStepHrefs?: string[];
+  /** Support-panel thread nudged this week — rotates next week's nudge. */
+  lastSupportNudgeThread?: SupportThreadId | null;
 };
 
 export type WeeklyProgressSummary = {
@@ -144,6 +147,9 @@ function readRaw(): WeeklyProgress | null {
       weekStart: parsed.weekStart,
       intakeDoneAt: typeof parsed.intakeDoneAt === 'string' ? parsed.intakeDoneAt : null,
       completedStepKeys,
+      ...(typeof parsed.lastSupportNudgeThread === 'string'
+        ? { lastSupportNudgeThread: parsed.lastSupportNudgeThread as SupportThreadId }
+        : {}),
       ...(legacyHrefs.length ? { completedStepHrefs: legacyHrefs } : {}),
     };
   } catch {
@@ -210,6 +216,9 @@ export function loadPreviousWeeklyProgress(): WeeklyProgress | null {
       completedStepKeys: Array.isArray(parsed.completedStepKeys)
         ? parsed.completedStepKeys.filter((s): s is string => typeof s === 'string')
         : [],
+      ...(typeof parsed.lastSupportNudgeThread === 'string'
+        ? { lastSupportNudgeThread: parsed.lastSupportNudgeThread as SupportThreadId }
+        : {}),
       ...(Array.isArray(parsed.completedStepHrefs)
         ? {
             completedStepHrefs: parsed.completedStepHrefs.filter(
@@ -256,6 +265,18 @@ export function unmarkStepDone(stepKey: string, now: Date = new Date()): WeeklyP
   return next;
 }
 
+/** Persist which support thread was nudged — used to rotate next week. */
+export function recordSupportNudgeThread(
+  thread: SupportThreadId | null,
+  now: Date = new Date(),
+): WeeklyProgress {
+  const current = loadWeeklyProgress(now);
+  if (current.lastSupportNudgeThread === thread) return current;
+  const next: WeeklyProgress = { ...current, lastSupportNudgeThread: thread };
+  writeRaw(next);
+  return next;
+}
+
 /** Force-reset the current week's progress (debug / test affordance). */
 export function resetWeeklyProgress(now: Date = new Date()): WeeklyProgress {
   const fresh = emptyProgress(now);
@@ -292,7 +313,13 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
     : resolveCompletedKeys(progress, []);
 
   const weekView = plan
-    ? getCarePlanWeekView(plan, weekNumber, resolvedKeys, legacyHrefs)
+    ? getCarePlanWeekView(
+        plan,
+        weekNumber,
+        resolvedKeys,
+        legacyHrefs,
+        loadPreviousWeeklyProgress()?.lastSupportNudgeThread ?? null,
+      )
     : null;
   const visibleSteps = weekView?.activeSteps ?? plan?.steps ?? [];
   const stepCount = visibleSteps.length;

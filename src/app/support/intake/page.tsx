@@ -106,6 +106,8 @@ const HELP_OPTIONS: HelpOption[] = [
 type StepKind =
   | 'q-stage'
   | 'q-coverage'
+  | 'q-other-children'
+  | 'q-partner'
   | 'q-hardest'
   | 'q-help'
   | 'building';
@@ -113,6 +115,8 @@ type StepKind =
 const STEP_ORDER: StepKind[] = [
   'q-stage',
   'q-coverage',
+  'q-other-children',
+  'q-partner',
   'q-hardest',
   'q-help',
   'building',
@@ -122,6 +126,8 @@ const STEP_ORDER: StepKind[] = [
 const PROGRESS_STEPS: StepKind[] = [
   'q-stage',
   'q-coverage',
+  'q-other-children',
+  'q-partner',
   'q-hardest',
   'q-help',
 ];
@@ -130,6 +136,8 @@ const PROGRESS_STEPS: StepKind[] = [
 const STEP_HUE: Record<StepKind, string> = {
   'q-stage': 'bg-brand-warm-50',
   'q-coverage': 'bg-brand-warm-50',
+  'q-other-children': 'bg-brand-warm-50',
+  'q-partner': 'bg-brand-warm-50',
   'q-hardest': 'bg-brand-warm-100',
   'q-help': 'bg-brand-warm-100',
   'building': 'bg-brand-warm-50',
@@ -145,6 +153,8 @@ export default function IntakePage() {
   const [stepIdx, setStepIdx] = useState(0);
   const [stage, setStage] = useState<Stage | null>(null);
   const [coverageStatus, setCoverageStatus] = useState<CoverageStatus | null>(null);
+  const [hasOtherChildren, setHasOtherChildren] = useState<boolean | null>(null);
+  const [hasPartner, setHasPartner] = useState<boolean | null>(null);
   const [hardest, setHardest] = useState<Hardest[]>([]);
   const [helpKinds, setHelpKinds] = useState<HelpKind[]>([]);
 
@@ -160,6 +170,8 @@ export default function IntakePage() {
     if (draft) {
       if (draft.stage) setStage(draft.stage);
       if (draft.coverageStatus) setCoverageStatus(draft.coverageStatus);
+      if (typeof draft.hasOtherChildren === 'boolean') setHasOtherChildren(draft.hasOtherChildren);
+      if (typeof draft.hasPartner === 'boolean') setHasPartner(draft.hasPartner);
       if (Array.isArray(draft.hardest)) setHardest(draft.hardest);
       if (Array.isArray(draft.helpKinds)) setHelpKinds(draft.helpKinds);
     }
@@ -169,8 +181,8 @@ export default function IntakePage() {
   // Autosave the draft on every answer change once restore has run.
   useEffect(() => {
     if (!draftLoaded) return;
-    saveCarePlanDraft({ stage, coverageStatus, hardest, helpKinds });
-  }, [draftLoaded, stage, coverageStatus, hardest, helpKinds]);
+    saveCarePlanDraft({ stage, coverageStatus, hasOtherChildren, hasPartner, hardest, helpKinds });
+  }, [draftLoaded, stage, coverageStatus, hasOtherChildren, hasPartner, hardest, helpKinds]);
 
   const step = STEP_ORDER[stepIdx];
   const progressIdx = PROGRESS_STEPS.indexOf(step);
@@ -180,11 +192,13 @@ export default function IntakePage() {
     switch (step) {
       case 'q-stage': return stage !== null;
       case 'q-coverage': return coverageStatus !== null;
+      case 'q-other-children': return hasOtherChildren !== null;
+      case 'q-partner': return hasPartner !== null;
       case 'q-hardest': return hardest.length > 0;
       case 'q-help': return helpKinds.length > 0;
       default: return true; // building auto-advances
     }
-  }, [step, stage, coverageStatus, hardest, helpKinds]);
+  }, [step, stage, coverageStatus, hasOtherChildren, hasPartner, hardest, helpKinds]);
 
   const next = () => setStepIdx((i) => Math.min(i + 1, STEP_ORDER.length - 1));
   const back = () => setStepIdx((i) => Math.max(i - 1, 0));
@@ -200,7 +214,7 @@ export default function IntakePage() {
   // Build & save on 'building' step.
   useEffect(() => {
     if (step !== 'building') return;
-    const answers = { hardest, stage, coverageStatus, helpKinds };
+    const answers = { hardest, stage, coverageStatus, hasOtherChildren, hasPartner, helpKinds };
     saveCarePlan({
       answers,
       summary: generateSummary(answers),
@@ -218,7 +232,7 @@ export default function IntakePage() {
     clearCarePlanDraft();
     const t = window.setTimeout(() => router.push('/support/care-plan'), 1700);
     return () => window.clearTimeout(t);
-  }, [step, hardest, stage, coverageStatus, helpKinds, router]);
+  }, [step, hardest, stage, coverageStatus, hasOtherChildren, hasPartner, helpKinds, router]);
 
   return (
     <main className={cn('min-h-[calc(100vh-4rem)] transition-colors duration-500', STEP_HUE[step])}>
@@ -263,7 +277,7 @@ export default function IntakePage() {
           {step === 'q-coverage' && (
             <Question
               title="How is care paid for right now?"
-              hint="This shapes week two — we will never assume you have private insurance."
+              hint="This helps us point you to the right resources — not an eligibility check."
             >
               <div className="grid gap-2">
                 {COVERAGE_OPTIONS.map((opt) => (
@@ -275,6 +289,50 @@ export default function IntakePage() {
                     sublabel={opt.hint}
                   />
                 ))}
+              </div>
+            </Question>
+          )}
+
+          {step === 'q-other-children' && (
+            <Question
+              title="Do you have other children?"
+              hint="If yes, we will show sibling support beside your plan every week."
+            >
+              <div className="grid grid-cols-2 gap-2">
+                <Toggle
+                  active={hasOtherChildren === true}
+                  onClick={() => setHasOtherChildren(true)}
+                  label="Yes"
+                  compact
+                />
+                <Toggle
+                  active={hasOtherChildren === false}
+                  onClick={() => setHasOtherChildren(false)}
+                  label="No"
+                  compact
+                />
+              </div>
+            </Question>
+          )}
+
+          {step === 'q-partner' && (
+            <Question
+              title="Are you parenting with a partner?"
+              hint="We use this to personalize support threads — never to gate your plan."
+            >
+              <div className="grid grid-cols-2 gap-2">
+                <Toggle
+                  active={hasPartner === true}
+                  onClick={() => setHasPartner(true)}
+                  label="Yes"
+                  compact
+                />
+                <Toggle
+                  active={hasPartner === false}
+                  onClick={() => setHasPartner(false)}
+                  label="No"
+                  compact
+                />
               </div>
             </Question>
           )}

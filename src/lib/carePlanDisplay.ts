@@ -5,16 +5,31 @@
  */
 
 import {
+  getArcWeek,
+  resolveArcWeekNumber,
+  type Phase,
+} from './arcs';
+import {
   getStepCompletionKey,
+  type CarePlanAnswers,
   type CarePlanStep,
   type SavedCarePlan,
 } from './carePlanStorage';
-import { enrichCarePlanStep, generateBucketSteps, generateWeekTwoSteps } from './generateNextSteps';
+import type { SupportThreadId } from './carePlanSupport';
+import {
+  enrichCarePlanStep,
+  generateArcWeekSteps,
+  generateBucketSteps,
+} from './generateNextSteps';
 import { isStepComplete, type WeeklyProgress } from './weeklyProgress';
 
-/** All bucket steps shown on the care plan (up to 5). */
-export function getCarePlanBucketSteps(plan: SavedCarePlan): CarePlanStep[] {
-  const fromBuckets = generateBucketSteps(plan.answers)
+/** All bucket steps for a given arc week (default week 1). */
+export function getCarePlanBucketSteps(
+  plan: SavedCarePlan,
+  arcWeekNumber = 1,
+): CarePlanStep[] {
+  const arcWeek = getArcWeek(plan.answers.stage, arcWeekNumber);
+  const fromBuckets = generateBucketSteps(plan.answers, arcWeek)
     .map((b) => b.step)
     .filter((s): s is CarePlanStep => s !== null);
   const source = fromBuckets.length ? fromBuckets : plan.steps;
@@ -24,26 +39,29 @@ export function getCarePlanBucketSteps(plan: SavedCarePlan): CarePlanStep[] {
 export type CarePlanWeekView = {
   /** Steps the parent should focus on right now. */
   activeSteps: CarePlanStep[];
-  /** Parked until week-one work is done (or calendar week 2+). */
+  /** Parked until week-one work is done (arc week 1 only). */
   nextWeekSteps: CarePlanStep[];
   /** True when every non–next-week step is marked done. */
   weekOneComplete: boolean;
   /** Week 2+ guide is unlocked — next-week steps move into focus. */
   weekTwoUnlocked: boolean;
+  /** Which arc week (1–8) the parent is on. */
+  arcWeekNumber: number;
+  arcTheme: string;
+  arcPhase: Phase;
+  /** Support-panel thread nudged this week (for rotation next week). */
+  supportNudgeThread: SupportThreadId | null;
 };
 
-/**
- * Week 1: focus on do-today / ask-bcba / try-home / save-resource.
- * When those are done — or the parent is in calendar week 2+ — promote
- * next-week steps into the active guide.
- */
-export function getCarePlanWeekView(
+function weekOneBucketView(
   plan: SavedCarePlan,
-  weekNumber: number,
   completedKeys: string[],
-  legacyHrefs: string[] = [],
-): CarePlanWeekView {
-  const all = getCarePlanBucketSteps(plan);
+  legacyHrefs: string[],
+): Pick<
+  CarePlanWeekView,
+  'activeSteps' | 'nextWeekSteps' | 'weekOneComplete' | 'weekTwoUnlocked'
+> {
+  const all = getCarePlanBucketSteps(plan, 1);
   const thisWeekSteps = all.filter((s) => s.bucket !== 'next-week');
   const nextWeekSteps = all.filter((s) => s.bucket === 'next-week');
 
@@ -51,32 +69,95 @@ export function getCarePlanWeekView(
     thisWeekSteps.length > 0 &&
     thisWeekSteps.every((s) => isStepComplete(s, completedKeys, legacyHrefs, all));
 
-  const weekTwoUnlocked = weekNumber >= 2 || weekOneComplete;
-
-  if (weekTwoUnlocked) {
-    const completedWeekOneIds = thisWeekSteps
-      .filter((s) => isStepComplete(s, completedKeys, legacyHrefs, all))
-      .map((s) => s.id ?? s.title);
-
-    const generatedWeekTwo = generateWeekTwoSteps({
-      answers: plan.answers,
-      weekOneSteps: thisWeekSteps,
-      completedWeekOneIds,
-    }).map(enrichCarePlanStep);
-
-    return {
-      activeSteps: generatedWeekTwo,
-      nextWeekSteps: [],
-      weekOneComplete,
-      weekTwoUnlocked,
-    };
-  }
+  const weekTwoUnlocked = weekOneComplete;
 
   return {
     activeSteps: thisWeekSteps,
     nextWeekSteps,
     weekOneComplete,
-    weekTwoUnlocked: false,
+    weekTwoUnlocked,
+  };
+}
+
+function resolveActiveStepsForArcWeek(
+  plan: SavedCarePlan,
+  arcWeekNumber: number,
+  completedKeys: string[],
+  legacyHrefs: string[],
+  lastSupportNudgeThread: SupportThreadId | null | undefined,
+): { steps: CarePlanStep[]; supportNudgeThread: SupportThreadId | null } {
+  if (arcWeekNumber <= 1) {
+    const steps = getCarePlanBucketSteps(plan, 1).filter((s) => s.bucket !== 'next-week');
+    return { steps, supportNudgeThread: null };
+  }
+
+  const prior = resolveActiveStepsForArcWeek(
+    plan,
+    arcWeekNumber - 1,
+    completedKeys,
+    legacyHrefs,
+    lastSupportNudgeThread,
+  );
+
+  const completedPriorWeekIds = prior.steps
+    .filter((s) => isStepComplete(s, completedKeys, legacyHrefs, prior.steps))
+    .map((s) => s.id ?? s.title);
+
+  const arcWeek = getArcWeek(plan.answers.stage, arcWeekNumber);
+  const rotationInput =
+    arcWeekNumber === 2 ? lastSupportNudgeThread : prior.supportNudgeThread;
+
+  return generateArcWeekSteps({
+    answers: plan.answers,
+    arcWeek,
+    priorWeekSteps: prior.steps,
+    completedPriorWeekIds,
+    lastSupportNudgeThread: rotationInput,
+  });
+}
+
+/**
+ * Week 1: focus on do-today / ask-bcba / try-home / save-resource from arc week 1.
+ * When those are done — or calendar week advances — promote into arc week 2+ guide.
+ */
+export function getCarePlanWeekView(
+  plan: SavedCarePlan,
+  weekNumber: number,
+  completedKeys: string[],
+  legacyHrefs: string[] = [],
+  lastSupportNudgeThread: SupportThreadId | null | undefined = null,
+): CarePlanWeekView {
+  const week1 = weekOneBucketView(plan, completedKeys, legacyHrefs);
+  const arcWeekNumber = resolveArcWeekNumber(weekNumber, week1.weekOneComplete);
+  const arcWeek = getArcWeek(plan.answers.stage, arcWeekNumber);
+
+  if (arcWeekNumber === 1) {
+    return {
+      ...week1,
+      arcWeekNumber: 1,
+      arcTheme: arcWeek.theme,
+      arcPhase: arcWeek.phase,
+      supportNudgeThread: null,
+    };
+  }
+
+  const generated = resolveActiveStepsForArcWeek(
+    plan,
+    arcWeekNumber,
+    completedKeys,
+    legacyHrefs,
+    lastSupportNudgeThread,
+  );
+
+  return {
+    activeSteps: generated.steps.map(enrichCarePlanStep),
+    nextWeekSteps: [],
+    weekOneComplete: week1.weekOneComplete,
+    weekTwoUnlocked: true,
+    arcWeekNumber,
+    arcTheme: arcWeek.theme,
+    arcPhase: arcWeek.phase,
+    supportNudgeThread: generated.supportNudgeThread,
   };
 }
 

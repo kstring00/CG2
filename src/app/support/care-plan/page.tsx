@@ -41,6 +41,9 @@ import {
 } from '@/lib/generateNextSteps';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
 import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
+import CarePlanSupportPanel from '@/components/CarePlanSupportPanel';
+import AdmissionsHandoff from '@/components/AdmissionsHandoff';
+import { ADMISSIONS_STEP_IDS } from '@/lib/carePlanSupport';
 import {
   completedStepTitles,
   getCarePlanBucketSteps,
@@ -52,6 +55,7 @@ import {
   loadPreviousWeeklyProgress,
   loadWeeklyProgress,
   markStepDone,
+  recordSupportNudgeThread,
   unmarkStepDone,
   WEEKLY_PROGRESS_EVENT,
 } from '@/lib/weeklyProgress';
@@ -173,9 +177,9 @@ function StepLink({
   className: string;
   children: React.ReactNode;
 }) {
-  if (href.startsWith('http')) {
+  if (href.startsWith('http') || href.startsWith('tel:')) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+      <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined} className={className}>
         {children}
       </a>
     );
@@ -244,9 +248,22 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
     : 1;
 
   const weekView = useMemo(
-    () => getCarePlanWeekView(plan, weekNumber, completedKeys, legacyHrefs),
+    () =>
+      getCarePlanWeekView(
+        plan,
+        weekNumber,
+        completedKeys,
+        legacyHrefs,
+        loadPreviousWeeklyProgress()?.lastSupportNudgeThread ?? null,
+      ),
     [plan, weekNumber, completedKeys, legacyHrefs],
   );
+
+  useEffect(() => {
+    if (weekView.supportNudgeThread) {
+      recordSupportNudgeThread(weekView.supportNudgeThread);
+    }
+  }, [weekView.supportNudgeThread]);
 
   const topSteps = weekView.activeSteps;
   const weekTwoIntro = useMemo(
@@ -399,37 +416,54 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
-      {weekView.weekOneComplete && weekView.weekTwoUnlocked && weekTwoIntro && (
+      {weekView.weekTwoUnlocked && weekTwoIntro && (
         <section
-          aria-label="Week two guide"
+          aria-label="Arc week guide"
           className="mt-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-white p-5 sm:p-6"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-            {weekNumber >= 2 ? `Week ${weekNumber}` : 'Ready for week 2'}
+            Week {weekView.arcWeekNumber} · {weekView.arcPhase}
           </p>
           <h2 className="mt-1 text-lg font-bold text-brand-navy-700">
-            {weekTwoIntro.title}
+            {weekView.arcTheme}
           </h2>
           <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-700">
             {weekTwoIntro.body}
           </p>
-          <Link
-            href={CHECK_IN_HREF}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-          >
-            Start your next check-in <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <Link
+              href={CHECK_IN_HREF}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+            >
+              Start your next check-in <ArrowRight className="h-4 w-4" />
+            </Link>
+            <AdmissionsHandoff compact />
+          </div>
         </section>
       )}
 
+      {!weekView.weekTwoUnlocked && (
+        <section
+          aria-label="Arc week theme"
+          className="mt-5 rounded-2xl border border-brand-plum-100 bg-brand-plum-50/50 px-4 py-3 sm:px-5"
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
+            Week {weekView.arcWeekNumber} · {weekView.arcPhase}
+          </p>
+          <p className="mt-1 text-[15px] font-semibold text-brand-navy-700">{weekView.arcTheme}</p>
+        </section>
+      )}
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+        <div>
       {/* 3) START HERE — the strongest section, numbered list */}
-      <section aria-label="Start here" className="mt-8">
+      <section aria-label="Start here">
         <SectionHeader
           icon={Flag}
           title="Start here"
           subtitle={
             weekView.weekTwoUnlocked
-              ? `Week ${Math.max(weekNumber, 2)} — steps built from your intake and what you finished last week.`
+              ? `Week ${weekView.arcWeekNumber} — ${weekView.arcTheme.toLowerCase()}.`
               : 'Your top priority steps for this week.'
           }
           right={
@@ -449,7 +483,9 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
             const isDone = isStepDone(step);
             const stepKey = getStepCompletionKey(step);
             const bucket = step.bucket;
-            const isExternal = step.href.startsWith('http');
+            const isExternal = step.href.startsWith('http') || step.href.startsWith('tel:');
+            const showAdmissions =
+              step.id !== undefined && ADMISSIONS_STEP_IDS.has(step.id);
             const ctaVerb =
               step.id === 'parentTherapist'
                 ? 'Find a therapist'
@@ -501,6 +537,12 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
                   </p>
 
                   {step.evidence && <EvidenceStrip evidence={step.evidence} />}
+
+                  {showAdmissions && step.id !== 'admissionsConsult' && (
+                    <div className="mt-2">
+                      <AdmissionsHandoff compact />
+                    </div>
+                  )}
 
                   <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
                     {bucket && (
@@ -575,6 +617,15 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
           </ul>
         </aside>
       )}
+
+        </div>
+
+        <CarePlanSupportPanel answers={plan.answers} className="lg:sticky lg:top-24" />
+      </div>
+
+      <div className="mt-6 print:hidden">
+        <AdmissionsHandoff />
+      </div>
 
       {/* 4) LOWER — two compact columns */}
       {resources.length > 0 && (
