@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { ArrowRight, Phone } from 'lucide-react';
 import { HERO_REASSURANCE } from '@/lib/homeBaseContent';
+import {
+  DAY_CHECK_BAD_DAY_PLAN_PERMISSION,
+  DAY_CHECK_GOOD_DAY_PLAN_LEAD,
+} from '@/lib/homeBaseDayCheck';
 
 function StepLink({
   href,
@@ -30,31 +34,34 @@ function StepLink({
   );
 }
 
+export type HomeBaseHeroVariant = 'prominent' | 'calm' | 'softened';
+
 type Props = {
   step: { title: string; href: string; because?: string; why?: string };
-  softened?: boolean;
-  intakeMode?: boolean;
+  variant?: HomeBaseHeroVariant;
 };
 
-export default function HomeBaseHero({ step, softened, intakeMode }: Props) {
+export default function HomeBaseHero({ step, variant = 'calm' }: Props) {
   const subtitle = step.because ?? step.why;
-  const ctaLabel = intakeMode
-    ? 'Start check-in'
-    : step.href === '/support/care-plan'
-      ? 'Open my plan'
-      : 'Open guide';
+  const ctaLabel =
+    step.href === '/support/care-plan' ? 'Open my plan' : 'Open guide';
+
+  const isProminent = variant === 'prominent';
+  const isSoftened = variant === 'softened';
 
   return (
     <section
-      aria-label={intakeMode ? 'Start this week' : 'Your next step'}
+      aria-label="Your next step"
       className={[
         'relative overflow-hidden rounded-[1.75rem] border transition',
-        softened
+        isSoftened
           ? 'border-surface-border/80 bg-white p-5 sm:p-6'
-          : 'border-brand-plum-200/60 bg-gradient-to-br from-brand-plum-50 via-[#f7f2fb] to-white p-6 shadow-soft sm:p-8',
+          : isProminent
+            ? 'border-brand-plum-200/60 bg-gradient-to-br from-brand-plum-50 via-[#f7f2fb] to-white p-6 shadow-soft sm:p-8'
+            : 'border-brand-plum-100/80 bg-gradient-to-br from-brand-plum-50/40 to-white p-5 shadow-soft sm:p-6',
       ].join(' ')}
     >
-      {!softened && (
+      {isProminent && (
         <div className="pointer-events-none absolute -bottom-6 -right-2 hidden opacity-90 sm:block">
           <div className="flex h-28 w-28 items-center justify-center rounded-full bg-brand-plum-100/80">
             <Phone className="h-12 w-12 text-brand-plum-400/90" strokeWidth={1.25} aria-hidden />
@@ -62,22 +69,22 @@ export default function HomeBaseHero({ step, softened, intakeMode }: Props) {
         </div>
       )}
 
-      {softened && (
+      {isSoftened && (
         <p className="mb-2 text-[12px] font-medium text-brand-muted-500">
-          When you&rsquo;re ready — your plan step is still here.
+          {DAY_CHECK_BAD_DAY_PLAN_PERMISSION}
         </p>
       )}
 
       <div className="relative max-w-2xl">
-        {!softened && (
+        {!isSoftened && (
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-plum-700">
-            {intakeMode ? 'Start here' : 'Today'}
+            {isProminent ? DAY_CHECK_GOOD_DAY_PLAN_LEAD : 'Your plan'}
           </p>
         )}
         <h2
           className={[
             'mt-2 font-semibold leading-tight text-brand-navy-700',
-            softened ? 'text-xl' : 'text-2xl sm:text-[1.75rem]',
+            isSoftened ? 'text-xl' : isProminent ? 'text-2xl sm:text-[1.75rem]' : 'text-xl sm:text-2xl',
           ].join(' ')}
         >
           {step.title}
@@ -86,7 +93,7 @@ export default function HomeBaseHero({ step, softened, intakeMode }: Props) {
           <p
             className={[
               'mt-3 leading-relaxed text-brand-muted-700',
-              softened ? 'text-[13px]' : 'text-[15px]',
+              isSoftened ? 'text-[13px]' : 'text-[14px] sm:text-[15px]',
             ].join(' ')}
           >
             {subtitle}
@@ -98,7 +105,7 @@ export default function HomeBaseHero({ step, softened, intakeMode }: Props) {
             href={step.href}
             className={[
               'inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold shadow-soft transition',
-              softened
+              isSoftened
                 ? 'border border-surface-border bg-white text-brand-navy-700 hover:border-primary/30'
                 : 'bg-primary text-white hover:bg-primary/90',
             ].join(' ')}
@@ -114,7 +121,7 @@ export default function HomeBaseHero({ step, softened, intakeMode }: Props) {
           </Link>
         </div>
 
-        {!softened && (
+        {!isSoftened && (
           <p className="mt-4 text-[13px] italic text-brand-plum-800/80">{HERO_REASSURANCE}</p>
         )}
       </div>

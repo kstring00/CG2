@@ -7,7 +7,6 @@ import HomeBaseHeader from '@/components/homeBase/HomeBaseHeader';
 import HomeBaseJourneyCard from '@/components/homeBase/HomeBaseJourneyCard';
 import HomeBaseDayCheck from '@/components/homeBase/HomeBaseDayCheck';
 import HomeBaseHero from '@/components/homeBase/HomeBaseHero';
-import HomeBaseRoughDayLead from '@/components/homeBase/HomeBaseRoughDayLead';
 import HomeBaseInsightGrid from '@/components/homeBase/HomeBaseInsightGrid';
 import HomeBaseQuickLinks from '@/components/homeBase/HomeBaseQuickLinks';
 import HomeBaseHumanFooter from '@/components/homeBase/HomeBaseHumanFooter';
@@ -31,13 +30,8 @@ import {
   WEEKLY_PROGRESS_EVENT,
 } from '@/lib/weeklyProgress';
 import { computeWeekNumber, loadCheckInState } from '@/lib/weeklyCheckIn';
-import {
-  loadHomeBaseDayMood,
-  saveHomeBaseDayMood,
-  type HomeBaseDayMood,
-} from '@/lib/homeBaseDayCheck';
-
-const CHECK_IN_HREF = '/support/check-in';
+import type { HomeBaseDayMood } from '@/lib/homeBaseDayCheck';
+import type { HomeBaseHeroVariant } from '@/components/homeBase/HomeBaseHero';
 
 function useHomeBasePlan() {
   const [hydrated, setHydrated] = useState(false);
@@ -141,17 +135,6 @@ function HomeBaseWithPlan({
   summary: WeeklyProgressSummary;
 }) {
   const [dayMood, setDayMood] = useState<HomeBaseDayMood | null>(null);
-  const [dayMoodHydrated, setDayMoodHydrated] = useState(false);
-
-  useEffect(() => {
-    setDayMood(loadHomeBaseDayMood());
-    setDayMoodHydrated(true);
-  }, []);
-
-  const handleDayMood = (value: HomeBaseDayMood | null) => {
-    setDayMood(value);
-    saveHomeBaseDayMood(value);
-  };
 
   const progress = loadWeeklyProgress();
   const legacyHrefs = progress.completedStepHrefs ?? [];
@@ -163,27 +146,25 @@ function HomeBaseWithPlan({
   );
 
   const heroStep = useMemo(() => {
-    if (!summary.intakeDoneThisWeek) {
-      return {
-        title: 'Start this week’s check-in',
-        href: CHECK_IN_HREF,
-        why: 'A quick pulse on how the week feels — then your plan steps unlock.',
-      };
-    }
     if (incompleteSteps.length > 0) return incompleteSteps[0];
     return {
       title: 'You’re caught up for this week',
       href: '/support/care-plan',
       why: 'Nothing urgent right now. Your full plan is always here when you want it.',
     };
-  }, [summary.intakeDoneThisWeek, incompleteSteps]);
+  }, [incompleteSteps]);
 
   const heroStepKey = useMemo(() => {
-    if (!summary.intakeDoneThisWeek || incompleteSteps.length === 0) return undefined;
+    if (incompleteSteps.length === 0) return undefined;
     return getStepCompletionKey(incompleteSteps[0]);
-  }, [summary.intakeDoneThisWeek, incompleteSteps]);
+  }, [incompleteSteps]);
 
-  const isRoughDay = dayMoodHydrated && dayMood === 'rough';
+  const heroVariant: HomeBaseHeroVariant | null = useMemo(() => {
+    if (!dayMood) return null;
+    if (dayMood === 'rough') return 'softened';
+    if (dayMood === 'good') return 'prominent';
+    return 'calm';
+  }, [dayMood]);
 
   return (
     <div className="page-shell gap-6 sm:gap-8">
@@ -195,27 +176,10 @@ function HomeBaseWithPlan({
           arcWeekNumber={weekView.arcWeekNumber}
           arcTheme={weekView.arcTheme}
         />
-        {dayMoodHydrated && (
-          <HomeBaseDayCheck value={dayMood} onChange={handleDayMood} />
-        )}
+        <HomeBaseDayCheck value={dayMood} onChange={setDayMood} />
       </div>
 
-      {isRoughDay && <HomeBaseRoughDayLead />}
-
-      {!isRoughDay && (
-        <HomeBaseHero
-          step={heroStep}
-          intakeMode={!summary.intakeDoneThisWeek}
-        />
-      )}
-
-      {isRoughDay && (
-        <HomeBaseHero
-          step={heroStep}
-          softened
-          intakeMode={!summary.intakeDoneThisWeek}
-        />
-      )}
+      {heroVariant && <HomeBaseHero step={heroStep} variant={heroVariant} />}
 
       <HomeBaseInsightGrid
         steps={allSteps}
