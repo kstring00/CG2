@@ -33,6 +33,7 @@ import {
   Wind,
   Wrench,
 } from 'lucide-react';
+import { AT_HOME_STRATEGIES_LABEL } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import { sensoryFriendlyPlaces } from '@/lib/data';
 import { verifiedProviders } from '@/lib/providers';
@@ -426,7 +427,7 @@ export default function HomeSupportHub() {
 
             {/* Card 2 — At-Home Strategies */}
             <FeatureCard
-              title="At-Home Strategies"
+              title={AT_HOME_STRATEGIES_LABEL}
               purpose="A clean parent toolbox of practical, real-life tools."
               ctaLabel="Browse Strategies"
               ctaHref="/support/at-home"

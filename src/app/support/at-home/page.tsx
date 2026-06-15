@@ -38,6 +38,7 @@ import {
   type AtHomeStrategy,
   type StrategySituation,
 } from '@/lib/atHomeStrategies';
+import { AT_HOME_STRATEGIES_LABEL } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 
 type FilterValue = StrategySituation | 'all';
@@ -108,7 +109,7 @@ export default function AtHomeStrategiesPage() {
           <li aria-hidden>
             <ChevronRight className="h-3 w-3" />
           </li>
-          <li className="font-medium text-brand-muted-700">At-Home Strategies</li>
+          <li className="font-medium text-brand-muted-700">{AT_HOME_STRATEGIES_LABEL}</li>
         </ol>
       </nav>
 
@@ -117,7 +118,7 @@ export default function AtHomeStrategiesPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1 text-[11px] font-semibold text-brand-plum-700">
-              <HomeIcon className="h-3.5 w-3.5" /> At-Home Strategies
+              <HomeIcon className="h-3.5 w-3.5" /> {AT_HOME_STRATEGIES_LABEL}
             </span>
             <h1 className="mt-3 text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">
               Ten things to try when the moment is hard.

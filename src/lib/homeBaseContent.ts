@@ -1,4 +1,7 @@
-/** Static Home Base copy + links — every item routes to real content. */
+import {
+  AT_HOME_STRATEGIES_LABEL,
+  RESOURCE_HUB_LABEL,
+} from '@/lib/supportNavLabels';
 
 export const HOME_BASE_TAGLINE = "You're showing up for your child — that matters.";
 
@@ -52,7 +55,7 @@ export function getHomeBaseQuickLinks(hasOtherChildren: boolean): HomeBaseQuickL
       iconClass: 'text-brand-plum-700',
     },
     {
-      label: 'At-home strategies',
+      label: AT_HOME_STRATEGIES_LABEL,
       href: '/support/at-home',
       cardClass: 'border-surface-border bg-gradient-to-br from-surface-muted/40 to-white',
       iconClass: 'text-brand-muted-600',
@@ -73,7 +76,7 @@ export function getHomeBaseQuickLinks(hasOtherChildren: boolean): HomeBaseQuickL
     });
   }
   links.push({
-    label: 'Guides & strategies',
+    label: RESOURCE_HUB_LABEL,
     href: '/support/resources',
     cardClass: 'border-emerald-200/70 bg-gradient-to-br from-emerald-50/80 to-white',
     iconClass: 'text-emerald-800',

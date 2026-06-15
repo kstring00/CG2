@@ -24,6 +24,7 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import { RESOURCE_HUB_LABEL } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import {
   BadgePill,
@@ -163,7 +164,7 @@ export default function ResourcesPage() {
       {/* Header */}
       <header className="page-header max-w-3xl">
         <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-          Helpful Guides
+          {RESOURCE_HUB_LABEL}
         </p>
         <h1 className="page-title text-brand-navy-700">Resources that actually help.</h1>
         <p className="page-description text-[15px] text-brand-muted-700">

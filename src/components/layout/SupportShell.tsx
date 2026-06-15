@@ -19,6 +19,10 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import Image from 'next/image';
+import {
+  AT_HOME_STRATEGIES_LABEL,
+  RESOURCE_HUB_LABEL,
+} from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 import NextStepButton from '@/components/layout/NextStepButton';
@@ -53,8 +57,8 @@ const navGroups = [
     label: 'Learn',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
-      { href: '/support/at-home', label: 'At-Home Strategies', icon: Lightbulb },
-      { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
+      { href: '/support/at-home', label: AT_HOME_STRATEGIES_LABEL, icon: Lightbulb },
+      { href: '/support/resources', label: RESOURCE_HUB_LABEL, icon: BookOpen },
       { href: '/support/siblings', label: 'Sibling Support', icon: Users },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
       { href: '/support/financial', label: 'Paying for Care', icon: Wallet },

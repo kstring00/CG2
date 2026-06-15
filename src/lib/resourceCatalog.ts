@@ -3,6 +3,7 @@
  * External entries mirror `resources` in data.ts; internal entries are Common Ground pages.
  */
 
+import { AT_HOME_STRATEGIES_LABEL } from '@/lib/supportNavLabels';
 import { resources as externalResources } from '@/lib/data';
 
 export type GuideResourceNeed =
@@ -275,7 +276,7 @@ export const GUIDE_RESOURCES: GuideResource[] = [
   }),
   internalGuide({
     id: 'cg-at-home',
-    title: 'At-Home Strategies',
+    title: AT_HOME_STRATEGIES_LABEL,
     shortDescription:
       'Ten ABA-grounded tactics you can try in the next 60 seconds when the moment is hard.',
     description:

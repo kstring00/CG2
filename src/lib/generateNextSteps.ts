@@ -23,6 +23,7 @@ import type {
   StepEvidence,
   WeekMood,
 } from './carePlanStorage';
+import { RESOURCE_HUB_LABEL } from './supportNavLabels';
 import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
 import type { ArcWeek } from './arcs';
 import { getArcWeek, isResolvableCandidateId } from './arcs';
@@ -1463,7 +1464,7 @@ const FALLBACK_STEPS: CarePlanStep[] = [
 ];
 
 const FALLBACK_RESOURCES: CarePlanResource[] = [
-  { label: 'Guides & strategies', href: '/support/resources' },
+  { label: RESOURCE_HUB_LABEL, href: '/support/resources' },
   { label: 'Find local help', href: '/support/find' },
   { label: 'Connect with parents', href: '/support/connect' },
   { label: 'Parent support', href: '/support/caregiver' },

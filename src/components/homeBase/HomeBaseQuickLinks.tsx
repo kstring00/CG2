@@ -1,15 +1,19 @@
 import Link from 'next/link';
 import { ArrowUpRight, BookOpen, Heart, Home, Users, Wallet } from 'lucide-react';
 import { getHomeBaseQuickLinks } from '@/lib/homeBaseContent';
+import {
+  AT_HOME_STRATEGIES_LABEL,
+  RESOURCE_HUB_LABEL,
+} from '@/lib/supportNavLabels';
 import { resolveHasOtherChildren } from '@/lib/carePlanSupport';
 import type { CarePlanAnswers } from '@/lib/carePlanStorage';
 
 const ICONS = {
   'Mental health for you': Heart,
-  'At-home strategies': Home,
+  [AT_HOME_STRATEGIES_LABEL]: Home,
   'Paying for care': Wallet,
   'Sibling support': Users,
-  'Guides & strategies': BookOpen,
+  [RESOURCE_HUB_LABEL]: BookOpen,
 } as const;
 
 type Props = {
