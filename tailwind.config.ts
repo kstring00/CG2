@@ -114,30 +114,10 @@ const config: Config = {
         page: {
           DEFAULT: '#f2f4f8',
         },
-        marriage: {
-          ink: '#1f1a26',
-          'ink-2': '#2a2330',
-          paper: '#f4efe8',
-          surface: '#fcfaf5',
-          pine: '#21453c',
-          'pine-soft': '#3e6b5e',
-          amber: '#e2a85e',
-          'amber-deep': '#cf9242',
-          clay: '#c5634a',
-          body: '#2b2620',
-          muted: '#6f665a',
-          footer: '#16121c',
-        },
       },
       fontFamily: {
         display: ['var(--font-display)', 'system-ui', 'sans-serif'],
         body: ['var(--font-body)', 'system-ui', 'sans-serif'],
-        'marriage-serif': ['var(--font-fraunces)', 'Georgia', 'serif'],
-        'marriage-sans': ['var(--font-hanken)', 'system-ui', 'sans-serif'],
-      },
-      borderColor: {
-        'marriage-line': 'rgba(33,28,38,0.12)',
-        'marriage-line-strong': 'rgba(33,28,38,0.2)',
       },
       keyframes: {
         fadeIn: {
@@ -152,16 +132,11 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateX(16px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
-        marriageLampBreathe: {
-          '0%, 100%': { transform: 'scale(1)', opacity: '0.55' },
-          '50%': { transform: 'scale(1.08)', opacity: '0.75' },
-        },
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
         'slide-up': 'slideUp 0.5s ease-out forwards',
         'slide-in-right': 'slideInRight 0.3s ease-out forwards',
-        'marriage-lamp': 'marriageLampBreathe 7s ease-in-out infinite',
       },
       borderRadius: {
         '2xl': '1rem',

@@ -1,88 +1,299 @@
-export type MarriageTruth = {
-  statement: string;
-  body: string;
-  tryThis: string;
+import type { LucideIcon } from 'lucide-react';
+import {
+  ArrowLeftRight,
+  Baby,
+  Clock,
+  Heart,
+  HeartHandshake,
+  MessageCircle,
+  RefreshCw,
+  Repeat,
+  ShieldAlert,
+  Users,
+  VolumeX,
+} from 'lucide-react';
+
+export type SituationId =
+  | 'same-fight'
+  | 'co-parents'
+  | 'parent-differently'
+  | 'no-time'
+  | 'communication'
+  | 'reconnect';
+
+export type SituationCard = {
+  id: SituationId;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  reassurance: string;
 };
 
-export type MarriageResource = {
+export const SITUATIONS: SituationCard[] = [
+  {
+    id: 'same-fight',
+    title: 'We keep having the same fight',
+    description: 'Same topics, same pain, different day.',
+    icon: Repeat,
+    reassurance:
+      'Repeating fights usually mean an unmet need is still unnamed — not that you’re failing.',
+  },
+  {
+    id: 'co-parents',
+    title: 'We feel more like co-parents than partners',
+    description: 'The “us” has taken a backseat.',
+    icon: Users,
+    reassurance:
+      'When parenting takes center stage, connection can feel distant — and that is recoverable.',
+  },
+  {
+    id: 'parent-differently',
+    title: 'We parent differently',
+    description: 'Different styles are causing tension.',
+    icon: ArrowLeftRight,
+    reassurance:
+      'Different styles are common; alignment on values matters more than matching every tactic.',
+  },
+  {
+    id: 'no-time',
+    title: 'We barely have time for us',
+    description: 'Busy, exhausted, and running on empty.',
+    icon: Clock,
+    reassurance:
+      'Small moments count. You don’t need a date night to start rebuilding closeness.',
+  },
+  {
+    id: 'communication',
+    title: 'Stress is hurting our communication',
+    description: 'Short tempers, shutdowns, or distance.',
+    icon: VolumeX,
+    reassurance:
+      'Stress shrinks our capacity to listen. Pausing is a skill — not avoidance.',
+  },
+  {
+    id: 'reconnect',
+    title: 'We need help rebuilding connection',
+    description: 'We want closeness again.',
+    icon: HeartHandshake,
+    reassurance:
+      'Wanting closeness again is already a step toward it. You’re not starting from zero.',
+  },
+];
+
+export const FOUR_STEPS = [
+  {
+    step: 1,
+    title: 'Pause the pattern',
+    body: 'Take a breath. Notice escalation. Hit pause.',
+    icon: RefreshCw,
+  },
+  {
+    step: 2,
+    title: 'Name what’s underneath',
+    body: 'Identify the need, fear, hurt, or stress driving it.',
+    icon: MessageCircle,
+  },
+  {
+    step: 3,
+    title: 'Use a short repair',
+    body: 'A few caring words can change the tone.',
+    icon: Heart,
+  },
+  {
+    step: 4,
+    title: 'Decide if you need outside support',
+    body: 'There’s strength in getting help.',
+    icon: HeartHandshake,
+  },
+] as const;
+
+export const QUICK_CHECKLIST = [
+  'We’re both willing to pause.',
+  'We will listen without interrupting.',
+  'We’ll speak using “I” statements.',
+  'We’ll take one small action for connection.',
+] as const;
+
+export type ResourceId =
+  | 'conflict-repair'
+  | 'communication-scripts'
+  | 'division-of-labor'
+  | 'reconnecting'
+  | 'parenting-team'
+  | 'after-argument'
+  | 'weekly-checkin'
+  | 'counseling';
+
+export type ResourceCard = {
+  id: ResourceId;
   title: string;
-  body: string;
-  cta: string;
+  description: string;
+  icon: LucideIcon;
   href: string;
 };
 
-export const truths: MarriageTruth[] = [
+export const RESOURCES: ResourceCard[] = [
   {
-    statement: "You've turned into a team of managers, not a couple.",
-    body: 'Therapy schedules, IEP meetings, who\'s covering pickup, which approach to try next. The logistics are endless, and somewhere in there the only conversations you have left are about handoffs and to-do lists.',
-    tryThis:
-      'Once a week, take ten minutes where the kids are completely off the table. No planning, no problem-solving. Just each other. Guard it like an appointment, because it is one.',
+    id: 'conflict-repair',
+    title: 'Conflict Repair Guide',
+    description: 'Step-by-step repair phrases that actually work.',
+    icon: RefreshCw,
+    href: '#insight-conflict',
   },
   {
-    statement: "You don't always agree on the path forward.",
-    body: "One of you researches every option at 2 a.m.; one of you just needs to breathe. You grieve differently, hope differently, and process differently — and it can start to feel like you're not even on the same side.",
-    tryThis:
-      "Before you discuss the disagreement, say the shared goal out loud: your child thriving, your family intact. You're standing on the same ground. Argue the how from there, not from opposite corners.",
+    id: 'communication-scripts',
+    title: 'Communication Scripts',
+    description: 'What to say and what not to say when things get hard.',
+    icon: MessageCircle,
+    href: '#insight-conflict',
   },
   {
-    statement: "There's no time that belongs to just the two of you.",
-    body: "A real date feels impossible. A sitter your child trusts is hard to find. And by the time the house finally goes quiet, you're both running on fumes with nothing left to give.",
-    tryThis:
-      "Stop waiting for the perfect window — it isn't coming. A shared cup of coffee after bedtime counts. Protect ten honest minutes more fiercely than you'd protect a two-hour night out you'll never actually get.",
+    id: 'division-of-labor',
+    title: 'Division of Labor Reset',
+    description: 'Fairer tasks, less resentment, more teamwork.',
+    icon: Users,
+    href: '#insight-decisions',
   },
   {
-    statement: "One of you is carrying more — and it's growing quietly.",
-    body: 'Usually one parent becomes the expert, the default, the one the school calls. The other can feel shut out. The one carrying it can feel completely alone. Either way, resentment builds in the silence.',
-    tryThis:
-      'Say the quiet part. "I feel alone in this" and "I don\'t know how to help you" are not attacks — they\'re the first honest step toward sharing the weight again. You can\'t split a load you won\'t name.',
-  },
-];
-
-export const prompts = [
-  'Tell me one good thing from today that had nothing to do with the kids.',
-  "What's something I did this week that you noticed, but I never got thanked for?",
-  'When did we last feel like a team? Let\'s name it out loud.',
-  "What's one thing you're carrying right now that you haven't said yet?",
-  'If we had a free Saturday — just us — what would you actually want to do?',
-  "What's one small way I could make your mornings easier?",
-  'Tell me about who you were before all of this. I want to remember them too.',
-  "What are you secretly proud of in how we're handling this?",
-  "What's one thing you need from me that you stopped asking for?",
-  'Where do you want us to be a year from now?',
-  'What made you laugh recently? Make me laugh too.',
-  'Put your phone down for a second. Just look at me. Hi.',
-];
-
-export const resources: MarriageResource[] = [
-  {
-    title: 'Counseling that actually gets it',
-    body: 'Find a couples therapist who understands raising a child with a disability. Ask them directly — experience here changes everything.',
-    cta: 'Find a counselor',
-    href: '/support/find',
+    id: 'reconnecting',
+    title: 'Reconnecting After Hard Seasons',
+    description: 'Gentle ways to rebuild closeness.',
+    icon: HeartHandshake,
+    href: '#reset',
   },
   {
-    title: 'A group for both of you',
-    body: 'Support groups exist for partners, not just for the parent who became the full-time caregiver. Going together changes the dynamic at home.',
-    cta: 'Find a group',
-    href: '/support/connect',
+    id: 'parenting-team',
+    title: 'Parenting as a Team',
+    description: 'Align on values, routines, and boundaries.',
+    icon: Baby,
+    href: '#insight-parenting-stress',
   },
   {
-    title: "A date that doesn't require leaving",
-    body: "No sitter, no budget, no problem. A set of small, doable ways to connect at home, after bedtime, when leaving the house just isn't going to happen.",
-    cta: 'See the ideas',
-    href: '/support/at-home',
+    id: 'after-argument',
+    title: 'After-the-Argument Recovery',
+    description: 'How to repair fast and learn without blaming.',
+    icon: Repeat,
+    href: '#insight-conflict',
   },
   {
-    title: "When it's bigger than a rough patch",
-    body: "If you're past tired and into crisis — drained, hopeless, or barely speaking — please don't wait it out alone. Reaching out early is strength, not failure.",
-    cta: 'Talk to someone today',
-    href: 'tel:988',
+    id: 'weekly-checkin',
+    title: 'Weekly Marriage Check-In',
+    description: 'A 30-minute rhythm that keeps you aligned.',
+    icon: Clock,
+    href: '#reset',
+  },
+  {
+    id: 'counseling',
+    title: 'When to Seek Counseling',
+    description: 'Signs, benefits, and how to get started.',
+    icon: ShieldAlert,
+    href: '#extra-support',
   },
 ];
 
-export const headerNav = [
-  { label: 'For Couples', href: '#intro' },
-  { label: 'Reconnect', href: '#tool' },
-  { label: 'Resources', href: '#resources' },
-  { label: 'For Families', href: '/support' },
+export const RESET_PROMPTS = [
+  'What has felt heavy for you lately?',
+  'What do you need more of from me this week?',
+  'Where are we working well as a team?',
+  'What is one small way we can reconnect this week?',
+  'What would help you feel supported tonight?',
 ] as const;
+
+export type InsightId =
+  | 'conflict'
+  | 'parenting-stress'
+  | 'trust'
+  | 'decisions'
+  | 'burnout'
+  | 'logistics';
+
+export type CounselorInsight = {
+  id: InsightId;
+  title: string;
+  summary: string;
+  body: string[];
+};
+
+export const COUNSELOR_INSIGHTS: CounselorInsight[] = [
+  {
+    id: 'conflict',
+    title: 'Managing conflict without attacking or withdrawing',
+    summary: 'Stay in the conversation without flooding or shutting down.',
+    body: [
+      'When parenting stress is high, conflict often sounds like criticism but is really fear — fear of being alone in the load, fear of getting it wrong, fear of losing each other.',
+      'Try a time-out signal you both agree on before voices rise. Return within 30 minutes with one sentence: “What I was really worried about was…”',
+      'Repairs don’t require a perfect apology. “I didn’t like how I said that. I care about us” is often enough to reopen safety.',
+    ],
+  },
+  {
+    id: 'parenting-stress',
+    title: 'Staying connected during parenting stress',
+    summary: 'Protect small rituals when schedules feel impossible.',
+    body: [
+      'Connection doesn’t require long blocks of time. A two-minute check-in at the kitchen counter, a text that says “I see how hard today was,” or sitting together for five minutes after bedtime can hold the relationship steady.',
+      'Name the season you’re in: diagnosis paperwork, therapy schedules, meltdowns, IEP meetings. Seasons pass, but unspoken resentment can linger.',
+      'Ask: “What would help you feel like we’re on the same team this week?” — then pick one doable action together.',
+    ],
+  },
+  {
+    id: 'trust',
+    title: 'Repairing trust and emotional safety',
+    summary: 'Rebuild safety with consistency, not grand gestures.',
+    body: [
+      'Trust grows when words and follow-through match — especially in small things like who handles bedtime or who makes the next call.',
+      'If one partner has felt dismissed, listen longer than feels comfortable before problem-solving.',
+      'Share appreciations out loud. Parents under stress often notice what went wrong; naming what went right rebuilds warmth.',
+    ],
+  },
+  {
+    id: 'decisions',
+    title: 'Making decisions together when you disagree',
+    summary: 'Separate the decision from the relationship.',
+    body: [
+      'Therapy choices, school plans, and discipline approaches can feel high-stakes. Start by naming shared values: safety, dignity, progress, family peace.',
+      'Use “What are we each afraid will happen?” before debating tactics. Fear is often the real disagreement.',
+      'If you stall, agree on a small experiment for two weeks, then revisit — progress beats perfect agreement.',
+    ],
+  },
+  {
+    id: 'burnout',
+    title: 'Protecting your marriage from burnout',
+    summary: 'Treat exhaustion as a relationship issue, not a personal flaw.',
+    body: [
+      'Caregiver burnout shows up as irritability, numbness, and distance. It is not a sign you’ve stopped loving each other.',
+      'Audit the invisible load: appointments, research, advocacy, emotional labor. Split by strength and capacity, not by default.',
+      'Schedule recovery for both partners — even 20 minutes — and protect it like a therapy appointment.',
+    ],
+  },
+  {
+    id: 'logistics',
+    title: 'Talking about money, schedules, and responsibilities',
+    summary: 'Practical talks work best when they’re planned, not heated.',
+    body: [
+      'Pick a calm time for logistics conversations — not during a meltdown or right after a hard day.',
+      'Use a simple agenda: what’s working, what’s unfair, one change to try this week.',
+      'Money stress and schedule chaos are common in autism families. Getting help with planning is a strength, not a failure.',
+    ],
+  },
+];
+
+export const EXTRA_SUPPORT_SIGNS = [
+  'Recurring contempt, name-calling, or put-downs',
+  'Feeling emotionally alone or unseen',
+  'Frequent shutdowns or walking on eggshells',
+  'Previous infidelity or breaches of trust',
+] as const;
+
+export const CONVERSATION_GUIDE_TEXT = `Common Ground — 10-Minute Relationship Reset
+
+Put phones away. Look at each other. Listen like it matters — because it does.
+
+Prompts:
+1. What has felt heavy for you lately?
+2. What do you need more of from me this week?
+3. Where are we working well as a team?
+4. What is one small way we can reconnect this week?
+5. What would help you feel supported tonight?
+
+Small, consistent steps build safety and closeness over time.
+`;

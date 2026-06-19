@@ -22,7 +22,7 @@ import {
 import Image from 'next/image';
 import {
   AT_HOME_STRATEGIES_LABEL,
-  FOR_COUPLES_LABEL,
+  MARRIAGE_RELATIONSHIPS_LABEL,
   RESOURCE_HUB_LABEL,
 } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
@@ -53,7 +53,7 @@ const navGroups = [
     label: 'Support',
     items: [
       { href: '/support/caregiver', label: 'Mental Health Toolbox', icon: HeartPulse },
-      { href: '/support/couples', label: FOR_COUPLES_LABEL, icon: HeartHandshake },
+      { href: '/support/couples', label: MARRIAGE_RELATIONSHIPS_LABEL, icon: HeartHandshake },
     ],
   },
   {

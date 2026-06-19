@@ -5,10 +5,7 @@
 
 import type { CarePlanAnswers } from './carePlanStorage';
 
-/** Marriage/partnership content is not authored yet — keep thread dark. */
-export const MARRIAGE_THREAD_ENABLED = false;
-
-export type SupportThreadId = 'mental-health' | 'siblings' | 'marriage';
+export type SupportThreadId = 'mental-health' | 'siblings';
 
 export type SupportThread = {
   id: SupportThreadId;
@@ -30,20 +27,10 @@ const SUPPORT_THREADS: Record<SupportThreadId, SupportThread> = {
     blurb: 'Guides and one small thing to try when brothers or sisters feel the strain.',
     href: '/support/siblings',
   },
-  marriage: {
-    id: 'marriage',
-    title: 'Marriage & partnership',
-    blurb: 'Coming soon — we are not linking here until content is ready.',
-    href: '/support/couples',
-  },
 };
 
 export function resolveHasOtherChildren(answers: CarePlanAnswers): boolean {
   return answers.hasOtherChildren === true;
-}
-
-export function resolveHasPartner(answers: CarePlanAnswers): boolean {
-  return answers.hasPartner === true;
 }
 
 /** Threads visible in the always-on support panel. */
@@ -51,9 +38,6 @@ export function getEligibleSupportThreads(answers: CarePlanAnswers): SupportThre
   const threads: SupportThread[] = [SUPPORT_THREADS['mental-health']];
   if (resolveHasOtherChildren(answers)) {
     threads.push(SUPPORT_THREADS.siblings);
-  }
-  if (resolveHasPartner(answers) && MARRIAGE_THREAD_ENABLED) {
-    threads.push(SUPPORT_THREADS.marriage);
   }
   return threads;
 }
@@ -74,14 +58,11 @@ const NUDGE_COPY: Record<SupportThreadId, string> = {
     'Your mental-health thread is always beside your plan — four minutes for you this week.',
   siblings:
     'Your sibling support thread is in the panel beside your plan — one small thing to try.',
-  marriage:
-    'Your partnership thread is in the panel beside your plan — one short check-in this week.',
 };
 
 const NUDGE_CANDIDATE: Record<SupportThreadId, string> = {
   'mental-health': 'fourMinutes',
   siblings: 'siblingOneThing',
-  marriage: 'partnerTalk',
 };
 
 export function getSupportNudgeCopy(thread: SupportThreadId): string {

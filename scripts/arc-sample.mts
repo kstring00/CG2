@@ -12,19 +12,12 @@ import {
   validateWeekTwoBecauseCopy,
 } from '../src/lib/generateNextSteps.ts';
 import type { CarePlanAnswers, CarePlanStep } from '../src/lib/carePlanStorage.ts';
-import {
-  getEligibleSupportThreads,
-  MARRIAGE_THREAD_ENABLED,
-} from '../src/lib/carePlanSupport.ts';
+import { getEligibleSupportThreads } from '../src/lib/carePlanSupport.ts';
 
 function printSupportPanel(label: string, answers: CarePlanAnswers) {
   const threads = getEligibleSupportThreads(answers);
   console.log(`\n--- Support panel: ${label} ---`);
-  console.log(`  MARRIAGE_THREAD_ENABLED: ${MARRIAGE_THREAD_ENABLED}`);
   threads.forEach((t) => console.log(`  · ${t.id}: ${t.title} → ${t.href}`));
-  if (!threads.some((t) => t.id === 'marriage')) {
-    console.log('  (no marriage thread — expected when flag is off)');
-  }
 }
 
 function printWeek(
@@ -32,7 +25,7 @@ function printWeek(
   arcWeekNumber: number,
   priorSteps: CarePlanStep[],
   completedPriorIds: string[],
-  lastNudge: 'mental-health' | 'siblings' | 'marriage' | null = null,
+  lastNudge: 'mental-health' | 'siblings' | null = null,
 ) {
   const arcWeek = getArcWeek(answers.stage, arcWeekNumber);
   console.log(`\n--- Arc week ${arcWeekNumber}: ${arcWeek.theme} (${arcWeek.phase}) ---`);

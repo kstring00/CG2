@@ -1,14 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Heart, Users, Brain } from 'lucide-react';
+import { ArrowRight, Users, Brain } from 'lucide-react';
 import type { CarePlanAnswers } from '@/lib/carePlanStorage';
 import { getEligibleSupportThreads, type SupportThreadId } from '@/lib/carePlanSupport';
 
 const THREAD_ICONS: Record<SupportThreadId, React.ComponentType<{ className?: string }>> = {
   'mental-health': Brain,
   siblings: Users,
-  marriage: Heart,
 };
 
 type Props = {
