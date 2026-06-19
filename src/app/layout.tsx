@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import ChatWidget from '@/components/ChatWidget';
-import SiteFooter from '@/components/SiteFooter';
+import AppChrome from '@/components/layout/AppChrome';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://texasabacenterscg.com'),
@@ -52,9 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col bg-surface font-body antialiased">
-        {children}
-        <SiteFooter />
-        <ChatWidget />
+        <AppChrome>{children}</AppChrome>
       </body>
     </html>
   );
