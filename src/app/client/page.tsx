@@ -81,7 +81,11 @@ export default function ClientSignInPage() {
                 Your family&apos;s care, in one place.
               </h1>
               <p className="mt-4 max-w-md text-base leading-7 text-white/80 sm:text-lg">
-                Session notes, goals, and direct messaging with your BCBA and RBT — all tied to your child&apos;s actual program.
+                Preview the client portal experience (demo) — session notes, goals, and messaging, shown with illustrative example data.
+              </p>
+              <p className="mt-4 flex max-w-md items-start gap-2 rounded-xl border border-amber-300/50 bg-amber-300/15 px-3 py-2 text-sm leading-relaxed text-amber-100">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                Preview — this portal is a design demo and is not connected to any client records. Pending clinical review.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -138,16 +142,17 @@ export default function ClientSignInPage() {
           </div>
 
           <p className="mt-5 text-sm leading-relaxed text-stone-600">
-            This portal is for families already receiving care with Texas ABA Centers.
-            Everything inside is personal to your child — BCBA-written goals, session notes,
-            and parent coaching tied to your actual plan.
+            This portal is designed for families receiving care with Texas ABA Centers.
+            The preview below shows the intended experience using example data only — in
+            production, goals, session notes, and parent coaching would come from your
+            child&apos;s care team.
           </p>
 
           <ul className="mt-5 space-y-2.5">
             {[
-              'HIPAA-protected — only you and your care team see it',
-              'Goals, progress, and coaching come directly from your BCBA',
-              'Message your BCBA or RBT without leaving the portal',
+              'Designed to be HIPAA-protected in production',
+              'Goals, progress, and coaching would come directly from your BCBA',
+              'Messaging with your BCBA or RBT without leaving the portal',
             ].map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-stone-700">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

@@ -41,7 +41,6 @@ import {
 } from '@/lib/generateNextSteps';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
 import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
-import CarePlanSupportPanel from '@/components/CarePlanSupportPanel';
 import AdmissionsHandoff from '@/components/AdmissionsHandoff';
 import { ADMISSIONS_STEP_IDS } from '@/lib/carePlanSupport';
 import {
@@ -454,7 +453,10 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+      {/* "Support alongside your plan" panel removed pending clinical
+          director review — caregiver mental-health content lives only under
+          Parent Support and never appears inside a generated care plan. */}
+      <div className="mt-8">
         <div>
       {/* 3) START HERE — the strongest section, numbered list */}
       <section aria-label="Start here">
@@ -619,8 +621,6 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
       )}
 
         </div>
-
-        <CarePlanSupportPanel answers={plan.answers} className="lg:sticky lg:top-24" />
       </div>
 
       <div className="mt-6 print:hidden">

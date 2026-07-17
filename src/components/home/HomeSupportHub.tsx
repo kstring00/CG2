@@ -3,10 +3,12 @@
 /**
  * Homepage support-hub sections, rendered beneath the existing hero:
  *   1. "What do you need today?" — six quick tiles
- *   2. Three feature cards (Next Step / At-Home / Mental Health Toolbox)
- *   3. Find Local Help — stylized Houston map + verified provider cards
+ *   2. Two feature cards (Next Step / At-Home) — the Mental Health Toolbox
+ *      tile was removed pending clinical review; its pages remain reachable
+ *      from the Parent Support section only.
+ *   3. Find Local Help — stylized map + reviewed listing cards
  *   4. Bottom support tiles (Financial / Siblings / Connect)
- *   5. "Already a Texas ABA family?" portal banner
+ *   5. "Already a Texas ABA family?" portal banner (demo preview)
  *
  * Every CTA links to an existing route. Provider cards reuse the real
  * vetted directory data that powers /support/find — no placeholder data.
@@ -15,19 +17,16 @@
 import Link from 'next/link';
 import {
   ArrowRight,
-  BatteryLow,
   BookOpen,
   Compass,
   ExternalLink,
-  Flower2,
   Heart,
   Home,
+  Info,
   Laptop,
   Link2,
   MapPin,
   MessagesSquare,
-  NotebookPen,
-  Phone,
   PiggyBank,
   Users,
   Wind,
@@ -169,14 +168,6 @@ const AT_HOME_ROWS = [
   { icon: Wind,   title: '5-minute sensory resets',  tag: 'Sensory Breaks' },
 ] as const;
 
-const TOOLBOX_LINKS = [
-  { href: '/support/hard-days', icon: Wind,        label: 'Grounding tools' },
-  { href: '/calm',              icon: Flower2,     label: 'Overwhelm reset' },
-  { href: '/support/caregiver', icon: NotebookPen, label: 'Caregiver reflection' },
-  { href: 'tel:988',            icon: Phone,       label: 'Crisis support' },
-  { href: '/support/check-in',  icon: BatteryLow,  label: 'Burnout check' },
-] as const;
-
 /* ─── Section 3 data — verified providers (reused, not invented) ──
    Picks one representative entry per category from the same vetted
    directory that powers /support/find. Entries without a real URL
@@ -268,18 +259,22 @@ function ProviderCard({ category, name, location, href }: VerifiedCardData) {
 
 /* ─── Section 3 — decorative Houston map ─────────────────── */
 
+// Location chips match the service footprint: Sugar Land, Katy, Pearland,
+// Missouri City, Austin, Plano.
 const MAP_PINS: { label: string; top: string; left: string; major?: boolean }[] = [
-  { label: 'Houston',    top: '34%', left: '56%', major: true },
-  { label: 'Katy',       top: '30%', left: '16%' },
-  { label: 'Sugar Land', top: '62%', left: '28%' },
-  { label: 'Pearland',   top: '72%', left: '58%' },
+  { label: 'Plano',         top: '18%', left: '62%' },
+  { label: 'Austin',        top: '38%', left: '22%' },
+  { label: 'Katy',          top: '42%', left: '52%' },
+  { label: 'Sugar Land',    top: '62%', left: '38%', major: true },
+  { label: 'Missouri City', top: '78%', left: '54%' },
+  { label: 'Pearland',      top: '58%', left: '74%' },
 ];
 
 function HoustonMap() {
   return (
     <Link
       href="/support/find"
-      aria-label="Open the Find Local Help directory for the greater Houston area"
+      aria-label="Open the Find Local Help directory for the communities we serve"
       className="group relative block aspect-[4/3] w-full overflow-hidden rounded-3xl border border-stone-200/80 shadow-soft transition duration-200 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
       style={{ backgroundColor: '#fbf9f4' }}
     >
@@ -388,10 +383,10 @@ export default function HomeSupportHub() {
         </div>
       </section>
 
-      {/* ── Section 2: Three feature cards ──────────────────── */}
+      {/* ── Section 2: Feature cards ─────────────────────────── */}
       <section aria-label="Main features" className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: CREAM }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="grid gap-6 lg:grid-cols-3">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid gap-6 lg:grid-cols-2">
 
             {/* Card 1 — Find My Next Step */}
             <FeatureCard
@@ -451,43 +446,10 @@ export default function HomeSupportHub() {
               </ul>
             </FeatureCard>
 
-            {/* Card 3 — Mental Health Toolbox (gentle toolbox, not a dashboard) */}
-            <FeatureCard
-              title="Mental Health Toolbox"
-              purpose="Calm, practical support for you — the caregiver."
-              ctaLabel="Open Toolbox"
-              ctaHref="/support/caregiver"
-            >
-              <ul className="space-y-2">
-                {TOOLBOX_LINKS.map(({ href, icon: Icon, label }) => {
-                  const isTel = href.startsWith('tel:');
-                  const inner = (
-                    <>
-                      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-50/60 text-amber-600">
-                        <Icon className="h-3.5 w-3.5" aria-hidden />
-                      </span>
-                      <span className="min-w-0 flex-1 text-[13.5px] font-medium text-stone-700">{label}</span>
-                      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-stone-300 transition group-hover:translate-x-0.5 group-hover:text-amber-600" aria-hidden />
-                    </>
-                  );
-                  const className =
-                    'group flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/70 px-3.5 py-2.5 transition hover:border-amber-200 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
-                  return (
-                    <li key={label}>
-                      {isTel ? (
-                        <a href={href} aria-label={`${label} — call or text 988`} className={className}>
-                          {inner}
-                        </a>
-                      ) : (
-                        <Link href={href} aria-label={label} className={className}>
-                          {inner}
-                        </Link>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </FeatureCard>
+            {/* Mental Health Toolbox tile removed pending clinical review.
+                The underlying pages (/support/caregiver, /support/hard-days,
+                /calm, /support/check-in) remain live, reachable from the
+                Parent Support section only. */}
           </div>
         </div>
       </section>
@@ -504,8 +466,7 @@ export default function HomeSupportHub() {
                 text="Local support you can trust, right where you are."
               />
               <p className="text-sm leading-relaxed text-stone-500">
-                Every listing is real, reviewed, and chosen because parents told us it actually helped —
-                across the greater Houston area.
+                Local support you can trust — reviewed listings across the communities we serve.
               </p>
               <Link
                 href="/support/find"
@@ -521,7 +482,7 @@ export default function HomeSupportHub() {
             {/* Right — verified provider cards */}
             <div>
               <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-800">
-                <Heart className="h-3 w-3" aria-hidden /> Verified by Texas ABA Centers
+                <Heart className="h-3 w-3" aria-hidden /> Reviewed for Common Ground
               </p>
               <div className="space-y-3">
                 {VERIFIED_CARDS.map((card) => (
@@ -574,7 +535,12 @@ export default function HomeSupportHub() {
                 Already a Texas ABA family?
               </h2>
               <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-white/75">
-                Sign in for session notes, goals, and messaging with your BCBA &amp; RBT.
+                Preview the client portal experience (demo).
+              </p>
+              <p className="mt-3 flex max-w-xl items-start gap-2 rounded-xl border border-amber-300/40 bg-amber-300/10 px-3 py-2 text-[13px] leading-relaxed text-amber-100">
+                <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                Preview — this portal is a design demo and is not connected to any client
+                records. Pending clinical review.
               </p>
               <Link
                 href="/client"

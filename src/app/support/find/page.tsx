@@ -31,17 +31,16 @@ import {
   CITIES,
   DELIVERY,
   findResources,
-  INSURANCE,
   intentMeta,
   INTENTS,
   SERVICES,
   type AgeGroup,
   type City,
   type Delivery,
-  type Insurance,
   type Intent,
   type Resource,
   type Service,
+  type VerifiedInsurance,
 } from './resources';
 
 type Locale = 'en' | 'es';
@@ -62,7 +61,6 @@ const copy = {
     groupLocation: 'Location / Area',
     groupService: 'Service type',
     groupAge: 'Age group',
-    groupInsurance: 'Insurance',
     groupDelivery: 'Delivery',
     goodFirstStep: 'Good first step only',
     goodFirstStepHelp: 'Highest-confidence starting points, vetted by our navigators.',
@@ -88,7 +86,7 @@ const copy = {
     goodFirstStepBadge: 'Good first step',
     sensoryBadge: 'Sensory-friendly',
     crisisLabel: 'Crisis & urgent support',
-    reviewedTooltip: (date: string) => `Reviewed ${date} by Texas ABA Centers`,
+    reviewedTooltip: (date: string) => `Reviewed ${date} for Common Ground`,
     hoverHint: 'Hover for details · click to pin',
     inlineHelpTitle: "Don't see what you need?",
     inlineHelpBody: 'A care navigator can spend 10 minutes with you and point to the right place.',
@@ -102,14 +100,14 @@ const copy = {
     rightDefaultEmptyHint: 'Tip: hover a card to preview, then click to pin it here.',
     rightSavedCount: (n: number) => (n === 1 ? '1 saved' : `${n} saved`),
     rightEmailLabel: 'Email this list to myself',
-    rightEmailPlaceholder: 'you@example.com',
+    rightEmailPlaceholder: 'you@email.com',
     rightEmailSend: 'Send',
     rightPrint: 'Print',
     rightClear: 'Clear list',
     rightNavigatorTitle: 'Not finding what you need?',
     rightNavigatorBody: 'A care navigator can spend ten minutes with you and point you to what fits your week.',
     rightNavigatorCta: 'Talk to a navigator',
-    expandedReviewed: (date: string) => `Reviewed ${date} · vetted by Texas ABA Centers`,
+    expandedReviewed: (date: string) => `Reviewed ${date} for Common Ground`,
     expandedSection: 'About',
     expandedSectionGood: 'Helpful to know',
     expandedSectionContact: 'How to reach them',
@@ -120,6 +118,9 @@ const copy = {
     expandedServices: 'Services',
     expandedDelivery: 'How they deliver',
     expandedInsurance: 'Insurance',
+    insuranceUnverified: 'Confirm coverage when you book, or ask our admissions team.',
+    verifiedInsuranceLine: (v: VerifiedInsurance) =>
+      `Confirmed accepts ${v.plan} as of ${v.verifiedDate} — confirm when you book, or ask our admissions team.`,
     pinnedLabel: 'Pinned',
     hoveringLabel: 'Hover preview',
     keyboardButton: 'Keyboard shortcuts',
@@ -153,7 +154,6 @@ const copy = {
     groupLocation: 'Ubicación / Área',
     groupService: 'Tipo de servicio',
     groupAge: 'Grupo de edad',
-    groupInsurance: 'Seguro',
     groupDelivery: 'Modalidad',
     goodFirstStep: 'Solo "buen primer paso"',
     goodFirstStepHelp: 'Puntos de partida de mayor confianza, revisados por nuestros navegadores.',
@@ -179,7 +179,7 @@ const copy = {
     goodFirstStepBadge: 'Buen primer paso',
     sensoryBadge: 'Sensorial-amigable',
     crisisLabel: 'Apoyo de crisis y urgente',
-    reviewedTooltip: (date: string) => `Revisado ${date} por Texas ABA Centers`,
+    reviewedTooltip: (date: string) => `Revisado ${date} para Common Ground`,
     hoverHint: 'Pasa el cursor para ver detalles · haz clic para fijar',
     inlineHelpTitle: '¿No encuentras lo que necesitas?',
     inlineHelpBody: 'Un navegador de atención puede dedicarte 10 minutos y guiarte al lugar correcto.',
@@ -200,7 +200,7 @@ const copy = {
     rightNavigatorTitle: '¿No encuentras lo que necesitas?',
     rightNavigatorBody: 'Un navegador de atención puede dedicarte diez minutos y guiarte a lo que encaje con tu semana.',
     rightNavigatorCta: 'Habla con un navegador',
-    expandedReviewed: (date: string) => `Revisado ${date} · verificado por Texas ABA Centers`,
+    expandedReviewed: (date: string) => `Revisado ${date} para Common Ground`,
     expandedSection: 'Acerca de',
     expandedSectionGood: 'Bueno saber',
     expandedSectionContact: 'Cómo contactar',
@@ -211,6 +211,9 @@ const copy = {
     expandedServices: 'Servicios',
     expandedDelivery: 'Cómo atienden',
     expandedInsurance: 'Seguro',
+    insuranceUnverified: 'Confirma la cobertura al reservar, o pregunta a nuestro equipo de admisiones.',
+    verifiedInsuranceLine: (v: VerifiedInsurance) =>
+      `Confirmado que acepta ${v.plan} a partir de ${v.verifiedDate} — confirma al reservar, o pregunta a nuestro equipo de admisiones.`,
     pinnedLabel: 'Fijado',
     hoveringLabel: 'Vista previa',
     keyboardButton: 'Atajos de teclado',
@@ -246,11 +249,6 @@ const localizedLabel = {
       Recreation: 'Recreation',
       'Sensory-friendly business': 'Sensory-friendly business',
     } satisfies Record<Service, string>,
-    insurance: {
-      'Accepts insurance': 'Accepts insurance',
-      'No insurance needed': 'No insurance needed',
-      Varies: 'Varies',
-    } satisfies Record<Insurance, string>,
     delivery: {
       'In-person': 'In-person',
       'In-home/Mobile': 'In-home / Mobile',
@@ -271,11 +269,6 @@ const localizedLabel = {
       Recreation: 'Recreación',
       'Sensory-friendly business': 'Negocio sensorial',
     } satisfies Record<Service, string>,
-    insurance: {
-      'Accepts insurance': 'Acepta seguro',
-      'No insurance needed': 'Sin seguro requerido',
-      Varies: 'Varía',
-    } satisfies Record<Insurance, string>,
     delivery: {
       'In-person': 'En persona',
       'In-home/Mobile': 'A domicilio',
@@ -288,7 +281,6 @@ interface FilterState {
   cities: City[];
   services: Service[];
   ageGroups: AgeGroup[];
-  insurance: Insurance[];
   delivery: Delivery[];
   goodFirstStepOnly: boolean;
 }
@@ -297,7 +289,6 @@ const emptyFilters: FilterState = {
   cities: [],
   services: [],
   ageGroups: [],
-  insurance: [],
   delivery: [],
   goodFirstStepOnly: false,
 };
@@ -316,7 +307,6 @@ function countActiveFilters(f: FilterState): number {
     f.cities.length +
     f.services.length +
     f.ageGroups.length +
-    f.insurance.length +
     f.delivery.length +
     (f.goodFirstStepOnly ? 1 : 0)
   );
@@ -328,13 +318,11 @@ const citySlug: Record<City, string> = {
   'Sugar Land': 'sugar-land',
   Katy: 'katy',
   Pearland: 'pearland',
-  'Missouri City': 'missouri-city',
-  'Clear Lake': 'clear-lake',
-  Houston: 'houston',
-  'Fort Bend County': 'fort-bend',
-  'The Woodlands': 'woodlands',
-  Statewide: 'statewide',
-  Online: 'online',
+  'Missouri City / Fort Bend County': 'missouri-city-fort-bend',
+  'Southwest Houston': 'southwest-houston',
+  Austin: 'austin',
+  Plano: 'plano',
+  'Online / phone — anywhere in Texas': 'online-statewide',
 };
 
 const serviceSlug: Record<Service, string> = {
@@ -359,12 +347,6 @@ const ageSlug: Record<AgeGroup, string> = {
   'All ages': 'all',
 };
 
-const insuranceSlug: Record<Insurance, string> = {
-  'Accepts insurance': 'yes',
-  'No insurance needed': 'no',
-  Varies: 'varies',
-};
-
 const deliverySlug: Record<Delivery, string> = {
   'In-person': 'in-person',
   'In-home/Mobile': 'mobile',
@@ -382,7 +364,6 @@ function invert<K extends string, V extends string>(map: Record<K, V>): Record<V
 const cityFromSlug = invert(citySlug);
 const serviceFromSlug = invert(serviceSlug);
 const ageFromSlug = invert(ageSlug);
-const insuranceFromSlug = invert(insuranceSlug);
 const deliveryFromSlug = invert(deliverySlug);
 
 interface UrlState {
@@ -400,7 +381,6 @@ function urlStateToParams(s: UrlState): URLSearchParams {
   if (s.filters.cities.length) params.set('city', s.filters.cities.map((c) => citySlug[c]).join(','));
   if (s.filters.services.length) params.set('service', s.filters.services.map((c) => serviceSlug[c]).join(','));
   if (s.filters.ageGroups.length) params.set('age', s.filters.ageGroups.map((c) => ageSlug[c]).join(','));
-  if (s.filters.insurance.length) params.set('insurance', s.filters.insurance.map((c) => insuranceSlug[c]).join(','));
   if (s.filters.delivery.length) params.set('delivery', s.filters.delivery.map((c) => deliverySlug[c]).join(','));
   if (s.filters.goodFirstStepOnly) params.set('gfs', '1');
   if (s.sort !== 'recommended') params.set('sort', s.sort);
@@ -432,7 +412,6 @@ function paramsToUrlState(params: URLSearchParams): UrlState {
       cities: parseList(params.get('city'), cityFromSlug),
       services: parseList(params.get('service'), serviceFromSlug),
       ageGroups: parseList(params.get('age'), ageFromSlug),
-      insurance: parseList(params.get('insurance'), insuranceFromSlug),
       delivery: parseList(params.get('delivery'), deliveryFromSlug),
       goodFirstStepOnly: params.get('gfs') === '1',
     },
@@ -445,7 +424,6 @@ function applyFilters(items: Resource[], f: FilterState): Resource[] {
     if (f.cities.length && !f.cities.some((c) => r.cities.includes(c))) return false;
     if (f.services.length && !f.services.some((s) => r.services.includes(s))) return false;
     if (f.ageGroups.length && !f.ageGroups.some((a) => r.ageGroups.includes(a))) return false;
-    if (f.insurance.length && !f.insurance.includes(r.insurance)) return false;
     if (f.delivery.length && !f.delivery.some((d) => r.delivery.includes(d))) return false;
     return true;
   });
@@ -613,7 +591,11 @@ function ExpandedResourcePanel({
         </div>
         <div>
           <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedInsurance}</dt>
-          <dd className="mt-0.5 text-brand-muted-700">{labels.insurance[resource.insurance]}</dd>
+          <dd className="mt-0.5 text-brand-muted-700">
+            {resource.verifiedInsurance
+              ? t.verifiedInsuranceLine(resource.verifiedInsurance)
+              : t.insuranceUnverified}
+          </dd>
         </div>
         <div className="col-span-2">
           <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedServices}</dt>
@@ -640,9 +622,9 @@ function ExpandedResourcePanel({
           {t.expandedSectionContact}
         </p>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {resource.phone && (
+          {resource.phone && resource.phoneDial && (
             <a
-              href={`tel:${resource.phone.replace(/[^0-9+]/g, '')}`}
+              href={`tel:${resource.phoneDial}`}
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
                 isCrisis ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-primary text-white hover:bg-primary-dark',
@@ -939,7 +921,7 @@ function ResourceCard({
   const meta = [
     resource.cities[0],
     resource.ageGroups.includes('All ages') ? 'All ages' : resource.ageGroups.join(', '),
-    labels.insurance[resource.insurance],
+    resource.verifiedInsurance ? t.verifiedInsuranceLine(resource.verifiedInsurance) : null,
     resource.delivery.map((d) => labels.delivery[d]).join(' · '),
   ].filter(Boolean);
 
@@ -1049,11 +1031,11 @@ function ResourceCard({
         </div>
       )}
 
-      {(resource.phone || resource.website) && !isBrowse && (
+      {((resource.phone && resource.phoneDial) || resource.website) && !isBrowse && (
         <div className="mt-1 flex flex-wrap items-center gap-2">
-          {resource.phone && (
+          {resource.phone && resource.phoneDial && (
             <a
-              href={`tel:${resource.phone.replace(/[^0-9+]/g, '')}`}
+              href={`tel:${resource.phoneDial}`}
               onClick={(e) => e.stopPropagation()}
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
@@ -1117,7 +1099,6 @@ function ActiveChips({
   filters.cities.forEach((c) => chips.push({ key: `c-${c}`, label: c, remove: () => setFilters({ ...filters, cities: filters.cities.filter((x) => x !== c) }) }));
   filters.services.forEach((s) => chips.push({ key: `s-${s}`, label: labels.services[s], remove: () => setFilters({ ...filters, services: filters.services.filter((x) => x !== s) }) }));
   filters.ageGroups.forEach((a) => chips.push({ key: `a-${a}`, label: a, remove: () => setFilters({ ...filters, ageGroups: filters.ageGroups.filter((x) => x !== a) }) }));
-  filters.insurance.forEach((i) => chips.push({ key: `i-${i}`, label: labels.insurance[i], remove: () => setFilters({ ...filters, insurance: filters.insurance.filter((x) => x !== i) }) }));
   filters.delivery.forEach((d) => chips.push({ key: `d-${d}`, label: labels.delivery[d], remove: () => setFilters({ ...filters, delivery: filters.delivery.filter((x) => x !== d) }) }));
   if (query.trim()) chips.push({ key: 'q', label: `“${query.trim()}”`, remove: () => setQuery('') });
 
@@ -1403,13 +1384,6 @@ function LeftFilters({ locale, filters, setFilters }: LeftFiltersProps) {
           onToggle={(v) => toggle('ageGroups', v)}
         />
         <CheckboxGroup
-          legend={t.groupInsurance}
-          options={INSURANCE}
-          selected={filters.insurance}
-          onToggle={(v) => toggle('insurance', v)}
-          labelMap={labels.insurance}
-        />
-        <CheckboxGroup
           legend={t.groupDelivery}
           options={DELIVERY}
           selected={filters.delivery}
@@ -1627,9 +1601,10 @@ export default function FindSupportPage() {
               <h1 className="mt-1.5 text-2xl font-bold text-brand-muted-900 sm:text-[28px]">{t.title}</h1>
               <p className="mt-1.5 max-w-2xl text-sm text-brand-muted-600">{t.description}</p>
               <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-brand-muted-500">
-                Local provider listings currently cover the greater Houston metros — Katy, Pearland,
-                Sugar Land, and nearby. Statewide and virtual resources — Medicaid &amp; ECI guidance,
-                financial help, the Autism Society of Texas, and 988 — are here for{' '}
+                Local listings cover the communities we serve — Sugar Land, Katy, Pearland,
+                Missouri City / Fort Bend County, southwest Houston, Austin, and Plano.
+                Statewide phone and online resources — Medicaid &amp; ECI guidance, financial help,
+                Texas Parent to Parent, and 988 — are here for{' '}
                 <span className="font-semibold text-brand-muted-700">every Texas family</span>,
                 wherever you live.
               </p>

@@ -62,8 +62,8 @@ export default function SupportPage() {
       </header>
 
       <DemoDataNotice
-        title="Some listings here are examples while we expand our verified network"
-        description="Look for the &ldquo;Example listing&rdquo; tag — those are placeholders. Listings tagged &ldquo;Verified by Texas ABA Centers&rdquo; are real, vetted providers you can contact today."
+        title="Support listings are being re-reviewed"
+        description="Placeholder listings have been removed while the directory is prepared for clinical review. Listings tagged &ldquo;Reviewed for Common Ground&rdquo; are real, vetted providers you can contact today — see Find Local Help for the current directory."
       />
 
       <section className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">

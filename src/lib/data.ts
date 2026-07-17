@@ -351,110 +351,12 @@ export const resources: Resource[] = [
   },
 ];
 
-export const supportProviders: SupportProvider[] = [
-  {
-    id: 'sp1',
-    name: 'Dr. Sarah Martinez, LPC',
-    type: 'therapist',
-    specialty: 'Caregiver Counseling & Family Therapy',
-    description:
-      'Supports parents navigating grief, chronic stress, relationship strain, and the emotional load of coordinating care.',
-    fit: 'Best when the parent or couple needs steady therapeutic support, not just a one-time consult.',
-    payment: 'Accepts major insurance plans and private pay.',
-    accessNotes: 'Evening telehealth openings typically available within 2 weeks.',
-    urgency: 'Use when stress is ongoing, conflict is rising, or the family needs more than peer support.',
-    location: 'Sugar Land, TX',
-    phone: '(832) 555-0142',
-    website: 'https://example.com',
-    acceptsInsurance: true,
-    rating: 4.9,
-    verification: 'Demo listing styled as a clinically reviewed referral example',
-    lastReviewed: 'March 2026',
-    journeyStages: ['just-diagnosed'],
-    isDemo: true,
-  },
-  {
-    id: 'sp2',
-    name: 'Houston Autism Parent Circle',
-    type: 'support-group',
-    specialty: 'Peer Support & Connection',
-    description:
-      'Weekly virtual meetups where parents share what is working, what is hard, and what support feels realistic right now.',
-    fit: 'Best for parents who need to feel less alone and hear from others living a similar stage.',
-    payment: 'No-cost community support.',
-    accessNotes: 'Rolling entry with a short orientation before the first session.',
-    urgency: 'Use early if isolation is rising or the parent has no support network yet.',
-    location: 'Online (Houston-based)',
-    meetingSchedule: 'Wednesdays 7:30 PM',
-    acceptsInsurance: false,
-    rating: 4.8,
-    verification: 'Demo listing styled as a moderated support referral example',
-    lastReviewed: 'February 2026',
-    journeyStages: ['just-diagnosed'],
-    isDemo: true,
-  },
-  {
-    id: 'sp3',
-    name: 'Autism Society of Texas Helpline',
-    type: 'hotline',
-    specialty: 'Information & Referral',
-    description:
-      'A first-stop helpline for families who need a human being to help sort the next step, not just another website.',
-    fit: 'Best when the family is confused about where to start or which support route fits the current problem.',
-    payment: 'No-cost helpline.',
-    accessNotes: 'Call volume varies; best for referral help rather than crisis response.',
-    urgency: 'Use when you need triage, referrals, or decision support quickly.',
-    location: 'Statewide',
-    phone: '(800) 555-0198',
-    acceptsInsurance: false,
-    rating: 4.7,
-    verification: 'Demo listing styled as a verified referral example',
-    lastReviewed: 'March 2026',
-    journeyStages: ['just-diagnosed', 'starting-therapy', 'school-transition'],
-    isDemo: true,
-  },
-  {
-    id: 'sp4',
-    name: 'Peaceful Hands Respite Care',
-    type: 'respite',
-    specialty: 'In-Home & Center-Based Respite',
-    description:
-      'Short-term respite support designed to help families rest, reset, and keep the household more stable during high-stress periods.',
-    fit: 'Best when a caregiver has no downtime and the family needs breathing room quickly.',
-    payment: 'Private pay with some waiver and grant support options.',
-    accessNotes: 'Intake required before scheduling recurring care.',
-    urgency: 'Use when caregiver exhaustion is affecting safety, patience, or basic functioning.',
-    location: 'Fort Bend County, TX',
-    phone: '(281) 555-0267',
-    acceptsInsurance: true,
-    rating: 4.6,
-    verification: 'Demo listing styled as a trusted respite example',
-    lastReviewed: 'January 2026',
-    journeyStages: [],
-    isDemo: true,
-  },
-  {
-    id: 'sp5',
-    name: 'Texas Parent to Parent',
-    type: 'advocacy',
-    specialty: 'IEP Advocacy & Educational Rights',
-    description:
-      'Parent advocates who help families prepare for school meetings, understand rights, and keep next steps documented.',
-    fit: 'Best when school planning feels confusing, delayed, or difficult to move forward.',
-    payment: 'Community and grant-supported; some services no-cost.',
-    accessNotes: 'Most families start with a prep call before meeting support.',
-    urgency: 'Use when the school process feels stuck or a parent needs backup for a meeting.',
-    location: 'Statewide',
-    phone: '(866) 555-0311',
-    website: 'https://example.com',
-    acceptsInsurance: false,
-    rating: 4.9,
-    verification: 'Demo listing styled as an advocacy referral example',
-    lastReviewed: 'March 2026',
-    journeyStages: ['school-transition'],
-    isDemo: true,
-  },
-];
+// Purged ahead of clinical director review (July 2026): every prior entry was
+// placeholder/demo data (fake phone numbers, placeholder links, or no
+// verifiable contact). Approved, verified listings can be added back one
+// object at a time. The real Texas Parent to Parent entry — with its actual
+// (866) 896-6001 / (512) 458-8600 numbers — lives in lib/providers.ts.
+export const supportProviders: SupportProvider[] = [];
 
 export const guidedSteps: GuidedStep[] = [
   {
@@ -618,68 +520,10 @@ export const guidedSteps: GuidedStep[] = [
 ];
 
 
-export const communityGroups: CommunityGroup[] = [
-  {
-    id: 'cg1',
-    name: 'Fort Bend Parent Navigation Circle',
-    type: 'local',
-    description:
-      'A local meetup for families who want practical support, calmer conversations, and a place to swap what is actually helping.',
-    memberCount: 127,
-    meetingSchedule: '2nd Saturday of each month',
-    location: 'Sugar Land, TX',
-    audience: 'Parents and caregivers across diagnosis, therapy, and school stages',
-    moderation: 'Moderated by a community facilitator with parent-ground-rule reminders',
-    faithStyle: 'general',
-    lastReviewed: 'March 2026',
-    isDemo: true,
-  },
-  {
-    id: 'cg2',
-    name: 'Autism Dads Social Club',
-    type: 'local',
-    description:
-      'A space specifically for dads and father figures. Low-pressure meetups, honest conversation, and practical support.',
-    memberCount: 43,
-    meetingSchedule: '1st Thursday, 7 PM',
-    location: 'Houston, TX',
-    audience: 'Dads and father figures looking for peer support',
-    moderation: 'Facilitated by a volunteer host with community guidelines',
-    faithStyle: 'general',
-    lastReviewed: 'February 2026',
-    isDemo: true,
-  },
-  {
-    id: 'cg3',
-    name: 'Texas Parent Support Online',
-    type: 'online',
-    description:
-      'An online parent space for service questions, school stress, and the everyday realities of supporting a child on the spectrum.',
-    memberCount: 892,
-    meetingSchedule: 'Always open with weekly discussion prompts',
-    location: 'Online',
-    audience: 'Parents across Texas who need flexible support',
-    moderation: 'Moderated discussion threads with clear posting boundaries and escalation guidance',
-    faithStyle: 'faith-friendly',
-    lastReviewed: 'March 2026',
-    isDemo: true,
-  },
-  {
-    id: 'cg4',
-    name: 'Sensory-Friendly Family Fun Day',
-    type: 'event',
-    description:
-      'A quarterly event with sensory-aware activities, low-pressure family connection, and practical local resources.',
-    memberCount: 200,
-    meetingSchedule: 'Next: June 14, 2026',
-    location: 'Pearland, TX',
-    audience: 'Families who want community without a high-stimulation event format',
-    moderation: 'Hosted by trained volunteers and community partners',
-    faithStyle: 'general',
-    lastReviewed: 'January 2026',
-    isDemo: true,
-  },
-];
+// Purged ahead of clinical director review (July 2026): all four prior groups
+// (and their member counts) were fabricated demo content. Real, verified
+// community listings can be added back one object at a time.
+export const communityGroups: CommunityGroup[] = [];
 
 export const diagnosisStageLabels: Record<DiagnosisStage, { label: string; color: string }> = {
   new: { label: 'Newly Diagnosed', color: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -963,7 +807,7 @@ export const sensoryFriendlyPlaces: SensoryFriendlyPlace[] = [
     whatWorks:
       'Reduces sensory input during visits — keeps light from child\'s eyes, dental instruments out of sight, and reduces smells and sounds. Offers sedation for longer procedures.',
     whatToKnow:
-      'Consistently strong parent reviews specifically from autism families. Accepts most major insurance plans.',
+      'Consistently strong parent reviews specifically from autism families. Call to confirm insurance before your first visit.',
     verificationSource: 'parent-submitted',
     phone: '(281) 242-4242',
     website: 'https://www.sweetpeasmiles.com',
@@ -1119,7 +963,7 @@ export const sensoryFriendlyPlaces: SensoryFriendlyPlace[] = [
     whatWorks:
       'Comprehensive diagnostic approach including genetic and chromosomal testing. Personal connections with patients and families maintained despite growth.',
     whatToKnow:
-      'Multiple locations convenient to all three clinic areas. Also has a Katy location. Accepts most major insurance plans.',
+      'Multiple locations convenient to all three clinic areas. Also has a Katy location. Call to confirm insurance before your first visit.',
     verificationSource: 'staff-vouched',
     phone: '(281) 809-4076',
     website: 'https://www.thinkkids.com',
@@ -1148,81 +992,9 @@ export const sensoryFriendlyPlaces: SensoryFriendlyPlace[] = [
   },
 
   // ── SPEECH, OT & THERAPY ──────────────────────────────────────────────
-  {
-    id: 'sf-st1',
-    name: 'Essential Speech and ABA Therapy — Sugar Land',
-    category: 'speech-ot',
-    city: 'Sugar Land',
-    state: 'TX',
-    description:
-      'True team approach: every child has a BCBA, Speech-Language Pathologist, and Occupational Therapist who collaborate daily. Ages 18 months to 6 years.',
-    whatWorks:
-      'All three disciplines under one roof collaborating on each child\'s plan. Individualized treatment plans. Strong parent reviews.',
-    whatToKnow:
-      'Focuses on early intervention (18 months to 6 years). Accepts most insurance plans including Medicaid.',
-    verificationSource: 'staff-vouched',
-    phone: '(281) 974-0588',
-    website: 'https://www.speechandaba.com/sugarland',
-    address: 'Sugar Land, TX',
-    lastReviewed: 'April 2026',
-    isDemo: false,
-  },
-  {
-    id: 'sf-st2',
-    name: 'Essential Speech and ABA Therapy — Pearland',
-    category: 'speech-ot',
-    city: 'Pearland',
-    state: 'TX',
-    description:
-      'Same team model as Sugar Land — BCBA, SLP, and OT on every child. Independently owned for personalized attention. Early intervention focus.',
-    whatWorks:
-      'Collaborative model ensures consistent care across all three disciplines. Each facility uniquely equipped for its community.',
-    whatToKnow:
-      'Pearland families: same quality program, closer to home. Accepts most insurance plans including Medicaid.',
-    verificationSource: 'staff-vouched',
-    phone: '(281) 974-0588',
-    website: 'https://www.speechandaba.com/pearland',
-    address: 'Pearland, TX',
-    lastReviewed: 'April 2026',
-    isDemo: false,
-  },
-  {
-    id: 'sf-st3',
-    name: 'Therapy and Beyond — Sugar Land',
-    category: 'speech-ot',
-    city: 'Sugar Land',
-    state: 'TX',
-    description:
-      'Family-focused ABA, speech, and occupational therapy. Founded by someone with a personal connection to autism through their adopted brother.',
-    whatWorks:
-      'Mission-driven practice with strong family involvement philosophy. Combination of ABA, speech, and OT focused on building strengths.',
-    whatToKnow:
-      'Personal mission drives the practice. They accept your child for who they are while working on areas of challenge.',
-    verificationSource: 'parent-submitted',
-    phone: '(832) 930-7803',
-    website: 'https://www.therapyandbeyond.com/aba-therapy-sugarland-tx',
-    address: 'Sugar Land, TX',
-    lastReviewed: 'April 2026',
-    isDemo: false,
-  },
-  {
-    id: 'sf-st4',
-    name: 'Pine Cone Therapies — Pearland / Missouri City',
-    category: 'speech-ot',
-    city: 'Pearland',
-    state: 'TX',
-    description:
-      'ABA, speech, and OT serving Pearland, Sugar Land, Missouri City, and Richmond. SLP specializes in Autism Spectrum Disorders and Sensory Processing.',
-    whatWorks:
-      'Experienced SLP with 9 years pediatric experience. BCBA with specialty in early intervention. Convenient Riverstone Shopping Center location.',
-    whatToKnow:
-      'Serves families across Sugar Land, Pearland, Missouri City, Richmond, and Rosenberg areas.',
-    verificationSource: 'parent-submitted',
-    website: 'https://www.pineconetherapies.com/location/pearland-tx-aba-therapy',
-    address: 'Riverstone Shopping Center, Riverstone Blvd, Missouri City, TX',
-    lastReviewed: 'April 2026',
-    isDemo: false,
-  },
+  // External ABA providers removed for clinical director review (July 2026):
+  // the ABA Therapy category contains exactly one entry — Texas ABA Centers
+  // (lib/providers.ts). Speech/OT-only providers may be re-added here.
 
   // ── MENTAL HEALTH & COUNSELING ────────────────────────────────────────
   {
@@ -1274,7 +1046,7 @@ export const sensoryFriendlyPlaces: SensoryFriendlyPlace[] = [
     whatWorks:
       'Multiple locations makes this accessible to families at all three clinics. Advanced counseling approaches. Bilingual therapists available.',
     whatToKnow:
-      'Good option specifically for parent/caregiver mental health support. Accepts most insurance plans.',
+      'Good option specifically for parent/caregiver mental health support. Call to confirm insurance before your first visit.',
     verificationSource: 'parent-submitted',
     website: 'https://districtcounseling.center',
     address: 'Multiple locations — Sugar Land, Katy, Pearland, Missouri City',
@@ -1333,7 +1105,7 @@ export const sensoryFriendlyPlaces: SensoryFriendlyPlace[] = [
     whatWorks:
       'Pediatric ophthalmologists are a specialty — few in the area. Visual issues are common in ASD. Experienced with the full range of pediatric eye conditions.',
     whatToKnow:
-      'Multiple locations available. Accepts most major insurance plans.',
+      'Multiple locations available. Call to confirm insurance before your first visit.',
     verificationSource: 'parent-submitted',
     phone: '(713) 668-6828',
     website: 'https://txeye.com/our-team/glenn-e-bulan-md',
@@ -1460,7 +1232,7 @@ export const sensoryVerificationLabels: Record<
   { label: string; color: string }
 > = {
   'staff-vouched': {
-    label: 'Verified by Texas ABA Centers',
+    label: 'Reviewed for Common Ground',
     color: 'bg-green-50 text-green-700 border-green-200',
   },
   'parent-submitted': {

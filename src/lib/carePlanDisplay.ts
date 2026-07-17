@@ -20,6 +20,8 @@ import {
   enrichCarePlanStep,
   generateArcWeekSteps,
   generateBucketSteps,
+  generateNewToAbaSteps,
+  isNewToAbaWithoutProvider,
 } from './generateNextSteps';
 import { isStepComplete, type WeeklyProgress } from './weeklyProgress';
 
@@ -28,6 +30,11 @@ export function getCarePlanBucketSteps(
   plan: SavedCarePlan,
   arcWeekNumber = 1,
 ): CarePlanStep[] {
+  // Stage gate: new-to-ABA families see the fixed intake-first plan in its
+  // authored order — never the bucket-scored mix.
+  if (arcWeekNumber <= 1 && isNewToAbaWithoutProvider(plan.answers)) {
+    return generateNewToAbaSteps().map(enrichCarePlanStep);
+  }
   const arcWeek = getArcWeek(plan.answers.stage, arcWeekNumber);
   const fromBuckets = generateBucketSteps(plan.answers, arcWeek)
     .map((b) => b.step)
