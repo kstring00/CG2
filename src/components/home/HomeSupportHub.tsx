@@ -5,11 +5,9 @@
  *   1. "What do you need today?" — six quick tiles
  *   2. Three feature cards (Next Step / At-Home / Mental Health Toolbox)
  *   3. Find Local Help — stylized Houston map + verified provider cards
- *   4. Bottom support tiles (Financial / Siblings / Connect)
- *   5. "Already a Texas ABA family?" portal banner
+ *   4. "Already a Texas ABA family?" portal banner
  *
- * Every CTA links to an existing route. Provider cards reuse the real
- * vetted directory data that powers /support/find — no placeholder data.
+ * Every CTA links to an existing route. Provider cards reuse the local directory data that powers /support/find.
  */
 
 import Link from 'next/link';
@@ -23,13 +21,10 @@ import {
   Heart,
   Home,
   Laptop,
-  Link2,
   MapPin,
   MessagesSquare,
   NotebookPen,
   Phone,
-  PiggyBank,
-  Users,
   Wind,
   Wrench,
 } from 'lucide-react';
@@ -177,10 +172,8 @@ const TOOLBOX_LINKS = [
   { href: '/support/check-in',  icon: BatteryLow,  label: 'Burnout check' },
 ] as const;
 
-/* ─── Section 3 data — verified providers (reused, not invented) ──
-   Picks one representative entry per category from the same vetted
-   directory that powers /support/find. Entries without a real URL
-   render "Being verified" instead of a link. */
+/* ─── Section 3 data — local provider previews ─────────────
+   Picks one representative entry per category from the local directory. */
 
 function shortLocation(location: string): string {
   return location.split('(')[0].replace(/,?\s*TX.*$/i, '').trim();
@@ -344,28 +337,6 @@ function HoustonMap() {
   );
 }
 
-/* ─── Section 4 data — bottom support tiles ──────────────── */
-
-const BOTTOM_TILES = [
-  {
-    href: '/support/financial',
-    icon: PiggyBank,
-    title: 'Financial Help',
-    text: 'Explore insurance, Medicaid waivers, and grants to help make care possible.',
-  },
-  {
-    href: '/support/siblings',
-    icon: Users,
-    title: 'Sibling Support',
-    text: 'Resources and support for siblings on their own unique journey.',
-  },
-  {
-    href: '/support/connect',
-    icon: Link2,
-    title: 'Connect With Parents',
-    text: "Get matched with a parent who gets it. You don't have to do this alone.",
-  },
-] as const;
 
 /* ─── the hub ────────────────────────────────────────────── */
 
@@ -511,7 +482,7 @@ export default function HomeSupportHub() {
                 href="/support/find"
                 className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary underline-offset-4 transition hover:text-primary/70 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-sm"
               >
-                See all verified providers <ArrowRight className="h-4 w-4" aria-hidden />
+                See all local providers <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
 
@@ -520,9 +491,6 @@ export default function HomeSupportHub() {
 
             {/* Right — verified provider cards */}
             <div>
-              <p className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-800">
-                <Heart className="h-3 w-3" aria-hidden /> Verified by Texas ABA Centers
-              </p>
               <div className="space-y-3">
                 {VERIFIED_CARDS.map((card) => (
                   <ProviderCard key={card.name} {...card} />
@@ -533,33 +501,7 @@ export default function HomeSupportHub() {
         </div>
       </section>
 
-      {/* ── Section 4: Bottom support tiles ─────────────────── */}
-      <section aria-label="More support" className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: CREAM }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="grid gap-5 sm:grid-cols-3">
-            {BOTTOM_TILES.map(({ href, icon: Icon, title, text }) => (
-              <Link
-                key={href + title}
-                href={href}
-                aria-label={`${title} — ${text}`}
-                className="group rounded-3xl border border-stone-200/80 bg-white p-6 shadow-soft transition duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
-              >
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-amber-200/70 bg-amber-50/70 text-amber-600 transition group-hover:bg-amber-100/80">
-                  <Icon className="h-5 w-5" aria-hidden />
-                </span>
-                <h3 className="mt-4 text-lg font-bold text-primary">{title}</h3>
-                <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-600">{text}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary">
-                  Learn more
-                  <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Section 5: Portal banner ────────────────────────── */}
+      {/* ── Section 4: Portal banner ────────────────────────── */}
       <section aria-labelledby="client-portal" className="bg-white px-6 py-16 sm:px-8 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <div
