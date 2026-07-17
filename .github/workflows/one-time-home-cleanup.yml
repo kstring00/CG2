@@ -1,0 +1,83 @@
+name: One-time homepage cleanup
+
+on:
+  push:
+    branches:
+      - cleanup-remove-demo-and-dead-links
+    paths:
+      - .github/workflows/one-time-home-cleanup.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cleanup-remove-demo-and-dead-links
+          fetch-depth: 0
+
+      - name: Apply approved homepage cleanup
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('src/components/home/HomeSupportHub.tsx')
+          text = path.read_text()
+
+          # Remove icons used only by the deleted bottom-tile section.
+          for line in ["  Link2,\n", "  PiggyBank,\n", "  Users,\n"]:
+              text = text.replace(line, "")
+
+          # Keep the component overview accurate.
+          text = text.replace(' *   4. Bottom support tiles (Financial / Siblings / Connect)\n *   5. "Already a Texas ABA family?" portal banner', ' *   4. "Already a Texas ABA family?" portal banner')
+          text = text.replace('Provider cards reuse the real\n * vetted directory data that powers /support/find — no placeholder data.', 'Provider cards reuse the local directory data that powers /support/find.')
+
+          # Use neutral, non-endorsement language.
+          text = text.replace('/* ─── Section 3 data — verified providers (reused, not invented) ──\n   Picks one representative entry per category from the same vetted\n   directory that powers /support/find. Entries without a real URL\n   render "Being verified" instead of a link. */', '/* ─── Section 3 data — local provider previews ─────────────\n   Picks one representative entry per category from the local directory. */')
+          text = text.replace('Every listing is real, reviewed, and chosen because parents told us it actually helped —\n                 across the greater Houston area.', 'Browse local providers and support resources in the greater Houston area.')
+          text = text.replace('See all verified providers', 'See all local providers')
+
+          # Remove the unsupported Texas ABA Centers verification badge.
+          text = re.sub(
+              r'\n\s*<p className="mb-3 inline-flex items-center gap-1\.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-\[11px\] font-bold uppercase tracking-wide text-amber-800">\n\s*<Heart className="h-3 w-3" aria-hidden /> Verified by Texas ABA Centers\n\s*</p>',
+              '',
+              text,
+              count=1,
+          )
+
+          # Remove the bottom-tile data block.
+          text = re.sub(
+              r'\n/\* ─── Section 4 data — bottom support tiles ─+ \*/\n\nconst BOTTOM_TILES = \[.*?\n\] as const;\n',
+              '\n',
+              text,
+              count=1,
+              flags=re.S,
+          )
+
+          # Remove the rendered Financial Help / Sibling Support / Connect section.
+          text = re.sub(
+              r'\n\s*\{?/\* ── Section 4: Bottom support tiles ─+ \*/\}?\n\s*<section aria-label="More support".*?</section>',
+              '',
+              text,
+              count=1,
+              flags=re.S,
+          )
+
+          # Renumber the remaining portal comment.
+          text = text.replace('Section 5: Portal banner', 'Section 4: Portal banner')
+
+          path.write_text(text)
+          PY
+
+      - name: Remove one-time workflow and commit
+        run: |
+          rm .github/workflows/one-time-home-cleanup.yml
+          git config user.name "ChatGPT cleanup"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/components/home/HomeSupportHub.tsx .github/workflows/one-time-home-cleanup.yml
+          git commit -m "Remove unsupported verification claims and extra homepage tiles"
+          git push origin HEAD:cleanup-remove-demo-and-dead-links
