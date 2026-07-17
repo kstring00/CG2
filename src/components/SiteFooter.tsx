@@ -1,13 +1,25 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 /**
  * Persistent site footer with a direct admissions handoff.
  */
 export default function SiteFooter() {
+  const pathname = usePathname();
+  const sitsBesideSupportSidebar = pathname?.startsWith('/support') ?? false;
+
   return (
-    <footer className="mt-auto border-t border-surface-border/70 bg-white/60">
+    <footer
+      className={cn(
+        'mt-auto border-t border-surface-border/70 bg-white/60',
+        sitsBesideSupportSidebar && 'lg:ml-64',
+      )}
+    >
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-4 text-[11px] text-brand-muted-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5">
           <p className="text-brand-muted-500">
             &copy; {new Date().getFullYear()} Texas ABA Centers &middot; Common Ground
           </p>
