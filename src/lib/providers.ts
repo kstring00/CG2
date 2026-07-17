@@ -48,6 +48,13 @@ export interface Provider {
   helpful_to_know: string;
   last_verified_date: string;
   recommendation_level: RecommendationLevel;
+  /**
+   * Insurance info may only be shown when explicitly verified. When populated,
+   * render as: "Confirmed accepts {plan} as of {verifiedDate} — confirm when
+   * you book, or ask our admissions team." Nothing is verified yet, so no
+   * listing sets this today.
+   */
+  verifiedInsurance?: { plan: string; verifiedDate: string };
 }
 
 export const categoryMeta: Record<
@@ -382,8 +389,8 @@ export const providers: Provider[] = [
     service_type: ['in-person', 'mobile'],
     website: 'https://www.daisykidscare.com/therapy-clinic/feeding-therapy/',
     phone: 'See website for current contact',
-    why_it_may_help: 'If mealtimes have become a major source of stress or your child has a very restricted diet, feeding therapy may be the highest-leverage support you can add right now. Daisy Kids Care specializes in autism-related feeding challenges and offers in-home treatment — which can be more effective for many kids.',
-    helpful_to_know: 'Feeding therapy is often underutilized because parents assume picky eating is just behavioral. For autistic kids, it is often sensory-driven and highly treatable with the right approach.',
+    why_it_may_help: 'Daisy Kids Care provides feeding evaluations and treatment for autism-related feeding challenges — food refusal, texture aversions, and mealtime stress — and offers in-home treatment in addition to clinic sessions.',
+    helpful_to_know: 'Offers same-week feeding evaluations (call to verify current availability). Ask about their in-home coverage area when you call.',
     last_verified_date: 'April 2026',
     recommendation_level: 'great-first-call',
   },
@@ -415,31 +422,9 @@ export const providers: Provider[] = [
   },
 
   // ─── DIAGNOSTIC TESTING ──────────────────────────────────────────────────────
+  // Removed for clinical director review (July 2026): one university
+  // assessment clinic (Clear Lake — outside the service footprint).
 
-  {
-    id: 'uhcl-psychological-services',
-    category: 'diagnostic-testing',
-    provider_name: 'UHCL Psychological Services Clinic – Autism Assessment',
-    location: 'University of Houston – Clear Lake, Houston, TX',
-    services: [
-      'Comprehensive autism evaluations (children, teens, adults)',
-      'Formal diagnosis and functioning levels across multiple domains',
-      'Evidence-based autism assessment',
-      'Intervention recommendations',
-    ],
-    age_range: 'Children, teens, and adults',
-    insurance_notes: 'University-run clinic — fees typically on a reduced/sliding-scale basis. Call to confirm current cost structure.',
-    referral_required: false,
-    waitlist_status: 'Call to verify — university clinics often have semester-based scheduling',
-    languages_offered: ['English — call to ask about bilingual evaluators'],
-    service_type: ['in-person'],
-    website: 'https://www.uhcl.edu/autism-center/autism-assessment-services',
-    phone: '(281) 283-3330',
-    why_it_may_help: 'For families who cannot afford a private neuropsychological evaluation (which can cost $1,500–$4,000+), UHCL\'s clinic provides comprehensive autism assessments at a reduced cost under licensed faculty supervision. This is one of the most accessible formal evaluation options in the Houston area.',
-    helpful_to_know: 'Evaluations are conducted by graduate students under licensed faculty supervision — the same model used at most university clinics. The result is a clinically valid, formally recognized diagnosis. Contact email: uhclpsc@uhcl.edu.',
-    last_verified_date: 'April 2026',
-    recommendation_level: 'great-first-call',
-  },
   {
     id: 'west-houston-psychology',
     category: 'diagnostic-testing',
@@ -466,33 +451,9 @@ export const providers: Provider[] = [
   },
 
   // ─── AUTISM-FRIENDLY PEDIATRICIAN ────────────────────────────────────────────
+  // Removed for clinical director review (July 2026): one pediatric practice
+  // (Greenspoint / Baytown — outside the service footprint).
 
-  {
-    id: 'hummingbird-pediatrics',
-    category: 'autism-friendly-pediatrician',
-    provider_name: 'Hummingbird Pediatrics',
-    location: 'Houston (Greenspoint area) & Baytown, TX',
-    services: [
-      'Autism screening and early evaluation',
-      'Ongoing medical care for autistic children',
-      'Co-occurring condition management',
-      'Referral coordination (speech, OT, ABA, behavioral services)',
-      'Parent guidance and treatment planning support',
-    ],
-    age_range: 'Children (birth – 18 years)',
-    insurance_notes: 'Call to verify insurance acceptance',
-    referral_required: false,
-    waitlist_status: 'Call to verify as a new patient',
-    languages_offered: ['English', 'Spanish — verify'],
-    service_type: ['in-person'],
-    sensory_accommodations: 'Stated as providing compassionate, neurodevelopmentally-aware care — call to discuss specific accommodations',
-    website: 'https://www.hummingbirdpediatrics.com',
-    phone: 'See website for current contact',
-    why_it_may_help: 'Finding a pediatrician who understands autism is often harder than finding a therapist. Hummingbird Pediatrics specifically lists autism screening and ongoing autism care as a core service — not a referral-out. They coordinate with the rest of your child\'s team, which reduces the burden on parents.',
-    helpful_to_know: 'Serves Greater Greenspoint (north Houston area) and Baytown. Two locations are an advantage for families on the east side of the metro. Call ahead about wait times for new patients.',
-    last_verified_date: 'April 2026',
-    recommendation_level: 'great-first-call',
-  },
   {
     id: 'texas-childrens-developmental-pediatrics',
     category: 'autism-friendly-pediatrician',
@@ -575,31 +536,8 @@ export const providers: Provider[] = [
     last_verified_date: 'April 2026',
     recommendation_level: 'great-first-call',
   },
-  {
-    id: 'feat-houston',
-    category: 'support-groups',
-    provider_name: 'FEAT Houston – Families for Effective Autism Treatment',
-    location: 'Houston, TX (Clear Lake / Bay Area)',
-    services: [
-      'Autism provider directory (Houston-specific)',
-      'Parent community and networking',
-      'School and day program resource listings',
-      'Adaptive recreation provider listings',
-      'Regular family events',
-    ],
-    age_range: 'All ages',
-    insurance_notes: 'Free resource',
-    referral_required: false,
-    waitlist_status: 'N/A — open resource directory and community',
-    languages_offered: ['English'],
-    service_type: ['in-person', 'virtual'],
-    website: 'https://www.feathouston.org',
-    phone: 'See website for current contact',
-    why_it_may_help: 'FEAT Houston is a parent-led community organization in the Clear Lake / Bay Area that connects autism families to events, day programs, schools, and recreational resources. A good place to find local families and community programs.',
-    helpful_to_know: 'Based in the Clear Lake / Bay Area — especially relevant for southeast Houston, Webster, League City, and Pearland families. Great for community events and connecting with other parents. For therapy services, contact your Texas ABA Centers care team.',
-    last_verified_date: 'April 2026',
-    recommendation_level: 'community-resource',
-  },
+  // Removed for clinical director review (July 2026): one parent-led
+  // community org (Clear Lake / Bay Area — outside the service footprint).
 
   // ─── RESPITE CARE ─────────────────────────────────────────────────────────────
 
@@ -650,29 +588,8 @@ export const providers: Provider[] = [
     last_verified_date: 'April 2026',
     recommendation_level: 'community-resource',
   },
-  {
-    id: 'angels-around-homecare-respite',
-    category: 'respite-care',
-    provider_name: 'Angels Around Home Care – Pediatric Respite',
-    location: 'Houston, TX (9601 Jones Road, Suite 150)',
-    services: [
-      'Respite care for children with disabilities',
-      'Autism-specific respite care',
-      'In-home support',
-    ],
-    age_range: 'Children with disabilities',
-    insurance_notes: 'Call to verify',
-    referral_required: 'unknown',
-    waitlist_status: 'Call to verify',
-    languages_offered: ['English'],
-    service_type: ['mobile'],
-    website: 'https://www.angelsaroundhomecare.com/respite-care/',
-    phone: '(832) 869-4110',
-    why_it_may_help: 'A Houston-based home care agency that specifically lists autistic children as a population they serve for respite. If other respite providers have long waits, this is a direct private option.',
-    helpful_to_know: 'Located in northwest Houston near Jones Road. Call to confirm current availability and pricing before assuming anything.',
-    last_verified_date: 'April 2026',
-    recommendation_level: 'backup-option',
-  },
+  // Removed for clinical director review (July 2026): one home-care respite
+  // agency (northwest Houston — outside the service footprint).
 
   // ─── ADVOCACY / IEP ───────────────────────────────────────────────────────────
 
@@ -786,33 +703,10 @@ export const providers: Provider[] = [
   },
 
   // ─── ADAPTIVE RECREATION ─────────────────────────────────────────────────────
+  // Removed for clinical director review (July 2026): one adaptive-sports
+  // program (Humble / northwest Houston / Kingwood — outside the service
+  // footprint).
 
-  {
-    id: 'ymca-adaptive-houston',
-    category: 'adaptive-recreation',
-    provider_name: 'YMCA of Greater Houston – Adaptive Sports Programs',
-    location: 'Multiple Houston locations (Humble, northwest Houston, Kingwood)',
-    services: [
-      'Miracle League Baseball',
-      'Adaptive Basketball',
-      'Adaptive Swimming',
-      'Adaptive Soccer',
-      'Buddy system during games',
-    ],
-    age_range: 'Ages 4+ (Recreational Minors: 4–9, Majors: 10+, Competitive: 12+)',
-    insurance_notes: 'Membership-based — sliding scale available. Call for fee assistance.',
-    referral_required: false,
-    waitlist_status: 'Varies by season and location — call to register',
-    languages_offered: ['English', 'Spanish — verify by location'],
-    service_type: ['in-person'],
-    sensory_accommodations: 'Programs designed for accessibility — call to discuss specific sensory needs',
-    website: 'https://ymcahouston.org/programs/community/adaptive-programs',
-    phone: 'See website for location-specific contact',
-    why_it_may_help: 'Sports participation has a proven impact on social skills, regulation, and confidence in autistic kids — and it gives them joy. YMCA\'s adaptive programs pair each athlete with a buddy and use a no-barrier environment designed for all ability levels.',
-    helpful_to_know: 'Three main adaptive facilities: Insperity Complex in Humble, Mabee Complex in northwest Houston (77095), and Lake Houston Family YMCA in Kingwood. Seasons vary — contact early to register before spots fill.',
-    last_verified_date: 'April 2026',
-    recommendation_level: 'community-resource',
-  },
   {
     id: 'texas-swim-academy-adaptive',
     category: 'adaptive-recreation',
@@ -834,8 +728,8 @@ export const providers: Provider[] = [
     sensory_accommodations: 'Environment designed for sensory sensitivity — calm, patient, individualized instruction',
     website: 'https://texasswimacademy.com/the-need-for-adaptive-aquatics/',
     phone: 'See website for current contact',
-    why_it_may_help: 'Drowning is the leading cause of death for autistic children. Water safety is not just recreation — it\'s safety. Texas Swim Academy trains instructors specifically to work with autistic swimmers, using communication approaches that match how autistic kids learn best.',
-    helpful_to_know: 'Hope For Three can fund swim lessons for eligible Fort Bend County families — combine these two resources if cost is a barrier. Nearly 48% of autistic children attempt to wander, and accidental drowning accounts for 91% of elopement-related deaths under 14.',
+    why_it_may_help: 'Water safety skills are especially important for autistic children. Texas Swim Academy trains instructors specifically to work with autistic swimmers, using communication approaches that match how autistic kids learn best.',
+    helpful_to_know: 'Hope For Three can fund swim lessons for eligible Fort Bend County families — combine these two resources if cost is a barrier.',
     last_verified_date: 'April 2026',
     recommendation_level: 'specialized-support',
   },
@@ -886,8 +780,8 @@ export const providers: Provider[] = [
     service_type: ['in-person', 'mobile', 'virtual'],
     website: 'https://www.theharriscenter.org',
     phone: '(713) 970-7000',
-    why_it_may_help: 'The primary mental health crisis authority for Harris County. If you are in Houston and facing a psychiatric emergency that is not life-threatening (so not a 911 situation), the Harris Center can dispatch a mobile crisis team — which is safer and more appropriate for autistic individuals than a police response.',
-    helpful_to_know: 'Mobile crisis teams are specifically trained for mental health situations. If your autistic child is in a severe crisis and you are concerned about how first responders would interact with them, calling the Harris Center first can result in a more appropriate response.',
+    why_it_may_help: 'The primary mental health crisis authority for Harris County. If you are in Houston and facing a psychiatric emergency that is not life-threatening (so not a 911 situation), the Harris Center can dispatch a mobile crisis team.',
+    helpful_to_know: 'Mobile crisis teams are specifically trained for mental health situations and are available 24/7 through the crisis line.',
     last_verified_date: 'April 2026',
     recommendation_level: 'great-first-call',
   },

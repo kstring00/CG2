@@ -46,9 +46,14 @@ export function resolveHasPartner(answers: CarePlanAnswers): boolean {
   return answers.hasPartner === true;
 }
 
-/** Threads visible in the always-on support panel. */
+/**
+ * Threads visible beside the plan. Caregiver mental-health content never
+ * appears inside a generated care plan (pre-review decision, July 2026) —
+ * it lives only under Parent Support, so the mental-health thread is no
+ * longer eligible here.
+ */
 export function getEligibleSupportThreads(answers: CarePlanAnswers): SupportThread[] {
-  const threads: SupportThread[] = [SUPPORT_THREADS['mental-health']];
+  const threads: SupportThread[] = [];
   if (resolveHasOtherChildren(answers)) {
     threads.push(SUPPORT_THREADS.siblings);
   }
@@ -58,13 +63,13 @@ export function getEligibleSupportThreads(answers: CarePlanAnswers): SupportThre
   return threads;
 }
 
-/** Pick a nudge thread — rotate away from last week when possible. */
+/** Pick a nudge thread — rotate away from last week when possible. Null when no thread is eligible. */
 export function pickSupportNudgeThread(
   answers: CarePlanAnswers,
   lastThread: SupportThreadId | null | undefined,
-): SupportThreadId {
+): SupportThreadId | null {
   const eligible = getEligibleSupportThreads(answers).map((t) => t.id);
-  if (eligible.length === 0) return 'mental-health';
+  if (eligible.length === 0) return null;
   const rotated = lastThread ? eligible.filter((id) => id !== lastThread) : eligible;
   return rotated[0] ?? eligible[0];
 }

@@ -12,15 +12,14 @@ const nextConfig = {
     deviceSizes: [640, 1080, 1440, 1920, 2560],
     imageSizes: [640, 1080, 1440, 1920, 2560],
   },
-  // The intake-first homepage replaces the prior /support/next-steps stage flow.
-  // Next.js forwards query strings (e.g. ?stage=school-transition) to the
-  // destination by default, so deep links from getRecommendedAction and
-  // SupportShell continue to land users on the right stage.
+  // "My Care Plan" (the intake flow at /support/intake) replaces the prior
+  // /support/next-steps stage flow, so old links land on the intake instead
+  // of breaking. Next.js forwards query strings to the destination by default.
   async redirects() {
     return [
       {
         source: '/support/next-steps',
-        destination: '/',
+        destination: '/support/intake',
         permanent: true,
       },
     ];

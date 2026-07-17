@@ -126,7 +126,7 @@ const waitingDiagnosisArc: Arc = {
       week: 6,
       theme: 'At-home strategies that help regardless',
       phase: 'sustain',
-      candidateStepIds: ['homeStrategy', 'meltdownNow', 'fourMinutes'],
+      candidateStepIds: ['homeStrategy', 'meltdownNow', 'practicalGuides'],
     },
     {
       week: 7,
@@ -259,7 +259,7 @@ const inAbaArc: Arc = {
       week: 8,
       theme: 'Build long-term sustainability',
       phase: 'sustain',
-      candidateStepIds: ['fourMinutes', 'parentTherapist', 'homeStrategy', 'todo-sustain-aba'],
+      candidateStepIds: ['parentMatch', 'homeStrategy', 'todo-sustain-aba'],
     },
   ],
 };

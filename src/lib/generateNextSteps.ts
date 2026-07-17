@@ -84,10 +84,10 @@ type Candidate = {
   evidence?: StepEvidence;
 };
 
-/** Psychology Today therapist directory — direct search, not the mental-health toolbox. */
-const PSYCHOLOGY_TODAY_THERAPISTS =
-  'https://www.psychologytoday.com/us/therapists/tx/houston';
-
+// Caregiver mental-health candidates (four-minute reset, find-a-parent-
+// therapist, partner check-in) were removed from the generator ahead of
+// clinical director review: that content lives only under Parent Support and
+// never appears inside a generated care plan.
 const C: Record<string, Candidate> = {
   // Financial track
   medicaidWaiver: {
@@ -121,36 +121,12 @@ const C: Record<string, Candidate> = {
     bucket: 'save-resource',
   },
 
-  // Hard-days / parent care
-  fourMinutes: {
-    id: 'fourMinutes',
-    title: 'Take four minutes for yourself',
-    why: 'Open this when you are running on empty. It’s a short, guided four-minute reset you can do right now — picked first because the rest of the plan is easier to face once you’ve caught your breath.',
-    href: '/support/caregiver',
-    bucket: 'do-today',
-    altBuckets: ['try-home'],
-    evidence: {
-      text: 'Slow, paced breathing activates the parasympathetic nervous system and can lower acute stress within minutes — one of the most studied rapid calming tools in DBT and trauma-informed care.',
-      source: 'Zaccaro et al., Frontiers in Human Neuroscience (2018) — breathwork & HRV review',
-    },
-  },
-  parentTherapist: {
-    id: 'parentTherapist',
-    title: 'Find a parent therapist',
-    why: 'Use this if the weight is becoming too much to carry alone. Search Houston-area therapists who work with caregivers — your own support makes you better able to keep advocating for your child.',
-    href: PSYCHOLOGY_TODAY_THERAPISTS,
-    bucket: 'ask-bcba',
-    altBuckets: ['save-resource'],
-    evidence: {
-      text: 'Parents of autistic children report significantly higher stress and depression. Therapy focused on caregiver wellbeing has been shown in multiple studies to reduce those symptoms — which often helps you show up steadier for your child.',
-      source: 'Samson & Ievers, Journal of Autism & Developmental Disorders (2020) — caregiver mental health meta-analysis',
-    },
-  },
+  // Behavior support for hard moments
   meltdownNow: {
     id: 'meltdownNow',
     title: 'If a meltdown is happening now',
     why: 'Bookmark this for the hard moments. It’s a two-minute, in-the-moment calming guide for when a meltdown is happening — fast steps to get through it, not a long strategy to study later.',
-    href: '/support/caregiver',
+    href: '/support/at-home',
     bucket: 'save-resource',
     altBuckets: ['try-home'],
     evidence: {
@@ -204,7 +180,7 @@ const C: Record<string, Candidate> = {
     id: 'documentHard',
     title: 'Document what is hard right now',
     why: 'Do this before any clinical or school meeting. It shows you how to write down three specific recent examples of what’s hard — concrete notes that help a BCBA or school team act faster than a general description would.',
-    href: '/support/caregiver',
+    href: '/support/resources',
     bucket: 'ask-bcba',
     altBuckets: ['try-home'],
   },
@@ -381,14 +357,41 @@ const C: Record<string, Candidate> = {
     altBuckets: ['ask-bcba'],
   },
 
-  // Marriage / partner (notes-driven)
-  partnerTalk: {
-    id: 'partnerTalk',
-    title: 'Set up one short partner check-in',
-    why: 'Use this if the strain is showing up between you and your partner. It’s a simple structure for one fifteen-minute weekly check-in together — a small, repeatable habit to stay a team through a hard stretch.',
-    href: '/support/caregiver',
-    bucket: 'next-week',
-    altBuckets: ['try-home'],
+  // New-to-ABA path (stage-gated plan for families without a provider yet)
+  gatherPaperwork: {
+    id: 'gatherPaperwork',
+    title: 'Gather your diagnosis paperwork',
+    why: 'Pull together the evaluation report, any referral letters, and your child’s records in one folder. Intake teams and insurers will ask for these, and having them ready keeps everything moving.',
+    href: '/support/resources',
+    bucket: 'do-today',
+  },
+  confirmCoveragePlan: {
+    id: 'confirmCoveragePlan',
+    title: 'Confirm your insurance or Medicaid plan (which MCO)',
+    why: 'Call the number on your card and confirm exactly which plan your child is on — for Texas Medicaid, that means which managed care organization (MCO), such as a STAR Kids plan. Intake will need this to verify coverage.',
+    href: '/support/financial',
+    bucket: 'do-today',
+  },
+  contactIntake: {
+    id: 'contactIntake',
+    title: 'Contact intake at Texas ABA Centers',
+    why: 'One call starts the process. The intake team verifies coverage, answers your questions, and schedules the first evaluation — no referral needed.',
+    href: 'tel:+18777715725',
+    bucket: 'do-today',
+  },
+  firstBcbaCall: {
+    id: 'firstBcbaCall',
+    title: 'What to expect on your first BCBA call',
+    why: 'A plain-language look at what the first conversation with a BCBA covers and the questions worth asking, so nothing on that call is a surprise.',
+    href: '/support/what-is-aba#questions',
+    bucket: 'ask-bcba',
+  },
+  waitlistAtHome: {
+    id: 'waitlistAtHome',
+    title: 'Waitlist-friendly at-home strategies',
+    why: 'Practical routines, first–then language, and transition tools you can start using at home right away — useful while you wait for services to begin.',
+    href: '/support/at-home',
+    bucket: 'try-home',
   },
 };
 
@@ -534,8 +537,10 @@ function applyHardest(
       applyFinancialHardest(scores, weight, because, coverage);
       break;
     case 'overwhelmed':
-      add(scores, C.fourMinutes, weight, because);
-      add(scores, C.parentTherapist, weight - 2, because);
+      // Caregiver mental-health steps no longer appear in generated plans —
+      // point overwhelmed parents toward peer connection and small wins.
+      add(scores, C.parentMatch, weight, because);
+      add(scores, C.practicalGuides, weight - 2, because);
       break;
     case 'connecting-parents':
       add(scores, C.parentMatch, weight, because);
@@ -619,17 +624,10 @@ const NOTES_RULES: NotesRule[] = [
     because: 'Because you mentioned a sibling.',
   },
   {
-    pattern: /\b(marriage|partner|spouse|husband|wife|relationship)\b/i,
-    candidate: C.partnerTalk,
-    matchedPhrase: 'partner',
-    reflection: 'You mentioned your partner — a short weekly check-in goes a long way.',
-    because: 'Because you mentioned your partner.',
-  },
-  {
     pattern: /\b(tired|exhausted|burn(ed|t)? out|drained|can'?t do this|overwhelmed)\b/i,
-    candidate: C.fourMinutes,
+    candidate: C.parentMatch,
     matchedPhrase: 'exhaustion',
-    reflection: 'You said you’re running on empty — four minutes for you comes first.',
+    reflection: 'You said you’re running on empty — another parent who gets it can help carry this.',
     because: 'Because you said you’re running on empty.',
   },
   {
@@ -741,8 +739,9 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
         add(scores, C.parentMatch, W.helpKind, 'Because you said you want someone to talk to.');
         break;
       case 'time-for-me':
-        add(scores, C.fourMinutes, W.helpKind, 'Because you said you need time for yourself.');
-        add(scores, C.parentTherapist, W.helpKind - 1, 'Because you said you need time for yourself.');
+        // Caregiver mental-health content lives under Parent Support only —
+        // the plan points to peer connection instead.
+        add(scores, C.parentMatch, W.helpKind, 'Because you said you need time for yourself.');
         break;
       case 'not-sure':
         add(scores, C.whatIsAba, W.helpKind - 2, 'A gentle starting point while you figure out what helps.');
@@ -772,6 +771,52 @@ function buildScores(answers: CarePlanAnswers): Map<string, Score> {
   return scores;
 }
 
+// ---------------------------------------------------------------------------
+// Stage gate — new to ABA, no provider yet
+// ---------------------------------------------------------------------------
+
+/**
+ * Families who are new to ABA and do not yet have a provider (including
+ * Medicaid families — coverage never changes this gate) get a fixed,
+ * ordered plan: (1) gather diagnosis paperwork, (2) confirm insurance or
+ * Medicaid plan (which MCO), (3) contact intake at Texas ABA Centers,
+ * (4) what to expect on the first BCBA call, plus waitlist-friendly at-home
+ * strategies. No caregiver mental-health module appears in this output.
+ * Families already in services see collaboration and at-home content via the
+ * regular scoring engine instead.
+ */
+export const NEW_TO_ABA_STAGES: ReadonlySet<Stage> = new Set<Stage>([
+  'newly-diagnosed',
+  'looking-for-aba',
+]);
+
+export function isNewToAbaWithoutProvider(answers: CarePlanAnswers): boolean {
+  return answers.stage != null && NEW_TO_ABA_STAGES.has(answers.stage);
+}
+
+const NEW_TO_ABA_STEP_IDS = [
+  'gatherPaperwork',
+  'confirmCoveragePlan',
+  'contactIntake',
+  'firstBcbaCall',
+  'waitlistAtHome',
+] as const;
+
+export function generateNewToAbaSteps(): CarePlanStep[] {
+  return NEW_TO_ABA_STEP_IDS.map((id, idx) => {
+    const candidate = C[id];
+    return {
+      id: candidate.id,
+      title: candidate.title,
+      why: candidate.why,
+      href: candidate.href,
+      because: 'Because you’re new to ABA and don’t have a provider yet.',
+      weight: NEW_TO_ABA_STEP_IDS.length - idx,
+      bucket: candidate.bucket,
+    };
+  });
+}
+
 /**
  * Top N steps, ordered by weight, with stable tiebreak by title.
  *
@@ -784,6 +829,10 @@ export function generateNextSteps(
   answers: CarePlanAnswers,
   bandwidthTier?: BandwidthTier,
 ): CarePlanStep[] {
+  // Stage gate: new-to-ABA families get the fixed intake-first plan, in
+  // order, regardless of bandwidth tier or coverage.
+  if (isNewToAbaWithoutProvider(answers)) return generateNewToAbaSteps();
+
   const scores = buildScores(answers);
   const limit = TIER_STEP_LIMIT[bandwidthTier ?? 'doing-well'];
   if (scores.size === 0) return FALLBACK_STEPS.slice(0, limit);
@@ -1309,20 +1358,22 @@ export function generateArcWeekSteps(
     input.answers,
     input.lastSupportNudgeThread,
   );
-  const nudgeCandidateId = getSupportNudgeCandidateId(nudgeThread);
-  if (
-    !previewIds.has(nudgeCandidateId) &&
-    !completed.has(nudgeCandidateId) &&
-    !buildSeen.has(nudgeCandidateId) &&
-    C[nudgeCandidateId]
-  ) {
-    supportNudgeThread = nudgeThread;
-    nudge = candidateToWeekTwoStep(
-      C[nudgeCandidateId],
-      getSupportNudgeCopy(nudgeThread),
-      'try-home',
-    );
-    buildSeen.add(nudgeCandidateId);
+  if (nudgeThread) {
+    const nudgeCandidateId = getSupportNudgeCandidateId(nudgeThread);
+    if (
+      !previewIds.has(nudgeCandidateId) &&
+      !completed.has(nudgeCandidateId) &&
+      !buildSeen.has(nudgeCandidateId) &&
+      C[nudgeCandidateId]
+    ) {
+      supportNudgeThread = nudgeThread;
+      nudge = candidateToWeekTwoStep(
+        C[nudgeCandidateId],
+        getSupportNudgeCopy(nudgeThread),
+        'try-home',
+      );
+      buildSeen.add(nudgeCandidateId);
+    }
   }
 
   const sparse =
@@ -1465,9 +1516,9 @@ const FALLBACK_STEPS: CarePlanStep[] = [
 
 const FALLBACK_RESOURCES: CarePlanResource[] = [
   { label: RESOURCE_HUB_LABEL, href: '/support/resources' },
-  { label: 'Find local help', href: '/support/find' },
+  { label: 'Find Local Help', href: '/support/find' },
   { label: 'Connect with parents', href: '/support/connect' },
-  { label: 'Parent support', href: '/support/caregiver' },
+  { label: 'What is ABA?', href: '/support/what-is-aba' },
 ];
 
 export function generateResources(answers: CarePlanAnswers): CarePlanResource[] {
@@ -1478,7 +1529,7 @@ export function generateResources(answers: CarePlanAnswers): CarePlanResource[] 
 
   const hardest = answers.hardest ?? [];
   if (hardest.includes('financial-insurance')) add({ label: 'Financial help', href: '/support/financial', because: 'Picked because financial pressure is on your list.' });
-  if (hardest.includes('overwhelmed')) add({ label: 'Parent support — start here', href: '/support/caregiver', because: 'Picked because you said you’re overwhelmed.' });
+  if (hardest.includes('overwhelmed')) add({ label: 'Connect with parents', href: '/support/connect', because: 'Picked because you said you’re overwhelmed.' });
   if (hardest.includes('connecting-parents')) add({ label: 'Connect with parents', href: '/support/connect', because: 'Picked because connection is on your list.' });
   if (hardest.includes('siblings')) add({ label: 'Sibling support', href: '/support/siblings', because: 'Picked because siblings are on your list.' });
   if (hardest.includes('school-iep')) add({ label: 'IEP / school guides', href: '/support/resources', because: 'Picked because school is on your list.' });
@@ -1492,7 +1543,6 @@ export function generateResources(answers: CarePlanAnswers): CarePlanResource[] 
       ? [answers.helpKind]
       : [];
   if (helpKinds.includes('someone-to-talk-to')) add({ label: 'Connect with parents', href: '/support/connect', because: 'Picked because you said you want someone to talk to.' });
-  if (helpKinds.includes('time-for-me')) add({ label: 'Parent support', href: '/support/caregiver', because: 'Picked because you said you need time for yourself.' });
 
   const { matches } = parseNotes(answers.notes ?? '');
   for (const m of matches) {
@@ -1515,7 +1565,7 @@ export function generateWeekMessage(mood: WeekMood | null | undefined): string {
   switch (mood) {
     case 'frayed':
     case 'heavy':
-      return 'This week sounds heavy. Before anything else: take four minutes for yourself. The rest of the plan can wait.';
+      return 'This week sounds heavy. One small step is enough — the rest of the plan can wait.';
     case 'numb':
       return 'Numb is also a signal — not a flaw. One small thing today is enough.';
     case 'steady':

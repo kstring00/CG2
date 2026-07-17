@@ -5,26 +5,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   BookOpen,
-  Link2,
   Search,
   Menu,
   X,
   Compass as CompassIcon,
-  Home,
+  // Home is only referenced by the archived Home Base nav entry below —
+  // re-import it when that line is restored.
   Lock,
   Users,
   HelpCircle,
   HeartHandshake,
   HeartPulse,
   Wallet,
-  Lightbulb,
 } from 'lucide-react';
 import Image from 'next/image';
-import {
-  AT_HOME_STRATEGIES_LABEL,
-  FOR_COUPLES_LABEL,
-  RESOURCE_HUB_LABEL,
-} from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 import NextStepButton from '@/components/layout/NextStepButton';
@@ -37,40 +31,40 @@ import NextStepButton from '@/components/layout/NextStepButton';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
-// CCO-review label map (round 2): Start Here now surfaces Parent Connection so
-// it's no longer buried; Sibling Support moves to Learn (it's content, not
-// active support). Order within each group reflects parent priority.
+// Single sitewide nav (pre-review cleanup, July 2026): one name per
+// destination. The intake flow is "My Care Plan" everywhere; the directory is
+// "Find Local Help" everywhere. Mental Health Center / Still Waters / the
+// Mental Health Toolbox stay live but are reachable from within Parent
+// Support, not from the nav.
 const navGroups = [
   {
     label: 'Start Here',
     items: [
-      { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/care-plan', label: 'My Family Care Plan', icon: CompassIcon },
-      { href: '/support/connect', label: 'Parent Connection', icon: Users },
+      // { href: '/support', label: 'Home Base', icon: Home }, // archived – pending CD review
+      { href: '/support/intake', label: 'My Care Plan', icon: CompassIcon },
+      { href: '/support/mental-health', label: 'Parent Support', icon: HeartPulse },
     ],
   },
   {
-    label: 'Support',
-    items: [
-      { href: '/support/caregiver', label: 'Mental Health Toolbox', icon: HeartPulse },
-      { href: '/support/couples', label: FOR_COUPLES_LABEL, icon: HeartHandshake },
-    ],
-  },
-  {
-    label: 'Learn',
+    label: 'Learn & Find Help',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
-      { href: '/support/at-home', label: AT_HOME_STRATEGIES_LABEL, icon: Lightbulb },
-      { href: '/support/resources', label: RESOURCE_HUB_LABEL, icon: BookOpen },
-      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+      { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
-      { href: '/support/financial', label: 'Paying for Care', icon: Wallet },
+      { href: '/support/connect', label: 'Connect With Parents', icon: HeartHandshake },
     ],
   },
   {
-    label: 'For Current Families',
+    label: 'Family Needs',
     items: [
-      { href: '/client', label: 'Client Portal Preview', icon: Lock },
+      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
+      { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+    ],
+  },
+  {
+    label: 'Texas ABA Families',
+    items: [
+      { href: '/client', label: 'Go to Client Portal', icon: Lock },
     ],
   },
 ];
