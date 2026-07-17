@@ -19,6 +19,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import Image from 'next/image';
+import { FOR_COUPLES_LABEL } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 import NextStepButton from '@/components/layout/NextStepButton';
@@ -51,6 +52,7 @@ const navGroups = [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
       { href: '/support/find', label: 'Find Local Help', icon: Search },
+      { href: '/support/couples', label: FOR_COUPLES_LABEL, icon: HeartHandshake },
       { href: '/support/connect', label: 'Connect With Parents', icon: HeartHandshake },
     ],
   },
