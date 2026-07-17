@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import ChatWidget from '@/components/ChatWidget';
 import SiteFooter from '@/components/SiteFooter';
 
 export const metadata: Metadata = {
@@ -54,7 +53,6 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col bg-surface font-body antialiased">
         {children}
         <SiteFooter />
-        <ChatWidget />
       </body>
     </html>
   );
