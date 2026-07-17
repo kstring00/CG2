@@ -1,0 +1,41 @@
+name: One-time neutral copy fix
+
+on:
+  push:
+    branches:
+      - cleanup-remove-demo-and-dead-links
+    paths:
+      - .github/workflows/one-time-neutral-copy.yml
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: cleanup-remove-demo-and-dead-links
+          fetch-depth: 0
+      - name: Replace unsupported homepage claim
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('src/components/home/HomeSupportHub.tsx')
+          text = path.read_text()
+          old = '''Every listing is real, reviewed, and chosen because parents told us it actually helped —
+                 across the greater Houston area.'''
+          new = 'Browse local providers and support resources in the greater Houston area.'
+          if old not in text:
+              raise SystemExit('Expected homepage claim was not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+      - name: Remove one-time workflow and commit
+        run: |
+          rm .github/workflows/one-time-neutral-copy.yml
+          git config user.name "ChatGPT cleanup"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/components/home/HomeSupportHub.tsx .github/workflows/one-time-neutral-copy.yml
+          git commit -m "Use neutral local-provider homepage copy"
+          git push origin HEAD:cleanup-remove-demo-and-dead-links
