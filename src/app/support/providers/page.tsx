@@ -23,7 +23,6 @@ import {
   type RecommendationLevel,
   type StartHereRoute,
 } from '@/lib/providers';
-import { parsePhone } from '@/lib/phone';
 import { cn } from '@/lib/utils';
 
 // ─── Filter state ──────────────────────────────────────────────────────────────
@@ -82,9 +81,6 @@ function ProviderCard({ provider }: { provider: (typeof providers)[0] }) {
   const [expanded, setExpanded] = useState(false);
   const catMeta = categoryMeta[provider.category];
   const recMeta = recommendationMeta[provider.recommendation_level];
-  // One dialable number per tel: link; strings like "Contact via website"
-  // render no phone button at all (the website link covers them).
-  const phone = parsePhone(provider.phone);
 
   return (
     <article
@@ -107,7 +103,7 @@ function ProviderCard({ provider }: { provider: (typeof providers)[0] }) {
           </span>
         </div>
         <span className="inline-flex items-center gap-1 rounded-full border border-surface-border bg-surface-muted px-3 py-1 text-[11px] text-brand-muted-500">
-          <Shield className="h-3 w-3" /> Reviewed {provider.last_verified_date}
+          <Shield className="h-3 w-3" /> Verified {provider.last_verified_date}
         </span>
       </div>
 
@@ -150,13 +146,13 @@ function ProviderCard({ provider }: { provider: (typeof providers)[0] }) {
 
       {/* Contact bar */}
       <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-surface-border pt-4">
-        {phone && (
+        {provider.phone && provider.phone !== 'See website for current contact' && (
           <a
-            href={`tel:${phone.dial}`}
+            href={`tel:${provider.phone.replace(/\D/g, '')}`}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-all hover:bg-primary-dark hover:shadow-card"
           >
             <Phone className="h-4 w-4" />
-            {phone.display}
+            {provider.phone}
           </a>
         )}
         {provider.website && (
@@ -187,11 +183,7 @@ function ProviderCard({ provider }: { provider: (typeof providers)[0] }) {
           </div>
           <div className="rounded-2xl bg-surface-muted p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-500">Insurance & Cost</p>
-            <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
-              {provider.verifiedInsurance
-                ? `Confirmed accepts ${provider.verifiedInsurance.plan} as of ${provider.verifiedInsurance.verifiedDate} — confirm when you book, or ask our admissions team.`
-                : 'Insurance details pending verification — confirm when you book, or ask our admissions team.'}
-            </p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">{provider.insurance_notes}</p>
           </div>
           <div className="rounded-2xl bg-surface-muted p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-500">Waitlist Status</p>
@@ -288,11 +280,8 @@ export default function ProvidersPage() {
       <header className="page-header">
         <h1 className="page-title">Providers & Community Resources</h1>
         <p className="page-description">
-          Every provider on this list is real, verifiable, and relevant to autism families. Local
-          listings cover the communities we serve — Sugar Land, Katy, Pearland, Missouri City /
-          Fort Bend County, southwest Houston, Austin, and Plano — and we removed anything we
-          couldn't confirm. Statewide and virtual resources are included for every Texas family,
-          wherever you live. Start with the section below if you're not sure where to begin.
+          Every provider on this list is real, verifiable, and relevant to autism families in the Houston and Fort Bend area.
+          We removed anything we couldn't confirm. Start with the section below if you're not sure where to begin.
         </p>
       </header>
 

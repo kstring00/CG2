@@ -1,24 +1,24 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import {
   ArrowRight,
+  ArrowUpRight,
   Check,
-  ChevronLeft,
-  ChevronRight,
   Heart,
-  HeartHandshake,
+  Languages,
   Lock,
   MessageCircle,
   MessageSquare,
   Phone,
   Shield,
+  ShieldCheck,
   Sparkles,
   Users,
   Video,
 } from 'lucide-react';
 import {
+  diagnosisStageLabels,
   mockParentMatches,
   peerGroups,
   type ConnectionPreference,
@@ -28,54 +28,97 @@ import {
 } from '@/lib/data';
 import { cn } from '@/lib/utils';
 
+/* ─── Types ─────────────────────────────────────────────────── */
 type AgeRange = '0-2' | '2-5' | '6-12' | '13-17';
+type Locale = 'en' | 'es';
 
+/* ─── EN/ES copy ────────────────────────────────────────────── */
 const connectCopy = {
-  eyebrow: 'Parent Connection',
-    headline: "You don't have to explain it. They already get it.",
+  en: {
+    eyebrow: 'Parent Connection',
+    headline: "You don't have to explain it. They already know.",
     subhead:
-      "Common Ground connects you with parents who live the same moments, ask the same questions, and know what you're going through.",
+      'Connect with other parents who are living this — same stage, same struggles, same long days. Moderated, private, and low-pressure.',
     ctaPrimary: 'Find my match',
     ctaSecondary: 'Browse small groups',
-    comingSoonTitle: 'Parent matching is coming soon.',
-    comingSoonText:
-      "We're building the right matches so you can connect with parents who truly understand.",
-    comingSoonCta: 'Learn more',
-    trustModerationTitle: 'Real moderators in every space',
-    trustModerationText:
-      'Conversations are guided by trained moderators who keep spaces safe, kind, and on-topic.',
-    trustPrivacyTitle: 'Your privacy, always',
-    trustPrivacyText:
-      'Your child stays private. We never share names, schools, or personal information.',
-    trustSupportTitle: 'Support when you need more',
-    trustSupportText:
-      'If you need extra help, resources and crisis support are just a click away.',
-    trustLearnMore: 'Learn more',
-    trustViewSupport: 'View support options',
-    formSectionTitle: "Let's find your people",
-    formSectionSub:
-      'A few quick questions help us connect you with parents who truly get your journey.',
-    stepOf: (step: number, total: number) => `Step ${step} of ${total}`,
-    backBtn: 'Back',
-    continueBtn: 'Continue',
-    skipReassurance: 'You can skip any question and change your answers anytime.',
-    intakeStep1Title: 'Child age',
-    intakeStep1Hint: 'Pick one or more — helps us match you with parents at the same stage.',
-    intakeStep2Title: 'Journey stage',
+    trustModerated: 'Moderated',
+    trustPrivate: 'Private',
+    trustFree: 'Free',
+    trustStripAria: 'How this space is run',
+    testimonialQuote: '“I didn’t have to start at the beginning. They already knew.”',
+    testimonialMeta: 'Parent of a 6-year-old, 14 months in',
+    testimonialBadge: 'Parent voice',
+    crisisBannerLead: 'In crisis right now?',
+    crisisBannerCallText: 'Call or text 988 — free, confidential, 24/7.',
+    crisisBannerLinkLabel: 'Call 988',
+    languageToggle: 'Español',
+
+    // Pillars
+    pillarsAria: 'How Parent Connection works',
+    pillarModerationEyebrow: 'Moderation',
+    pillarModerationTitle: 'Real moderators in every space',
+    pillarModerationLead:
+      'Moderators set the tone, reset hard threads, and step in when a conversation needs care.',
+    threadModNote: 'A gentle reminder before we share: stories stay in this room.',
+    threadParent1Name: 'Parent A',
+    threadParent1Reply: 'Thank you. That helps me actually post tonight.',
+    threadParent2Name: 'Parent B',
+    threadParent2Reply: 'Same. The structure is part of why I keep showing up.',
+
+    pillarPrivacyEyebrow: 'Privacy',
+    pillarPrivacyTitle: 'Your child stays private. Always.',
+    pillarPrivacyLead: 'Three commitments, in plain language.',
+    privacyItem1: 'No child records, names, schools, or diagnoses are ever shared.',
+    privacyItem2: 'No home address required — ever.',
+    privacyItem3: 'Opt-in only. Nothing is shared with another parent until you say so.',
+
+    pillarMatchingEyebrow: 'Matching',
+    pillarMatchingTitle: 'Matched by stage and fit, not by algorithm guessing',
+    pillarMatchingLead:
+      'We use four signals — and only four — to suggest parents who actually get your week.',
+    matchAxisAge: 'Age range',
+    matchAxisStage: 'Journey stage',
+    matchAxisFormat: 'Format',
+    matchAxisStyle: 'Support style',
+    matchAxisAgeHint: 'e.g. 6–12',
+    matchAxisStageHint: 'e.g. ongoing',
+    matchAxisFormatHint: 'e.g. text · group',
+    matchAxisStyleHint: 'e.g. faith-based',
+
+    pillarMoreEyebrow: 'When you need more',
+    pillarMoreTitle: 'Peer support is not the last stop.',
+    pillarMoreLead:
+      'If peer support isn’t enough, we don’t leave you holding it. Three real exits, always reachable.',
+    pillarMoreLinkFind: 'Find a vetted provider',
+    pillarMoreLinkMental: 'Mental health for caregivers',
+    pillarMoreLinkCrisis: 'Crisis support — 988',
+
+    // Intake
+    intakeEyebrow: 'A short intake',
+    intakeTitle: 'Tell us what support feels right',
+    intakeSub:
+      'We do not ask for identifying child details. Five quick questions to make the first step feel safer and more relevant.',
+    intakeProgress: (done: number, total: number) => `${done} of ${total} answered`,
+    intakeStep1Title: 'Child age range',
+    intakeStep1Hint: 'Pick one or more — helps us match you with parents at the same stage of growth.',
+    intakeStep2Title: 'Where are you in the journey?',
     intakeStep2Hint: 'Pick one. There is no wrong answer.',
+    intakeStep3Eyebrow: 'The human moment',
     intakeStep3Title: 'What is hardest right now?',
-    intakeStep3Hint: 'Choose up to two.',
-    intakeStep4Title: 'How to connect',
+    intakeStep3Reassure: 'Pick what fits today. You can change this anytime.',
+    intakeStep3Hint: 'Pick one or more.',
+    intakeStep4Title: 'How would you like to connect?',
     intakeStep4Hint: 'Pick one or more — text, calls, small groups, or any combination.',
     intakeStep5Title: 'Support style',
     intakeStep5Hint: 'Pick one. We use this to surface compatible parents and groups.',
-    intakeInlineRequired: 'Pick at least one answer on each step to join the waitlist.',
+    intakeInlineRequired: 'Pick at least one to continue.',
+    intakeSectionDone: 'Done',
     intakeSubmit: 'Join the waitlist',
     intakeSubmitHint:
-      "When enough parents with a similar stage and need have joined, we'll reach out with matches.",
-    intakeSubmittedHeading: "You're on the list.",
+      'Common Ground is currently building its parent matching pool. When enough parents have joined the waitlist with a similar stage and need to yours, we&rsquo;ll send you matches. There&rsquo;s no firehose, no inbox of strangers — just real parents, when the timing is right.',
+    intakeSubmittedHeading: 'You&rsquo;re on the list.',
     intakeSubmittedBody:
-      "We'll let you know when we have parents matched to your stage. In the meantime, here's what's nearby.",
+      'We&rsquo;ll let you know when we have parents matched to your stage. In the meantime, here&rsquo;s what&rsquo;s nearby and ready right now.',
     intakeSubmittedSeeMatches: 'See parent matches',
     intakeSubmittedSeeGroups: 'Browse small groups',
     intakeOptionAge02: '0–2 years',
@@ -96,23 +139,185 @@ const connectCopy = {
     intakeOptionConnectGroup: 'Small group',
     intakeOptionStyleFaith: 'Faith-based',
     intakeOptionStyleGeneral: 'General',
-    previewTitle: 'See who you might connect with',
-    previewSub: 'Examples of parent matches and groups based on families like yours.',
-    previewViewAll: 'View all matches and groups',
-    previewMatchesHeading: 'Example parent matches',
-    previewMatchBlurb: 'Parents navigating similar stages and challenges.',
-    previewGroupsHeading: 'Example small groups',
-    findMyMatchBtn: 'Find my match',
-    browseGroupsBtn: 'Browse all groups',
-    bottomSupportTitle: 'Need support right now?',
-    bottomSupportText:
-      "You're not alone. Get help from trusted providers and resources.",
-    offrampFindTitle: 'Find a provider',
-    offrampMentalTitle: 'Mental health for caregivers',
-    offrampCrisisTitle: 'Crisis support',
-} as const;
 
-const TOTAL_STEPS = 5;
+    // Preview
+    previewEyebrow: 'Preview',
+    previewTitle: 'What matches look like',
+    previewSub:
+      'Sample profiles styled exactly like the real product. Use these to get a feel — answer the intake above for real, tailored suggestions.',
+    previewMatchesHeading: 'Example parent matches',
+    previewGroupsHeading: 'Example small groups',
+    previewMatchBadge: 'Example match',
+    previewGroupBadge: 'Example group',
+    previewBioLead: 'In their words',
+    previewMatchCtaGuided: 'Guided intro',
+    previewMatchCtaMod: 'Moderator-supported intro',
+    previewGroupCta: 'Request to join',
+    previewDemoNote:
+      'Names, schedules, and any specific details are placeholders — real listings replace these once a navigator approves them.',
+
+    // Off-ramps
+    offrampEyebrow: 'Off-ramps',
+    offrampHeading: "If peer support isn't the right fit right now",
+    offrampSub:
+      'Real exits — clearly marked. Use any of these the moment peer connection stops being enough.',
+    offrampFindTitle: 'Find a provider',
+    offrampFindBody:
+      'Browse 60 vetted providers and sensory-friendly places — filter by city, service, insurance, and more.',
+    offrampFindCta: 'Open the directory',
+    offrampMentalTitle: 'Mental health for caregivers',
+    offrampMentalBody:
+      'A space designed for the parent — daily check-ins, calming tools, and recommendations sized for your week.',
+    offrampMentalCta: 'Open the mental health center',
+    offrampCrisisTitle: 'Crisis support',
+    offrampCrisisBody:
+      'Call or text 988 (free, 24/7). For Harris County mobile crisis: (713) 970-7000. For an emergency, 911.',
+    offrampCrisisCta988: 'Call or text 988',
+    offrampCrisisCtaHarris: 'Harris Center',
+    offrampCrisisCta911: '911',
+  },
+  es: {
+    eyebrow: 'Conexión entre padres',
+    headline: 'No tienes que explicarlo. Ya lo entienden.',
+    subhead:
+      'Conecta con otros padres que están viviendo esto — la misma etapa, las mismas luchas, los mismos días largos. Moderado, privado y sin presión.',
+    ctaPrimary: 'Encontrar mi conexión',
+    ctaSecondary: 'Ver grupos pequeños',
+    trustModerated: 'Moderado',
+    trustPrivate: 'Privado',
+    trustFree: 'Gratis',
+    trustStripAria: 'Cómo se mantiene este espacio',
+    testimonialQuote: '“No tuve que empezar desde el principio. Ya lo entendían.”',
+    testimonialMeta: 'Madre de un niño de 6 años, 14 meses en este camino',
+    testimonialBadge: 'Voz de un padre',
+    crisisBannerLead: '¿Estás en crisis ahora?',
+    crisisBannerCallText: 'Llama o envía mensaje al 988 — gratis, confidencial, 24/7.',
+    crisisBannerLinkLabel: 'Llamar al 988',
+    languageToggle: 'English',
+
+    // Pillars
+    pillarsAria: 'Cómo funciona la conexión entre padres',
+    pillarModerationEyebrow: 'Moderación',
+    pillarModerationTitle: 'Moderadores reales en cada espacio',
+    pillarModerationLead:
+      'Los moderadores marcan el tono, reencauzan los hilos difíciles y ayudan cuando una conversación necesita cuidado.',
+    threadModNote: 'Recordatorio suave antes de compartir: lo que se cuenta aquí, se queda aquí.',
+    threadParent1Name: 'Padre A',
+    threadParent1Reply: 'Gracias. Eso me ayuda a publicar esta noche.',
+    threadParent2Name: 'Madre B',
+    threadParent2Reply: 'Igual. La estructura es parte de por qué sigo viniendo.',
+
+    pillarPrivacyEyebrow: 'Privacidad',
+    pillarPrivacyTitle: 'Tu hijo permanece privado. Siempre.',
+    pillarPrivacyLead: 'Tres compromisos, en lenguaje claro.',
+    privacyItem1: 'Nunca se comparten registros, nombres, escuelas ni diagnósticos del niño.',
+    privacyItem2: 'Nunca se requiere dirección de casa.',
+    privacyItem3: 'Solo si tú aceptas. Nada se comparte con otro padre hasta que lo decidas.',
+
+    pillarMatchingEyebrow: 'Emparejamiento',
+    pillarMatchingTitle: 'Por etapa y afinidad, no por adivinanzas algorítmicas',
+    pillarMatchingLead:
+      'Usamos cuatro señales — y solo cuatro — para sugerir padres que entienden tu semana.',
+    matchAxisAge: 'Rango de edad',
+    matchAxisStage: 'Etapa del camino',
+    matchAxisFormat: 'Formato',
+    matchAxisStyle: 'Estilo de apoyo',
+    matchAxisAgeHint: 'p. ej. 6–12',
+    matchAxisStageHint: 'p. ej. en curso',
+    matchAxisFormatHint: 'p. ej. texto · grupo',
+    matchAxisStyleHint: 'p. ej. con base en la fe',
+
+    pillarMoreEyebrow: 'Cuando necesitas más',
+    pillarMoreTitle: 'El apoyo entre padres no es la última parada.',
+    pillarMoreLead:
+      'Si el apoyo entre padres no alcanza, no te dejamos sostenerlo. Tres salidas reales, siempre disponibles.',
+    pillarMoreLinkFind: 'Buscar un proveedor verificado',
+    pillarMoreLinkMental: 'Salud mental para cuidadores',
+    pillarMoreLinkCrisis: 'Apoyo en crisis — 988',
+
+    // Intake
+    intakeEyebrow: 'Un cuestionario breve',
+    intakeTitle: 'Cuéntanos qué apoyo se siente correcto',
+    intakeSub:
+      'No pedimos detalles que identifiquen al niño. Cinco preguntas rápidas para que el primer paso se sienta más seguro y relevante.',
+    intakeProgress: (done: number, total: number) => `${done} de ${total} contestadas`,
+    intakeStep1Title: 'Rango de edad del niño',
+    intakeStep1Hint: 'Elige una o más — ayuda a emparejarte con padres en la misma etapa.',
+    intakeStep2Title: '¿En qué punto del camino estás?',
+    intakeStep2Hint: 'Elige una. No hay respuesta incorrecta.',
+    intakeStep3Eyebrow: 'El momento humano',
+    intakeStep3Title: '¿Qué es lo más difícil ahora?',
+    intakeStep3Reassure: 'Elige lo que encaje hoy. Puedes cambiarlo cuando quieras.',
+    intakeStep3Hint: 'Elige una o más.',
+    intakeStep4Title: '¿Cómo prefieres conectar?',
+    intakeStep4Hint: 'Elige una o más — texto, llamadas, grupos o cualquier combinación.',
+    intakeStep5Title: 'Estilo de apoyo',
+    intakeStep5Hint: 'Elige una. Usamos esto para sugerir padres y grupos compatibles.',
+    intakeInlineRequired: 'Elige al menos una opción para continuar.',
+    intakeSectionDone: 'Listo',
+    intakeSubmit: 'Únete a la lista de espera',
+    intakeSubmitHint:
+      'Common Ground está formando su grupo de emparejamiento de padres. Cuando haya suficientes padres en la lista con una etapa y necesidad similares a la tuya, te enviaremos emparejamientos.',
+    intakeSubmittedHeading: 'Estás en la lista.',
+    intakeSubmittedBody: 'Te avisaremos cuando tengamos padres en tu misma etapa. Mientras tanto, aquí tienes lo que está disponible hoy.',
+    intakeSubmittedSeeMatches: 'Ver emparejamientos',
+    intakeSubmittedSeeGroups: 'Ver grupos pequeños',
+    intakeOptionAge02: '0–2 años',
+    intakeOptionAge25: '2–5 años',
+    intakeOptionAge612: '6–12 años',
+    intakeOptionAge1317: '13–17 años',
+    intakeOptionStageNew: 'Recién diagnosticado',
+    intakeOptionStageOngoing: 'Camino en curso',
+    intakeOptionStageAdvanced: 'Padre con experiencia',
+    intakeOptionStruggleBehavior: 'Retos de comportamiento',
+    intakeOptionStruggleCommunication: 'Comunicación',
+    intakeOptionStruggleSchool: 'Escuela / IEP',
+    intakeOptionStruggleBurnout: 'Agotamiento del cuidador',
+    intakeOptionStruggleIsolation: 'Sentirse aislado',
+    intakeOptionStruggleInsurance: 'Seguro / acceso',
+    intakeOptionConnectText: 'Texto',
+    intakeOptionConnectCall: 'Llamada / video',
+    intakeOptionConnectGroup: 'Grupo pequeño',
+    intakeOptionStyleFaith: 'Con base en la fe',
+    intakeOptionStyleGeneral: 'General',
+
+    // Preview
+    previewEyebrow: 'Vista previa',
+    previewTitle: 'Cómo se ven los emparejamientos',
+    previewSub:
+      'Perfiles de muestra con el mismo estilo que el producto real. Úsalos para hacerte una idea — responde al cuestionario para obtener sugerencias reales.',
+    previewMatchesHeading: 'Ejemplos de padres compatibles',
+    previewGroupsHeading: 'Ejemplos de grupos pequeños',
+    previewMatchBadge: 'Ejemplo',
+    previewGroupBadge: 'Ejemplo',
+    previewBioLead: 'En sus palabras',
+    previewMatchCtaGuided: 'Introducción guiada',
+    previewMatchCtaMod: 'Introducción con moderador',
+    previewGroupCta: 'Pedir unirme',
+    previewDemoNote:
+      'Los nombres, horarios y detalles específicos son temporales — los listados reales los reemplazarán cuando un navegador los apruebe.',
+
+    // Off-ramps
+    offrampEyebrow: 'Salidas',
+    offrampHeading: 'Si el apoyo entre padres no es lo correcto en este momento',
+    offrampSub:
+      'Salidas reales — claramente marcadas. Úsalas en cuanto la conexión entre padres deje de ser suficiente.',
+    offrampFindTitle: 'Buscar un proveedor',
+    offrampFindBody:
+      'Explora 60 proveedores verificados y lugares sensorialmente amigables — filtra por ciudad, servicio, seguro y más.',
+    offrampFindCta: 'Abrir el directorio',
+    offrampMentalTitle: 'Salud mental para cuidadores',
+    offrampMentalBody:
+      'Un espacio diseñado para el padre — chequeos diarios, herramientas calmantes y recomendaciones a la medida de tu semana.',
+    offrampMentalCta: 'Abrir el centro de salud mental',
+    offrampCrisisTitle: 'Apoyo en crisis',
+    offrampCrisisBody:
+      'Llama o envía mensaje al 988 (gratis, 24/7). Crisis móvil del condado de Harris: (713) 970-7000. Para emergencia, 911.',
+    offrampCrisisCta988: 'Llamar o texto al 988',
+    offrampCrisisCtaHarris: 'Harris Center',
+    offrampCrisisCta911: '911',
+  },
+} as const;
 
 const ageRangeValues: AgeRange[] = ['0-2', '2-5', '6-12', '13-17'];
 const stageValues: DiagnosisStage[] = ['new', 'ongoing', 'advanced'];
@@ -131,21 +336,14 @@ const connectionValues: { value: ConnectionPreference; icon: typeof MessageSquar
 ];
 const styleValues: SupportStyle[] = ['faith-based', 'general'];
 
-function scrollTo(id: string) {
-  if (typeof window === 'undefined') return;
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function OptionPill({
+function Toggle({
   active,
   onClick,
   children,
-  className,
 }: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
-  className?: string;
 }) {
   return (
     <button
@@ -153,55 +351,277 @@ function OptionPill({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'inline-flex min-h-[44px] items-center gap-2 rounded-2xl border px-4 py-2.5 text-[13px] font-semibold transition-colors duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2',
+        'rounded-xl border px-3.5 py-2 text-sm font-medium transition-all',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
         active
-          ? 'border-brand-plum-300 bg-brand-plum-50 text-brand-plum-900'
-          : 'border-surface-border bg-white text-brand-muted-700 hover:border-brand-plum-200 hover:bg-brand-plum-50/40',
-        className,
+          ? 'border-primary bg-primary text-white shadow-soft'
+          : 'border-surface-border bg-white text-brand-muted-600 hover:border-primary/30 hover:text-primary',
       )}
     >
-      {active && <Check className="h-3.5 w-3.5 shrink-0 text-brand-plum-700" aria-hidden />}
       {children}
     </button>
   );
 }
 
-function TrustCard({
-  icon: Icon,
-  title,
-  text,
-  cta,
-  onClick,
-}: {
-  icon: typeof Shield;
+/* ─── Intake section wrapper ────────────────────────────────── */
+interface IntakeSectionProps {
+  number: number;
+  total: number;
+  done: boolean;
+  invalid: boolean;
   title: string;
-  text: string;
-  cta: string;
-  onClick?: () => void;
-}) {
+  hint: string;
+  doneLabel: string;
+  errorLabel: string;
+  /** Render the section as the page's "human moment" — softer
+   *  inset background, eyebrow + reassurance line above the title. */
+  human?: boolean;
+  eyebrow?: string;
+  reassurance?: string;
+  children: React.ReactNode;
+}
+
+function IntakeSection({
+  number,
+  total,
+  done,
+  invalid,
+  title,
+  hint,
+  doneLabel,
+  errorLabel,
+  human,
+  eyebrow,
+  reassurance,
+  children,
+}: IntakeSectionProps) {
   return (
-    <article className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand-plum-50 text-brand-plum-700">
-        <Icon className="h-4 w-4" aria-hidden />
-      </span>
-      <h3 className="mt-3 text-[15px] font-semibold text-brand-navy-700">{title}</h3>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">{text}</p>
-      <button
-        type="button"
-        onClick={onClick}
-        className="mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80"
+    <div
+      className={cn(
+        'rounded-2xl border p-4 sm:p-5 transition-colors',
+        human
+          ? 'border-brand-plum-100 bg-gradient-to-br from-brand-plum-50/60 via-white to-brand-warm-100/40'
+          : 'border-surface-border bg-white',
+        invalid && 'border-red-300 bg-red-50/40',
+      )}
+      aria-invalid={invalid || undefined}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          {human && eyebrow && (
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
+              {eyebrow}
+            </p>
+          )}
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-muted-400">
+            {number} / {total}
+          </p>
+          <h3
+            className={cn(
+              'mt-1 text-[15.5px] font-semibold leading-snug text-brand-muted-900 sm:text-base',
+              human && 'text-[16px]',
+            )}
+          >
+            {title}
+          </h3>
+          {human && reassurance && (
+            <p className="mt-1.5 text-[12.5px] italic leading-snug text-brand-plum-700/85">
+              {reassurance}
+            </p>
+          )}
+          <p className="mt-1 text-[12px] text-brand-muted-500">{hint}</p>
+        </div>
+        {done && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-semibold text-emerald-700"
+            aria-label={doneLabel}
+          >
+            <Check className="h-3 w-3" aria-hidden />
+            {doneLabel}
+          </span>
+        )}
+      </div>
+      <div className="mt-3">{children}</div>
+      {invalid && (
+        <p
+          className="mt-2 text-[12px] font-semibold text-red-700"
+          role="alert"
+          aria-live="polite"
+        >
+          {errorLabel}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/* ─── Preview match card ────────────────────────────────────── */
+interface PreviewMatchCardProps {
+  match: (typeof mockParentMatches)[0];
+  locale: Locale;
+}
+
+function PreviewMatchCard({ match, locale }: PreviewMatchCardProps) {
+  const t = connectCopy[locale];
+  const stageLabel = diagnosisStageLabels[match.diagnosisStage];
+  const formatChip = (c: ConnectionPreference): string => {
+    if (c === 'text') return t.intakeOptionConnectText;
+    if (c === 'call') return t.intakeOptionConnectCall;
+    return t.intakeOptionConnectGroup;
+  };
+  const ageChip: Record<AgeRange, string> = {
+    '0-2': t.intakeOptionAge02,
+    '2-5': t.intakeOptionAge25,
+    '6-12': t.intakeOptionAge612,
+    '13-17': t.intakeOptionAge1317,
+  };
+
+  return (
+    <article
+      className={cn(
+        'group/match relative overflow-hidden rounded-3xl bg-white p-5 shadow-soft transition-all',
+        'motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-card-hover',
+      )}
+    >
+      <span
+        className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800"
+        aria-label={t.previewMatchBadge}
       >
-        {cta} <ArrowRight className="h-3.5 w-3.5" />
-      </button>
+        <Sparkles className="h-3 w-3" aria-hidden />
+        {t.previewMatchBadge}
+      </span>
+
+      <div className="flex items-start gap-3 pr-20">
+        <span
+          aria-hidden
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-[13px] font-bold text-primary"
+        >
+          {match.avatar}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[15px] font-semibold leading-snug text-brand-muted-900">{match.displayName}</p>
+          <span className={cn('mt-1 inline-flex rounded-full border px-2 py-0.5 text-[10.5px] font-semibold', stageLabel.color)}>
+            {stageLabel.label}
+          </span>
+        </div>
+      </div>
+
+      <p className="mt-4 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-muted-400">
+        {t.previewBioLead}
+      </p>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-brand-muted-700">{match.bio}</p>
+
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        <span className="rounded-full border border-surface-border bg-surface-muted px-2 py-0.5 text-[10.5px] font-semibold text-brand-muted-600">
+          {ageChip[match.childAgeRange as AgeRange]}
+        </span>
+        {match.connectionPreference.map((c) => (
+          <span
+            key={c}
+            className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[10.5px] font-semibold text-primary"
+          >
+            {formatChip(c)}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+          {t.previewMatchCtaGuided}
+        </button>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3 py-1.5 text-[12px] font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          <Shield className="h-3.5 w-3.5" aria-hidden />
+          {t.previewMatchCtaMod}
+        </button>
+      </div>
     </article>
   );
 }
 
-export default function ConnectPage() {
-  const t = connectCopy;
+/* ─── Preview group card ────────────────────────────────────── */
+interface PreviewGroupCardProps {
+  group: (typeof peerGroups)[0];
+  locale: Locale;
+}
 
-  const [currentStep, setCurrentStep] = useState(1);
+function PreviewGroupCard({ group, locale }: PreviewGroupCardProps) {
+  const t = connectCopy[locale];
+  const formatLabel =
+    group.format === 'virtual' ? 'Virtual' : group.format === 'in-person' ? 'In-person' : 'Hybrid';
+  const styleLabel =
+    group.faithStyle === 'faith-based'
+      ? t.intakeOptionStyleFaith
+      : group.faithStyle === 'faith-friendly'
+        ? `${t.intakeOptionStyleFaith}-friendly`
+        : t.intakeOptionStyleGeneral;
+  const spotsLeft = group.maxMembers - group.memberCount;
+
+  return (
+    <article
+      className={cn(
+        'group/grp relative overflow-hidden rounded-3xl bg-white p-5 shadow-soft transition-all',
+        'motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-card-hover',
+      )}
+    >
+      <span
+        className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800"
+        aria-label={t.previewGroupBadge}
+      >
+        <Sparkles className="h-3 w-3" aria-hidden />
+        {t.previewGroupBadge}
+      </span>
+
+      <div className="flex flex-wrap items-start gap-2 pr-20">
+        <span className="rounded-full border border-primary/15 bg-primary/5 px-2 py-0.5 text-[10.5px] font-semibold text-primary">
+          {formatLabel}
+        </span>
+        <span className="rounded-full border border-amber-100 bg-amber-50/80 px-2 py-0.5 text-[10.5px] font-semibold text-amber-800">
+          {styleLabel}
+        </span>
+      </div>
+
+      <h3 className="mt-3 text-[15.5px] font-semibold leading-snug text-brand-muted-900">{group.name}</h3>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-brand-muted-600">{group.description}</p>
+
+      <dl className="mt-3 grid grid-cols-2 gap-2 text-[11.5px]">
+        <div className="rounded-xl bg-surface-muted/60 px-2.5 py-1.5">
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">Schedule</dt>
+          <dd className="mt-0.5 text-brand-muted-700">{group.meetingSchedule}</dd>
+        </div>
+        <div className="rounded-xl bg-surface-muted/60 px-2.5 py-1.5">
+          <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">Spots</dt>
+          <dd className="mt-0.5 text-brand-muted-700">
+            {spotsLeft} / {group.maxMembers}
+          </dd>
+        </div>
+      </dl>
+
+      <div className="mt-4 flex items-center justify-end">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+        >
+          <Users className="h-3.5 w-3.5" aria-hidden />
+          {t.previewGroupCta}
+        </button>
+      </div>
+    </article>
+  );
+}
+
+/* ─── Main Page ──────────────────────────────────────────────── */
+export default function ConnectPage() {
+  const [locale, setLocale] = useState<Locale>('en');
+  const t = connectCopy[locale];
+
+  // Intake form state
   const [ageRanges, setAgeRanges] = useState<AgeRange[]>([]);
   const [stage, setStage] = useState<DiagnosisStage | null>(null);
   const [struggles, setStruggles] = useState<Struggle[]>([]);
@@ -213,14 +633,8 @@ export default function ConnectPage() {
   const toggleArr = <T,>(arr: T[], val: T): T[] =>
     arr.includes(val) ? arr.filter((v) => v !== val) : [...arr, val];
 
-  const toggleStruggle = (val: Struggle) => {
-    setStruggles((prev) => {
-      if (prev.includes(val)) return prev.filter((v) => v !== val);
-      if (prev.length >= 2) return prev;
-      return [...prev, val];
-    });
-  };
-
+  // Per-section completion → drives the inline progress indicator
+  // and the per-section validation messages.
   const sectionDone = {
     age: ageRanges.length > 0,
     stage: stage !== null,
@@ -228,7 +642,8 @@ export default function ConnectPage() {
     connections: connections.length > 0,
     style: style !== null,
   };
-  const intakeComplete = Object.values(sectionDone).every(Boolean);
+  const sectionsComplete = Object.values(sectionDone).filter(Boolean).length;
+  const intakeComplete = sectionsComplete === 5;
 
   const ageLabel: Record<AgeRange, string> = {
     '0-2': t.intakeOptionAge02,
@@ -259,441 +674,786 @@ export default function ConnectPage() {
     general: t.intakeOptionStyleGeneral,
   };
 
-  const submitWaitlist = () => {
-    if (!intakeComplete) {
-      setAttemptedSubmit(true);
-      return;
-    }
-    setIntakeSubmitted(true);
-    setAttemptedSubmit(false);
-    try {
-      const existing = JSON.parse(window.localStorage.getItem('cg.connectWaitlist.v1') || '[]');
-      existing.push({
-        id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
-          ageRanges,
-        stage,
-        struggles,
-        connections,
-        style,
-        createdAt: new Date().toISOString(),
-      });
-      window.localStorage.setItem('cg.connectWaitlist.v1', JSON.stringify(existing));
-    } catch {
-      /* best-effort */
-    }
-    requestAnimationFrame(() => scrollTo('preview'));
-  };
-
-  const stepMeta = [
-    { title: t.intakeStep1Title, hint: t.intakeStep1Hint },
-    { title: t.intakeStep2Title, hint: t.intakeStep2Hint },
-    { title: t.intakeStep3Title, hint: t.intakeStep3Hint },
-    { title: t.intakeStep4Title, hint: t.intakeStep4Hint },
-    { title: t.intakeStep5Title, hint: t.intakeStep5Hint },
-  ][currentStep - 1];
-
   return (
-    <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-      <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
-        <ol className="flex items-center gap-1.5">
-          <li>
-            <Link href="/support" className="hover:text-brand-navy-700">
-              Home
-            </Link>
-          </li>
-          <li aria-hidden>
-            <ChevronRight className="h-3 w-3" />
-          </li>
-          <li className="font-medium text-brand-muted-700">Parent Connection</li>
-        </ol>
-      </nav>
-
-      {/* Coming soon banner */}
-      <div className="mt-4 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 px-4 py-3 sm:px-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-[13px] font-semibold text-brand-navy-700">{t.comingSoonTitle}</p>
-            <p className="mt-0.5 text-[12.5px] leading-relaxed text-brand-muted-700">
-              {t.comingSoonText}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => scrollTo('intake')}
-            className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-900"
+    <div className="page-shell">
+      {/* Sticky 988 mini-banner — quiet, persistent crisis line. Pins below
+          the support nav header so it's always within reach without
+          dominating this connection-focused page. */}
+      <div
+        className="sticky top-[56px] z-10 -mx-4 -mt-6 border-b border-amber-200/70 bg-amber-50/95 backdrop-blur-md sm:-mx-6 sm:-mt-8 lg:-mx-8"
+        role="region"
+        aria-label="Crisis support"
+      >
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-1.5 sm:px-6 lg:px-8">
+          <p className="inline-flex items-center gap-2 text-[12px] text-amber-900">
+            <Phone className="h-3.5 w-3.5" aria-hidden />
+            <span className="font-semibold">{t.crisisBannerLead}</span>
+            <span className="hidden sm:inline">{t.crisisBannerCallText}</span>
+          </p>
+          <a
+            href="tel:988"
+            className="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
           >
-            {t.comingSoonCta} <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+            <Phone className="h-3 w-3" aria-hidden />
+            {t.crisisBannerLinkLabel}
+          </a>
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="mt-6 overflow-hidden rounded-3xl border border-surface-border bg-white shadow-soft">
-        <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="p-6 sm:p-8">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1 text-[11px] font-semibold text-brand-plum-700">
-              <HeartHandshake className="h-3.5 w-3.5" /> {t.eyebrow}
-            </span>
-            <h1 className="mt-4 text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">
-              {t.headline}
-            </h1>
-            <p className="mt-3 text-[15px] leading-relaxed text-brand-muted-700">{t.subhead}</p>
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              <button
-                type="button"
-                onClick={() => scrollTo('intake')}
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-              >
-                {t.ctaPrimary} <ArrowRight className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollTo('preview')}
-                className="inline-flex items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-5 py-2.5 text-[13px] font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
-              >
-                {t.ctaSecondary}
-              </button>
-            </div>
+      {/* CCO-review pass: parent matching is preview-only today. Make that
+          unambiguous at the top of the page so a parent never thinks they are
+          signing up for an active service. */}
+      <div className="mb-6 rounded-2xl border-2 border-amber-300 bg-amber-50 px-4 py-3 sm:px-5 sm:py-4">
+        <p className="text-[12px] font-semibold uppercase tracking-wide text-amber-900">
+          Parent matching is coming soon
+        </p>
+        <p className="mt-1 text-[13.5px] leading-relaxed text-amber-900">
+          We&rsquo;re still building the parent matching pool. Joining the waitlist
+          below tells us where you are on the journey so we can reach out when
+          we have parents matched to your stage. No clinical records, no inbox
+          of strangers — just a real person, when the timing is right.
+        </p>
+      </div>
+
+      {/* Hero — headline (the whole page in one line), subhead, two CTAs,
+          trust strip, and a parent-voice testimonial card on the right. */}
+      <header className="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-center">
+        <div className="min-w-0">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+              {t.eyebrow}
+            </p>
+            <button
+              type="button"
+              onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-muted-600 hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+              aria-label={locale === 'en' ? 'Switch to Spanish' : 'Switch to English'}
+            >
+              <Languages className="h-3.5 w-3.5" aria-hidden />
+              <span aria-hidden>{locale === 'en' ? 'EN' : 'ES'}</span>
+              <span aria-hidden className="text-brand-muted-400">·</span>
+              <span>{t.languageToggle}</span>
+            </button>
+          </div>
+          <h1 className="mt-2 text-3xl font-bold leading-[1.1] tracking-tight text-brand-muted-900 sm:text-[2.25rem] lg:text-[2.6rem]">
+            {t.headline}
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-brand-muted-600">
+            {t.subhead}
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                document.getElementById('intake')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+            >
+              {t.ctaPrimary}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              onClick={() => {
+                if (typeof window === 'undefined') return;
+                document.getElementById('preview-groups')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+            >
+              {t.ctaSecondary}
+            </button>
           </div>
 
+          <ul
+            className="mt-4 inline-flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] font-semibold text-brand-muted-500"
+            aria-label={t.trustStripAria}
+          >
+            <li className="inline-flex items-center gap-1.5">
+              <Shield className="h-3 w-3 text-emerald-600" aria-hidden /> {t.trustModerated}
+            </li>
+            <li aria-hidden className="text-brand-muted-300">·</li>
+            <li className="inline-flex items-center gap-1.5">
+              <Lock className="h-3 w-3 text-emerald-600" aria-hidden /> {t.trustPrivate}
+            </li>
+            <li aria-hidden className="text-brand-muted-300">·</li>
+            <li className="inline-flex items-center gap-1.5">
+              <Heart className="h-3 w-3 text-emerald-600" aria-hidden /> {t.trustFree}
+            </li>
+          </ul>
+        </div>
+
+        {/* Parent-voice testimonial card */}
+        <figure className="relative overflow-hidden rounded-3xl border border-brand-plum-100 bg-gradient-to-br from-brand-plum-50 via-white to-brand-warm-100 p-6 shadow-soft sm:p-7">
           <div
             aria-hidden
-            className="relative hidden min-h-[220px] bg-gradient-to-br from-brand-plum-50 via-brand-plum-100/40 to-brand-warm-100 lg:block"
+            className="absolute -top-10 -right-8 h-40 w-40 rounded-full bg-brand-plum-100/60 blur-3xl"
+          />
+          <div
+            aria-hidden
+            className="absolute -bottom-12 -left-6 h-32 w-32 rounded-full bg-brand-warm-200/70 blur-2xl"
+          />
+          <span className="relative inline-flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-brand-plum-700 ring-1 ring-brand-plum-200">
+            <Sparkles className="h-3 w-3" aria-hidden />
+            {t.testimonialBadge}
+          </span>
+          <blockquote className="relative mt-4">
+            <p className="text-[18px] font-semibold leading-snug text-brand-muted-900 sm:text-[20px]">
+              {t.testimonialQuote}
+            </p>
+          </blockquote>
+          <figcaption className="relative mt-4 flex items-center gap-3">
+            <span
+              aria-hidden
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-plum-100 text-[11px] font-bold text-brand-plum-700"
+            >
+              ✦
+            </span>
+            <span className="text-[12.5px] text-brand-muted-600">{t.testimonialMeta}</span>
+          </figcaption>
+        </figure>
+      </header>
+
+      {/* Pillars — four cards, four different treatments. Privacy is the
+          load-bearing promise so it gets the visually heaviest card. */}
+      <section
+        aria-label={t.pillarsAria}
+        className="grid gap-4 lg:grid-cols-2"
+      >
+        {/* Moderation — show, don't tell. A miniature moderated thread. */}
+        <article className="group/card relative rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Shield className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+              {t.pillarModerationEyebrow}
+            </p>
+          </div>
+          <h3 className="text-[17px] font-semibold leading-snug text-brand-muted-900">
+            {t.pillarModerationTitle}
+          </h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {t.pillarModerationLead}
+          </p>
+
+          {/* Mock moderated thread — purely illustrative. */}
+          <div
+            aria-hidden
+            className="mt-4 space-y-2 rounded-2xl border border-surface-border bg-surface-muted/60 p-3"
           >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="grid grid-cols-2 gap-3 p-8">
-                {[
-                  { icon: Users, label: 'Parents' },
-                  { icon: MessageCircle, label: 'Messages' },
-                  { icon: Heart, label: 'Support' },
-                  { icon: Shield, label: 'Safe space' },
-                ].map(({ icon: Icon, label }) => (
-                  <div
-                    key={label}
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm"
-                  >
-                    <Icon className="h-6 w-6 text-brand-plum-700" />
-                    <span className="text-[11px] font-semibold text-brand-plum-800">{label}</span>
-                  </div>
-                ))}
+            <div className="flex items-start gap-2">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                M
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11.5px] font-semibold text-brand-muted-900">Mod</span>
+                  <span className="rounded-full bg-primary/10 px-1.5 py-0 text-[9.5px] font-bold uppercase tracking-wider text-primary">
+                    Moderator
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[12px] leading-snug text-brand-muted-700">
+                  {t.threadModNote}
+                </p>
+              </div>
+            </div>
+
+            <div className="ml-9 flex items-start gap-2">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-plum-100 text-[10px] font-bold text-brand-plum-700">
+                A
+              </span>
+              <div className="min-w-0 flex-1 rounded-xl border border-surface-border bg-white px-2.5 py-1.5">
+                <p className="text-[11px] font-semibold text-brand-muted-900">{t.threadParent1Name}</p>
+                <p className="text-[11.5px] leading-snug text-brand-muted-600">
+                  {t.threadParent1Reply}
+                </p>
+              </div>
+            </div>
+
+            <div className="ml-9 flex items-start gap-2">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
+                B
+              </span>
+              <div className="min-w-0 flex-1 rounded-xl border border-surface-border bg-white px-2.5 py-1.5">
+                <p className="text-[11px] font-semibold text-brand-muted-900">{t.threadParent2Name}</p>
+                <p className="text-[11.5px] leading-snug text-brand-muted-600">
+                  {t.threadParent2Reply}
+                </p>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </article>
 
-      {/* Trust cards */}
-      <section aria-label="Why this space is safe" className="mt-6 grid gap-4 sm:grid-cols-3">
-        <TrustCard
-          icon={Shield}
-          title={t.trustModerationTitle}
-          text={t.trustModerationText}
-          cta={t.trustLearnMore}
-          onClick={() => scrollTo('intake')}
-        />
-        <TrustCard
-          icon={Lock}
-          title={t.trustPrivacyTitle}
-          text={t.trustPrivacyText}
-          cta={t.trustLearnMore}
-          onClick={() => scrollTo('intake')}
-        />
-        <TrustCard
-          icon={Heart}
-          title={t.trustSupportTitle}
-          text={t.trustSupportText}
-          cta={t.trustViewSupport}
-          onClick={() => scrollTo('support')}
-        />
-      </section>
-
-      {/* Guided matching form */}
-      <section
-        id="intake"
-        aria-labelledby="intake-heading"
-        className="mt-9 scroll-mt-6 rounded-2xl border border-surface-border bg-white p-5 shadow-soft sm:p-6"
-      >
-        {intakeSubmitted ? (
-          <div className="py-6 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100">
-              <Heart className="h-7 w-7 text-emerald-600" aria-hidden />
-            </div>
-            <h2 id="intake-heading" className="mt-4 text-xl font-bold text-brand-navy-700">
-              {t.intakeSubmittedHeading}
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-[14px] leading-relaxed text-brand-muted-600">
-              {t.intakeSubmittedBody}
-            </p>
-            <div className="mt-4 flex flex-wrap justify-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => scrollTo('preview')}
-                className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-[13px] font-semibold text-white"
-              >
-                {t.intakeSubmittedSeeMatches} <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollTo('preview-groups')}
-                className="inline-flex items-center gap-2 rounded-2xl border border-surface-border px-4 py-2.5 text-[13px] font-semibold text-brand-muted-700"
-              >
-                {t.intakeSubmittedSeeGroups}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <h2 id="intake-heading" className="text-xl font-bold text-brand-navy-700 sm:text-2xl">
-              {t.formSectionTitle}
-            </h2>
-            <p className="mt-1 text-[14px] leading-relaxed text-brand-muted-600">
-              {t.formSectionSub}
-            </p>
-
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <p className="text-[12px] font-semibold text-brand-muted-600" aria-live="polite">
-                {t.stepOf(currentStep, TOTAL_STEPS)}
+        {/* Privacy — heaviest card. Deep navy panel with white text +
+            three checkmark commitments. AAA contrast on body copy. */}
+        <article className="relative overflow-hidden rounded-3xl border border-brand-navy-700 bg-gradient-to-br from-brand-navy-700 via-brand-navy-600 to-brand-navy-500 p-5 text-white shadow-card sm:p-6">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-16 -right-12 h-52 w-52 rounded-full bg-emerald-400/10 blur-3xl"
+          />
+          <div className="relative">
+            <div className="mb-3 inline-flex items-center gap-2">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-400/15 text-emerald-200">
+                <ShieldCheck className="h-4 w-4" aria-hidden />
+              </span>
+              <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-emerald-200">
+                {t.pillarPrivacyEyebrow}
               </p>
-              <div className="flex gap-1" aria-hidden>
-                {Array.from({ length: TOTAL_STEPS }, (_, i) => (
+            </div>
+            <h3 className="text-[18px] font-semibold leading-snug text-white sm:text-[19px]">
+              {t.pillarPrivacyTitle}
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-white/85">{t.pillarPrivacyLead}</p>
+
+            <ul className="mt-5 space-y-3">
+              {[t.privacyItem1, t.privacyItem2, t.privacyItem3].map((line, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400/20 ring-1 ring-emerald-300/40"
+                  >
+                    <Check className="h-3.5 w-3.5 text-emerald-200" />
+                  </span>
+                  <span className="text-[14px] leading-snug text-white">{line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </article>
+
+        {/* Matching — the four matching axes as chips that highlight on hover. */}
+        <article className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-brand-plum-100 text-brand-plum-700">
+              <Sparkles className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+              {t.pillarMatchingEyebrow}
+            </p>
+          </div>
+          <h3 className="text-[17px] font-semibold leading-snug text-brand-muted-900">
+            {t.pillarMatchingTitle}
+          </h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {t.pillarMatchingLead}
+          </p>
+
+          <ul
+            aria-label={t.pillarMatchingEyebrow}
+            className="mt-4 grid grid-cols-2 gap-2"
+          >
+            {[
+              { label: t.matchAxisAge, hint: t.matchAxisAgeHint },
+              { label: t.matchAxisStage, hint: t.matchAxisStageHint },
+              { label: t.matchAxisFormat, hint: t.matchAxisFormatHint },
+              { label: t.matchAxisStyle, hint: t.matchAxisStyleHint },
+            ].map((axis, i) => (
+              <li
+                key={axis.label}
+                className={cn(
+                  'group/axis relative overflow-hidden rounded-xl border border-surface-border bg-surface-muted/40 px-3 py-2 transition-all',
+                  'motion-safe:hover:-translate-y-0.5 motion-safe:hover:border-brand-plum-300 motion-safe:hover:bg-brand-plum-50',
+                )}
+                style={{ transitionDelay: `${i * 30}ms` }}
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 bottom-0 h-[2px] origin-left scale-x-0 bg-brand-plum-400 transition-transform duration-300 motion-reduce:duration-0 motion-safe:group-hover/axis:scale-x-100"
+                />
+                <p className="text-[12px] font-semibold text-brand-muted-900">{axis.label}</p>
+                <p className="mt-0.5 text-[11px] text-brand-muted-500">{axis.hint}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        {/* When you need more — a door, not a wall. Three explicit exits. */}
+        <article className="rounded-3xl border border-surface-border bg-gradient-to-br from-white to-brand-warm-100 p-5 shadow-soft sm:p-6">
+          <div className="mb-3 inline-flex items-center gap-2">
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-accent/10 text-accent">
+              <ArrowUpRight className="h-4 w-4" aria-hidden />
+            </span>
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+              {t.pillarMoreEyebrow}
+            </p>
+          </div>
+          <h3 className="text-[17px] font-semibold leading-snug text-brand-muted-900">
+            {t.pillarMoreTitle}
+          </h3>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {t.pillarMoreLead}
+          </p>
+
+          <ul className="mt-4 space-y-2">
+            {[
+              { label: t.pillarMoreLinkFind, href: '/support/find', icon: Users },
+              { label: t.pillarMoreLinkMental, href: '/support/caregiver', icon: Heart },
+              { label: t.pillarMoreLinkCrisis, href: 'tel:988', icon: Phone, accent: true },
+            ].map((row) => (
+              <li key={row.label}>
+                <a
+                  href={row.href}
+                  className={cn(
+                    'group/exit flex items-center justify-between gap-3 rounded-xl border border-surface-border bg-white px-3 py-2.5 text-[13px] font-semibold transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                    row.accent
+                      ? 'text-red-700 hover:border-red-200 hover:bg-red-50 focus-visible:ring-red-400'
+                      : 'text-brand-muted-800 hover:border-primary/30 hover:bg-primary/5 hover:text-primary focus-visible:ring-primary/40',
+                  )}
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <row.icon className="h-3.5 w-3.5" aria-hidden />
+                    {row.label}
+                  </span>
+                  <ArrowUpRight
+                    className="h-4 w-4 text-brand-muted-400 transition-transform motion-safe:group-hover/exit:translate-x-0.5 motion-safe:group-hover/exit:-translate-y-0.5 group-hover/exit:text-current"
+                    aria-hidden
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </article>
+      </section>
+
+      {/* ── INTAKE — single-page progressive form ── */}
+      <section
+          id="intake"
+          className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-7"
+          aria-labelledby="intake-heading"
+        >
+          {intakeSubmitted ? (
+            <div className="py-8 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
+                <Heart className="h-8 w-8 text-emerald-600" aria-hidden />
+              </div>
+              <h2 id="intake-heading" className="mt-5 text-xl font-semibold text-brand-muted-900">
+                {t.intakeSubmittedHeading}
+              </h2>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-brand-muted-600">
+                {t.intakeSubmittedBody}
+              </p>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById('preview-matches')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+                >
+                  <Heart className="h-4 w-4" aria-hidden /> {t.intakeSubmittedSeeMatches}
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </button>
+                <button
+                  onClick={() =>
+                    document
+                      .getElementById('preview-groups')
+                      ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }
+                  className="inline-flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-muted px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition-colors hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+                >
+                  <Users className="h-4 w-4" aria-hidden /> {t.intakeSubmittedSeeGroups}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-primary">
+                    {t.intakeEyebrow}
+                  </p>
+                  <h2 id="intake-heading" className="mt-1 text-xl font-semibold leading-snug text-brand-muted-900 sm:text-[22px]">
+                    {t.intakeTitle}
+                  </h2>
+                </div>
+                <p
+                  className="text-[12px] font-semibold text-brand-muted-500"
+                  aria-live="polite"
+                >
+                  {t.intakeProgress(sectionsComplete, 5)}
+                </p>
+              </div>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-muted-600">{t.intakeSub}</p>
+
+              {/* Slim segmented progress bar — five segments, fills as
+                  sections complete. Decorative; the live region above
+                  carries the assistive announcement. */}
+              <div
+                aria-hidden
+                className="mt-4 grid grid-cols-5 gap-1"
+              >
+                {Object.values(sectionDone).map((done, i) => (
                   <span
                     key={i}
                     className={cn(
-                      'h-1.5 w-8 rounded-full transition-colors duration-200',
-                      i + 1 <= currentStep ? 'bg-primary' : 'bg-surface-muted',
+                      'h-1.5 rounded-full',
+                      done ? 'bg-primary' : 'bg-surface-muted',
                     )}
                   />
                 ))}
               </div>
-            </div>
 
-            <div
-              key={currentStep}
-              className="mt-5 rounded-2xl border border-brand-plum-100 bg-brand-plum-50/30 p-5 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-300"
-            >
-              <h3 className="text-[16px] font-semibold text-brand-navy-700">{stepMeta.title}</h3>
-              <p className="mt-1 text-[13px] text-brand-muted-600">{stepMeta.hint}</p>
+              <div className="mt-7 space-y-6">
+                {/* 1 — Age range (multi-select) */}
+                <IntakeSection
+                  number={1}
+                  total={5}
+                  done={sectionDone.age}
+                  invalid={attemptedSubmit && !sectionDone.age}
+                  title={t.intakeStep1Title}
+                  hint={t.intakeStep1Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep1Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {ageRangeValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={ageRanges.includes(value)}
+                          onClick={() => setAgeRanges(toggleArr(ageRanges, value))}
+                        >
+                          {ageLabel[value]}
+                        </Toggle>
+                      ))}
+                    </div>
+                  </fieldset>
+                </IntakeSection>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {currentStep === 1 &&
-                  ageRangeValues.map((value) => (
-                    <OptionPill
-                      key={value}
-                      active={ageRanges.includes(value)}
-                      onClick={() => setAgeRanges(toggleArr(ageRanges, value))}
-                    >
-                      {ageLabel[value]}
-                    </OptionPill>
-                  ))}
+                {/* 2 — Journey stage (single-select) */}
+                <IntakeSection
+                  number={2}
+                  total={5}
+                  done={sectionDone.stage}
+                  invalid={attemptedSubmit && !sectionDone.stage}
+                  title={t.intakeStep2Title}
+                  hint={t.intakeStep2Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep2Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {stageValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={stage === value}
+                          onClick={() => setStage(value)}
+                        >
+                          {stageLabelLocal[value]}
+                        </Toggle>
+                      ))}
+                    </div>
+                  </fieldset>
+                </IntakeSection>
 
-                {currentStep === 2 &&
-                  stageValues.map((value) => (
-                    <OptionPill
-                      key={value}
-                      active={stage === value}
-                      onClick={() => setStage(value)}
-                      className="w-full sm:w-auto"
-                    >
-                      {stageLabelLocal[value]}
-                    </OptionPill>
-                  ))}
+                {/* 3 — Hardest right now (multi-select). Visually
+                    distinct: softer inset background, reassurance line. */}
+                <IntakeSection
+                  number={3}
+                  total={5}
+                  done={sectionDone.struggles}
+                  invalid={attemptedSubmit && !sectionDone.struggles}
+                  title={t.intakeStep3Title}
+                  hint={t.intakeStep3Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                  human
+                  eyebrow={t.intakeStep3Eyebrow}
+                  reassurance={t.intakeStep3Reassure}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep3Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {struggleValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={struggles.includes(value)}
+                          onClick={() => setStruggles(toggleArr(struggles, value))}
+                        >
+                          {struggleLabelLocal[value]}
+                        </Toggle>
+                      ))}
+                    </div>
+                  </fieldset>
+                </IntakeSection>
 
-                {currentStep === 3 &&
-                  struggleValues.map((value) => (
-                    <OptionPill
-                      key={value}
-                      active={struggles.includes(value)}
-                      onClick={() => toggleStruggle(value)}
-                    >
-                      {struggleLabelLocal[value]}
-                    </OptionPill>
-                  ))}
+                {/* 4 — Connection format (multi-select) */}
+                <IntakeSection
+                  number={4}
+                  total={5}
+                  done={sectionDone.connections}
+                  invalid={attemptedSubmit && !sectionDone.connections}
+                  title={t.intakeStep4Title}
+                  hint={t.intakeStep4Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep4Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {connectionValues.map((opt) => (
+                        <Toggle
+                          key={opt.value}
+                          active={connections.includes(opt.value)}
+                          onClick={() => setConnections(toggleArr(connections, opt.value))}
+                        >
+                          <span className="inline-flex items-center gap-1.5">
+                            <opt.icon className="h-3.5 w-3.5" aria-hidden />
+                            {connectionLabelLocal[opt.value]}
+                          </span>
+                        </Toggle>
+                      ))}
+                    </div>
+                  </fieldset>
+                </IntakeSection>
 
-                {currentStep === 4 &&
-                  connectionValues.map((opt) => (
-                    <OptionPill
-                      key={opt.value}
-                      active={connections.includes(opt.value)}
-                      onClick={() => setConnections(toggleArr(connections, opt.value))}
-                    >
-                      <opt.icon className="h-3.5 w-3.5" aria-hidden />
-                      {connectionLabelLocal[opt.value]}
-                    </OptionPill>
-                  ))}
-
-                {currentStep === 5 &&
-                  styleValues.map((value) => (
-                    <OptionPill
-                      key={value}
-                      active={style === value}
-                      onClick={() => setStyle(value)}
-                      className="w-full sm:w-auto"
-                    >
-                      {styleLabelLocal[value]}
-                    </OptionPill>
-                  ))}
+                {/* 5 — Support style (single-select) */}
+                <IntakeSection
+                  number={5}
+                  total={5}
+                  done={sectionDone.style}
+                  invalid={attemptedSubmit && !sectionDone.style}
+                  title={t.intakeStep5Title}
+                  hint={t.intakeStep5Hint}
+                  doneLabel={t.intakeSectionDone}
+                  errorLabel={t.intakeInlineRequired}
+                >
+                  <fieldset>
+                    <legend className="sr-only">{t.intakeStep5Title}</legend>
+                    <div className="flex flex-wrap gap-2">
+                      {styleValues.map((value) => (
+                        <Toggle
+                          key={value}
+                          active={style === value}
+                          onClick={() => setStyle(value)}
+                        >
+                          {styleLabelLocal[value]}
+                        </Toggle>
+                      ))}
+                    </div>
+                  </fieldset>
+                </IntakeSection>
               </div>
 
-              {attemptedSubmit && currentStep === TOTAL_STEPS && !intakeComplete && (
-                <p className="mt-3 text-[12px] font-semibold text-red-700" role="alert">
-                  {t.intakeInlineRequired}
+              <div className="mt-8 border-t border-surface-border pt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (intakeComplete) {
+                      setIntakeSubmitted(true);
+                      setAttemptedSubmit(false);
+                      // Persist the waitlist signup so it survives reloads.
+                      try {
+                        const existing = JSON.parse(
+                          window.localStorage.getItem('cg.connectWaitlist.v1') || '[]',
+                        );
+                        existing.push({
+                          id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+                          locale,
+                          ageRanges,
+                          stage,
+                          struggles,
+                          connections,
+                          style,
+                          createdAt: new Date().toISOString(),
+                        });
+                        window.localStorage.setItem(
+                          'cg.connectWaitlist.v1',
+                          JSON.stringify(existing),
+                        );
+                      } catch {
+                        // ignore — best-effort while there's no backend
+                      }
+                      requestAnimationFrame(() =>
+                        document
+                          .getElementById('preview')
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+                      );
+                    } else {
+                      setAttemptedSubmit(true);
+                    }
+                  }}
+                  className={cn(
+                    'inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-semibold text-white shadow-soft transition-colors',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2',
+                    intakeComplete
+                      ? 'bg-primary hover:bg-primary-dark'
+                      : 'bg-primary/70 hover:bg-primary',
+                  )}
+                  aria-disabled={!intakeComplete}
+                >
+                  {t.intakeSubmit}
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </button>
+                <p className="mt-2 text-center text-[12px] text-brand-muted-500">
+                  {t.intakeSubmitHint}
                 </p>
-              )}
-            </div>
+              </div>
+            </>
+          )}
+        </section>
 
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
-                disabled={currentStep === 1}
-                className={cn(
-                  'inline-flex items-center gap-1 rounded-2xl border px-4 py-2.5 text-[13px] font-semibold transition',
-                  currentStep === 1
-                    ? 'cursor-not-allowed border-surface-border text-brand-muted-400'
-                    : 'border-surface-border text-brand-muted-700 hover:bg-surface-subtle',
-                )}
-              >
-                <ChevronLeft className="h-4 w-4" /> {t.backBtn}
-              </button>
-
-              {currentStep < TOTAL_STEPS ? (
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep((s) => Math.min(TOTAL_STEPS, s + 1))}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-                >
-                  {t.continueBtn} <ArrowRight className="h-4 w-4" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={submitWaitlist}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-                >
-                  {t.intakeSubmit} <ArrowRight className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-
-            <p className="mt-4 text-center text-[12px] text-brand-muted-500">{t.skipReassurance}</p>
-            {currentStep === TOTAL_STEPS && (
-              <p className="mt-1 text-center text-[11.5px] text-brand-muted-500">
-                {t.intakeSubmitHint}
-              </p>
-            )}
-          </>
-        )}
-      </section>
-
-      {/* Preview */}
-      <section id="preview" aria-labelledby="preview-heading" className="mt-9 scroll-mt-6">
-        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-brand-plum-100 pb-2.5">
-          <div>
-            <h2 id="preview-heading" className="text-lg font-bold text-brand-navy-700 sm:text-xl">
+      {/* ── POST-INTAKE PREVIEW — example matches and groups ── */}
+      <section
+        id="preview"
+        aria-labelledby="preview-heading"
+        className="space-y-6"
+      >
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-primary">
+              {t.previewEyebrow}
+            </p>
+            <h2
+              id="preview-heading"
+              className="mt-1 text-xl font-semibold leading-snug text-brand-muted-900 sm:text-[22px]"
+            >
               {t.previewTitle}
             </h2>
-            <p className="mt-1 text-[13px] text-brand-muted-600">{t.previewSub}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => scrollTo('preview-groups')}
-            className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-900"
-          >
-            {t.previewViewAll} <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          <article className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
-            <h3 className="text-[15px] font-semibold text-brand-navy-700">
-              {t.previewMatchesHeading}
-            </h3>
-            <div className="mt-3 flex -space-x-2">
-              {mockParentMatches.slice(0, 3).map((match) => (
-                <span
-                  key={match.id}
-                  aria-hidden
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-brand-plum-100 text-[11px] font-bold text-brand-plum-800"
-                >
-                  {match.avatar}
-                </span>
-              ))}
-            </div>
-            <p className="mt-3 text-[13px] leading-relaxed text-brand-muted-600">
-              {t.previewMatchBlurb}
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-brand-muted-600">
+              {t.previewSub}
             </p>
-            <button
-              type="button"
-              onClick={() => scrollTo('intake')}
-              className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-            >
-              {t.findMyMatchBtn}
-            </button>
-          </article>
+          </div>
+        </header>
 
-          <article
-            id="preview-groups"
-            className="scroll-mt-6 rounded-2xl border border-surface-border bg-white p-5 shadow-soft"
-          >
-            <h3 className="text-[15px] font-semibold text-brand-navy-700">
-              {t.previewGroupsHeading}
-            </h3>
-            <ul className="mt-3 space-y-3">
-              {peerGroups.slice(0, 2).map((group) => (
-                <li
-                  key={group.id}
-                  className="rounded-xl border border-brand-plum-100 bg-brand-plum-50/40 px-3.5 py-2.5"
-                >
-                  <p className="text-[14px] font-semibold text-brand-navy-700">{group.name}</p>
-                  <p className="mt-0.5 text-[12px] text-brand-muted-600">{group.description}</p>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={() => scrollTo('preview-groups')}
-              className="mt-4 inline-flex items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-4 py-2.5 text-[13px] font-semibold text-brand-plum-700 transition hover:bg-brand-plum-50"
-            >
-              {t.browseGroupsBtn}
-            </button>
-          </article>
+        {/* Example parent matches — three cards in a 3-up grid (lg+),
+            stack on mobile. Each card carries an "Example match" badge. */}
+        <div id="preview-matches">
+          <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {t.previewMatchesHeading}
+          </h3>
+          <div className="mt-3 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {mockParentMatches.slice(0, 3).map((match) => (
+              <PreviewMatchCard key={match.id} match={match} locale={locale} />
+            ))}
+          </div>
         </div>
+
+        {/* Example small groups — two cards in a 2-up grid (md+). */}
+        <div id="preview-groups">
+          <h3 className="text-[13px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {t.previewGroupsHeading}
+          </h3>
+          <div className="mt-3 grid gap-4 md:grid-cols-2">
+            {peerGroups.slice(0, 2).map((group) => (
+              <PreviewGroupCard key={group.id} group={group} locale={locale} />
+            ))}
+          </div>
+        </div>
+
+        <p className="text-[11.5px] italic text-brand-muted-500">{t.previewDemoNote}</p>
       </section>
 
-      {/* Bottom support callout */}
+      {/* ── OFF-RAMPS — quietly styled but clearly marked ── */}
       <section
-        id="support"
-        aria-labelledby="support-heading"
-        className="mt-9 scroll-mt-6 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/50 px-5 py-5 sm:px-6"
+        aria-labelledby="offramps-heading"
+        className="rounded-3xl border border-surface-border bg-surface-muted/40 p-5 sm:p-7"
       >
-        <h2 id="support-heading" className="text-lg font-bold text-brand-navy-700">
-          {t.bottomSupportTitle}
-        </h2>
-        <p className="mt-1 text-[14px] leading-relaxed text-brand-muted-700">
-          {t.bottomSupportText}
+        <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+          {t.offrampEyebrow}
         </p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <Link
-            href="/support/find"
-            className="rounded-2xl border border-surface-border bg-white px-4 py-3 text-[13px] font-semibold text-brand-navy-700 shadow-sm transition hover:border-primary/30 hover:text-primary"
-          >
-            {t.offrampFindTitle}
-          </Link>
-          <Link
-            href="/support/caregiver"
-            className="rounded-2xl border border-surface-border bg-white px-4 py-3 text-[13px] font-semibold text-brand-navy-700 shadow-sm transition hover:border-brand-plum-300 hover:text-brand-plum-800"
-          >
-            {t.offrampMentalTitle}
-          </Link>
+        <h2
+          id="offramps-heading"
+          className="mt-1 text-lg font-semibold leading-snug text-brand-muted-900 sm:text-xl"
+        >
+          {t.offrampHeading}
+        </h2>
+        <p className="mt-1.5 max-w-2xl text-[13.5px] leading-relaxed text-brand-muted-600">
+          {t.offrampSub}
+        </p>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {/* Find a provider */}
           <a
-            href="tel:988"
-            className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-[13px] font-semibold text-rose-800 shadow-sm transition hover:bg-rose-100"
+            href="/support/find"
+            className="group/exit flex flex-col rounded-2xl border border-surface-border bg-white p-4 text-left transition-colors hover:border-primary/30 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
           >
-            <Phone className="mr-1.5 inline h-4 w-4" aria-hidden />
-            {t.offrampCrisisTitle}
+            <div className="flex items-start justify-between gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Users className="h-4 w-4" aria-hidden />
+              </span>
+              <ArrowUpRight
+                className="h-4 w-4 text-brand-muted-400 transition-transform motion-safe:group-hover/exit:translate-x-0.5 motion-safe:group-hover/exit:-translate-y-0.5 group-hover/exit:text-primary"
+                aria-hidden
+              />
+            </div>
+            <h3 className="mt-3 text-[14.5px] font-semibold text-brand-muted-900">
+              {t.offrampFindTitle}
+            </h3>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-brand-muted-600">
+              {t.offrampFindBody}
+            </p>
+            <span className="mt-3 text-[12px] font-semibold text-primary">
+              {t.offrampFindCta} →
+            </span>
           </a>
+
+          {/* Mental health for caregivers */}
+          <a
+            href="/support/caregiver"
+            className="group/exit flex flex-col rounded-2xl border border-surface-border bg-white p-4 text-left transition-colors hover:border-brand-plum-300 hover:bg-brand-plum-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-plum-400 focus-visible:ring-offset-2"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-brand-plum-100 text-brand-plum-700">
+                <Heart className="h-4 w-4" aria-hidden />
+              </span>
+              <ArrowUpRight
+                className="h-4 w-4 text-brand-muted-400 transition-transform motion-safe:group-hover/exit:translate-x-0.5 motion-safe:group-hover/exit:-translate-y-0.5 group-hover/exit:text-brand-plum-700"
+                aria-hidden
+              />
+            </div>
+            <h3 className="mt-3 text-[14.5px] font-semibold text-brand-muted-900">
+              {t.offrampMentalTitle}
+            </h3>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-brand-muted-600">
+              {t.offrampMentalBody}
+            </p>
+            <span className="mt-3 text-[12px] font-semibold text-brand-plum-700">
+              {t.offrampMentalCta} →
+            </span>
+          </a>
+
+          {/* Crisis support — three direct dial actions */}
+          <div className="flex flex-col rounded-2xl border border-red-200 bg-red-50/60 p-4">
+            <div className="flex items-start justify-between gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-red-100 text-red-700">
+                <Phone className="h-4 w-4" aria-hidden />
+              </span>
+            </div>
+            <h3 className="mt-3 text-[14.5px] font-semibold text-red-900">
+              {t.offrampCrisisTitle}
+            </h3>
+            <p className="mt-1 text-[12.5px] leading-relaxed text-red-900/80">
+              {t.offrampCrisisBody}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <a
+                href="tel:988"
+                className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-2.5 py-1 text-[11.5px] font-semibold text-white hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
+              >
+                <Phone className="h-3 w-3" aria-hidden />
+                {t.offrampCrisisCta988}
+              </a>
+              <a
+                href="tel:+17139707000"
+                className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+              >
+                {t.offrampCrisisCtaHarris}
+              </a>
+              <a
+                href="tel:911"
+                className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-2.5 py-1 text-[11.5px] font-semibold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2"
+              >
+                {t.offrampCrisisCta911}
+              </a>
+            </div>
+          </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

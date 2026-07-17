@@ -1,9 +1,15 @@
 import type { Metadata } from 'next';
 import { Fraunces, Inter_Tight } from 'next/font/google';
 import {
-  SectionChooser,
-  type ChooserSection,
-} from '@/components/support/SectionChooser';
+  Shield,
+  HeartPulse,
+  PiggyBank,
+  HandCoins,
+  Receipt,
+  Compass,
+  ScrollText,
+  Phone,
+} from 'lucide-react';
 import styles from './financial.module.css';
 
 const fraunces = Fraunces({
@@ -22,108 +28,159 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: 'Paying for care',
+  title: 'Financial pressure is mental health',
   description:
-    'A working guide to insurance, Medicaid waivers, grants, ABLE accounts, tax breaks, and planning for autism families — compact, with each topic one tap away.',
+    'A working guide to therapy coverage, Medicaid waivers, ABLE accounts, respite funding, tax breaks, and adulthood planning for autism families.',
 };
 
-// Collapsed accordion items (compact until selected), matching the SectionChooser
-// pattern used by the other guide tabs. The eight original sections are grouped
-// into six clearer topics; old anchors are preserved via `aliases` so deep links
-// keep working.
-const FINANCIAL_SECTIONS: ChooserSection[] = [
+interface SectionMeta {
+  num: string;
+  id: string;
+  title: React.ReactNode;
+  short: string;
+  icon: React.ReactNode;
+}
+
+const SECTIONS: SectionMeta[] = [
   {
+    num: '01',
     id: 'insurance',
-    label: 'Insurance basics',
-    description: 'What ABA, speech, and OT plans cover — and the calls to make first.',
-    cardClass: 'border-sky-200/80 bg-gradient-to-br from-sky-50 to-white',
-    accentClass: 'text-sky-700',
-    content: <InsuranceBody />,
+    title: <>Insurance &amp; <em>coverage</em></>,
+    short: 'Insurance & coverage',
+    icon: <Shield size={16} />,
   },
   {
+    num: '02',
     id: 'medicaid',
-    label: 'Medicaid & waivers',
-    description: 'Waiver interest lists, who qualifies, and why to sign up today.',
-    cardClass: 'border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white',
-    accentClass: 'text-emerald-700',
-    content: <MedicaidBody />,
+    title: <>Medicaid &amp; <em>waivers</em></>,
+    short: 'Medicaid & waivers',
+    icon: <HeartPulse size={16} />,
   },
   {
-    id: 'grants',
-    aliases: ['respite'],
-    label: 'Grants & respite funds',
-    description: 'Funding to apply for, plus three calls that move help fast.',
-    cardClass: 'border-amber-200/80 bg-gradient-to-br from-amber-50 to-white',
-    accentClass: 'text-amber-700',
-    content: <RespiteBody />,
+    num: '03',
+    id: 'able',
+    title: <><em>ABLE</em> accounts</>,
+    short: 'ABLE accounts',
+    icon: <PiggyBank size={16} />,
   },
   {
-    id: 'savings',
-    aliases: ['able', 'taxes'],
-    label: 'Savings & taxes',
-    description: 'ABLE accounts and the tax breaks caregivers most often miss.',
-    cardClass: 'border-violet-200/80 bg-gradient-to-br from-violet-50 to-white',
-    accentClass: 'text-violet-700',
-    content: (
-      <div className="flex flex-col gap-12">
-        <AbleBody />
-        <TaxesBody />
-      </div>
-    ),
+    num: '04',
+    id: 'respite',
+    title: <>Respite &amp; <em>emergency</em> funds</>,
+    short: 'Respite & emergency funds',
+    icon: <HandCoins size={16} />,
   },
   {
+    num: '05',
+    id: 'taxes',
+    title: <>Tax credits &amp; <em>deductions</em></>,
+    short: 'Tax credits & deductions',
+    icon: <Receipt size={16} />,
+  },
+  {
+    num: '06',
     id: 'adulthood',
-    label: 'Planning for adulthood',
-    description: 'Trusts, guardianship choices, SSI at 18, and the cliff at 22.',
-    cardClass: 'border-rose-200/80 bg-gradient-to-br from-rose-50 to-white',
-    accentClass: 'text-rose-700',
-    content: <AdulthoodBody />,
+    title: <>Planning for <em>adulthood</em></>,
+    short: 'Planning for adulthood',
+    icon: <Compass size={16} />,
   },
   {
-    id: 'help',
-    aliases: ['scripts', 'navigators'],
-    label: 'Scripts & who can help',
-    description: 'Copy-paste letters, plus free navigators who do this all day.',
-    cardClass: 'border-brand-plum-200/80 bg-gradient-to-br from-brand-plum-50 to-white',
-    accentClass: 'text-brand-plum-700',
-    content: (
-      <div className="flex flex-col gap-12">
-        <ScriptsBody />
-        <NavigatorsBody />
-      </div>
-    ),
+    num: '07',
+    id: 'scripts',
+    title: <>Scripts &amp; <em>templates</em></>,
+    short: 'Scripts & templates',
+    icon: <ScrollText size={16} />,
+  },
+  {
+    num: '08',
+    id: 'navigators',
+    title: <>Get help <em>navigating this</em></>,
+    short: 'Get help navigating this',
+    icon: <Phone size={16} />,
   },
 ];
 
 export default function FinancialPage() {
   return (
-    <div className="page-shell pb-10">
-      {/* Header — site-standard, lighter than the old "Financial pressure" hero */}
-      <header className="page-header max-w-3xl">
-        <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-          Inside Common Ground
+    <div className={`${styles.root} ${fraunces.variable} ${interTight.variable}`}>
+      {/* ─── Hero ────────────────────────────────────────────── */}
+      <header className={styles.hero}>
+        <span className={styles.chip}>Inside Common Ground</span>
+        <h1 className={styles.heroTitle}>
+          Financial pressure is <em>mental health.</em>
+        </h1>
+        <p className={styles.heroSubtitle}>
+          Money stress for autism families is its own kind of crisis — therapy costs that outpace
+          coverage, lost income from caregiving, the labyrinth of insurance and Medicaid, and a
+          horizon of adulthood planning nobody prepared you for. This is a working guide to the
+          programs, scripts, and decisions that can take some weight off.
         </p>
-        <h1 className="page-title text-brand-navy-700">Paying for care.</h1>
-        <p className="page-description text-[15px] text-brand-muted-700">
-          A working guide to insurance, Medicaid waivers, grants, ABLE accounts, and the programs
-          that can take some weight off. Pick a topic — each one stays compact until you open it.
-        </p>
-        <p className="mt-2 text-[12px] italic text-brand-muted-500">
-          Last reviewed · April 2026 · Not financial advice — start here, then talk to a benefits
-          counselor for your situation.
-        </p>
+        <div className={styles.heroMeta}>
+          <span className={styles.heroReviewed}>Last reviewed · April 2026</span>
+          <span className={styles.heroDisclaimer}>
+            Not financial advice — start here, then talk to a benefits counselor for your situation.
+          </span>
+        </div>
       </header>
 
-      {/* Accordion topics. The editorial body styling lives in the CSS module, so
-          the font variables + ink palette are applied on this wrapper. */}
-      <section
-        aria-label="Paying for care topics"
-        className={`${styles.root} ${fraunces.variable} ${interTight.variable} mt-2`}
-      >
-        <SectionChooser ariaLabel="Paying for care topics" sections={FINANCIAL_SECTIONS} />
-      </section>
+      {/* ─── Two-column reading shell ─────────────────────────── */}
+      <div className={styles.shell}>
+        {/* Sticky left TOC (desktop only) */}
+        <aside className={styles.toc} aria-label="On this page">
+          <p className={styles.tocLabel}>On this page</p>
+          <ul className={styles.tocList}>
+            {SECTIONS.map((s) => (
+              <li key={s.id}>
+                <a href={`#${s.id}`}>
+                  <span className={styles.tocNum}>{s.num}</span>
+                  <span>{s.short}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+
+        {/* Reading column — explicit sections so each can carry its own body */}
+        <main className={styles.reading}>
+          {SECTIONS.map((s) => (
+            <section key={s.id} id={s.id} className={styles.section}>
+              <div className={styles.sectionHead}>
+                <span className={styles.sectionNum}>{s.num}</span>
+                <span className={styles.sectionIcon}>{s.icon}</span>
+                <h2 className={styles.sectionTitle}>{s.title}</h2>
+              </div>
+              <SectionBody id={s.id} />
+            </section>
+          ))}
+        </main>
+      </div>
     </div>
   );
+}
+
+/* ─── Section bodies ───────────────────────────────────────── */
+
+function SectionBody({ id }: { id: string }) {
+  switch (id) {
+    case 'insurance':
+      return <InsuranceBody />;
+    case 'medicaid':
+      return <MedicaidBody />;
+    case 'able':
+      return <AbleBody />;
+    case 'respite':
+      return <RespiteBody />;
+    case 'taxes':
+      return <TaxesBody />;
+    case 'adulthood':
+      return <AdulthoodBody />;
+    case 'scripts':
+      return <ScriptsBody />;
+    case 'navigators':
+      return <NavigatorsBody />;
+    default:
+      return null;
+  }
 }
 
 /* ── 01 · Insurance & coverage ────────────────────────────── */

@@ -166,7 +166,7 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
             type="email"
             inputMode="email"
             autoComplete="email"
-            placeholder="you@email.com"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1.5 w-full rounded-xl border border-stone-300 bg-white px-3 py-2.5 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"

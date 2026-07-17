@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Hammer, MessageSquare } from 'lucide-react';
 
 const realToday = [
-  'Reviewed provider listings (the ones tagged "Reviewed for Common Ground")',
+  'Verified provider listings (the ones tagged "Verified by Texas ABA Centers")',
   'The resource library',
   'The intake flow',
   'The wellness check-in tool',

@@ -1,30 +1,29 @@
 // ============================================================
-// CG2 — Find Local Help directory: unified resource model.
+// CG2 — Find Support directory: unified resource model.
 // Maps every entry from `verifiedProviders` and
 // `sensoryFriendlyPlaces` into one shape so the directory can
 // filter/sort/render them without branching on source type.
 // ============================================================
 
 import {
+  sensoryCategoryMeta,
   sensoryFriendlyPlaces,
   type SensoryFriendlyPlace,
   type SensoryPlaceCategory,
 } from '@/lib/data';
-import { parsePhone } from '@/lib/phone';
 import { verifiedProviders, type Provider, type ProviderCategory } from '@/lib/providers';
 
-// Region chips match the actual service footprint, plus one chip for
-// statewide phone/online resources (TxP2P, Navigate Life Texas, 988, the
-// Harris Center, etc.).
 export const CITIES = [
   'Sugar Land',
   'Katy',
   'Pearland',
-  'Missouri City / Fort Bend County',
-  'Southwest Houston',
-  'Austin',
-  'Plano',
-  'Online / phone — anywhere in Texas',
+  'Missouri City',
+  'Clear Lake',
+  'Houston',
+  'Fort Bend County',
+  'The Woodlands',
+  'Statewide',
+  'Online',
 ] as const;
 export type City = (typeof CITIES)[number];
 
@@ -46,6 +45,9 @@ export type Service = (typeof SERVICES)[number];
 export const AGE_GROUPS = ['Birth–5', '6–12', '13–17', 'Adult', 'All ages'] as const;
 export type AgeGroup = (typeof AGE_GROUPS)[number];
 
+export const INSURANCE = ['Accepts insurance', 'No insurance needed', 'Varies'] as const;
+export type Insurance = (typeof INSURANCE)[number];
+
 export const DELIVERY = ['In-person', 'In-home/Mobile', 'Virtual'] as const;
 export type Delivery = (typeof DELIVERY)[number];
 
@@ -61,34 +63,23 @@ export type Intent = (typeof INTENTS)[number];
 
 export type Urgency = 'crisis' | 'standard' | 'sensory-browse';
 
-/**
- * Insurance info may only appear when explicitly verified. When populated,
- * render as: "Confirmed accepts {plan} as of {verifiedDate} — confirm when
- * you book, or ask our admissions team." No listing is verified yet, so no
- * listing shows an insurance tag right now.
- */
-export type VerifiedInsurance = { plan: string; verifiedDate: string };
-
 export interface Resource {
   id: string;
   name: string;
-  /** Neutral one-liner describing what the provider offers — shows on the card. */
+  /** Editorial one-liner — shows on the card. */
   blurb: string;
-  /** Longer description — shows in right rail. */
+  /** Long editorial paragraph — shows in right rail. */
   description: string;
   helpfulToKnow?: string;
   cities: City[];
   services: Service[];
   ageGroups: AgeGroup[];
-  verifiedInsurance?: VerifiedInsurance;
+  insurance: Insurance;
   delivery: Delivery[];
   goodFirstStep: boolean;
   urgency: Urgency;
   twentyFourSeven?: boolean;
-  /** Human-readable phone string — may include visible extension text ("ext. 2"). */
   phone?: string;
-  /** Digits-only value for the tel: href — exactly one dialable number. */
-  phoneDial?: string;
   website?: string;
   address?: string;
   tags: string[];
@@ -104,22 +95,14 @@ function extractCities(loc: string): City[] {
   if (l.includes('sugar land') || l.includes('stafford') || l.includes('richmond') || l.includes('rosenberg')) out.add('Sugar Land');
   if (l.includes('katy') || l.includes('cinco ranch')) out.add('Katy');
   if (l.includes('pearland')) out.add('Pearland');
-  if (l.includes('missouri city') || l.includes('fort bend')) out.add('Missouri City / Fort Bend County');
-  if (l.includes('austin')) out.add('Austin');
-  if (l.includes('plano')) out.add('Plano');
-  if (
-    l.includes('statewide') ||
-    l.includes('nationwide') ||
-    l.includes('multiple, tx') ||
-    l.includes('online') ||
-    l.includes('virtual')
-  ) {
-    out.add('Online / phone — anywhere in Texas');
-  }
-  // Remaining Houston-area listings serve the footprint's Houston side
-  // (southwest Houston / Fort Bend corridor).
-  if (l.includes('houston') && !out.has('Sugar Land')) out.add('Southwest Houston');
-  if (out.size === 0) out.add('Southwest Houston');
+  if (l.includes('missouri city')) out.add('Missouri City');
+  if (l.includes('clear lake') || l.includes('league city') || l.includes('webster') || l.includes('bay area')) out.add('Clear Lake');
+  if (l.includes('woodlands')) out.add('The Woodlands');
+  if (l.includes('fort bend')) out.add('Fort Bend County');
+  if (l.includes('statewide') || l.includes('texas health') || l.includes('nationwide')) out.add('Statewide');
+  if (l.includes('houston') && !out.has('Sugar Land')) out.add('Houston');
+  if (l.includes('online') || l.includes('virtual')) out.add('Online');
+  if (out.size === 0) out.add('Houston');
   return Array.from(out);
 }
 
@@ -141,6 +124,15 @@ function extractAgeGroups(range: string): AgeGroup[] {
   }
   if (out.size === 0) out.add('All ages');
   return Array.from(out);
+}
+
+// ── insurance extraction ───────────────────────────────────────
+
+function inferInsurance(notes: string): Insurance {
+  const n = notes.toLowerCase();
+  if (/free|no(?:[ -])(?:cost|insurance required)|no insurance|grant-based/.test(n)) return 'No insurance needed';
+  if (/accept|covers|major insurance|medicaid/.test(n)) return 'Accepts insurance';
+  return 'Varies';
 }
 
 // ── provider category → service mapping ────────────────────────
@@ -181,7 +173,7 @@ const sensoryServiceMap: Record<SensoryPlaceCategory, Service[]> = {
   dentist: ['Sensory-friendly business', 'Pediatrician'],
   haircut: ['Sensory-friendly business'],
   developmental: ['Diagnosis', 'Pediatrician'],
-  'speech-ot': ['Speech', 'OT'],
+  'speech-ot': ['ABA', 'Speech', 'OT'],
   'mental-health': ['Mental Health'],
   'pediatric-gi': ['Pediatrician'],
   'eye-care': ['Pediatrician'],
@@ -229,10 +221,6 @@ function buildFromProvider(p: Provider): Resource {
   if (p.waitlist_status.toLowerCase().includes('no wait')) tags.push('No waitlist');
   if (p.sensory_accommodations) tags.push('Sensory accommodations');
 
-  // Only phone strings that contain one dialable number become tel: links —
-  // "Contact via website" / "Varies by therapist" render no phone at all.
-  const phone = parsePhone(p.phone);
-
   return {
     id: `provider-${p.id}`,
     name: p.provider_name,
@@ -242,13 +230,12 @@ function buildFromProvider(p: Provider): Resource {
     cities: extractCities(p.location),
     services,
     ageGroups: extractAgeGroups(p.age_range),
-    verifiedInsurance: p.verifiedInsurance,
+    insurance: inferInsurance(p.insurance_notes),
     delivery: providerDelivery(p),
     goodFirstStep,
     urgency: isCrisis ? 'crisis' : 'standard',
     twentyFourSeven: /24\/7|anytime/.test(`${p.waitlist_status} ${p.services.join(' ')}`),
-    phone: phone?.display,
-    phoneDial: phone?.dial,
+    phone: p.phone && !p.phone.toLowerCase().includes('see website') && !p.phone.toLowerCase().includes('contact via website') && !p.phone.toLowerCase().includes('varies') ? p.phone : undefined,
     website: p.website,
     tags,
     lastReviewed: p.last_verified_date,
@@ -269,8 +256,6 @@ function buildFromSensory(s: SensoryFriendlyPlace): Resource {
   if (s.verificationSource === 'staff-vouched') tags.push('Staff-vouched');
   if (s.verificationSource === 'parent-submitted') tags.push('Parent-recommended');
 
-  const phone = parsePhone(s.phone);
-
   return {
     id: `sensory-${s.id}`,
     name: s.name,
@@ -280,11 +265,11 @@ function buildFromSensory(s: SensoryFriendlyPlace): Resource {
     cities: extractCities(`${s.city}, ${s.state} ${s.address ?? ''}`),
     services,
     ageGroups: ['All ages'],
+    insurance: 'Varies',
     delivery: sensoryDelivery(),
     goodFirstStep: false,
     urgency: isBrowse ? 'sensory-browse' : 'standard',
-    phone: phone?.display,
-    phoneDial: phone?.dial,
+    phone: s.phone,
     website: s.website,
     address: s.address,
     tags,
@@ -310,15 +295,15 @@ const extraResources: Resource[] = [
     blurb: 'For any life-threatening emergency. Tell the dispatcher your child is autistic so first responders can adapt their approach.',
     description:
       'Call 911 only when there is an immediate threat to life. When you call, tell the dispatcher your child is autistic, what behaviors they may show, and what helps them. This gives first responders a chance to adapt their tone and approach before they arrive.',
-    cities: ['Online / phone — anywhere in Texas'],
+    cities: ['Statewide'],
     services: ['Mental Health'],
     ageGroups: ['All ages'],
+    insurance: 'No insurance needed',
     delivery: ['Virtual'],
     goodFirstStep: false,
     urgency: 'crisis',
     twentyFourSeven: true,
     phone: '911',
-    phoneDial: '911',
     tags: ['24/7', 'Emergency'],
     lastReviewed: 'April 2026',
     intents: ['crisis'],
@@ -329,15 +314,15 @@ const extraResources: Resource[] = [
     blurb: 'A free statewide line that points you to local food, housing, financial, and disability programs you may not know about.',
     description:
       'Texas 211 is a free, confidential statewide service that connects you to local programs for food, housing, utility assistance, Medicaid, and disability services. Call when you need help and don\'t know who to ask. Available 24/7 in English and Spanish.',
-    cities: ['Online / phone — anywhere in Texas'],
+    cities: ['Statewide'],
     services: ['Advocacy'],
     ageGroups: ['All ages'],
+    insurance: 'No insurance needed',
     delivery: ['Virtual'],
     goodFirstStep: true,
     urgency: 'standard',
     twentyFourSeven: true,
     phone: '211',
-    phoneDial: '211',
     website: 'https://www.211texas.org',
     tags: ['Good first step', 'Spanish', '24/7'],
     lastReviewed: 'April 2026',
@@ -349,14 +334,14 @@ const extraResources: Resource[] = [
     blurb: 'Long-running disability advocacy nonprofit with respite events, IEP support, and a navigator phone line.',
     description:
       'The Arc of Greater Houston runs respite events, family days out, and an IEP advocacy program. Their navigator line can match your family with a peer mentor and walk you through Texas waiver lists.',
-    cities: ['Southwest Houston'],
+    cities: ['Houston'],
     services: ['Advocacy', 'Respite'],
     ageGroups: ['All ages'],
+    insurance: 'No insurance needed',
     delivery: ['In-person', 'Virtual'],
     goodFirstStep: true,
     urgency: 'standard',
     phone: '(713) 957-1600',
-    phoneDial: '+17139571600',
     website: 'https://www.aogh.org',
     tags: ['Good first step'],
     lastReviewed: 'April 2026',
@@ -368,18 +353,35 @@ const extraResources: Resource[] = [
     blurb: 'Free developmental services for kids under 3 — no diagnosis or referral required.',
     description:
       'ECI provides developmental evaluations and in-home therapy for children under three regardless of income or diagnosis. If you are seeing delays, you do not need to wait for a referral — call directly.',
-    cities: ['Online / phone — anywhere in Texas'],
+    cities: ['Statewide'],
     services: ['Diagnosis', 'Speech', 'OT'],
     ageGroups: ['Birth–5'],
+    insurance: 'No insurance needed',
     delivery: ['In-home/Mobile'],
     goodFirstStep: true,
     urgency: 'standard',
     phone: '(877) 787-8999',
-    phoneDial: '+18777878999',
     website: 'https://www.hhs.texas.gov/services/disability/early-childhood-intervention-services',
     tags: ['Good first step', 'Spanish', 'No waitlist'],
     lastReviewed: 'April 2026',
     intents: ['just-diagnosed', 'therapy'],
+  },
+  {
+    id: 'extra-dads',
+    name: 'Autism Dads Houston — Peer Support',
+    blurb: 'A casual monthly meetup for dads and father figures. No agenda, no pressure — just other guys who get it.',
+    description:
+      'A peer-led group for dads and father figures of autistic kids in the Houston area. Meets monthly in person and runs a private chat group between meetings. Conversations stay practical and judgment-free.',
+    cities: ['Houston'],
+    services: ['Mental Health', 'Advocacy'],
+    ageGroups: ['Adult'],
+    insurance: 'No insurance needed',
+    delivery: ['In-person', 'Virtual'],
+    goodFirstStep: true,
+    urgency: 'standard',
+    tags: ['Good first step', 'Peer support'],
+    lastReviewed: 'February 2026',
+    intents: ['crisis'],
   },
   {
     id: 'extra-spanish-line',
@@ -387,14 +389,14 @@ const extraResources: Resource[] = [
     blurb: 'Information y referidos en español de un equipo familiarizado con el sistema de Texas.',
     description:
       'Para familias hispanohablantes: orientación uno-a-uno en español con personal de Autism Society of Texas. Cubren preguntas de diagnóstico, terapia, escuela y ayuda financiera. Llame y pida la extensión 3.',
-    cities: ['Online / phone — anywhere in Texas'],
+    cities: ['Statewide'],
     services: ['Advocacy'],
     ageGroups: ['All ages'],
+    insurance: 'No insurance needed',
     delivery: ['Virtual'],
     goodFirstStep: true,
     urgency: 'standard',
-    phone: '(512) 479-4199 ext. 3',
-    phoneDial: '+15124794199',
+    phone: '(512) 479-4199',
     website: 'https://www.texasautismsociety.org',
     tags: ['Good first step', 'Spanish'],
     lastReviewed: 'April 2026',
@@ -406,15 +408,15 @@ const extraResources: Resource[] = [
     blurb: 'Text-only crisis support for parents who can\'t talk on the phone.',
     description:
       'Text HOME to 741741 from anywhere in the US to reach a trained crisis counselor by text. Free, 24/7, confidential. Useful when you cannot speak out loud — for example, when your child is nearby or when speaking would escalate the situation.',
-    cities: ['Online / phone — anywhere in Texas'],
+    cities: ['Statewide'],
     services: ['Mental Health'],
     ageGroups: ['All ages'],
+    insurance: 'No insurance needed',
     delivery: ['Virtual'],
     goodFirstStep: false,
     urgency: 'crisis',
     twentyFourSeven: true,
     phone: '741741',
-    phoneDial: '741741',
     website: 'https://www.crisistextline.org',
     tags: ['24/7', 'Text-based'],
     lastReviewed: 'April 2026',
@@ -426,16 +428,16 @@ const extraResources: Resource[] = [
     blurb: 'School-based food assistance for kids — sent home Friday in a backpack so they\'re fed all weekend.',
     description:
       'For families stretched thin: ask your school if they participate in Backpack Buddy. Kids quietly receive a backpack of food on Fridays. No paperwork, no income test through the school. Many Houston-area districts participate.',
-    cities: ['Southwest Houston'],
+    cities: ['Houston'],
     services: ['Advocacy'],
     ageGroups: ['Birth–5', '6–12', '13–17'],
+    insurance: 'No insurance needed',
     delivery: ['In-person'],
     goodFirstStep: false,
     urgency: 'standard',
     phone: '(832) 369-9390',
-    phoneDial: '+18323699390',
     website: 'https://www.houstonfoodbank.org',
-    tags: ['Free program'],
+    tags: ['No insurance needed'],
     lastReviewed: 'March 2026',
     intents: ['financial'],
   },

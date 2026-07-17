@@ -19,20 +19,9 @@
  * what would be required to send a real Monday email or run a scheduled job.
  */
 
-import {
-  getStepCompletionKey,
-  loadCarePlan,
-  type CarePlanStep,
-} from './carePlanStorage';
 import { loadBandwidth } from './bandwidth';
-import type { SupportThreadId } from './carePlanSupport';
-import {
-  formatArcWeekLabel,
-  getCarePlanBucketSteps,
-  getCarePlanWeekView,
-  resolvedCompletionKeys,
-} from './carePlanDisplay';
-import { computeWeekNumber, loadCheckInState } from './weeklyCheckIn';
+import { loadCarePlan } from './carePlanStorage';
+import { TIER_STEP_LIMIT } from './bandwidth';
 
 const KEY = 'cg.weeklyProgress.v1';
 const PREV_KEY = 'cg.weeklyProgress.prev.v1';
@@ -44,12 +33,8 @@ export type WeeklyProgress = {
   weekStart: string;
   /** ISO timestamp when the weekly intake/check-in was explicitly marked done. */
   intakeDoneAt: string | null;
-  /** Stable per-step keys marked done this week. Order = completion order. */
-  completedStepKeys: string[];
-  /** @deprecated Legacy href-based completion — read for backward compat only. */
-  completedStepHrefs?: string[];
-  /** Support-panel thread nudged this week — rotates next week's nudge. */
-  lastSupportNudgeThread?: SupportThreadId | null;
+  /** Hrefs (or titles) of plan steps marked done this week. Order = completion order. */
+  completedStepHrefs: string[];
 };
 
 export type WeeklyProgressSummary = {
@@ -57,8 +42,8 @@ export type WeeklyProgressSummary = {
   weekStart: string;
   /** Has the weekly bandwidth/intake check-in been completed this week? */
   intakeDoneThisWeek: boolean;
-  /** Plan step keys the parent has marked complete this week. */
-  completedStepKeys: string[];
+  /** Plan steps the parent has marked complete this week. */
+  completedStepHrefs: string[];
   /** Total notches in the meter (1 intake + N plan steps). */
   totalNotches: number;
   /** How many notches are filled right now. */
@@ -73,12 +58,6 @@ export type WeeklyProgressSummary = {
   weekComplete: boolean;
   /** True when no plan exists yet — meter still renders, intake is the only step. */
   noPlanYet: boolean;
-  /** Arc week the parent is on (when a plan exists). */
-  arcWeekNumber?: number;
-  /** Arc theme for the current week. */
-  arcTheme?: string;
-  /** Human-readable stage-named week — e.g. "Week 3 — sort how care is paid for". */
-  arcWeekLabel?: string;
 };
 
 function isBrowser(): boolean {
@@ -103,36 +82,8 @@ function emptyProgress(now: Date = new Date()): WeeklyProgress {
     version: 1,
     weekStart: weekStartISO(now),
     intakeDoneAt: null,
-    completedStepKeys: [],
+    completedStepHrefs: [],
   };
-}
-
-/** True when this step is marked done — key-based, with legacy href fallback. */
-export function isStepComplete(
-  step: CarePlanStep,
-  completedKeys: string[],
-  legacyHrefs: string[],
-  visibleSteps: CarePlanStep[],
-): boolean {
-  const key = getStepCompletionKey(step);
-  if (completedKeys.includes(key)) return true;
-  const hrefDupes = visibleSteps.filter((s) => s.href === step.href).length;
-  if (hrefDupes === 1 && legacyHrefs.includes(step.href)) return true;
-  return false;
-}
-
-/** Merge key-based progress with legacy href completions (unique hrefs only). */
-function resolveCompletedKeys(
-  progress: WeeklyProgress,
-  visibleSteps: CarePlanStep[],
-): string[] {
-  const keys = new Set(progress.completedStepKeys ?? []);
-  const legacyHrefs = progress.completedStepHrefs ?? [];
-  for (const href of legacyHrefs) {
-    const matches = visibleSteps.filter((s) => s.href === href);
-    if (matches.length === 1) keys.add(getStepCompletionKey(matches[0]));
-  }
-  return [...keys];
 }
 
 function readRaw(): WeeklyProgress | null {
@@ -143,21 +94,13 @@ function readRaw(): WeeklyProgress | null {
     const parsed = JSON.parse(raw) as Partial<WeeklyProgress> | null;
     if (!parsed || typeof parsed !== 'object') return null;
     if (typeof parsed.weekStart !== 'string') return null;
-    const legacyHrefs = Array.isArray(parsed.completedStepHrefs)
-      ? parsed.completedStepHrefs.filter((s): s is string => typeof s === 'string')
-      : [];
-    const completedStepKeys = Array.isArray(parsed.completedStepKeys)
-      ? parsed.completedStepKeys.filter((s): s is string => typeof s === 'string')
-      : [];
     return {
       version: 1,
       weekStart: parsed.weekStart,
       intakeDoneAt: typeof parsed.intakeDoneAt === 'string' ? parsed.intakeDoneAt : null,
-      completedStepKeys,
-      ...(typeof parsed.lastSupportNudgeThread === 'string'
-        ? { lastSupportNudgeThread: parsed.lastSupportNudgeThread as SupportThreadId }
-        : {}),
-      ...(legacyHrefs.length ? { completedStepHrefs: legacyHrefs } : {}),
+      completedStepHrefs: Array.isArray(parsed.completedStepHrefs)
+        ? parsed.completedStepHrefs.filter((s): s is string => typeof s === 'string')
+        : [],
     };
   } catch {
     return null;
@@ -208,37 +151,6 @@ export function loadWeeklyProgress(now: Date = new Date()): WeeklyProgress {
   return fresh;
 }
 
-/** Last week's archived progress (after Monday rollover), if any. */
-export function loadPreviousWeeklyProgress(): WeeklyProgress | null {
-  if (!isBrowser()) return null;
-  try {
-    const raw = window.localStorage.getItem(PREV_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<WeeklyProgress> | null;
-    if (!parsed || typeof parsed.weekStart !== 'string') return null;
-    return {
-      version: 1,
-      weekStart: parsed.weekStart,
-      intakeDoneAt: typeof parsed.intakeDoneAt === 'string' ? parsed.intakeDoneAt : null,
-      completedStepKeys: Array.isArray(parsed.completedStepKeys)
-        ? parsed.completedStepKeys.filter((s): s is string => typeof s === 'string')
-        : [],
-      ...(typeof parsed.lastSupportNudgeThread === 'string'
-        ? { lastSupportNudgeThread: parsed.lastSupportNudgeThread as SupportThreadId }
-        : {}),
-      ...(Array.isArray(parsed.completedStepHrefs)
-        ? {
-            completedStepHrefs: parsed.completedStepHrefs.filter(
-              (s): s is string => typeof s === 'string',
-            ),
-          }
-        : {}),
-    };
-  } catch {
-    return null;
-  }
-}
-
 /** Mark this week's intake/check-in as done. Idempotent. */
 export function markWeeklyIntakeDone(now: Date = new Date()): WeeklyProgress {
   const current = loadWeeklyProgress(now);
@@ -248,38 +160,26 @@ export function markWeeklyIntakeDone(now: Date = new Date()): WeeklyProgress {
   return next;
 }
 
-/** Mark a plan step done. Idempotent — same step key won't tick twice. */
-export function markStepDone(stepKey: string, now: Date = new Date()): WeeklyProgress {
+/** Mark a plan step done. Idempotent — same href won't tick twice. */
+export function markStepDone(href: string, now: Date = new Date()): WeeklyProgress {
   const current = loadWeeklyProgress(now);
-  if (current.completedStepKeys.includes(stepKey)) return current;
+  if (current.completedStepHrefs.includes(href)) return current;
   const next: WeeklyProgress = {
     ...current,
-    completedStepKeys: [...current.completedStepKeys, stepKey],
+    completedStepHrefs: [...current.completedStepHrefs, href],
   };
   writeRaw(next);
   return next;
 }
 
 /** Unmark a plan step (parent changed their mind). */
-export function unmarkStepDone(stepKey: string, now: Date = new Date()): WeeklyProgress {
+export function unmarkStepDone(href: string, now: Date = new Date()): WeeklyProgress {
   const current = loadWeeklyProgress(now);
-  if (!current.completedStepKeys.includes(stepKey)) return current;
+  if (!current.completedStepHrefs.includes(href)) return current;
   const next: WeeklyProgress = {
     ...current,
-    completedStepKeys: current.completedStepKeys.filter((k) => k !== stepKey),
+    completedStepHrefs: current.completedStepHrefs.filter((h) => h !== href),
   };
-  writeRaw(next);
-  return next;
-}
-
-/** Persist which support thread was nudged — used to rotate next week. */
-export function recordSupportNudgeThread(
-  thread: SupportThreadId | null,
-  now: Date = new Date(),
-): WeeklyProgress {
-  const current = loadWeeklyProgress(now);
-  if (current.lastSupportNudgeThread === thread) return current;
-  const next: WeeklyProgress = { ...current, lastSupportNudgeThread: thread };
   writeRaw(next);
   return next;
 }
@@ -296,14 +196,14 @@ export function resetWeeklyProgress(now: Date = new Date()): WeeklyProgress {
  *   - the current week's progress object
  *   - the bandwidth result (so a fresh BandwidthCheck this week implicitly
  *     fills the intake notch — the parent doesn't have to do it twice)
- *   - the saved care plan's bucket steps (same list as /support/care-plan)
+ *   - the saved care plan, which provides the *list* of steps. The plan
+ *     today is sized by the parent's bandwidth tier (TIER_STEP_LIMIT), so
+ *     the meter uses the same visible-step count to stay honest.
  */
 export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgressSummary {
   const progress = loadWeeklyProgress(now);
   const plan = loadCarePlan();
   const bandwidth = loadBandwidth();
-  const checkIn = loadCheckInState();
-  const weekNumber = computeWeekNumber(checkIn.planStartedAt ?? plan?.createdAt ?? null, now);
 
   // Bandwidth recorded inside this calendar week counts as this week's check-in.
   const bandwidthThisWeek = (() => {
@@ -314,31 +214,21 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
   })();
   const intakeDoneThisWeek = Boolean(progress.intakeDoneAt) || bandwidthThisWeek;
 
-  const legacyHrefs = progress.completedStepHrefs ?? [];
-  const resolvedKeys = plan
-    ? resolvedCompletionKeys(getCarePlanBucketSteps(plan), progress)
-    : resolveCompletedKeys(progress, []);
-
-  const weekView = plan
-    ? getCarePlanWeekView(
-        plan,
-        weekNumber,
-        resolvedKeys,
-        legacyHrefs,
-        loadPreviousWeeklyProgress()?.lastSupportNudgeThread ?? null,
-      )
-    : null;
-  const visibleSteps = weekView?.activeSteps ?? plan?.steps ?? [];
+  // Care plan steps gated by current tier — that's what the parent actually
+  // sees on /support/care-plan, so the meter shouldn't promise more notches
+  // than steps shown.
+  const tier = bandwidth?.tier ?? 'doing-well';
+  const stepLimit = TIER_STEP_LIMIT[tier];
+  const allSteps = plan?.steps ?? [];
+  const visibleSteps = allSteps.slice(0, stepLimit);
   const stepCount = visibleSteps.length;
-  const totalNotches = 1 + stepCount; // intake + each active plan step
+  const totalNotches = 1 + stepCount; // intake + each visible plan step
 
-  const validStepKeys = new Set(visibleSteps.map(getStepCompletionKey));
-  const completedStepKeys = resolvedKeys.filter((k) => validStepKeys.has(k));
-  const filledNotches =
-    (intakeDoneThisWeek ? 1 : 0) +
-    visibleSteps.filter((s) =>
-      isStepComplete(s, completedStepKeys, legacyHrefs, visibleSteps),
-    ).length;
+  // Only count completed steps that still exist in the current visible plan,
+  // so editing the intake (which rewrites steps) doesn't leave ghost notches.
+  const validStepHrefs = new Set(visibleSteps.map((s) => s.href));
+  const completedStepHrefs = progress.completedStepHrefs.filter((h) => validStepHrefs.has(h));
+  const filledNotches = (intakeDoneThisWeek ? 1 : 0) + completedStepHrefs.length;
   const fraction = totalNotches === 0 ? 0 : filledNotches / totalNotches;
 
   let nextLabel: string;
@@ -352,9 +242,7 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
     nextLabel = 'Start this week’s check-in';
     nextHref = '/support/intake';
   } else {
-    const remaining = visibleSteps.find(
-      (s) => !isStepComplete(s, completedStepKeys, legacyHrefs, visibleSteps),
-    );
+    const remaining = visibleSteps.find((s) => !completedStepHrefs.includes(s.href));
     if (remaining) {
       nextLabel = remaining.title;
       nextHref = remaining.href;
@@ -372,7 +260,7 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
   return {
     weekStart: progress.weekStart,
     intakeDoneThisWeek,
-    completedStepKeys,
+    completedStepHrefs,
     totalNotches,
     filledNotches,
     fraction,
@@ -380,12 +268,5 @@ export function getWeeklyProgressSummary(now: Date = new Date()): WeeklyProgress
     nextHref,
     weekComplete,
     noPlanYet: !plan,
-    ...(weekView
-      ? {
-          arcWeekNumber: weekView.arcWeekNumber,
-          arcTheme: weekView.arcTheme,
-          arcWeekLabel: formatArcWeekLabel(weekView.arcWeekNumber, weekView.arcTheme),
-        }
-      : {}),
   };
 }

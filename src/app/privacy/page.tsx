@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 const EFFECTIVE_DATE = 'April 23, 2026';
 const CONTACT_EMAIL = 'info@texasabacenters.com';
 const CONTACT_PHONE = '(832) 402-4144';
-const CONTACT_PHONE_DIAL = '+18324024144';
 
 export default function PrivacyPage() {
   return (
@@ -73,7 +72,7 @@ export default function PrivacyPage() {
               Texas ABA Centers is headquartered in Houston, Texas. For questions about this policy, contact us at{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: '#1a2e52', fontWeight: 600 }}>{CONTACT_EMAIL}</a>{' '}
               or{' '}
-              <a href={`tel:${CONTACT_PHONE_DIAL}`} style={{ color: '#1a2e52', fontWeight: 600 }}>{CONTACT_PHONE}</a>.
+              <a href={`tel:${CONTACT_PHONE}`} style={{ color: '#1a2e52', fontWeight: 600 }}>{CONTACT_PHONE}</a>.
             </p>
           </Section>
 
@@ -254,7 +253,7 @@ export default function PrivacyPage() {
                 {CONTACT_EMAIL}
               </a>
               <a
-                href={`tel:${CONTACT_PHONE_DIAL}`}
+                href={`tel:${CONTACT_PHONE}`}
                 className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition hover:opacity-90"
                 style={{ borderColor: '#d4d8e3', color: '#1a2e52', backgroundColor: '#ffffff' }}
               >

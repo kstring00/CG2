@@ -17,7 +17,6 @@ import {
   X,
 } from 'lucide-react';
 import CrisisPill from '@/components/CrisisPill';
-import HomeSupportHub from '@/components/home/HomeSupportHub';
 import IntakeFlow, { type IntakeAnswers } from '@/components/IntakeFlow';
 import WelcomeBackPanel from '@/components/WelcomeBackPanel';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
@@ -387,19 +386,12 @@ export default function HomePage() {
         latestCheckIn={checkInState?.history.length ? checkInState.history[checkInState.history.length - 1] : null}
       />
 
-      {/* SUPPORT HUB — quick tiles, feature cards, local help, portal banner */}
-      <HomeSupportHub />
-
-      {/* The global SiteFooter (©, In Review badge, Privacy) renders right
-          below this — the homepage only adds the urgent-help line. */}
-      <footer className="border-t border-stone-200/70 px-6 py-8 sm:px-8" style={{ backgroundColor: '#f4efe8' }}>
-        <p className="mx-auto max-w-4xl text-center">
-          <a
-            href="tel:988"
-            className="text-sm font-semibold text-primary underline-offset-4 transition hover:underline"
-          >
-            For urgent help, call or text 988
-          </a>
+      <footer className="px-6 py-10 sm:px-8" style={{ backgroundColor: '#f4efe8' }}>
+        <p className="mx-auto max-w-3xl text-center text-xs text-stone-400">
+          Powered by <span className="font-semibold text-stone-600">Texas ABA Centers</span> · Common Ground is available to every family in Texas. {' · '}
+          <Link href="/privacy" className="underline-offset-2 hover:underline">
+            Privacy Policy
+          </Link>
         </p>
       </footer>
     </main>

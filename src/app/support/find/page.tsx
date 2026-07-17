@@ -9,6 +9,8 @@ import {
   ExternalLink,
   Globe,
   HeartHandshake,
+  Keyboard,
+  Languages,
   List,
   Mail,
   MapPin,
@@ -31,16 +33,17 @@ import {
   CITIES,
   DELIVERY,
   findResources,
+  INSURANCE,
   intentMeta,
   INTENTS,
   SERVICES,
   type AgeGroup,
   type City,
   type Delivery,
+  type Insurance,
   type Intent,
   type Resource,
   type Service,
-  type VerifiedInsurance,
 } from './resources';
 
 type Locale = 'en' | 'es';
@@ -61,6 +64,7 @@ const copy = {
     groupLocation: 'Location / Area',
     groupService: 'Service type',
     groupAge: 'Age group',
+    groupInsurance: 'Insurance',
     groupDelivery: 'Delivery',
     goodFirstStep: 'Good first step only',
     goodFirstStepHelp: 'Highest-confidence starting points, vetted by our navigators.',
@@ -86,7 +90,7 @@ const copy = {
     goodFirstStepBadge: 'Good first step',
     sensoryBadge: 'Sensory-friendly',
     crisisLabel: 'Crisis & urgent support',
-    reviewedTooltip: (date: string) => `Reviewed ${date} for Common Ground`,
+    reviewedTooltip: (date: string) => `Reviewed ${date} by Texas ABA Centers`,
     hoverHint: 'Hover for details · click to pin',
     inlineHelpTitle: "Don't see what you need?",
     inlineHelpBody: 'A care navigator can spend 10 minutes with you and point to the right place.',
@@ -97,17 +101,17 @@ const copy = {
     mapHint: 'Hover a city to highlight its resources.',
     rightDefaultTitle: 'Your saved resources',
     rightDefaultEmpty: 'Save anything you want to come back to. They\'ll live here, in your browser, no login required.',
-    rightDefaultEmptyHint: 'Tip: hover a card to preview, then click to pin it here.',
+    rightDefaultEmptyHint: 'Tip: hover a card to preview · click to pin · ⌘/Ctrl+S to save the focused one.',
     rightSavedCount: (n: number) => (n === 1 ? '1 saved' : `${n} saved`),
     rightEmailLabel: 'Email this list to myself',
-    rightEmailPlaceholder: 'you@email.com',
+    rightEmailPlaceholder: 'you@example.com',
     rightEmailSend: 'Send',
     rightPrint: 'Print',
     rightClear: 'Clear list',
     rightNavigatorTitle: 'Not finding what you need?',
     rightNavigatorBody: 'A care navigator can spend ten minutes with you and point you to what fits your week.',
     rightNavigatorCta: 'Talk to a navigator',
-    expandedReviewed: (date: string) => `Reviewed ${date} for Common Ground`,
+    expandedReviewed: (date: string) => `Reviewed ${date} · vetted by Texas ABA Centers`,
     expandedSection: 'About',
     expandedSectionGood: 'Helpful to know',
     expandedSectionContact: 'How to reach them',
@@ -118,9 +122,6 @@ const copy = {
     expandedServices: 'Services',
     expandedDelivery: 'How they deliver',
     expandedInsurance: 'Insurance',
-    insuranceUnverified: 'Confirm coverage when you book, or ask our admissions team.',
-    verifiedInsuranceLine: (v: VerifiedInsurance) =>
-      `Confirmed accepts ${v.plan} as of ${v.verifiedDate} — confirm when you book, or ask our admissions team.`,
     pinnedLabel: 'Pinned',
     hoveringLabel: 'Hover preview',
     keyboardButton: 'Keyboard shortcuts',
@@ -154,6 +155,7 @@ const copy = {
     groupLocation: 'Ubicación / Área',
     groupService: 'Tipo de servicio',
     groupAge: 'Grupo de edad',
+    groupInsurance: 'Seguro',
     groupDelivery: 'Modalidad',
     goodFirstStep: 'Solo "buen primer paso"',
     goodFirstStepHelp: 'Puntos de partida de mayor confianza, revisados por nuestros navegadores.',
@@ -179,7 +181,7 @@ const copy = {
     goodFirstStepBadge: 'Buen primer paso',
     sensoryBadge: 'Sensorial-amigable',
     crisisLabel: 'Apoyo de crisis y urgente',
-    reviewedTooltip: (date: string) => `Revisado ${date} para Common Ground`,
+    reviewedTooltip: (date: string) => `Revisado ${date} por Texas ABA Centers`,
     hoverHint: 'Pasa el cursor para ver detalles · haz clic para fijar',
     inlineHelpTitle: '¿No encuentras lo que necesitas?',
     inlineHelpBody: 'Un navegador de atención puede dedicarte 10 minutos y guiarte al lugar correcto.',
@@ -190,7 +192,7 @@ const copy = {
     mapHint: 'Pasa el cursor sobre una ciudad para resaltar sus recursos.',
     rightDefaultTitle: 'Tus recursos guardados',
     rightDefaultEmpty: 'Guarda lo que quieras revisar después. Vivirá aquí, en tu navegador, sin necesidad de cuenta.',
-    rightDefaultEmptyHint: 'Tip: pasa el cursor para previsualizar y haz clic para fijarlo aquí.',
+    rightDefaultEmptyHint: 'Tip: pasa el cursor para previsualizar · clic para fijar · ⌘/Ctrl+S para guardar el seleccionado.',
     rightSavedCount: (n: number) => (n === 1 ? '1 guardado' : `${n} guardados`),
     rightEmailLabel: 'Enviarme esta lista por email',
     rightEmailPlaceholder: 'tu@ejemplo.com',
@@ -200,7 +202,7 @@ const copy = {
     rightNavigatorTitle: '¿No encuentras lo que necesitas?',
     rightNavigatorBody: 'Un navegador de atención puede dedicarte diez minutos y guiarte a lo que encaje con tu semana.',
     rightNavigatorCta: 'Habla con un navegador',
-    expandedReviewed: (date: string) => `Revisado ${date} para Common Ground`,
+    expandedReviewed: (date: string) => `Revisado ${date} · verificado por Texas ABA Centers`,
     expandedSection: 'Acerca de',
     expandedSectionGood: 'Bueno saber',
     expandedSectionContact: 'Cómo contactar',
@@ -211,9 +213,6 @@ const copy = {
     expandedServices: 'Servicios',
     expandedDelivery: 'Cómo atienden',
     expandedInsurance: 'Seguro',
-    insuranceUnverified: 'Confirma la cobertura al reservar, o pregunta a nuestro equipo de admisiones.',
-    verifiedInsuranceLine: (v: VerifiedInsurance) =>
-      `Confirmado que acepta ${v.plan} a partir de ${v.verifiedDate} — confirma al reservar, o pregunta a nuestro equipo de admisiones.`,
     pinnedLabel: 'Fijado',
     hoveringLabel: 'Vista previa',
     keyboardButton: 'Atajos de teclado',
@@ -249,6 +248,11 @@ const localizedLabel = {
       Recreation: 'Recreation',
       'Sensory-friendly business': 'Sensory-friendly business',
     } satisfies Record<Service, string>,
+    insurance: {
+      'Accepts insurance': 'Accepts insurance',
+      'No insurance needed': 'No insurance needed',
+      Varies: 'Varies',
+    } satisfies Record<Insurance, string>,
     delivery: {
       'In-person': 'In-person',
       'In-home/Mobile': 'In-home / Mobile',
@@ -269,6 +273,11 @@ const localizedLabel = {
       Recreation: 'Recreación',
       'Sensory-friendly business': 'Negocio sensorial',
     } satisfies Record<Service, string>,
+    insurance: {
+      'Accepts insurance': 'Acepta seguro',
+      'No insurance needed': 'Sin seguro requerido',
+      Varies: 'Varía',
+    } satisfies Record<Insurance, string>,
     delivery: {
       'In-person': 'En persona',
       'In-home/Mobile': 'A domicilio',
@@ -281,6 +290,7 @@ interface FilterState {
   cities: City[];
   services: Service[];
   ageGroups: AgeGroup[];
+  insurance: Insurance[];
   delivery: Delivery[];
   goodFirstStepOnly: boolean;
 }
@@ -289,6 +299,7 @@ const emptyFilters: FilterState = {
   cities: [],
   services: [],
   ageGroups: [],
+  insurance: [],
   delivery: [],
   goodFirstStepOnly: false,
 };
@@ -307,6 +318,7 @@ function countActiveFilters(f: FilterState): number {
     f.cities.length +
     f.services.length +
     f.ageGroups.length +
+    f.insurance.length +
     f.delivery.length +
     (f.goodFirstStepOnly ? 1 : 0)
   );
@@ -318,11 +330,13 @@ const citySlug: Record<City, string> = {
   'Sugar Land': 'sugar-land',
   Katy: 'katy',
   Pearland: 'pearland',
-  'Missouri City / Fort Bend County': 'missouri-city-fort-bend',
-  'Southwest Houston': 'southwest-houston',
-  Austin: 'austin',
-  Plano: 'plano',
-  'Online / phone — anywhere in Texas': 'online-statewide',
+  'Missouri City': 'missouri-city',
+  'Clear Lake': 'clear-lake',
+  Houston: 'houston',
+  'Fort Bend County': 'fort-bend',
+  'The Woodlands': 'woodlands',
+  Statewide: 'statewide',
+  Online: 'online',
 };
 
 const serviceSlug: Record<Service, string> = {
@@ -347,6 +361,12 @@ const ageSlug: Record<AgeGroup, string> = {
   'All ages': 'all',
 };
 
+const insuranceSlug: Record<Insurance, string> = {
+  'Accepts insurance': 'yes',
+  'No insurance needed': 'no',
+  Varies: 'varies',
+};
+
 const deliverySlug: Record<Delivery, string> = {
   'In-person': 'in-person',
   'In-home/Mobile': 'mobile',
@@ -364,6 +384,7 @@ function invert<K extends string, V extends string>(map: Record<K, V>): Record<V
 const cityFromSlug = invert(citySlug);
 const serviceFromSlug = invert(serviceSlug);
 const ageFromSlug = invert(ageSlug);
+const insuranceFromSlug = invert(insuranceSlug);
 const deliveryFromSlug = invert(deliverySlug);
 
 interface UrlState {
@@ -381,6 +402,7 @@ function urlStateToParams(s: UrlState): URLSearchParams {
   if (s.filters.cities.length) params.set('city', s.filters.cities.map((c) => citySlug[c]).join(','));
   if (s.filters.services.length) params.set('service', s.filters.services.map((c) => serviceSlug[c]).join(','));
   if (s.filters.ageGroups.length) params.set('age', s.filters.ageGroups.map((c) => ageSlug[c]).join(','));
+  if (s.filters.insurance.length) params.set('insurance', s.filters.insurance.map((c) => insuranceSlug[c]).join(','));
   if (s.filters.delivery.length) params.set('delivery', s.filters.delivery.map((c) => deliverySlug[c]).join(','));
   if (s.filters.goodFirstStepOnly) params.set('gfs', '1');
   if (s.sort !== 'recommended') params.set('sort', s.sort);
@@ -412,6 +434,7 @@ function paramsToUrlState(params: URLSearchParams): UrlState {
       cities: parseList(params.get('city'), cityFromSlug),
       services: parseList(params.get('service'), serviceFromSlug),
       ageGroups: parseList(params.get('age'), ageFromSlug),
+      insurance: parseList(params.get('insurance'), insuranceFromSlug),
       delivery: parseList(params.get('delivery'), deliveryFromSlug),
       goodFirstStepOnly: params.get('gfs') === '1',
     },
@@ -424,6 +447,7 @@ function applyFilters(items: Resource[], f: FilterState): Resource[] {
     if (f.cities.length && !f.cities.some((c) => r.cities.includes(c))) return false;
     if (f.services.length && !f.services.some((s) => r.services.includes(s))) return false;
     if (f.ageGroups.length && !f.ageGroups.some((a) => r.ageGroups.includes(a))) return false;
+    if (f.insurance.length && !f.insurance.includes(r.insurance)) return false;
     if (f.delivery.length && !f.delivery.some((d) => r.delivery.includes(d))) return false;
     return true;
   });
@@ -591,11 +615,7 @@ function ExpandedResourcePanel({
         </div>
         <div>
           <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedInsurance}</dt>
-          <dd className="mt-0.5 text-brand-muted-700">
-            {resource.verifiedInsurance
-              ? t.verifiedInsuranceLine(resource.verifiedInsurance)
-              : t.insuranceUnverified}
-          </dd>
+          <dd className="mt-0.5 text-brand-muted-700">{labels.insurance[resource.insurance]}</dd>
         </div>
         <div className="col-span-2">
           <dt className="font-semibold uppercase tracking-wider text-brand-muted-400">{t.expandedServices}</dt>
@@ -622,9 +642,9 @@ function ExpandedResourcePanel({
           {t.expandedSectionContact}
         </p>
         <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {resource.phone && resource.phoneDial && (
+          {resource.phone && (
             <a
-              href={`tel:${resource.phoneDial}`}
+              href={`tel:${resource.phone.replace(/[^0-9+]/g, '')}`}
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
                 isCrisis ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-primary text-white hover:bg-primary-dark',
@@ -921,7 +941,7 @@ function ResourceCard({
   const meta = [
     resource.cities[0],
     resource.ageGroups.includes('All ages') ? 'All ages' : resource.ageGroups.join(', '),
-    resource.verifiedInsurance ? t.verifiedInsuranceLine(resource.verifiedInsurance) : null,
+    labels.insurance[resource.insurance],
     resource.delivery.map((d) => labels.delivery[d]).join(' · '),
   ].filter(Boolean);
 
@@ -1031,11 +1051,11 @@ function ResourceCard({
         </div>
       )}
 
-      {((resource.phone && resource.phoneDial) || resource.website) && !isBrowse && (
+      {(resource.phone || resource.website) && !isBrowse && (
         <div className="mt-1 flex flex-wrap items-center gap-2">
-          {resource.phone && resource.phoneDial && (
+          {resource.phone && (
             <a
-              href={`tel:${resource.phoneDial}`}
+              href={`tel:${resource.phone.replace(/[^0-9+]/g, '')}`}
               onClick={(e) => e.stopPropagation()}
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors',
@@ -1099,6 +1119,7 @@ function ActiveChips({
   filters.cities.forEach((c) => chips.push({ key: `c-${c}`, label: c, remove: () => setFilters({ ...filters, cities: filters.cities.filter((x) => x !== c) }) }));
   filters.services.forEach((s) => chips.push({ key: `s-${s}`, label: labels.services[s], remove: () => setFilters({ ...filters, services: filters.services.filter((x) => x !== s) }) }));
   filters.ageGroups.forEach((a) => chips.push({ key: `a-${a}`, label: a, remove: () => setFilters({ ...filters, ageGroups: filters.ageGroups.filter((x) => x !== a) }) }));
+  filters.insurance.forEach((i) => chips.push({ key: `i-${i}`, label: labels.insurance[i], remove: () => setFilters({ ...filters, insurance: filters.insurance.filter((x) => x !== i) }) }));
   filters.delivery.forEach((d) => chips.push({ key: `d-${d}`, label: labels.delivery[d], remove: () => setFilters({ ...filters, delivery: filters.delivery.filter((x) => x !== d) }) }));
   if (query.trim()) chips.push({ key: 'q', label: `“${query.trim()}”`, remove: () => setQuery('') });
 
@@ -1384,6 +1405,13 @@ function LeftFilters({ locale, filters, setFilters }: LeftFiltersProps) {
           onToggle={(v) => toggle('ageGroups', v)}
         />
         <CheckboxGroup
+          legend={t.groupInsurance}
+          options={INSURANCE}
+          selected={filters.insurance}
+          onToggle={(v) => toggle('insurance', v)}
+          labelMap={labels.insurance}
+        />
+        <CheckboxGroup
           legend={t.groupDelivery}
           options={DELIVERY}
           selected={filters.delivery}
@@ -1408,7 +1436,7 @@ function LeftFilters({ locale, filters, setFilters }: LeftFiltersProps) {
 }
 
 export default function FindSupportPage() {
-  const locale = 'en' as const;
+  const [locale, setLocale] = useState<Locale>('en');
   const [activeIntent, setActiveIntent] = useState<Intent | null>(null);
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [query, setQuery] = useState('');
@@ -1417,6 +1445,7 @@ export default function FindSupportPage() {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [pinnedId, setPinnedId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [filtersDrawerOpen, setFiltersDrawerOpen] = useState(false);
   const [savedDrawerOpen, setSavedDrawerOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -1531,8 +1560,15 @@ export default function FindSupportPage() {
         return;
       }
 
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setHelpOpen((p) => !p);
+        return;
+      }
+
       if (e.key === 'Escape') {
-        if (filtersDrawerOpen) setFiltersDrawerOpen(false);
+        if (helpOpen) setHelpOpen(false);
+        else if (filtersDrawerOpen) setFiltersDrawerOpen(false);
         else if (savedDrawerOpen) setSavedDrawerOpen(false);
         else if (pinnedId) setPinnedId(null);
         else if (hoveredId) setHoveredId(null);
@@ -1565,7 +1601,7 @@ export default function FindSupportPage() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [filteredResources, hoveredId, pinnedId, filtersDrawerOpen, savedDrawerOpen]);
+  }, [filteredResources, hoveredId, pinnedId, helpOpen]);
 
   const toggleSave = (id: string) => {
     setSavedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -1600,14 +1636,26 @@ export default function FindSupportPage() {
               </p>
               <h1 className="mt-1.5 text-2xl font-bold text-brand-muted-900 sm:text-[28px]">{t.title}</h1>
               <p className="mt-1.5 max-w-2xl text-sm text-brand-muted-600">{t.description}</p>
-              <p className="mt-2 max-w-2xl text-[12.5px] leading-relaxed text-brand-muted-500">
-                Local listings cover the communities we serve — Sugar Land, Katy, Pearland,
-                Missouri City / Fort Bend County, southwest Houston, Austin, and Plano.
-                Statewide phone and online resources — Medicaid &amp; ECI guidance, financial help,
-                Texas Parent to Parent, and 988 — are here for{' '}
-                <span className="font-semibold text-brand-muted-700">every Texas family</span>,
-                wherever you live.
-              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                onClick={() => setHelpOpen(true)}
+                className="hidden items-center gap-1.5 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary md:inline-flex"
+                aria-label={t.keyboardButton}
+              >
+                <Keyboard className="h-4 w-4" />
+                <span>?</span>
+              </button>
+              <button
+                onClick={() => setLocale((l) => (l === 'en' ? 'es' : 'en'))}
+                className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-3 py-2 text-xs font-semibold text-brand-muted-700 hover:border-primary/30 hover:text-primary"
+                aria-label="Toggle language"
+              >
+                <Languages className="h-4 w-4" />
+                <span>{locale === 'en' ? 'EN' : 'ES'}</span>
+                <span className="text-brand-muted-400">·</span>
+                <span>{t.languageToggle}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1677,18 +1725,14 @@ export default function FindSupportPage() {
         <div className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)_320px] xl:grid-cols-[280px_minmax(0,1fr)_360px]">
             {/* Left rail (hidden < lg; opens as a drawer instead) */}
-            <aside className="hidden lg:sticky lg:top-[calc(var(--find-sticky-top)+1rem)] lg:block lg:max-h-[calc(100vh-var(--find-sticky-top)-2rem)] lg:overflow-y-auto lg:pr-1">
+            <aside className="hidden lg:sticky lg:top-[104px] lg:block lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto lg:pr-1">
               <LeftFilters locale={locale} filters={filters} setFilters={setFilters} />
             </aside>
 
             {/* Center column */}
             <div className="min-w-0">
-              {/* Sticky toolbar — solid neutral surface so page content (incl. the
-                  crisis bar) never bleeds through as it scrolls beneath. Sticks on
-                  desktop flush under the fixed-height crisis bar (--find-sticky-top);
-                  on mobile the crisis bar wraps to a variable height, so the toolbar
-                  is non-sticky there to avoid an offset that can't be known. */}
-              <div className="z-10 flex flex-col gap-3 rounded-2xl border border-surface-border bg-white p-3 shadow-soft lg:sticky lg:top-[var(--find-sticky-top)]">
+              {/* Sticky toolbar */}
+              <div className="sticky top-[88px] z-10 -mx-1 flex flex-col gap-3 rounded-2xl border border-surface-border bg-white/95 p-3 shadow-soft backdrop-blur-md">
                 <div className="flex flex-wrap items-center gap-2">
                   <label className="relative min-w-0 flex-1">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
@@ -1698,8 +1742,12 @@ export default function FindSupportPage() {
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={t.searchPlaceholder}
-                      className="w-full rounded-xl border border-surface-border bg-white py-2 pl-9 pr-3 text-sm outline-none ring-primary/20 transition focus:ring-2"
+                      className="w-full rounded-xl border border-surface-border bg-white py-2 pl-9 pr-24 text-sm outline-none ring-primary/20 transition focus:ring-2"
                     />
+                    <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-brand-muted-400 lg:flex">
+                      <kbd className="rounded border border-surface-border bg-surface-muted px-1 py-0.5 text-[10px] font-mono text-brand-muted-500">/</kbd>
+                      <span>{t.searchShortcut}</span>
+                    </span>
                   </label>
 
                   <button
@@ -1842,7 +1890,7 @@ export default function FindSupportPage() {
             </div>
 
             {/* Right rail — context panel */}
-            <aside className="hidden lg:flex lg:sticky lg:top-[calc(var(--find-sticky-top)+1rem)] lg:max-h-[calc(100vh-var(--find-sticky-top)-2rem)] lg:flex-col lg:gap-3 lg:overflow-y-auto lg:pr-1">
+            <aside className="hidden lg:flex lg:sticky lg:top-[104px] lg:max-h-[calc(100vh-120px)] lg:flex-col lg:gap-3 lg:overflow-y-auto lg:pr-1">
               {(() => {
                 const focusedId = pinnedId ?? hoveredId;
                 const focused = focusedId ? findResources.find((r) => r.id === focusedId) ?? null : null;
@@ -2002,6 +2050,51 @@ export default function FindSupportPage() {
         </div>
       )}
 
+      {helpOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.helpTitle}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setHelpOpen(false);
+          }}
+        >
+          <div className="w-full max-w-md rounded-2xl border border-surface-border bg-white p-5 shadow-card-hover">
+            <div className="flex items-start justify-between gap-3">
+              <p className="inline-flex items-center gap-2 text-base font-semibold text-brand-muted-900">
+                <Keyboard className="h-4 w-4 text-primary" />
+                {t.helpTitle}
+              </p>
+              <button
+                onClick={() => setHelpOpen(false)}
+                className="rounded-md p-1 text-brand-muted-400 hover:bg-surface-subtle hover:text-brand-muted-700"
+                aria-label={t.helpClose}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ul className="mt-4 flex flex-col gap-2">
+              {t.helpRows.map(([keys, label]) => (
+                <li
+                  key={keys}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-surface-border bg-surface-muted/40 px-3 py-2"
+                >
+                  <span className="text-[12.5px] text-brand-muted-700">{label}</span>
+                  <span className="rounded-md border border-surface-border bg-white px-2 py-0.5 text-[11px] font-mono font-semibold text-brand-muted-700">
+                    {keys}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-[11px] text-brand-muted-500">
+              {locale === 'en'
+                ? 'Filtered URLs are shareable — copy this tab\'s link to send a co-parent the same view.'
+                : 'Las URLs filtradas se pueden compartir — copia el enlace para que tu copadre vea la misma vista.'}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

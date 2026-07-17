@@ -1,32 +1,31 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import {
-  AlertCircle,
+  Users,
+  Heart,
   BookOpen,
-  Check,
+  Star,
+  Smile,
+  AlertCircle,
+  ArrowRight,
   CheckCircle2,
   ChevronDown,
-  Copy,
-  Heart,
-  Smile,
-  Star,
-  Users,
+  ChevronUp,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import {
-  BadgePill,
-  GuideCard,
-  GuideSectionHeading,
-  SupportActionCard,
-  SupportCalloutBand,
-} from '@/components/support/GuideCards';
-import {
-  SectionChooser,
-  type ChooserSection,
-} from '@/components/support/SectionChooser';
+import { StickyToc, type TocItem } from '@/components/ui/StickyToc';
 
 /* ─── data ─────────────────────────────────────────────────── */
+
+const SIBLINGS_TOC: TocItem[] = [
+  { num: '01', id: 'age-by-age',         label: 'What siblings need at each stage' },
+  { num: '02', id: 'signs-struggling',   label: 'Signs a sibling is struggling' },
+  { num: '03', id: 'guilt',              label: 'The guilt — and naming it' },
+  { num: '04', id: 'one-on-one',         label: 'Dedicated 1:1 time' },
+  { num: '05', id: 'books',              label: 'Books and resources' },
+  { num: '06', id: 'teachers',           label: 'Teachers and counselors' },
+];
 
 const ageGroups = [
   {
@@ -129,31 +128,37 @@ const ageGroups = [
 
 const strugglingSignals = [
   {
+    icon: AlertCircle,
     color: 'amber',
     title: 'Withdrawal from family activities',
     desc: 'Increasingly absent at mealtimes, family outings, or any context that involves the whole family. May be spending more time alone in their room or at friends\' homes.',
   },
   {
+    icon: AlertCircle,
     color: 'rose',
     title: 'Acting out or picking fights',
     desc: 'Increased irritability, arguments, or provocative behavior — often a bid for attention that has been structurally difficult to give. The behavior is communication.',
   },
   {
+    icon: AlertCircle,
     color: 'amber',
     title: 'Sudden regression',
     desc: 'A child who was previously independent starts wetting the bed, clinging, having meltdowns, or reverting to younger behaviors. This is often an unconscious attempt to receive the attention their sibling gets.',
   },
   {
+    icon: AlertCircle,
     color: 'violet',
     title: 'Becoming "too perfect"',
     desc: 'The sibling who never complains, never asks for anything, always says they\'re fine — and is being invisible on purpose. This child has learned that their needs are secondary and has adapted by erasing them. This pattern is often the most overlooked.',
   },
   {
+    icon: AlertCircle,
     color: 'rose',
     title: 'Anxiety or sleep issues',
     desc: 'New fear of school, nightmares, stomach aches with no medical cause. Siblings often absorb household stress somatically before they can name it emotionally.',
   },
   {
+    icon: AlertCircle,
     color: 'amber',
     title: 'Talking about fairness constantly',
     desc: '"It\'s not fair" repeated and escalating — the verbal version of a child trying to articulate an injustice they feel but can\'t fully name. Underneath it is usually a need for acknowledgment, not an argument to be won.',
@@ -167,25 +172,6 @@ const siblingGuilts = [
   'Feeling angry about the way the family\'s plans revolve around their sibling\'s needs',
   'Not wanting to bring friends home because of unpredictability',
   'Feeling guilty for having all the things their sibling struggles with — friends, school, language',
-];
-
-const oneOnOnePrinciples = [
-  {
-    title: 'Let them choose the entire activity',
-    desc: 'No suggestions. No redirecting. Whatever they want to do for that hour, you do it. Their preferences matter more than efficiency.',
-  },
-  {
-    title: 'Announce it as theirs',
-    desc: '"This is your time. No phones, no interruptions, no talking about your brother unless you want to." Naming it makes it land differently.',
-  },
-  {
-    title: 'Don\'t wait for a big block of time',
-    desc: '20 focused minutes beats a distracted afternoon. Frequency matters more than duration. Twice a week for 20 minutes is worth more than one annual day trip.',
-  },
-  {
-    title: 'Debrief after, not during',
-    desc: 'During their time, just be present. After, if they open up about the family situation, follow their lead. Don\'t use their 1:1 time as a processing session unless they initiate it.',
-  },
 ];
 
 const books = [
@@ -221,364 +207,90 @@ const books = [
   },
 ];
 
-const teacherScripts = [
-  {
-    title: 'What to tell the teacher at the start of the year',
-    content: '"We have a child with autism in our family who has complex needs. Our other child, [name], sometimes carries stress from that at home. I want you to know so if you notice anything — withdrawal, anxiety, behavior changes — you can tell me and we can address it together."',
+const colorMap: Record<string, { card: string; tag: string; accent: string }> = {
+  sky: {
+    card: 'border-sky-200 bg-sky-50',
+    tag: 'bg-sky-100 text-sky-700',
+    accent: 'text-sky-600',
   },
-  {
-    title: 'What to tell the school counselor',
-    content: '"I\'d like [name] to check in with you periodically, not because anything is wrong, but because they might need a neutral place to talk about what\'s hard at home. They won\'t always bring it to me — and that\'s okay — but I want them to have somewhere to put it."',
+  emerald: {
+    card: 'border-emerald-200 bg-emerald-50',
+    tag: 'bg-emerald-100 text-emerald-700',
+    accent: 'text-emerald-600',
   },
-  {
-    title: 'What the sibling needs permission to say at school',
-    content: 'Help them find age-appropriate language for their peers: "My brother has autism. That\'s why sometimes he does things that look different." You don\'t need to share more than that. Practice this with them so it feels natural, not heavy.',
+  violet: {
+    card: 'border-violet-200 bg-violet-50',
+    tag: 'bg-violet-100 text-violet-700',
+    accent: 'text-violet-600',
   },
-];
-
-/** Badge-pill + icon tints per accent color (same palette as resource pills). */
-const ACCENT: Record<string, { badge: string; icon: string }> = {
-  rose:    { badge: 'border-rose-200 bg-rose-50 text-rose-700',          icon: 'text-rose-500' },
-  amber:   { badge: 'border-amber-200 bg-amber-50 text-amber-700',       icon: 'text-amber-500' },
-  violet:  { badge: 'border-violet-200 bg-violet-50 text-violet-700',    icon: 'text-violet-500' },
-  sky:     { badge: 'border-sky-200 bg-sky-50 text-sky-700',             icon: 'text-sky-500' },
-  emerald: { badge: 'border-emerald-200 bg-emerald-50 text-emerald-700', icon: 'text-emerald-500' },
+  amber: {
+    card: 'border-amber-200 bg-amber-50',
+    tag: 'bg-amber-100 text-amber-700',
+    accent: 'text-amber-600',
+  },
+  rose: {
+    card: 'border-rose-200 bg-rose-50',
+    tag: 'bg-rose-100 text-rose-700',
+    accent: 'text-rose-600',
+  },
 };
 
-/* ─── section panels ───────────────────────────────────────── */
+const signalColorMap: Record<string, string> = {
+  amber: 'border-amber-200 bg-amber-50 text-amber-600',
+  rose: 'border-rose-200 bg-rose-50 text-rose-600',
+  violet: 'border-violet-200 bg-violet-50 text-violet-600',
+};
 
-function AgePanel() {
-  const [ageIdx, setAgeIdx] = useState(0);
-  const [openSub, setOpenSub] = useState<number | null>(null);
-  const group = ageGroups[ageIdx];
-  const accent = ACCENT[group.color];
+/* ─── component ────────────────────────────────────────────── */
+
+export default function SiblingsPage() {
+  const [openAge, setOpenAge] = useState<number | null>(0);
+  const [openSection, setOpenSection] = useState<Record<number, number | null>>({});
+
+  function toggleSection(ageIdx: number, secIdx: number) {
+    setOpenSection((prev) => ({
+      ...prev,
+      [ageIdx]: prev[ageIdx] === secIdx ? null : secIdx,
+    }));
+  }
 
   return (
-    <div>
-      <GuideSectionHeading
-        icon={Star}
-        title="What siblings need — at each stage"
-        meta="4 stages"
-      />
-      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-        A three-year-old sibling and a seventeen-year-old sibling are living in completely
-        different emotional worlds. What they need from you is different too. Open the age group
-        that matches your child.
-      </p>
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Choose an age range">
-        {ageGroups.map((g, i) => (
-          <button
-            key={g.range}
-            type="button"
-            aria-pressed={i === ageIdx}
-            onClick={() => {
-              setAgeIdx(i);
-              setOpenSub(null);
-            }}
-            className={cn(
-              'rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition duration-200',
-              i === ageIdx
-                ? 'border-primary bg-primary text-white shadow-soft'
-                : 'border-surface-border bg-white text-brand-muted-600 hover:border-brand-plum-200 hover:text-brand-plum-700',
-            )}
-          >
-            {g.range}
-          </button>
-        ))}
-      </div>
-      <GuideCard as="div" className="mt-4">
-        <div className="mb-3 flex flex-wrap items-center gap-2.5">
-          <BadgePill className={accent.badge}>{group.range}</BadgePill>
-          <span className="text-[13px] font-semibold text-brand-navy-700">{group.tag}</span>
+    <div className="page-shell">
+
+      {/* ══════════════════════════════════════════
+          SECTION 1 — SEEN
+          "We see the invisible child."
+      ══════════════════════════════════════════ */}
+
+      {/* Hero header */}
+      <header className="page-header">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1.5 text-xs font-semibold text-brand-plum-700">
+          <Users className="h-3.5 w-3.5" /> For siblings — and the parents watching them
         </div>
-        <p className="mb-4 border-b border-surface-border pb-4 text-[13px] italic leading-relaxed text-brand-muted-700">
-          {group.summary}
+        <h1 className="page-title text-3xl font-bold sm:text-4xl">
+          The invisible child
+        </h1>
+        <p className="page-description text-base leading-relaxed">
+          In families where one child has significant needs, another child often quietly disappears
+          into the background. Not through neglect — through the sheer gravitational pull of a child
+          who needs more. This page is for the child who needed less and learned to ask for even
+          less than that.
         </p>
-        <div className="divide-y divide-surface-border">
-          {group.sections.map((sec, i) => {
-            const isOpen = openSub === i;
-            return (
-              <div key={sec.heading}>
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  onClick={() => setOpenSub(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-3 py-3 text-left"
-                >
-                  <span className="text-[14px] font-semibold text-brand-navy-700">{sec.heading}</span>
-                  <ChevronDown
-                    className={cn(
-                      'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
-                      isOpen && 'rotate-180',
-                    )}
-                  />
-                </button>
-                <div className="toolbox-reveal grid" data-open={isOpen ? 'true' : 'false'}>
-                  <div className="toolbox-reveal-inner min-h-0">
-                    <div className="toolbox-reveal-content pb-3.5">
-                      <p className="text-[13px] leading-relaxed text-brand-muted-600">{sec.content}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </GuideCard>
-    </div>
-  );
-}
+      </header>
 
-function SignsPanel() {
-  const [openSign, setOpenSign] = useState<string | null>(null);
-  return (
-    <div>
-      <GuideSectionHeading
-        icon={AlertCircle}
-        title="Signs a sibling is struggling"
-        meta="6 signals"
-      />
-      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-        These signals are not bad behavior. They are communication from a child who doesn&apos;t
-        have the words — or who has learned that their words don&apos;t change anything. Pay
-        attention to the pattern more than the individual incident.
-      </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {strugglingSignals.map(({ color, title, desc }) => {
-          const isOpen = openSign === title;
-          return (
-            <GuideCard as="div" key={title} className="p-4 sm:p-4">
-              <button
-                type="button"
-                aria-expanded={isOpen}
-                onClick={() => setOpenSign(isOpen ? null : title)}
-                className="flex w-full items-start gap-3 text-left"
-              >
-                <AlertCircle className={cn('mt-0.5 h-4 w-4 shrink-0', ACCENT[color].icon)} />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-semibold leading-snug text-brand-navy-700">
-                    {title}
-                  </span>
-                  <span
-                    className={cn(
-                      'mt-1 block text-[13px] leading-relaxed text-brand-muted-600',
-                      !isOpen && 'line-clamp-2',
-                    )}
-                  >
-                    {desc}
-                  </span>
-                </span>
-                <ChevronDown
-                  className={cn(
-                    'mt-0.5 h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
-                    isOpen && 'rotate-180',
-                  )}
-                />
-              </button>
-            </GuideCard>
-          );
-        })}
-      </div>
-      {/* Pinned — always visible, never behind a tap */}
-      <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
-        <p className="text-[14px] font-semibold text-amber-800">
-          A note on the &ldquo;too perfect&rdquo; child
-        </p>
-        <p className="mt-1 text-[13px] leading-relaxed text-amber-700">
-          This is the most commonly missed signal. The sibling who never complains is often the
-          sibling who needs the most attention. Their invisibility is not contentment — it is
-          adaptation. Check in with that child specifically and regularly.
-        </p>
-      </div>
-    </div>
-  );
-}
+      <div className="lg:grid lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-12">
+        <StickyToc items={SIBLINGS_TOC} />
+        <div className="space-y-8 md:space-y-10">
 
-function GuiltPanel() {
-  return (
-    <div>
-      <GuideSectionHeading
-        icon={Heart}
-        title="The guilt siblings feel — and how to name it with them"
-      />
-      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-        Siblings carry guilt that they often haven&apos;t named and haven&apos;t been given
-        permission to release. The act of naming it — before they do — signals that their inner
-        experience is acceptable and seen.
-      </p>
-      <p className="mb-3 text-[13px] font-semibold text-brand-muted-700">
-        Things siblings feel guilty for feeling:
-      </p>
-      <GuideCard as="div" className="overflow-hidden p-0 sm:p-0">
-        <ul className="divide-y divide-surface-border">
-          {siblingGuilts.map((item, i) => (
-            <li key={i} className="flex items-start gap-3 px-4 py-3 sm:px-5">
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-plum-400" />
-              <p className="text-[13px] leading-relaxed text-brand-muted-700">{item}</p>
-            </li>
-          ))}
-        </ul>
-      </GuideCard>
-      <div className="mt-4 rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4 sm:p-5">
-        <p className="mb-2 text-[14px] font-semibold text-brand-plum-800">
-          How to start the conversation
-        </p>
-        <blockquote className="border-l-2 border-brand-plum-300 pl-3 text-[13px] italic leading-relaxed text-brand-plum-700">
-          &ldquo;Sometimes kids feel embarrassed, or left out, or even a little jealous when their
-          sibling needs so much attention. That would be totally normal — and I want you to know
-          you can tell me any of that without getting in trouble.&rdquo;
-        </blockquote>
-        <p className="mt-3 text-[13px] leading-relaxed text-brand-plum-700">
-          You don&apos;t have to wait for them to bring it up. Opening the door is enough.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function OneOnOnePanel() {
-  return (
-    <div>
-      <GuideSectionHeading
-        icon={Smile}
-        title="Dedicated 1:1 time — what actually works"
-        meta="4 principles"
-      />
-      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-        A sibling who gets real, uninterrupted time with a parent will regulate more, act out less,
-        and feel genuinely less resentful — even if the time is small. The key word is
-        &ldquo;real.&rdquo; Distracted presence doesn&apos;t count to a child.
-      </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {oneOnOnePrinciples.map((item) => (
-          <GuideCard as="div" key={item.title}>
-            <h3 className="text-[14px] font-bold leading-snug text-brand-navy-700">{item.title}</h3>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">{item.desc}</p>
-          </GuideCard>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function BooksPanel() {
-  return (
-    <div>
-      <GuideSectionHeading
-        icon={BookOpen}
-        title="Books and resources for siblings"
-        meta={`${books.length} picks`}
-      />
-      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-        Reading about other kids in similar situations is enormously validating for siblings.
-        These books and resources are worth keeping accessible — on the nightstand, not the shelf.
-      </p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {books.map((book) => (
-          <GuideCard as="div" key={book.title}>
-            <div className="mb-2 flex items-start justify-between gap-2">
-              <h3 className="text-[14px] font-bold leading-snug text-brand-navy-700">{book.title}</h3>
-              <BadgePill className={cn('shrink-0', ACCENT[book.color].badge)}>
-                {book.ages}
-              </BadgePill>
-            </div>
-            <p className="text-[13px] leading-relaxed text-brand-muted-600">{book.desc}</p>
-          </GuideCard>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ScriptCard({ title, content }: { title: string; content: string }) {
-  const [copied, setCopied] = useState(false);
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(content);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard unavailable — the quote is still selectable.
-    }
-  };
-  return (
-    <GuideCard as="div">
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="text-[14px] font-semibold leading-snug text-brand-navy-700">{title}</h3>
-        <button
-          type="button"
-          onClick={copy}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-surface-border bg-white px-2.5 py-1 text-[11px] font-semibold text-brand-muted-600 transition hover:border-brand-plum-200 hover:text-brand-plum-700"
-        >
-          {copied ? (
-            <Check className="h-3 w-3 text-emerald-500" />
-          ) : (
-            <Copy className="h-3 w-3" />
-          )}
-          {copied ? 'Copied' : 'Copy'}
-        </button>
-      </div>
-      <blockquote className="mt-3 border-l-2 border-brand-plum-300 pl-3 text-[13px] italic leading-relaxed text-brand-muted-700">
-        {content}
-      </blockquote>
-    </GuideCard>
-  );
-}
-
-function TeachersPanel() {
-  return (
-    <div>
-      <GuideSectionHeading
-        icon={Users}
-        title="Talking to teachers and school counselors"
-        meta="3 scripts"
-      />
-      <p className="-mt-2 mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-        A school counselor who knows what&apos;s happening at home can be a powerful support for
-        a sibling — checking in regularly, watching for signs of stress, and providing a neutral
-        space for the child to process without feeling like they&apos;re burdening their parents.
-      </p>
-      <div className="space-y-3">
-        {teacherScripts.map((item) => (
-          <ScriptCard key={item.title} title={item.title} content={item.content} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ─── "what we know" disclosure (kept compact under the hero) ── */
-
-function ResearchNote() {
-  const [open, setOpen] = useState(false);
-  return (
-    <GuideCard as="div" className="overflow-hidden p-0 sm:p-0">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => setOpen(!open)}
-        className={cn(
-          'flex w-full items-center gap-3 px-4 py-3.5 text-left transition duration-200 sm:px-5',
-          open ? 'bg-brand-plum-50/50' : 'hover:bg-surface-subtle/40',
-        )}
-      >
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-brand-plum-200 bg-brand-plum-50 text-brand-plum-600">
-          <Heart className="h-4 w-4" aria-hidden />
-        </span>
-        <span className="flex-1 text-[14px] font-semibold text-brand-navy-700">
-          What we know about siblings
-        </span>
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
-            open && 'rotate-180',
-          )}
-        />
-      </button>
-      <div className="toolbox-reveal grid" data-open={open ? 'true' : 'false'}>
-        <div className="toolbox-reveal-inner min-h-0">
-          <div className="toolbox-reveal-content border-t border-surface-border bg-surface-subtle/30 px-4 py-4 sm:px-5">
-            <p className="text-[13px] leading-relaxed text-brand-muted-700">
+      {/* The honest opening */}
+      <div className="rounded-3xl border-2 border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 to-white p-6 sm:p-8">
+        <div className="flex gap-4">
+          <Heart className="mt-1 h-6 w-6 shrink-0 text-brand-plum-400" />
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-plum-400 mb-2">
+              What we know about siblings
+            </p>
+            <p className="text-base leading-relaxed text-brand-plum-900">
               Research on neurotypical siblings of children with autism consistently shows they are
               at elevated risk for anxiety, depression, and social difficulty — not because something
               is wrong with them, but because their environment places enormous invisible demands on
@@ -588,150 +300,332 @@ function ResearchNote() {
           </div>
         </div>
       </div>
-    </GuideCard>
-  );
-}
 
-/* ─── page ─────────────────────────────────────────────────── */
+      {/* ══════════════════════════════════════════
+          SECTION 2 — GROUNDED
+          "Here's what to know at each age."
+      ══════════════════════════════════════════ */}
 
-const SIBLING_SECTIONS: ChooserSection[] = [
-  {
-    id: 'age-by-age',
-    label: 'By age',
-    description: 'What siblings need at 3–6, 7–11, 12–16, and 17+.',
-    cardClass: 'border-sky-200/80 bg-gradient-to-br from-sky-50 to-white',
-    accentClass: 'text-sky-700',
-    content: <AgePanel />,
-  },
-  {
-    id: 'signs-struggling',
-    label: "Signs they're struggling",
-    description: 'Six signals — including the one most parents miss.',
-    cardClass: 'border-amber-200/80 bg-gradient-to-br from-amber-50 to-white',
-    accentClass: 'text-amber-700',
-    content: <SignsPanel />,
-  },
-  {
-    id: 'guilt',
-    label: 'The guilt',
-    description: 'Name it before they do — and open the conversation.',
-    cardClass: 'border-brand-plum-200/80 bg-gradient-to-br from-brand-plum-50 to-white',
-    accentClass: 'text-brand-plum-700',
-    content: <GuiltPanel />,
-  },
-  {
-    id: 'one-on-one',
-    label: '1:1 time',
-    description: 'What actually works, even in small windows.',
-    cardClass: 'border-emerald-200/80 bg-gradient-to-br from-emerald-50 to-white',
-    accentClass: 'text-emerald-700',
-    content: <OneOnOnePanel />,
-  },
-  {
-    id: 'books',
-    label: 'Books & resources',
-    description: 'Validating reads for every age.',
-    cardClass: 'border-violet-200/80 bg-gradient-to-br from-violet-50 to-white',
-    accentClass: 'text-violet-700',
-    content: <BooksPanel />,
-  },
-  {
-    id: 'teachers',
-    label: 'School & teachers',
-    description: 'Scripts for teachers and counselors.',
-    cardClass: 'border-rose-200/80 bg-gradient-to-br from-rose-50 to-white',
-    accentClass: 'text-rose-700',
-    content: <TeachersPanel />,
-  },
-];
+      <div className="flex items-center gap-3 pt-2">
+        <div className="h-px flex-1 bg-surface-border" />
+        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
+          Age by age
+        </span>
+        <div className="h-px flex-1 bg-surface-border" />
+      </div>
 
-export default function SiblingsPage() {
-  return (
-    <div className="page-shell pb-10">
-
-      {/* Compact hero */}
-      <header className="page-header max-w-3xl">
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-            Sibling Support
-          </p>
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1 text-xs font-semibold text-brand-plum-700">
-            <Users className="h-3.5 w-3.5" /> For siblings — and the parents watching them
-          </span>
+      {/* Age-by-age accordion */}
+      <section id="age-by-age" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Star className="h-5 w-5 text-brand-plum-600" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">What siblings need — at each stage</h2>
         </div>
-        <h1 className="page-title text-brand-navy-700">The invisible child</h1>
-        <p className="page-description text-[15px] text-brand-muted-700">
-          In families where one child has significant needs, another child often quietly disappears
-          into the background. Not through neglect — through the sheer gravitational pull of a child
-          who needs more. This page is for the child who needed less and learned to ask for even
-          less than that.
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          A three-year-old sibling and a seventeen-year-old sibling are living in completely
+          different emotional worlds. What they need from you is different too. Open the age group
+          that matches your child.
         </p>
-      </header>
-
-      {/* The honest opening — compact disclosure */}
-      <ResearchNote />
-
-      {/* "What do you need?" chooser */}
-      <section aria-label="What do you need?">
-        <GuideSectionHeading title="What do you need?" meta="Pick a topic" />
-        <SectionChooser ariaLabel="Sibling support topics" sections={SIBLING_SECTIONS} />
-      </section>
-
-      {/* A note for the sibling — intentionally NOT in the chooser.
-          Written to be shown to a child; reachable by scrolling alone. */}
-      <section aria-label="A note for the sibling">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-plum-600">
-          Show this to your child
-        </p>
-        <div className="rounded-3xl border border-brand-plum-200 bg-gradient-to-br from-brand-plum-50 via-white to-sky-50 p-6 shadow-soft sm:p-8">
-          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-surface-border bg-white shadow-soft">
-            <Star className="h-6 w-6 text-amber-400" />
-          </div>
-          <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
-            A note for the sibling — written for them, for you to share
-          </p>
-          <div className="mx-auto max-w-lg space-y-4 text-[14px] leading-relaxed text-brand-muted-800">
-            <p>
-              This is hard. What is happening in your family is hard — and no one should tell you
-              it&apos;s not, or that you shouldn&apos;t have big feelings about it.
-            </p>
-            <p>
-              If you feel jealous sometimes, that makes sense. If you feel embarrassed sometimes,
-              that makes sense. If you feel proud of your sibling and frustrated with them in the same
-              hour — that makes sense too. Feelings can be complicated. They don&apos;t have to be
-              neat, and they don&apos;t make you a bad person.
-            </p>
-            <p>
-              Your needs matter. Your feelings matter. You are not forgotten — even when it might
-              feel that way. The grownups in your life are doing their best, and sometimes their best
-              means you get less than you deserve. That&apos;s not your fault.
-            </p>
-            <p className="font-semibold text-brand-navy-700">
-              You are not forgotten. You are loved. And you are allowed to say when things are hard.
-            </p>
-          </div>
+        <div className="space-y-3">
+          {ageGroups.map((group, ageIdx) => {
+            const colors = colorMap[group.color];
+            return (
+              <div
+                key={group.range}
+                className={`rounded-2xl border transition-all ${
+                  openAge === ageIdx ? colors.card : 'border-surface-border bg-surface-muted'
+                }`}
+              >
+                <button
+                  className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+                  onClick={() => {
+                    setOpenAge(openAge === ageIdx ? null : ageIdx);
+                    setOpenSection({});
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${colors.tag}`}>
+                      {group.range}
+                    </span>
+                    <span className="text-sm font-semibold text-brand-muted-900">{group.tag}</span>
+                  </div>
+                  {openAge === ageIdx
+                    ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                    : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                </button>
+                {openAge === ageIdx && (
+                  <div className="px-5 pb-5">
+                    <p className="text-sm leading-relaxed text-brand-muted-700 mb-4 italic border-b border-surface-border pb-4">
+                      {group.summary}
+                    </p>
+                    <div className="space-y-2">
+                      {group.sections.map((sec, secIdx) => (
+                        <div
+                          key={sec.heading}
+                          className="rounded-xl border border-surface-border bg-white overflow-hidden"
+                        >
+                          <button
+                            className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+                            onClick={() => toggleSection(ageIdx, secIdx)}
+                          >
+                            <span className="text-sm font-semibold text-brand-muted-900">{sec.heading}</span>
+                            {openSection[ageIdx] === secIdx
+                              ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
+                              : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                          </button>
+                          {openSection[ageIdx] === secIdx && (
+                            <div className="px-4 pb-4">
+                              <p className="text-sm leading-relaxed text-brand-muted-600">{sec.content}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Closing — styled like the resources closing band */}
-      <SupportCalloutBand
-        title="Your whole family matters — not just the child in therapy."
-        text="Supporting siblings well makes the family stronger — and ultimately, it makes the entire ABA journey more sustainable for everyone. You don't have to choose between your children's wellbeing. They both count."
-        columns={2}
-      >
-        <SupportActionCard
-          href="/support/caregiver"
-          icon={Heart}
-          title="Caregiver support"
-          detail="Mental health toolbox"
-        />
-        <SupportActionCard
-          href="/support/connect"
-          icon={Users}
-          title="Connect with other families"
-          detail="Find peer support"
-        />
-      </SupportCalloutBand>
+      {/* Signs a sibling is struggling */}
+      <section id="signs-struggling" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <AlertCircle className="h-5 w-5 text-amber-500" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">Signs a sibling is struggling</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          These signals are not bad behavior. They are communication from a child who doesn&apos;t
+          have the words — or who has learned that their words don&apos;t change anything. Pay
+          attention to the pattern more than the individual incident.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {strugglingSignals.map(({ icon: Icon, color, title, desc }) => (
+            <div key={title} className={`flex gap-3 rounded-2xl border p-4 ${signalColorMap[color]}`}>
+              <Icon className="mt-0.5 h-4 w-4 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold">{title}</p>
+                <p className="mt-1 text-sm leading-relaxed opacity-80">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-800">A note on the &ldquo;too perfect&rdquo; child</p>
+          <p className="mt-1 text-sm leading-relaxed text-amber-700">
+            This is the most commonly missed signal. The sibling who never complains is often the
+            sibling who needs the most attention. Their invisibility is not contentment — it is
+            adaptation. Check in with that child specifically and regularly.
+          </p>
+        </div>
+      </section>
+
+      {/* The guilt siblings feel */}
+      <section id="guilt" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Heart className="h-5 w-5 text-brand-plum-600" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">The guilt siblings feel — and how to name it with them</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          Siblings carry guilt that they often haven&apos;t named and haven&apos;t been given
+          permission to release. The act of naming it — before they do — signals that their inner
+          experience is acceptable and seen.
+        </p>
+        <p className="mb-4 text-sm font-semibold text-brand-muted-700">
+          Things siblings feel guilty for feeling:
+        </p>
+        <ul className="space-y-2 mb-5">
+          {siblingGuilts.map((item, i) => (
+            <li key={i} className="flex items-start gap-3 rounded-2xl border border-surface-border bg-surface-muted px-4 py-3">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-plum-400" />
+              <p className="text-sm leading-relaxed text-brand-muted-700">{item}</p>
+            </li>
+          ))}
+        </ul>
+        <div className="rounded-2xl border border-brand-plum-200 bg-brand-plum-50 p-4">
+          <p className="text-sm font-semibold text-brand-plum-800 mb-2">How to start the conversation</p>
+          <p className="text-sm leading-relaxed text-brand-plum-700 italic">
+            &ldquo;Sometimes kids feel embarrassed, or left out, or even a little jealous when their
+            sibling needs so much attention. That would be totally normal — and I want you to know
+            you can tell me any of that without getting in trouble.&rdquo;
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-brand-plum-700">
+            You don&apos;t have to wait for them to bring it up. Opening the door is enough.
+          </p>
+        </div>
+      </section>
+
+      {/* 1:1 time */}
+      <section id="one-on-one" className="scroll-mt-24 rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Smile className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">Dedicated 1:1 time — what actually works</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-6">
+          A sibling who gets real, uninterrupted time with a parent will regulate more, act out less,
+          and feel genuinely less resentful — even if the time is small. The key word is
+          &ldquo;real.&rdquo; Distracted presence doesn&apos;t count to a child.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[
+            {
+              title: 'Let them choose the entire activity',
+              desc: 'No suggestions. No redirecting. Whatever they want to do for that hour, you do it. Their preferences matter more than efficiency.',
+            },
+            {
+              title: 'Announce it as theirs',
+              desc: '"This is your time. No phones, no interruptions, no talking about your brother unless you want to." Naming it makes it land differently.',
+            },
+            {
+              title: 'Don\'t wait for a big block of time',
+              desc: '20 focused minutes beats a distracted afternoon. Frequency matters more than duration. Twice a week for 20 minutes is worth more than one annual day trip.',
+            },
+            {
+              title: 'Debrief after, not during',
+              desc: 'During their time, just be present. After, if they open up about the family situation, follow their lead. Don\'t use their 1:1 time as a processing session unless they initiate it.',
+            },
+          ].map((item, i) => (
+            <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
+              <p className="text-sm font-semibold text-brand-muted-900">{item.title}</p>
+              <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Books */}
+      <section id="books" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <BookOpen className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">Books and resources for siblings</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          Reading about other kids in similar situations is enormously validating for siblings.
+          These books and resources are worth keeping accessible — on the nightstand, not the shelf.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {books.map((book) => {
+            const colors = colorMap[book.color];
+            return (
+              <div key={book.title} className={`rounded-2xl border p-4 ${colors.card}`}>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <p className="text-sm font-semibold text-brand-muted-900">{book.title}</p>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${colors.tag}`}>
+                    {book.ages}
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed text-brand-muted-600">{book.desc}</p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Talking to teachers */}
+      <section id="teachers" className="scroll-mt-24 rounded-3xl border border-surface-border bg-white p-6 sm:p-8 shadow-card">
+        <div className="flex items-center gap-2 mb-2">
+          <Users className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold text-brand-muted-900">Talking to teachers and school counselors</h2>
+        </div>
+        <p className="text-sm leading-relaxed text-brand-muted-600 mb-5">
+          A school counselor who knows what&apos;s happening at home can be a powerful support for
+          a sibling — checking in regularly, watching for signs of stress, and providing a neutral
+          space for the child to process without feeling like they&apos;re burdening their parents.
+        </p>
+        <div className="space-y-4">
+          {[
+            {
+              title: 'What to tell the teacher at the start of the year',
+              content: '"We have a child with autism in our family who has complex needs. Our other child, [name], sometimes carries stress from that at home. I want you to know so if you notice anything — withdrawal, anxiety, behavior changes — you can tell me and we can address it together."',
+            },
+            {
+              title: 'What to tell the school counselor',
+              content: '"I\'d like [name] to check in with you periodically, not because anything is wrong, but because they might need a neutral place to talk about what\'s hard at home. They won\'t always bring it to me — and that\'s okay — but I want them to have somewhere to put it."',
+            },
+            {
+              title: 'What the sibling needs permission to say at school',
+              content: 'Help them find age-appropriate language for their peers: "My brother has autism. That\'s why sometimes he does things that look different." You don\'t need to share more than that. Practice this with them so it feels natural, not heavy.',
+            },
+          ].map((item, i) => (
+            <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
+              <p className="text-sm font-semibold text-brand-muted-900 mb-2">{item.title}</p>
+              <p className="text-sm leading-relaxed text-brand-muted-600 italic">{item.content}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════
+          SECTION 3 — HOPEFUL
+          Direct note to the sibling
+      ══════════════════════════════════════════ */}
+
+      <div className="flex items-center gap-3 pt-2">
+        <div className="h-px flex-1 bg-surface-border" />
+        <span className="rounded-full border border-surface-border bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
+          For the sibling
+        </span>
+        <div className="h-px flex-1 bg-surface-border" />
+      </div>
+
+      {/* Note directly to the sibling */}
+      <div className="rounded-3xl bg-gradient-to-br from-brand-plum-50 via-white to-sky-50 border border-brand-plum-200 p-8 shadow-soft">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-surface-border shadow-soft mb-5">
+          <Star className="h-6 w-6 text-amber-400" />
+        </div>
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400 text-center mb-4">
+          A note for the sibling — written for them, for you to share
+        </p>
+        <div className="max-w-lg mx-auto space-y-4 text-sm leading-relaxed text-brand-muted-800">
+          <p>
+            This is hard. What is happening in your family is hard — and no one should tell you
+            it&apos;s not, or that you shouldn&apos;t have big feelings about it.
+          </p>
+          <p>
+            If you feel jealous sometimes, that makes sense. If you feel embarrassed sometimes,
+            that makes sense. If you feel proud of your sibling and frustrated with them in the same
+            hour — that makes sense too. Feelings can be complicated. They don&apos;t have to be
+            neat, and they don&apos;t make you a bad person.
+          </p>
+          <p>
+            Your needs matter. Your feelings matter. You are not forgotten — even when it might
+            feel that way. The grownups in your life are doing their best, and sometimes their best
+            means you get less than you deserve. That&apos;s not your fault.
+          </p>
+          <p className="font-semibold text-brand-muted-900">
+            You are not forgotten. You are loved. And you are allowed to say when things are hard.
+          </p>
+        </div>
+      </div>
+
+      {/* Closing CTAs */}
+      <div className="rounded-3xl bg-gradient-to-br from-primary/5 via-sky-50/40 to-white border border-primary/10 p-8 text-center shadow-soft">
+        <h2 className="text-xl font-bold text-brand-muted-900">
+          Your whole family matters — not just the child in therapy.
+        </h2>
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-brand-muted-600">
+          Supporting siblings well makes the family stronger — and ultimately, it makes the
+          entire ABA journey more sustainable for everyone. You don&apos;t have to choose between
+          your children&apos;s wellbeing. They both count.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/support/caregiver"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+          >
+            Caregiver support <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/support/connect"
+            className="inline-flex items-center gap-2 rounded-xl border border-surface-border bg-white px-5 py-2.5 text-sm font-semibold text-brand-muted-700 transition hover:bg-surface-muted"
+          >
+            <Users className="h-4 w-4" /> Connect with other families
+          </Link>
+        </div>
+      </div>
+
+        </div>
+      </div>
 
     </div>
   );

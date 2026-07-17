@@ -5,21 +5,20 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   BookOpen,
+  Link2,
   Search,
   Menu,
   X,
   Compass as CompassIcon,
-  // Home is only referenced by the archived Home Base nav entry below —
-  // re-import it when that line is restored.
+  Home,
   Lock,
   Users,
   HelpCircle,
-  HeartHandshake,
   HeartPulse,
   Wallet,
+  Lightbulb,
 } from 'lucide-react';
 import Image from 'next/image';
-import { FOR_COUPLES_LABEL } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 import NextStepButton from '@/components/layout/NextStepButton';
@@ -32,41 +31,39 @@ import NextStepButton from '@/components/layout/NextStepButton';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
-// Single sitewide nav (pre-review cleanup, July 2026): one name per
-// destination. The intake flow is "My Care Plan" everywhere; the directory is
-// "Find Local Help" everywhere. Mental Health Center / Still Waters / the
-// Mental Health Toolbox stay live but are reachable from within Parent
-// Support, not from the nav.
+// CCO-review label map (round 2): Start Here now surfaces Parent Connection so
+// it's no longer buried; Sibling Support moves to Learn (it's content, not
+// active support). Order within each group reflects parent priority.
 const navGroups = [
   {
     label: 'Start Here',
     items: [
-      // { href: '/support', label: 'Home Base', icon: Home }, // archived – pending CD review
-      { href: '/support/intake', label: 'My Care Plan', icon: CompassIcon },
-      { href: '/support/mental-health', label: 'Parent Support', icon: HeartPulse },
+      { href: '/support', label: 'Home Base', icon: Home },
+      { href: '/support/care-plan', label: 'My Family Care Plan', icon: CompassIcon },
+      { href: '/support/connect', label: 'Parent Connection', icon: Users },
     ],
   },
   {
-    label: 'Learn & Find Help',
+    label: 'Support',
+    items: [
+      { href: '/support/caregiver', label: 'Mental Health Toolbox', icon: HeartPulse },
+    ],
+  },
+  {
+    label: 'Learn',
     items: [
       { href: '/support/what-is-aba', label: 'What Is ABA?', icon: HelpCircle },
+      { href: '/support/at-home', label: 'At-Home Strategies', icon: Lightbulb },
       { href: '/support/resources', label: 'Guides & Strategies', icon: BookOpen },
-      { href: '/support/find', label: 'Find Local Help', icon: Search },
-      { href: '/support/couples', label: FOR_COUPLES_LABEL, icon: HeartHandshake },
-      { href: '/support/connect', label: 'Connect With Parents', icon: HeartHandshake },
-    ],
-  },
-  {
-    label: 'Family Needs',
-    items: [
-      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
       { href: '/support/siblings', label: 'Sibling Support', icon: Users },
+      { href: '/support/find', label: 'Find Local Help', icon: Search },
+      { href: '/support/financial', label: 'Financial Help', icon: Wallet },
     ],
   },
   {
-    label: 'Texas ABA Families',
+    label: 'For Current Families',
     items: [
-      { href: '/client', label: 'Go to Client Portal', icon: Lock },
+      { href: '/client', label: 'Client Portal Preview', icon: Lock },
     ],
   },
 ];
@@ -170,37 +167,30 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <SidebarContent />
       </aside>
 
-      <div
-        className="flex min-h-screen flex-1 flex-col lg:ml-64"
-        // Single source of truth for the find-page sticky offset. The crisis bar
-        // (the only sticky chrome above the directory toolbar) is pinned to this
-        // exact height on desktop, and the toolbar / rails stick to the same
-        // token — so they stay flush even if the height changes later.
-        style={{ ['--find-sticky-top' as string]: '2.75rem' }}
-      >
+      <div className="flex min-h-screen flex-1 flex-col lg:ml-64">
         {isFindPage && (
           <div
-            className="sticky top-0 z-40 border-b border-surface-border bg-white text-brand-muted-700 shadow-sm lg:flex lg:h-[var(--find-sticky-top)] lg:items-center"
+            className="sticky top-0 z-40 border-b border-red-700/40 bg-gradient-to-r from-red-700 via-red-600 to-orange-600 text-white shadow-md"
             role="region"
             aria-label="Crisis support"
           >
             <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 text-[12px] font-semibold sm:px-6 lg:px-8">
               <p className="inline-flex items-center gap-2">
-                <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] uppercase tracking-wider text-rose-700">
+                <span className="rounded-full bg-white/20 px-2 py-0.5 text-[10px] uppercase tracking-wider">
                   Need help now?
                 </span>
               </p>
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                <a href="tel:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
+                <a href="tel:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
                   <span aria-hidden>📞</span> Call 988
                 </a>
-                <a href="sms:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
+                <a href="sms:988" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
                   <span aria-hidden>💬</span> Text 988
                 </a>
-                <a href="tel:+17139707000" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
+                <a href="tel:+17139707000" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
                   <span aria-hidden>📞</span> Harris Center (713) 970-7000
                 </a>
-                <a href="tel:911" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:text-rose-700 hover:underline">
+                <a href="tel:911" className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 underline-offset-2 hover:bg-white/15 hover:underline">
                   <span aria-hidden>🚨</span> Emergency 911
                 </a>
               </div>

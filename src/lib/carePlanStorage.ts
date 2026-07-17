@@ -36,23 +36,9 @@ export type HelpKind =
 /** Shared mood vocabulary for consistency across the app. */
 export type WeekMood = 'frayed' | 'heavy' | 'numb' | 'steady' | 'hopeful';
 
-/** How the family pays for care — drives week-2 financial steps (never assume insurance). */
-export type CoverageStatus =
-  | 'private-insurance'
-  | 'medicaid-waiver'
-  | 'uninsured-self-pay'
-  | 'not-sure';
-
 export type CarePlanAnswers = {
   hardest?: Hardest[] | null;
   stage?: Stage | null;
-  /** Week 1 intake — how care is paid for. Legacy plans without this default to `not-sure`. */
-  coverageStatus?: CoverageStatus | null;
-  /** Intake — unknown/null is treated as false (conditional threads hidden). */
-  hasOtherChildren?: boolean | null;
-  /** Intake — unknown/null is treated as false (conditional threads hidden). */
-  hasPartner?: boolean | null;
-  // TODO (product decision): child age-band (ECI birth–3 vs school-age) for school theme placement — not built yet.
   // What would help most — now multi-select (Week 1 intake).
   helpKinds?: HelpKind[] | null;
   // Legacy fields — kept readable so older plans still load.
@@ -79,15 +65,7 @@ export type StepBucket =
   | 'save-resource'
   | 'next-week';
 
-/** Compact research note shown on the care plan — "worth trying," not a guarantee. */
-export type StepEvidence = {
-  text: string;
-  source: string;
-};
-
 export type CarePlanStep = {
-  /** Stable id from the generator — used for per-step completion tracking. */
-  id?: string;
   title: string;
   why: string;
   href: string;
@@ -97,14 +75,7 @@ export type CarePlanStep = {
   weight?: number;
   /** Which CCO-review bucket this step belongs in (added in 2026-05 CCO pass). */
   bucket?: StepBucket;
-  /** Optional one-line research context for why this step is worth trying. */
-  evidence?: StepEvidence;
 };
-
-/** Unique key for weekly progress — stable across href collisions. */
-export function getStepCompletionKey(step: CarePlanStep): string {
-  return step.id ?? step.title;
-}
 
 export type CarePlanResource = {
   label: string;
