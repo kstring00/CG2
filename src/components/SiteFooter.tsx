@@ -1,17 +1,26 @@
 import Link from 'next/link';
 
 /**
- * Persistent site footer — replaces the top-of-page ReviewBanner with a
- * tiny "in review" pill for returning visitors who already dismissed
- * the first-visit modal.
+ * Persistent site footer with a direct admissions handoff.
  */
 export default function SiteFooter() {
   return (
     <footer className="mt-auto border-t border-surface-border/70 bg-white/60">
-      <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 text-[11px] text-brand-muted-500 sm:px-6 lg:px-8">
-        <p className="text-brand-muted-500">
-          &copy; {new Date().getFullYear()} Texas ABA Centers &middot; Common Ground
-        </p>
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-4 text-[11px] text-brand-muted-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <div className="flex flex-col gap-1.5">
+          <p className="text-brand-muted-500">
+            &copy; {new Date().getFullYear()} Texas ABA Centers &middot; Common Ground
+          </p>
+          <p className="text-[12px] text-brand-muted-600">
+            Need help choosing your next step?{' '}
+            <a
+              href="tel:+18777715725"
+              className="font-semibold text-primary underline-offset-2 transition hover:underline"
+            >
+              Talk to Admissions &mdash; (877) 771-5725
+            </a>
+          </p>
+        </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <Link
             href="/about/in-review"
