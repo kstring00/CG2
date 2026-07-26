@@ -6,8 +6,8 @@ import {
   ArrowRight,
   BookOpen,
   Brain,
-  CalendarDays,
   Check,
+  CheckCircle2,
   ChevronRight,
   Circle,
   Compass,
@@ -20,8 +20,11 @@ import {
   Mail,
   Pencil,
   Printer,
+  RefreshCw,
+  Route,
   Search,
   Sparkles,
+  Target,
   Users,
   Wrench,
 } from 'lucide-react';
@@ -39,8 +42,8 @@ import {
   getWeekTwoGuideIntro,
   HARDEST_OPTIONS,
 } from '@/lib/generateNextSteps';
+import type { Phase } from '@/lib/arcs';
 import EmailPlanDialog from '@/components/EmailPlanDialog';
-import WeeklyProgressMeter from '@/components/WeeklyProgressMeter';
 import CarePlanSupportPanel from '@/components/CarePlanSupportPanel';
 import AdmissionsHandoff from '@/components/AdmissionsHandoff';
 import { ADMISSIONS_STEP_IDS } from '@/lib/carePlanSupport';
@@ -66,14 +69,11 @@ import {
 } from '@/lib/weeklyCheckIn';
 
 /**
- * Persistent care plan view — the *result* of the intake flow.
+ * Persistent care plan view — the result of Find My Next Step.
  *
- *   /support/intake     → on-ramp (the questions)
- *   /support/care-plan  → outcome (saved + revisitable)
- *
- * Presentation only. All recommendations come from the saved plan; this page
- * never recomputes scoring. Where it limits how many items show, it slices the
- * already-computed arrays for display.
+ * The saved recommendation engine still uses the legacy arc-position model
+ * internally. This page deliberately presents that work as a current stage,
+ * focus, and evidence of progress so parents are not locked into a calendar.
  */
 export default function CarePlanPage() {
   const [hydrated, setHydrated] = useState(false);
@@ -85,7 +85,11 @@ export default function CarePlanPage() {
   }, []);
 
   if (!hydrated) {
-    return <Shell><div className="h-40 animate-pulse rounded-2xl bg-surface-subtle" /></Shell>;
+    return (
+      <Shell>
+        <div className="h-40 animate-pulse rounded-3xl bg-surface-subtle" />
+      </Shell>
+    );
   }
 
   if (!plan) return <EmptyState />;
@@ -95,7 +99,9 @@ export default function CarePlanPage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      {children}
+    </main>
   );
 }
 
@@ -109,48 +115,43 @@ function EmptyState() {
         <h1 className="mt-5 text-2xl font-semibold text-brand-navy-700 sm:text-3xl">
           You don&rsquo;t have a plan yet — that&rsquo;s okay.
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-brand-muted-700">
-          A few honest questions, and we&rsquo;ll put together a small starting point
-          for the week ahead. Three minutes, no sign-up, no clinical paperwork.
+        <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-brand-muted-700">
+          Tell us where your family is and what feels hardest right now. Common Ground will
+          turn that into one clear starting point using the support already available here.
         </p>
         <Link
           href="/support/intake"
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
         >
-          <Sparkles className="h-4 w-4" /> Start Find My Next Step <ArrowRight className="h-4 w-4" />
+          <Sparkles className="h-4 w-4" /> Start Find My Next Step{' '}
+          <ArrowRight className="h-4 w-4" />
         </Link>
         <p className="mt-4 text-[13px] text-brand-muted-500">
-          Saved privately on this device. You can change it anytime.
+          Saved privately on this device. You can update it whenever something changes.
         </p>
       </div>
     </Shell>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Presentation helpers (no scoring/logic — display only)
-// ---------------------------------------------------------------------------
-
 const INTAKE_HREF = '/support/intake';
 const CHECK_IN_HREF = '/support/check-in';
 
-/** Icon per key-concern, mirroring the intake page so the two stay in sync. */
 const HARDEST_ICONS: Record<Hardest, React.ComponentType<{ className?: string }>> = {
   'understanding-aba': Brain,
   'behavior-home': Home,
-  'overwhelmed': Heart,
+  overwhelmed: Heart,
   'finding-resources': Search,
   'financial-insurance': DollarSign,
-  'siblings': Users,
+  siblings: Users,
   'connecting-parents': HeartHandshake,
   'school-iep': GraduationCap,
 };
 
 const HARDEST_LABEL_BY_VALUE: Record<string, string> = Object.fromEntries(
-  HARDEST_OPTIONS.map((o) => [o.value, o.label]),
+  HARDEST_OPTIONS.map((option) => [option.value, option.label]),
 );
 
-/** Soft color tint per bucket for the small category pill. */
 const BUCKET_PILL: Record<StepBucket, string> = {
   'do-today': 'bg-brand-plum-50 text-brand-plum-700',
   'ask-bcba': 'bg-brand-purple-50 text-brand-purple-500',
@@ -159,7 +160,6 @@ const BUCKET_PILL: Record<StepBucket, string> = {
   'next-week': 'bg-sky-50 text-sky-700',
 };
 
-/** Link-style CTA verb per bucket — reuses the bucket's intent. */
 const BUCKET_CTA: Record<StepBucket, string> = {
   'do-today': 'Start here',
   'ask-bcba': 'Find help',
@@ -167,6 +167,61 @@ const BUCKET_CTA: Record<StepBucket, string> = {
   'save-resource': 'Browse guides',
   'next-week': 'Open guide',
 };
+
+type StageMeta = {
+  label: string;
+  description: string;
+  badgeClass: string;
+};
+
+const PHASE_STAGE: Record<Phase, StageMeta> = {
+  orient: {
+    label: 'Getting clear',
+    description: 'Understand the situation, your options, and what matters most before acting.',
+    badgeClass: 'border-brand-purple-100 bg-brand-purple-50 text-brand-purple-600',
+  },
+  setup: {
+    label: 'Preparing',
+    description: 'Gather the information, questions, and support needed for the next action.',
+    badgeClass: 'border-sky-100 bg-sky-50 text-sky-700',
+  },
+  sustain: {
+    label: 'Maintaining & reassessing',
+    description: 'Keep what is helping, notice what has changed, and decide what support is next.',
+    badgeClass: 'border-emerald-100 bg-emerald-50 text-emerald-700',
+  },
+};
+
+function resolveStageMeta(phase: Phase, doneCount: number, totalSteps: number): StageMeta {
+  if (totalSteps > 0 && doneCount >= totalSteps) {
+    return {
+      label: 'Ready to reassess',
+      description: 'You completed the current actions. Check in so the plan can respond to what changed.',
+      badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    };
+  }
+
+  if (doneCount > 0) {
+    return {
+      label: 'Taking action',
+      description: 'You are actively working the plan. Keep going, or check in when the situation changes.',
+      badgeClass: 'border-primary/15 bg-primary/10 text-primary',
+    };
+  }
+
+  return PHASE_STAGE[phase];
+}
+
+function stageLanguage(value: string | null | undefined): string {
+  if (!value) return '';
+  return value
+    .replace(/\bweek one\b/gi, 'the first part of your plan')
+    .replace(/\bweek two\b/gi, 'the next part of your plan')
+    .replace(/\bweek-two\b/gi, 'next-step')
+    .replace(/\bnext week\b/gi, 'later in your plan')
+    .replace(/\bthis week\b/gi, 'right now')
+    .replace(/\bthe week ahead\b/gi, 'what comes next');
+}
 
 function StepLink({
   href,
@@ -179,11 +234,17 @@ function StepLink({
 }) {
   if (href.startsWith('http') || href.startsWith('tel:')) {
     return (
-      <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined} className={className}>
+      <a
+        href={href}
+        target={href.startsWith('http') ? '_blank' : undefined}
+        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+        className={className}
+      >
         {children}
       </a>
     );
   }
+
   return (
     <Link href={href} className={className}>
       {children}
@@ -193,9 +254,9 @@ function StepLink({
 
 function EvidenceStrip({ evidence }: { evidence: StepEvidence }) {
   return (
-    <p className="mt-2 rounded-xl border border-brand-plum-100 bg-brand-plum-50/60 px-3 py-2 text-[12px] leading-relaxed text-brand-muted-700">
+    <p className="mt-3 rounded-xl border border-brand-plum-100 bg-brand-plum-50/60 px-3 py-2.5 text-[12px] leading-relaxed text-brand-muted-700">
       <span className="font-semibold text-brand-plum-800">Why this is worth trying: </span>
-      {evidence.text}
+      {stageLanguage(evidence.text)}
       <span className="mt-1 block text-[11px] text-brand-muted-500">
         Source: {evidence.source}
       </span>
@@ -215,10 +276,10 @@ function SectionHeader({
   right?: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-brand-plum-100 pb-2.5">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+    <div className="border-b border-brand-plum-100 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+        <div className="flex items-center gap-2.5">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Icon className="h-4 w-4" aria-hidden />
           </span>
           <h2 className="text-lg font-bold leading-tight text-brand-navy-700 sm:text-xl">
@@ -228,7 +289,7 @@ function SectionHeader({
         {right}
       </div>
       {subtitle && (
-        <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
+        <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
           {subtitle}
         </p>
       )}
@@ -243,7 +304,7 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
   const [legacyHrefs, setLegacyHrefs] = useState<string[]>([]);
 
   const allBucketSteps = useMemo(() => getCarePlanBucketSteps(plan), [plan]);
-  const weekNumber = checkInState
+  const legacyArcPosition = checkInState
     ? computeWeekNumber(checkInState.planStartedAt)
     : 1;
 
@@ -251,12 +312,12 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
     () =>
       getCarePlanWeekView(
         plan,
-        weekNumber,
+        legacyArcPosition,
         completedKeys,
         legacyHrefs,
         loadPreviousWeeklyProgress()?.lastSupportNudgeThread ?? null,
       ),
-    [plan, weekNumber, completedKeys, legacyHrefs],
+    [plan, legacyArcPosition, completedKeys, legacyHrefs],
   );
 
   useEffect(() => {
@@ -266,14 +327,18 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
   }, [weekView.supportNudgeThread]);
 
   const topSteps = weekView.activeSteps;
-  const weekTwoIntro = useMemo(
+  const focusIntro = useMemo(
     () => (weekView.weekTwoUnlocked ? getWeekTwoGuideIntro(plan.answers) : null),
     [plan.answers, weekView.weekTwoUnlocked],
   );
-  const prevWeekProgress = useMemo(() => loadPreviousWeeklyProgress(), [completedKeys]);
-  const lastWeekDone = useMemo(
-    () => completedStepTitles(allBucketSteps, prevWeekProgress),
-    [allBucketSteps, prevWeekProgress],
+
+  const previousProgress = useMemo(
+    () => loadPreviousWeeklyProgress(),
+    [completedKeys],
+  );
+  const recentlyCompleted = useMemo(
+    () => completedStepTitles(allBucketSteps, previousProgress),
+    [allBucketSteps, previousProgress],
   );
 
   const refreshProgress = () => {
@@ -303,25 +368,30 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
     if (typeof window !== 'undefined') window.print();
   };
 
+  const completionUniverse = useMemo(
+    () => [...allBucketSteps, ...topSteps],
+    [allBucketSteps, topSteps],
+  );
   const isStepDone = (step: CarePlanStep) =>
-    isStepComplete(step, completedKeys, legacyHrefs, allBucketSteps);
+    isStepComplete(step, completedKeys, legacyHrefs, completionUniverse);
   const doneCount = topSteps.filter(isStepDone).length;
+  const progressPercent = topSteps.length
+    ? Math.round((doneCount / topSteps.length) * 100)
+    : 0;
+  const stageMeta = resolveStageMeta(weekView.arcPhase, doneCount, topSteps.length);
 
-  // The page computes one resources array; split it for the two lower cards
-  // and the resources strip. There is no dedicated "tools" source, so the
-  // left/right split is a presentational slice of the same resource list.
   const resources = plan.resources;
-  const weekActions = resources.slice(0, 3);
+  const nextActions = resources.slice(0, 3);
   const toolItems = resources.slice(3, 6).length
     ? resources.slice(3, 6)
     : resources.slice(0, 3);
   const recommended = resources.slice(0, 3);
-
   const concerns = (plan.answers.hardest ?? []) as Hardest[];
 
-  const latestCheckIn = checkInState && checkInState.history.length
-    ? checkInState.history[checkInState.history.length - 1]
-    : null;
+  const latestCheckIn =
+    checkInState && checkInState.history.length
+      ? checkInState.history[checkInState.history.length - 1]
+      : null;
 
   const updated = new Date(plan.updatedAt);
   const updatedDisplay = updated.toLocaleDateString(undefined, {
@@ -332,54 +402,128 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
 
   return (
     <Shell>
-      {/* Weekly progress — top of the care-plan area, only when a plan exists */}
-      <WeeklyProgressMeter variant="panel" className="mb-5" />
+      <section
+        aria-label={`Current stage: ${stageMeta.label}`}
+        className="rounded-3xl border border-surface-border bg-gradient-to-br from-white via-white to-brand-plum-50/35 p-5 shadow-soft sm:p-6"
+      >
+        <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(220px,0.55fr)] sm:items-start">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-500">
+              Your current stage
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2.5">
+              <span
+                className={`inline-flex rounded-full border px-3 py-1 text-[12px] font-semibold ${stageMeta.badgeClass}`}
+              >
+                {stageMeta.label}
+              </span>
+              <span className="text-[13px] font-medium text-brand-muted-600">
+                Based on your latest check-in
+              </span>
+            </div>
+            <h2 className="mt-3 text-xl font-bold leading-tight text-brand-navy-700 sm:text-2xl">
+              {weekView.arcTheme}
+            </h2>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-brand-muted-700">
+              {stageMeta.description}
+            </p>
+          </div>
 
-      {/* 1) TOP — breadcrumb, title, subtitle, saved note */}
-      <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
+          <div className="rounded-2xl border border-surface-border bg-white/85 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
+                  Action progress
+                </p>
+                <p className="mt-1 text-[14px] font-semibold text-brand-navy-700">
+                  {doneCount} of {topSteps.length} complete
+                </p>
+              </div>
+              <span className="text-lg font-bold tabular-nums text-primary">
+                {progressPercent}%
+              </span>
+            </div>
+            <div
+              role="progressbar"
+              aria-label={`${doneCount} of ${topSteps.length} current actions complete`}
+              aria-valuemin={0}
+              aria-valuemax={Math.max(topSteps.length, 1)}
+              aria-valuenow={doneCount}
+              className="mt-3 h-2 overflow-hidden rounded-full bg-stone-200/80"
+            >
+              <div
+                className="h-full rounded-full bg-primary transition-[width] duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <Link
+              href={CHECK_IN_HREF}
+              className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-primary hover:text-primary/80"
+            >
+              Tell us what changed <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-surface-muted/45 px-3.5 py-3 text-[12px] leading-relaxed text-brand-muted-600">
+          <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-brand-plum-600" />
+          <p>
+            Check in whenever your situation, completed actions, or biggest concern changes.
+            That gives Common Ground the information it needs to recalculate what comes next.
+          </p>
+        </div>
+      </section>
+
+      <nav aria-label="Breadcrumb" className="mt-6 text-[12px] text-brand-muted-500">
         <ol className="flex items-center gap-1.5">
           <li>
-            <Link href="/support" className="hover:text-brand-navy-700">Home</Link>
+            <Link href="/support" className="hover:text-brand-navy-700">
+              Home
+            </Link>
           </li>
-          <li aria-hidden><ChevronRight className="h-3 w-3" /></li>
+          <li aria-hidden>
+            <ChevronRight className="h-3 w-3" />
+          </li>
           <li className="font-medium text-brand-muted-700">My Family Care Plan</li>
         </ol>
       </nav>
 
       <header className="mt-3">
         <h1 className="text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">
-          <span className="inline-block border-b-[3px] border-brand-plum-300 pb-0.5">Your plan</span>,
-          simplified
+          <span className="inline-block border-b-[3px] border-brand-plum-300 pb-0.5">
+            Your plan
+          </span>
+          , simplified
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-brand-muted-700">
-          {plan.summary || 'A clear, step-by-step plan that fits your life. You can change it anytime.'}
+        <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-brand-muted-700">
+          A focused plan built from what you told us. Complete what is useful, return when
+          something changes, and let the next check-in keep the plan accurate.
         </p>
         <p className="mt-1.5 text-[12px] text-brand-muted-500">
           Last updated {updatedDisplay} · Saved privately on this device
         </p>
       </header>
 
-      {/* 2) KEY CONCERNS STRIP */}
       {concerns.length > 0 && (
         <section
-          aria-label="Your key concerns"
+          aria-label="What shaped this plan"
           className="mt-5 rounded-2xl bg-brand-plum-50 px-4 py-3 sm:px-5"
         >
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-                Your key concerns
+                What shaped this plan
               </p>
               <ul className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                {concerns.map((c) => {
-                  const Icon = HARDEST_ICONS[c];
+                {concerns.map((concern) => {
+                  const Icon = HARDEST_ICONS[concern];
                   return (
                     <li
-                      key={c}
+                      key={concern}
                       className="inline-flex items-center gap-1.5 text-[13px] font-medium text-brand-navy-700"
                     >
                       {Icon && <Icon className="h-3.5 w-3.5 text-brand-plum-600" />}
-                      {HARDEST_LABEL_BY_VALUE[c] ?? c}
+                      {HARDEST_LABEL_BY_VALUE[concern] ?? concern}
                     </li>
                   );
                 })}
@@ -395,16 +539,16 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
-      {lastWeekDone.length > 0 && (
+      {recentlyCompleted.length > 0 && (
         <section
-          aria-label="Last week recap"
+          aria-label="Recently completed actions"
           className="mt-5 rounded-2xl border border-surface-border bg-surface-muted/40 px-4 py-3 sm:px-5"
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            Last week you finished
+            Recently completed
           </p>
           <ul className="mt-2 flex flex-wrap gap-2">
-            {lastWeekDone.map((title) => (
+            {recentlyCompleted.map((title) => (
               <li
                 key={title}
                 className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[12px] font-medium text-emerald-800"
@@ -416,208 +560,217 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
-      {weekView.weekTwoUnlocked && weekTwoIntro && (
-        <section
-          aria-label="Arc week guide"
-          className="mt-5 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-white p-5 sm:p-6"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-            Week {weekView.arcWeekNumber} · {weekView.arcPhase}
-          </p>
-          <h2 className="mt-1 text-lg font-bold text-brand-navy-700">
-            {weekView.arcTheme}
-          </h2>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-700">
-            {weekTwoIntro.body}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Link
-              href={CHECK_IN_HREF}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-            >
-              Start your next check-in <ArrowRight className="h-4 w-4" />
-            </Link>
-            <AdmissionsHandoff compact />
+      <section
+        aria-label="Current focus"
+        className="mt-5 overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/75 via-white to-white shadow-soft"
+      >
+        <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_245px]">
+          <div className="p-5 sm:p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.17em] text-emerald-700">
+                Current focus
+              </p>
+              <span className="h-1 w-1 rounded-full bg-emerald-300" aria-hidden />
+              <p className="text-[11px] font-semibold text-emerald-700">{stageMeta.label}</p>
+            </div>
+            <h2 className="mt-2 text-xl font-bold leading-tight text-brand-navy-700">
+              {weekView.arcTheme}
+            </h2>
+            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-brand-muted-700">
+              {focusIntro
+                ? stageLanguage(focusIntro.body)
+                : 'These actions were selected from your most recent answers. Start with the smallest useful step, then update the plan when your circumstances change.'}
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <Link
+                href={CHECK_IN_HREF}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
+              >
+                Update my next step <ArrowRight className="h-4 w-4" />
+              </Link>
+              <AdmissionsHandoff compact />
+            </div>
           </div>
-        </section>
-      )}
 
-      {!weekView.weekTwoUnlocked && (
-        <section
-          aria-label="Arc week theme"
-          className="mt-5 rounded-2xl border border-brand-plum-100 bg-brand-plum-50/50 px-4 py-3 sm:px-5"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-            Week {weekView.arcWeekNumber} · {weekView.arcPhase}
-          </p>
-          <p className="mt-1 text-[15px] font-semibold text-brand-navy-700">{weekView.arcTheme}</p>
-        </section>
-      )}
+          <div className="border-t border-emerald-100 bg-white/70 p-5 lg:border-l lg:border-t-0">
+            <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+              <Route className="h-4.5 w-4.5" />
+            </div>
+            <h3 className="mt-3 text-[14px] font-semibold text-brand-navy-700">
+              How your plan moves
+            </h3>
+            <p className="mt-1.5 text-[12px] leading-relaxed text-brand-muted-600">
+              Complete actions at your pace. When something changes, check in again so the
+              system can validate your situation and update the focus.
+            </p>
+          </div>
+        </div>
+      </section>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
         <div>
-      {/* 3) START HERE — the strongest section, numbered list */}
-      <section aria-label="Start here">
-        <SectionHeader
-          icon={Flag}
-          title="Start here"
-          subtitle={
-            weekView.weekTwoUnlocked
-              ? `Week ${weekView.arcWeekNumber} — ${weekView.arcTheme.toLowerCase()}.`
-              : 'Your top priority steps for this week.'
-          }
-          right={
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
-                1
-              </span>
-              <span className="text-[12px] font-semibold text-brand-muted-600">
-                {doneCount} of {topSteps.length} steps done
-              </span>
-            </div>
-          }
-        />
-
-        <ol className="mt-1 divide-y divide-surface-border">
-          {topSteps.map((step, i) => {
-            const isDone = isStepDone(step);
-            const stepKey = getStepCompletionKey(step);
-            const bucket = step.bucket;
-            const isExternal = step.href.startsWith('http') || step.href.startsWith('tel:');
-            const showAdmissions =
-              step.id !== undefined && ADMISSIONS_STEP_IDS.has(step.id);
-            const ctaVerb =
-              step.id === 'parentTherapist'
-                ? 'Find a therapist'
-                : bucket
-                  ? BUCKET_CTA[bucket]
-                  : 'Open guide';
-            return (
-              <li
-                key={stepKey}
-                className={
-                  'flex gap-3 rounded-xl py-4 transition ' +
-                  (isDone
-                    ? 'bg-emerald-50/50 px-3 -mx-3 opacity-90'
-                    : '')
-                }
-              >
-                <span
-                  className={
-                    'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold ' +
-                    (isDone
-                      ? 'bg-emerald-100 text-emerald-700'
-                      : 'bg-primary/10 text-primary')
-                  }
-                >
-                  {isDone ? <Check className="h-3.5 w-3.5" /> : i + 1}
-                </span>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-                    <h3
-                      className={
-                        'text-[15px] font-semibold text-brand-navy-700 ' +
-                        (isDone ? 'line-through decoration-brand-muted-300' : '')
-                      }
-                    >
-                      {step.title}
-                    </h3>
-                    <StepLink
-                      href={step.href}
-                      className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80"
-                    >
-                      {ctaVerb} <ArrowRight className="h-3.5 w-3.5" />
-                      {isExternal && <span className="sr-only"> (opens in new tab)</span>}
-                    </StepLink>
-                  </div>
-
-                  <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
-                    {step.because ?? step.why}
-                  </p>
-
-                  {step.evidence && <EvidenceStrip evidence={step.evidence} />}
-
-                  {showAdmissions && step.id !== 'admissionsConsult' && (
-                    <div className="mt-2">
-                      <AdmissionsHandoff compact />
-                    </div>
+          <section aria-label="Your next steps">
+            <SectionHeader
+              icon={Target}
+              title="Your next steps"
+              subtitle="The smallest useful actions for your current focus. You do not have to complete everything at once."
+              right={
+                <div className="flex items-center gap-2">
+                  {doneCount >= topSteps.length && topSteps.length > 0 ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                  ) : (
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
+                      {Math.min(doneCount + 1, Math.max(topSteps.length, 1))}
+                    </span>
                   )}
+                  <span className="text-[12px] font-semibold text-brand-muted-600">
+                    {doneCount} of {topSteps.length} complete
+                  </span>
+                </div>
+              }
+            />
 
-                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                    {bucket && (
-                      <span
-                        className={
-                          'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ' +
-                          BUCKET_PILL[bucket]
-                        }
-                      >
-                        {BUCKET_LABELS[bucket]}
-                      </span>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleStep(stepKey, isDone)}
-                      aria-pressed={isDone}
+            <ol className="mt-1 divide-y divide-surface-border">
+              {topSteps.map((step, index) => {
+                const isDone = isStepDone(step);
+                const stepKey = getStepCompletionKey(step);
+                const bucket = step.bucket;
+                const isExternal = step.href.startsWith('http') || step.href.startsWith('tel:');
+                const showAdmissions =
+                  step.id !== undefined && ADMISSIONS_STEP_IDS.has(step.id);
+                const ctaVerb =
+                  step.id === 'parentTherapist'
+                    ? 'Find a therapist'
+                    : bucket
+                      ? BUCKET_CTA[bucket]
+                      : 'Open guide';
+
+                return (
+                  <li
+                    key={stepKey}
+                    className={
+                      'flex gap-3 rounded-xl py-4 transition ' +
+                      (isDone ? '-mx-3 bg-emerald-50/50 px-3 opacity-90' : '')
+                    }
+                  >
+                    <span
                       className={
-                        'inline-flex items-center gap-1.5 text-[12px] font-semibold transition ' +
+                        'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold ' +
                         (isDone
-                          ? 'text-emerald-700 hover:text-emerald-800'
-                          : 'text-brand-muted-500 hover:text-brand-navy-700')
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-primary/10 text-primary')
                       }
                     >
-                      {isDone ? (
-                        <>
-                          <Check className="h-3.5 w-3.5" /> Done
-                        </>
-                      ) : (
-                        <>
-                          <Circle className="h-3.5 w-3.5" /> Mark done
-                        </>
+                      {isDone ? <Check className="h-3.5 w-3.5" /> : index + 1}
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+                        <h3
+                          className={
+                            'text-[15px] font-semibold text-brand-navy-700 ' +
+                            (isDone ? 'line-through decoration-brand-muted-300' : '')
+                          }
+                        >
+                          {step.title}
+                        </h3>
+                        <StepLink
+                          href={step.href}
+                          className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80"
+                        >
+                          {ctaVerb} <ArrowRight className="h-3.5 w-3.5" />
+                          {isExternal && (
+                            <span className="sr-only"> (opens in new tab)</span>
+                          )}
+                        </StepLink>
+                      </div>
+
+                      <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
+                        {stageLanguage(step.because ?? step.why)}
+                      </p>
+
+                      {step.evidence && <EvidenceStrip evidence={step.evidence} />}
+
+                      {showAdmissions && step.id !== 'admissionsConsult' && (
+                        <div className="mt-2">
+                          <AdmissionsHandoff compact />
+                        </div>
                       )}
-                    </button>
-                  </div>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
 
-      {!weekView.weekTwoUnlocked && weekView.nextWeekSteps.length > 0 && (
-        <aside
-          aria-label="Saved for next week"
-          className="mt-6 rounded-2xl border border-dashed border-sky-200 bg-sky-50/40 p-5"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
-            Saved for next week
-          </p>
-          <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
-            These become your week-two guide once you finish the steps above.
-          </p>
-          <ul className="mt-3 space-y-2">
-            {weekView.nextWeekSteps.map((step) => (
-              <li
-                key={getStepCompletionKey(step)}
-                className="flex items-start gap-2 rounded-xl border border-sky-100 bg-white/80 px-3 py-2.5"
-              >
-                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[10px] font-bold text-sky-700">
-                  →
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[13px] font-semibold text-brand-navy-700">
-                    {step.title}
-                  </span>
-                  <span className="mt-0.5 block text-[12px] text-brand-muted-500">
-                    {step.because ?? step.why}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      )}
+                      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                        {bucket && (
+                          <span
+                            className={
+                              'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ' +
+                              BUCKET_PILL[bucket]
+                            }
+                          >
+                            {stageLanguage(BUCKET_LABELS[bucket])}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleStep(stepKey, isDone)}
+                          aria-pressed={isDone}
+                          className={
+                            'inline-flex items-center gap-1.5 text-[12px] font-semibold transition ' +
+                            (isDone
+                              ? 'text-emerald-700 hover:text-emerald-800'
+                              : 'text-brand-muted-500 hover:text-brand-navy-700')
+                          }
+                        >
+                          {isDone ? (
+                            <>
+                              <Check className="h-3.5 w-3.5" /> Done
+                            </>
+                          ) : (
+                            <>
+                              <Circle className="h-3.5 w-3.5" /> Mark done
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
 
+          {!weekView.weekTwoUnlocked && weekView.nextWeekSteps.length > 0 && (
+            <aside
+              aria-label="Later in this support arc"
+              className="mt-6 rounded-2xl border border-dashed border-sky-200 bg-sky-50/40 p-5"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
+                Later in this arc
+              </p>
+              <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
+                These are useful, but they are not the priority yet. Your next check-in can
+                move them into focus when the information supports it.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {weekView.nextWeekSteps.map((step) => (
+                  <li
+                    key={getStepCompletionKey(step)}
+                    className="flex items-start gap-2 rounded-xl border border-sky-100 bg-white/80 px-3 py-2.5"
+                  >
+                    <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[10px] font-bold text-sky-700">
+                      →
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[13px] font-semibold text-brand-navy-700">
+                        {step.title}
+                      </span>
+                      <span className="mt-0.5 block text-[12px] text-brand-muted-500">
+                        {stageLanguage(step.because ?? step.why)}
+                      </span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </div>
 
         <CarePlanSupportPanel answers={plan.answers} className="lg:sticky lg:top-24" />
@@ -627,23 +780,22 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         <AdmissionsHandoff />
       </div>
 
-      {/* 4) LOWER — two compact columns */}
       {resources.length > 0 && (
-        <section aria-label="This week and tools" className="mt-9 grid gap-5 lg:grid-cols-2">
+        <section aria-label="Next actions and tools" className="mt-9 grid gap-5 lg:grid-cols-2">
           <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
             <SectionHeader
-              icon={CalendarDays}
-              title="Do this this week"
-              subtitle="Helpful actions to make progress."
+              icon={Flag}
+              title="Do this next"
+              subtitle="Useful actions that support the focus above."
             />
             <ul className="mt-1 divide-y divide-surface-border">
-              {weekActions.map((r) => (
-                <li key={r.href}>
+              {nextActions.map((resource) => (
+                <li key={resource.href}>
                   <Link
-                    href={r.href}
+                    href={resource.href}
                     className="flex items-center justify-between gap-3 py-3 text-[14px] font-medium text-brand-navy-700 hover:text-primary"
                   >
-                    <span className="min-w-0 truncate">{r.label}</span>
+                    <span className="min-w-0 truncate">{resource.label}</span>
                     <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
                       Open <ArrowRight className="h-3.5 w-3.5" />
                     </span>
@@ -657,16 +809,16 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
             <SectionHeader
               icon={Wrench}
               title="Helpful tools"
-              subtitle="Calculators, templates & checklists."
+              subtitle="Calculators, templates, and checklists."
             />
             <ul className="mt-1 divide-y divide-surface-border">
-              {toolItems.map((r) => (
-                <li key={r.href}>
+              {toolItems.map((resource) => (
+                <li key={resource.href}>
                   <Link
-                    href={r.href}
+                    href={resource.href}
                     className="flex items-center justify-between gap-3 py-3 text-[14px] font-medium text-brand-navy-700 hover:text-primary"
                   >
-                    <span className="min-w-0 truncate">{r.label}</span>
+                    <span className="min-w-0 truncate">{resource.label}</span>
                     <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
                       Use tool <ArrowRight className="h-3.5 w-3.5" />
                     </span>
@@ -684,13 +836,12 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
-      {/* 5) RECOMMENDED RESOURCES — short list, not cards */}
       {recommended.length > 0 && (
         <section aria-label="Recommended resources" className="mt-9">
           <SectionHeader
             icon={BookOpen}
             title="Recommended resources"
-            subtitle="Curated reads and videos from our team."
+            subtitle="Curated reads and videos connected to your current focus."
             right={
               <Link
                 href="/support/resources"
@@ -701,17 +852,17 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
             }
           />
           <ul className="mt-1 divide-y divide-surface-border">
-            {recommended.map((r, i) => (
-              <li key={r.href}>
+            {recommended.map((resource, index) => (
+              <li key={resource.href}>
                 <Link
-                  href={r.href}
+                  href={resource.href}
                   className="flex items-center justify-between gap-3 py-3 hover:text-primary"
                 >
                   <span className="min-w-0 truncate text-[14px] font-medium text-brand-navy-700">
-                    {r.label}
+                    {resource.label}
                   </span>
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-warm-100 px-2.5 py-0.5 text-[11px] font-semibold text-brand-muted-700">
-                    {i === 1 ? 'Video (3 min)' : 'Article'}
+                    {index === 1 ? 'Video (3 min)' : 'Article'}
                   </span>
                 </Link>
               </li>
@@ -720,7 +871,6 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         </section>
       )}
 
-      {/* 6) BOTTOM — slim action bar */}
       <section
         aria-label="Plan actions"
         className="mt-9 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 rounded-2xl bg-brand-plum-50 px-4 py-3 text-[13px] font-semibold text-brand-plum-700 print:hidden sm:gap-x-4"
@@ -732,7 +882,9 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         >
           <Printer className="h-4 w-4" /> Print my plan
         </button>
-        <span aria-hidden className="text-brand-plum-200">|</span>
+        <span aria-hidden className="text-brand-plum-200">
+          |
+        </span>
         <button
           type="button"
           onClick={() => setEmailOpen(true)}
@@ -740,19 +892,29 @@ function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
         >
           <Mail className="h-4 w-4" /> Email my plan
         </button>
-        <span aria-hidden className="text-brand-plum-200">|</span>
+        <span aria-hidden className="text-brand-plum-200">
+          |
+        </span>
+        <Link
+          href={CHECK_IN_HREF}
+          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
+        >
+          <RefreshCw className="h-4 w-4" /> Check in &amp; update
+        </Link>
+        <span aria-hidden className="text-brand-plum-200">
+          |
+        </span>
         <Link
           href={INTAKE_HREF}
           className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
         >
-          <Pencil className="h-4 w-4" /> Update my plan
+          <Pencil className="h-4 w-4" /> Edit concerns
         </Link>
       </section>
 
       <p className="mt-6 text-[11.5px] leading-relaxed text-brand-muted-500">
-        Saved privately on this device. Clearing your browser data removes it.
-        Common Ground is parent support — it does not diagnose, treat, or
-        replace clinical care.
+        Saved privately on this device. Clearing your browser data removes it. Common
+        Ground is parent support — it does not diagnose, treat, or replace clinical care.
       </p>
 
       <EmailPlanDialog
