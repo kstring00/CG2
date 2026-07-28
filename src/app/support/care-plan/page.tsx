@@ -1,928 +1,855 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
   BookOpen,
   Brain,
   Check,
-  CheckCircle2,
-  ChevronRight,
-  Circle,
-  Compass,
-  DollarSign,
-  Flag,
-  GraduationCap,
+  ChevronDown,
+  ChevronUp,
+  CircleHelp,
   Heart,
   HeartHandshake,
-  Home,
-  Mail,
-  Pencil,
-  Printer,
-  RefreshCw,
-  Route,
-  Search,
+  LifeBuoy,
+  ListChecks,
+  MessageCircle,
+  ShieldCheck,
   Sparkles,
-  Target,
   Users,
-  Wrench,
 } from 'lucide-react';
-import {
-  getStepCompletionKey,
-  loadCarePlan,
-  type CarePlanStep,
-  type Hardest,
-  type SavedCarePlan,
-  type StepBucket,
-  type StepEvidence,
-} from '@/lib/carePlanStorage';
-import {
-  BUCKET_LABELS,
-  getWeekTwoGuideIntro,
-  HARDEST_OPTIONS,
-} from '@/lib/generateNextSteps';
-import type { Phase } from '@/lib/arcs';
-import EmailPlanDialog from '@/components/EmailPlanDialog';
-import CarePlanSupportPanel from '@/components/CarePlanSupportPanel';
-import AdmissionsHandoff from '@/components/AdmissionsHandoff';
-import { ADMISSIONS_STEP_IDS } from '@/lib/carePlanSupport';
-import {
-  completedStepTitles,
-  getCarePlanBucketSteps,
-  getCarePlanWeekView,
-  resolvedCompletionKeys,
-} from '@/lib/carePlanDisplay';
-import {
-  isStepComplete,
-  loadPreviousWeeklyProgress,
-  loadWeeklyProgress,
-  markStepDone,
-  recordSupportNudgeThread,
-  unmarkStepDone,
-  WEEKLY_PROGRESS_EVENT,
-} from '@/lib/weeklyProgress';
-import {
-  computeWeekNumber,
-  ensurePlanStarted,
-  type WeeklyCheckInState,
-} from '@/lib/weeklyCheckIn';
+import { cn } from '@/lib/utils';
 
-/**
- * Persistent care plan view — the result of Find My Next Step.
- *
- * The saved recommendation engine still uses the legacy arc-position model
- * internally. This page deliberately presents that work as a current stage,
- * focus, and evidence of progress so parents are not locked into a calendar.
- */
-export default function CarePlanPage() {
-  const [hydrated, setHydrated] = useState(false);
-  const [plan, setPlan] = useState<SavedCarePlan | null>(null);
+type StepNumber = 1 | 2 | 3;
+type ParentFocus =
+  | 'overwhelmed'
+  | 'exhausted'
+  | 'relationship'
+  | 'isolated'
+  | 'aba'
+  | 'child-concern';
+type SupportNeed = 'steady' | 'clarity' | 'connection' | 'practical' | 'conversation';
 
-  useEffect(() => {
-    setHydrated(true);
-    setPlan(loadCarePlan());
-  }, []);
-
-  if (!hydrated) {
-    return (
-      <Shell>
-        <div className="h-40 animate-pulse rounded-3xl bg-surface-subtle" />
-      </Shell>
-    );
-  }
-
-  if (!plan) return <EmptyState />;
-
-  return <PopulatedPlan plan={plan} />;
-}
-
-function Shell({ children }: { children: React.ReactNode }) {
-  return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-      {children}
-    </main>
-  );
-}
-
-function EmptyState() {
-  return (
-    <Shell>
-      <div className="rounded-3xl border border-surface-border bg-white p-8 text-center shadow-soft sm:p-12">
-        <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <Compass className="h-6 w-6" />
-        </div>
-        <h1 className="mt-5 text-2xl font-semibold text-brand-navy-700 sm:text-3xl">
-          You don&rsquo;t have a plan yet — that&rsquo;s okay.
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-brand-muted-700">
-          Tell us where your family is and what feels hardest right now. Common Ground will
-          turn that into one clear starting point using the support already available here.
-        </p>
-        <Link
-          href="/support/intake"
-          className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-        >
-          <Sparkles className="h-4 w-4" /> Start Find My Next Step{' '}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-        <p className="mt-4 text-[13px] text-brand-muted-500">
-          Saved privately on this device. You can update it whenever something changes.
-        </p>
-      </div>
-    </Shell>
-  );
-}
-
-const INTAKE_HREF = '/support/intake';
-const CHECK_IN_HREF = '/support/check-in';
-
-const HARDEST_ICONS: Record<Hardest, React.ComponentType<{ className?: string }>> = {
-  'understanding-aba': Brain,
-  'behavior-home': Home,
-  overwhelmed: Heart,
-  'finding-resources': Search,
-  'financial-insurance': DollarSign,
-  siblings: Users,
-  'connecting-parents': HeartHandshake,
-  'school-iep': GraduationCap,
-};
-
-const HARDEST_LABEL_BY_VALUE: Record<string, string> = Object.fromEntries(
-  HARDEST_OPTIONS.map((option) => [option.value, option.label]),
-);
-
-const BUCKET_PILL: Record<StepBucket, string> = {
-  'do-today': 'bg-brand-plum-50 text-brand-plum-700',
-  'ask-bcba': 'bg-brand-purple-50 text-brand-purple-500',
-  'try-home': 'bg-emerald-50 text-emerald-700',
-  'save-resource': 'bg-brand-warm-100 text-brand-muted-700',
-  'next-week': 'bg-sky-50 text-sky-700',
-};
-
-const BUCKET_CTA: Record<StepBucket, string> = {
-  'do-today': 'Start here',
-  'ask-bcba': 'Find help',
-  'try-home': 'Open guide',
-  'save-resource': 'Browse guides',
-  'next-week': 'Open guide',
-};
-
-type StageMeta = {
+type FocusOption = {
+  id: ParentFocus;
   label: string;
+  shortLabel: string;
   description: string;
-  badgeClass: string;
 };
 
-const PHASE_STAGE: Record<Phase, StageMeta> = {
-  orient: {
-    label: 'Getting clear',
-    description: 'Understand the situation, your options, and what matters most before acting.',
-    badgeClass: 'border-brand-purple-100 bg-brand-purple-50 text-brand-purple-600',
-  },
-  setup: {
-    label: 'Preparing',
-    description: 'Gather the information, questions, and support needed for the next action.',
-    badgeClass: 'border-sky-100 bg-sky-50 text-sky-700',
-  },
-  sustain: {
-    label: 'Maintaining & reassessing',
-    description: 'Keep what is helping, notice what has changed, and decide what support is next.',
-    badgeClass: 'border-emerald-100 bg-emerald-50 text-emerald-700',
-  },
+type SupportAction = {
+  id: string;
+  title: string;
+  description: string;
+  detail: string;
 };
 
-function resolveStageMeta(phase: Phase, doneCount: number, totalSteps: number): StageMeta {
-  if (totalSteps > 0 && doneCount >= totalSteps) {
-    return {
-      label: 'Ready to reassess',
-      description: 'You completed the current actions. Check in so the plan can respond to what changed.',
-      badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-    };
-  }
-
-  if (doneCount > 0) {
-    return {
-      label: 'Taking action',
-      description: 'You are actively working the plan. Keep going, or check in when the situation changes.',
-      badgeClass: 'border-primary/15 bg-primary/10 text-primary',
-    };
-  }
-
-  return PHASE_STAGE[phase];
-}
-
-function stageLanguage(value: string | null | undefined): string {
-  if (!value) return '';
-  return value
-    .replace(/\bweek one\b/gi, 'the first part of your plan')
-    .replace(/\bweek two\b/gi, 'the next part of your plan')
-    .replace(/\bweek-two\b/gi, 'next-step')
-    .replace(/\bnext week\b/gi, 'later in your plan')
-    .replace(/\bthis week\b/gi, 'right now')
-    .replace(/\bthe week ahead\b/gi, 'what comes next');
-}
-
-function StepLink({
-  href,
-  className,
-  children,
-}: {
+type ConnectionOption = {
+  title: string;
+  description: string;
   href: string;
-  className: string;
-  children: React.ReactNode;
-}) {
-  if (href.startsWith('http') || href.startsWith('tel:')) {
-    return (
-      <a
-        href={href}
-        target={href.startsWith('http') ? '_blank' : undefined}
-        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-        className={className}
-      >
-        {children}
-      </a>
+  label: string;
+  icon: typeof Heart;
+  accent: string;
+};
+
+const FOCUS_OPTIONS: FocusOption[] = [
+  {
+    id: 'overwhelmed',
+    label: 'I feel overwhelmed',
+    shortLabel: 'Overwhelmed',
+    description: 'There is too much to hold at once, and I need the load to feel smaller.',
+  },
+  {
+    id: 'exhausted',
+    label: 'I feel exhausted',
+    shortLabel: 'Exhausted',
+    description: 'My energy is low, and I need support that does not create another demand.',
+  },
+  {
+    id: 'relationship',
+    label: 'A relationship feels strained',
+    shortLabel: 'Relationship strain',
+    description: 'Stress at home is affecting communication, connection, or shared responsibilities.',
+  },
+  {
+    id: 'isolated',
+    label: 'I feel alone in this',
+    shortLabel: 'Feeling isolated',
+    description: 'I need connection with someone who can listen, understand, or help.',
+  },
+  {
+    id: 'aba',
+    label: 'I do not understand part of ABA',
+    shortLabel: 'Understanding ABA',
+    description: 'I need clearer information before I can feel confident about what comes next.',
+  },
+  {
+    id: 'child-concern',
+    label: 'I have a concern about my child',
+    shortLabel: 'Child-related concern',
+    description: 'I need help preparing to bring a concern to my child\'s BCBA or clinical team.',
+  },
+];
+
+const SUPPORT_NEEDS: Array<{ id: SupportNeed; label: string; description: string }> = [
+  {
+    id: 'steady',
+    label: 'Feel steadier',
+    description: 'Reduce the immediate emotional pressure before deciding what to do next.',
+  },
+  {
+    id: 'clarity',
+    label: 'Get clearer information',
+    description: 'Understand one issue, process, or expectation more clearly.',
+  },
+  {
+    id: 'connection',
+    label: 'Feel less alone',
+    description: 'Connect with a trusted person, another parent, or professional support.',
+  },
+  {
+    id: 'practical',
+    label: 'Get practical help',
+    description: 'Identify one form of relief or assistance that would make today more manageable.',
+  },
+  {
+    id: 'conversation',
+    label: 'Prepare a conversation',
+    description: 'Organize what matters before speaking with a partner, BCBA, or support person.',
+  },
+];
+
+const ACTIONS_BY_FOCUS: Record<ParentFocus, SupportAction[]> = {
+  overwhelmed: [
+    {
+      id: 'overwhelmed-one-thing',
+      title: 'Choose only one thing to carry right now',
+      description: 'The rest can stay here without being solved today.',
+      detail: 'Choose the concern that would make the biggest difference if it felt even slightly lighter. You are not dismissing the other concerns; you are reducing the number of decisions in front of you.',
+    },
+    {
+      id: 'overwhelmed-lower-demand',
+      title: 'Lower one nonessential demand',
+      description: 'A hard day can have a smaller plan.',
+      detail: 'Identify one task that can wait, be simplified, or be shared. Support should lower the load rather than add another assignment.',
+    },
+    {
+      id: 'overwhelmed-human-help',
+      title: 'Choose one person or resource',
+      description: 'You do not have to build the whole solution alone.',
+      detail: 'Decide whether you need someone to listen, practical help, clearer information, or professional support. Connect will help you choose the right destination.',
+    },
+  ],
+  exhausted: [
+    {
+      id: 'exhausted-protect-energy',
+      title: 'Protect a small recovery window',
+      description: 'Choose something realistic enough to happen today.',
+      detail: 'A recovery window can be brief. The goal is not perfect self-care; it is a short period that is not used to complete another task or solve another problem.',
+    },
+    {
+      id: 'exhausted-specific-relief',
+      title: 'Identify the relief that would matter most',
+      description: 'Different kinds of exhaustion need different support.',
+      detail: 'Consider whether you need sleep, quiet, emotional support, childcare relief, food, transportation, help with paperwork, or clearer expectations from the care team.',
+    },
+    {
+      id: 'exhausted-professional',
+      title: 'Notice when self-guided support is not enough',
+      description: 'Persistent exhaustion deserves real support.',
+      detail: 'If exhaustion is worsening, lasting, or affecting your ability to function, Connect can take you to approved mental-health and human-support resources.',
+    },
+  ],
+  relationship: [
+    {
+      id: 'relationship-pause',
+      title: 'Separate the stressful moment from the conversation',
+      description: 'The hardest moment may not be the best time to solve the disagreement.',
+      detail: 'Handle immediate needs first. Choose a calmer time to discuss one specific pressure point rather than trying to resolve the entire relationship at once.',
+    },
+    {
+      id: 'relationship-one-topic',
+      title: 'Choose one topic',
+      description: 'Narrow the conversation to something both people can understand.',
+      detail: 'Focus on one routine, responsibility, communication issue, or decision. A focused conversation is easier to enter than a conversation about everything that feels wrong.',
+    },
+    {
+      id: 'relationship-support',
+      title: 'Decide what support belongs outside the relationship',
+      description: 'Not every pressure should be solved only by the two of you.',
+      detail: 'Some concerns may need clearer BCBA guidance, caregiver support, individual therapy, couples support, or practical help from another person.',
+    },
+  ],
+  isolated: [
+    {
+      id: 'isolated-one-connection',
+      title: 'Choose one safe connection',
+      description: 'Connection can begin with one person, not a whole community.',
+      detail: 'Think about the person most likely to listen without immediately judging, fixing, or minimizing what you are carrying.',
+    },
+    {
+      id: 'isolated-name-support',
+      title: 'Choose the kind of connection you need',
+      description: 'Listening, shared experience, and practical help are different needs.',
+      detail: 'You may need another parent who understands, a trusted friend, a faith community, a therapist, or practical help from someone close to you.',
+    },
+    {
+      id: 'isolated-community',
+      title: 'Use an existing support pathway',
+      description: 'Common Ground can help you find a starting point.',
+      detail: 'Connect will show parent connection, mental-health, and local-resource options without requiring you to explain everything again here.',
+    },
+  ],
+  aba: [
+    {
+      id: 'aba-one-question',
+      title: 'Reduce the confusion to one question',
+      description: 'You do not need to understand every part of ABA at once.',
+      detail: 'Choose the one term, recommendation, or expectation that is preventing you from feeling prepared. Connect will help you bring that question to the BCBA.',
+    },
+    {
+      id: 'aba-approved-info',
+      title: 'Start with approved plain-language information',
+      description: 'Use existing Common Ground education before searching everywhere online.',
+      detail: 'The Understanding ABA section explains core ideas in parent-friendly language and can help you decide what still needs clarification from the clinical team.',
+    },
+    {
+      id: 'aba-demonstration',
+      title: 'Ask for explanation, modeling, or written steps',
+      description: 'Understanding often requires more than hearing something once.',
+      detail: 'It is appropriate to ask the BCBA to explain the purpose, demonstrate what they mean, watch you practice, or provide a shorter written version.',
+    },
+  ],
+  'child-concern': [
+    {
+      id: 'child-current-plan',
+      title: 'Use the current clinical or safety plan',
+      description: 'This page should not invent a new response for your child.',
+      detail: 'Follow guidance already provided by the clinical team. If the current plan is unclear, difficult to use, or no longer fits what is happening, Connect will help you prepare questions for the BCBA.',
+    },
+    {
+      id: 'child-observable',
+      title: 'Keep the concern concrete',
+      description: 'Describe what you can see or hear without diagnosing why it happens.',
+      detail: 'Useful information may include what happened, when it tends to occur, what changed, what adults tried, and what felt difficult or unsafe.',
+    },
+    {
+      id: 'child-bcba',
+      title: 'Bring the concern to the BCBA',
+      description: 'The clinical team should guide child-specific recommendations.',
+      detail: 'Use the predefined questions in Connect to ask for clarification, demonstration, written steps, or an earlier conversation when the concern is changing or becoming harder to manage.',
+    },
+  ],
+};
+
+const BCBA_QUESTIONS = [
+  'What should I focus on first when this concern comes up at home?',
+  'Can you explain the current recommendation in plain language?',
+  'Can you demonstrate the response and watch me practice it?',
+  'Can you give both caregivers the same short written steps?',
+  'What information would be most useful for me to notice and bring back?',
+  'What changes or safety concerns should lead me to contact you before our next meeting?',
+];
+
+function getConnections(focus: ParentFocus, need: SupportNeed | null): ConnectionOption[] {
+  const options: ConnectionOption[] = [];
+
+  if (focus === 'child-concern' || focus === 'aba' || need === 'conversation') {
+    options.push({
+      title: 'Prepare for my BCBA conversation',
+      description: 'Choose from approved questions without entering identifying clinical details.',
+      href: '#bcba-questions',
+      label: 'Choose BCBA questions',
+      icon: ListChecks,
+      accent: 'text-violet-700 bg-violet-50',
+    });
+  }
+
+  if (focus === 'relationship') {
+    options.push({
+      title: 'Marriage & Relationships',
+      description: 'Open parent-centered relationship support and conversation guidance.',
+      href: '/support/couples',
+      label: 'Open relationship support',
+      icon: HeartHandshake,
+      accent: 'text-rose-700 bg-rose-50',
+    });
+  }
+
+  if (focus === 'overwhelmed' || focus === 'exhausted' || need === 'steady') {
+    options.push({
+      title: 'Mental Health Toolbox',
+      description: 'Find approved tools for overwhelm, stress, and emotional support.',
+      href: '/support/mental-health',
+      label: 'Open the toolbox',
+      icon: Brain,
+      accent: 'text-teal-700 bg-teal-50',
+    });
+  }
+
+  if (focus === 'isolated' || need === 'connection') {
+    options.push({
+      title: 'Parent Connection',
+      description: 'Explore ways to connect with other parents and supportive people.',
+      href: '/support/connect',
+      label: 'Find connection',
+      icon: Users,
+      accent: 'text-blue-700 bg-blue-50',
+    });
+  }
+
+  if (focus === 'aba') {
+    options.push({
+      title: 'Understanding ABA',
+      description: 'Review approved explanations written for parents and caregivers.',
+      href: '/support/what-is-aba',
+      label: 'Learn in plain language',
+      icon: BookOpen,
+      accent: 'text-indigo-700 bg-indigo-50',
+    });
+  }
+
+  if (focus === 'child-concern') {
+    options.push({
+      title: 'At Home Strategies',
+      description: 'Review existing approved home-support resources while your BCBA guides child-specific care.',
+      href: '/support/at-home',
+      label: 'Open approved guides',
+      icon: ShieldCheck,
+      accent: 'text-emerald-700 bg-emerald-50',
+    });
+  }
+
+  if (need === 'practical') {
+    options.push({
+      title: 'Resource Hub',
+      description: 'Find practical, financial, local, and family-support resources.',
+      href: '/support/resources',
+      label: 'Browse resources',
+      icon: CircleHelp,
+      accent: 'text-amber-700 bg-amber-50',
+    });
+  }
+
+  if (options.length < 3) {
+    options.push({
+      title: 'Caregiver Support',
+      description: 'Choose support that focuses on your capacity and well-being.',
+      href: '/support/caregiver',
+      label: 'Open caregiver support',
+      icon: Heart,
+      accent: 'text-pink-700 bg-pink-50',
+    });
+  }
+
+  if (options.length < 3) {
+    options.push({
+      title: 'Resource Hub',
+      description: 'Explore approved Common Ground support organized by parent need.',
+      href: '/support/resources',
+      label: 'Browse resources',
+      icon: BookOpen,
+      accent: 'text-amber-700 bg-amber-50',
+    });
+  }
+
+  return options.slice(0, 4);
+}
+
+export default function FamilyCarePlanPage() {
+  const [activeStep, setActiveStep] = useState<StepNumber>(1);
+  const [focus, setFocus] = useState<ParentFocus>('overwhelmed');
+  const [supportNeed, setSupportNeed] = useState<SupportNeed | null>(null);
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+
+  const focusOption = FOCUS_OPTIONS.find((option) => option.id === focus) ?? FOCUS_OPTIONS[0];
+  const actions = ACTIONS_BY_FOCUS[focus];
+  const connections = useMemo(() => getConnections(focus, supportNeed), [focus, supportNeed]);
+  const selectedActionDetail = actions.find((action) => action.id === selectedAction) ?? null;
+
+  function selectFocus(nextFocus: ParentFocus) {
+    setFocus(nextFocus);
+    setSelectedAction(null);
+    setSupportNeed(null);
+    setSelectedQuestions([]);
+  }
+
+  function toggleQuestion(question: string) {
+    setSelectedQuestions((current) =>
+      current.includes(question)
+        ? current.filter((item) => item !== question)
+        : [...current, question],
     );
   }
 
   return (
-    <Link href={href} className={className}>
-      {children}
-    </Link>
-  );
-}
-
-function EvidenceStrip({ evidence }: { evidence: StepEvidence }) {
-  return (
-    <p className="mt-3 rounded-xl border border-brand-plum-100 bg-brand-plum-50/60 px-3 py-2.5 text-[12px] leading-relaxed text-brand-muted-700">
-      <span className="font-semibold text-brand-plum-800">Why this is worth trying: </span>
-      {stageLanguage(evidence.text)}
-      <span className="mt-1 block text-[11px] text-brand-muted-500">
-        Source: {evidence.source}
-      </span>
-    </p>
-  );
-}
-
-function SectionHeader({
-  icon: Icon,
-  title,
-  subtitle,
-  right,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  subtitle?: string;
-  right?: React.ReactNode;
-}) {
-  return (
-    <div className="border-b border-brand-plum-100 pb-3">
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-        <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Icon className="h-4 w-4" aria-hidden />
-          </span>
-          <h2 className="text-lg font-bold leading-tight text-brand-navy-700 sm:text-xl">
-            {title}
-          </h2>
+    <div className="page-shell gap-6 sm:gap-8">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-stretch">
+        <div className="rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-brand-plum-50/80 via-white to-brand-warm-50 p-6 shadow-soft sm:p-8">
+          <div className="flex items-start gap-4">
+            <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-primary shadow-sm">
+              <Heart className="h-6 w-6" />
+            </span>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+                My Family Care Plan
+              </p>
+              <h1 className="mt-2 text-balance text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
+                This plan is for you.
+              </h1>
+              <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-brand-muted-600">
+                Use three calm sections to feel steadier, understand what you need, and choose the
+                right next support. Open only the part that is useful today.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold text-brand-muted-600">
+                <span className="rounded-full border border-surface-border bg-white px-3 py-1.5">No scores</span>
+                <span className="rounded-full border border-surface-border bg-white px-3 py-1.5">No deadlines</span>
+                <span className="rounded-full border border-surface-border bg-white px-3 py-1.5">No child names</span>
+              </div>
+            </div>
+          </div>
         </div>
-        {right}
-      </div>
-      {subtitle && (
-        <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
-          {subtitle}
-        </p>
-      )}
+
+        <aside className="rounded-[1.75rem] border border-surface-border bg-white p-5 shadow-soft sm:p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+            Your current focus
+          </p>
+          <p className="mt-3 text-lg font-semibold text-brand-navy-700">{focusOption.shortLabel}</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-600">
+            {focusOption.description}
+          </p>
+          <p className="mt-5 rounded-2xl bg-brand-warm-50 px-4 py-3 text-[12px] leading-relaxed text-brand-muted-600">
+            Your selections shape this page. They are not a message to your care team.
+          </p>
+        </aside>
+      </section>
+
+      <section className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+              What feels closest today?
+            </p>
+            <h2 className="mt-1 text-xl font-semibold text-brand-navy-700">
+              Choose one starting point
+            </h2>
+            <p className="mt-1 text-[13px] text-brand-muted-500">
+              You can change this at any time. Choosing one does not erase anything else you are carrying.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {FOCUS_OPTIONS.map((option) => {
+            const selected = option.id === focus;
+            return (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => selectFocus(option.id)}
+                aria-pressed={selected}
+                className={cn(
+                  'rounded-2xl border p-4 text-left transition',
+                  selected
+                    ? 'border-primary/35 bg-brand-plum-50/70 ring-2 ring-primary/10'
+                    : 'border-surface-border bg-white hover:border-primary/25 hover:bg-brand-warm-50/40',
+                )}
+              >
+                <span className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border',
+                      selected
+                        ? 'border-primary bg-primary text-white'
+                        : 'border-brand-muted-300 text-transparent',
+                    )}
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-brand-navy-700">{option.label}</span>
+                    <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-500">
+                      {option.description}
+                    </span>
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="space-y-3" aria-label="Parent support plan">
+        <AccordionStep
+          number={1}
+          title="Stabilize"
+          subtitle="What may help me right now"
+          description="Reduce the immediate pressure enough to make the next decision clearer."
+          accent="teal"
+          open={activeStep === 1}
+          onToggle={() => setActiveStep(1)}
+        >
+          <div className="grid gap-3 lg:grid-cols-3">
+            {actions.map((action) => {
+              const selected = selectedAction === action.id;
+              return (
+                <button
+                  key={action.id}
+                  type="button"
+                  onClick={() => setSelectedAction(selected ? null : action.id)}
+                  aria-pressed={selected}
+                  className={cn(
+                    'rounded-2xl border p-4 text-left transition',
+                    selected
+                      ? 'border-teal-300 bg-teal-50/75'
+                      : 'border-teal-100 bg-white hover:border-teal-300',
+                  )}
+                >
+                  <span className="flex items-start justify-between gap-3">
+                    <span>
+                      <span className="block text-sm font-semibold text-brand-navy-700">{action.title}</span>
+                      <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                        {action.description}
+                      </span>
+                    </span>
+                    <span
+                      className={cn(
+                        'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border',
+                        selected
+                          ? 'border-teal-600 bg-teal-600 text-white'
+                          : 'border-teal-200 text-transparent',
+                      )}
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedActionDetail && (
+            <div className="mt-4 rounded-2xl border border-teal-200 bg-teal-50/55 p-4">
+              <div className="flex items-start gap-3">
+                <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-teal-700" />
+                <div>
+                  <p className="text-sm font-semibold text-teal-950">A calmer way to approach this</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-teal-950/75">
+                    {selectedActionDetail.detail}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-teal-100 pt-4">
+            <p className="text-[11px] leading-relaxed text-brand-muted-500">
+              Nothing in this section is required. Use one idea or close it when you have enough.
+            </p>
+            <button
+              type="button"
+              onClick={() => setActiveStep(2)}
+              className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800"
+            >
+              Open Understand <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </AccordionStep>
+
+        <AccordionStep
+          number={2}
+          title="Understand"
+          subtitle="Help me make sense of what I need"
+          description="Choose the kind of support that would make this concern feel more manageable."
+          accent="blue"
+          open={activeStep === 2}
+          onToggle={() => setActiveStep(2)}
+        >
+          <p className="mb-4 text-[13px] leading-relaxed text-brand-muted-600">
+            This is not an assessment. You are simply choosing the kind of support that feels most relevant.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            {SUPPORT_NEEDS.map((need) => {
+              const selected = supportNeed === need.id;
+              return (
+                <button
+                  key={need.id}
+                  type="button"
+                  onClick={() => setSupportNeed(selected ? null : need.id)}
+                  aria-pressed={selected}
+                  className={cn(
+                    'rounded-2xl border p-4 text-left transition',
+                    selected
+                      ? 'border-blue-300 bg-blue-50/70'
+                      : 'border-blue-100 bg-white hover:border-blue-300',
+                  )}
+                >
+                  <span className="flex items-start gap-3">
+                    <span
+                      className={cn(
+                        'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border',
+                        selected
+                          ? 'border-blue-600 bg-blue-600 text-white'
+                          : 'border-blue-200 text-transparent',
+                      )}
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <span>
+                      <span className="block text-sm font-semibold text-brand-navy-700">{need.label}</span>
+                      <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                        {need.description}
+                      </span>
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {supportNeed && (
+            <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50/45 px-4 py-3 text-[13px] leading-relaxed text-blue-950">
+              <strong>Your support direction:</strong>{' '}
+              {SUPPORT_NEEDS.find((need) => need.id === supportNeed)?.description}
+            </div>
+          )}
+
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-blue-100 pt-4">
+            <p className="text-[11px] leading-relaxed text-brand-muted-500">
+              Skip this section when choosing a category feels like more work than help.
+            </p>
+            <button
+              type="button"
+              onClick={() => setActiveStep(3)}
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
+            >
+              Open Connect <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        </AccordionStep>
+
+        <AccordionStep
+          number={3}
+          title="Connect"
+          subtitle="Help me choose the right support"
+          description="Open an approved resource or prepare a useful conversation with the right person."
+          accent="violet"
+          open={activeStep === 3}
+          onToggle={() => setActiveStep(3)}
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            {connections.map((option) => {
+              const Icon = option.icon;
+              return option.href.startsWith('#') ? (
+                <button
+                  key={option.title}
+                  type="button"
+                  onClick={() => {
+                    document.getElementById('bcba-questions')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="group flex items-start gap-3 rounded-2xl border border-violet-100 bg-white p-4 text-left transition hover:border-violet-300"
+                >
+                  <span className={cn('inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', option.accent)}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-brand-navy-700">{option.title}</span>
+                    <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                      {option.description}
+                    </span>
+                    <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-violet-800">
+                      {option.label} <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  </span>
+                </button>
+              ) : (
+                <Link
+                  key={option.title}
+                  href={option.href}
+                  className="group flex items-start gap-3 rounded-2xl border border-violet-100 bg-white p-4 transition hover:border-violet-300"
+                >
+                  <span className={cn('inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', option.accent)}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-brand-navy-700">{option.title}</span>
+                    <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                      {option.description}
+                    </span>
+                    <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-violet-800">
+                      {option.label} <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                    </span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {(focus === 'child-concern' || focus === 'aba' || supportNeed === 'conversation') && (
+            <section id="bcba-questions" className="mt-5 scroll-mt-24 rounded-2xl border border-violet-200 bg-violet-50/45 p-4 sm:p-5">
+              <div className="flex items-start gap-3">
+                <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-violet-700" />
+                <div>
+                  <h3 className="text-sm font-semibold text-violet-950">Questions I may bring to my BCBA</h3>
+                  <p className="mt-1 text-[12px] leading-relaxed text-violet-950/70">
+                    Choose only the questions that fit. Do not enter your child\'s name or clinical details here.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                {BCBA_QUESTIONS.map((question) => {
+                  const selected = selectedQuestions.includes(question);
+                  return (
+                    <button
+                      key={question}
+                      type="button"
+                      onClick={() => toggleQuestion(question)}
+                      aria-pressed={selected}
+                      className={cn(
+                        'flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition',
+                        selected
+                          ? 'border-violet-300 bg-white'
+                          : 'border-violet-100 bg-white/70 hover:border-violet-300',
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          'mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
+                          selected
+                            ? 'border-violet-600 bg-violet-600 text-white'
+                            : 'border-violet-200 text-transparent',
+                        )}
+                      >
+                        <Check className="h-3 w-3" />
+                      </span>
+                      <span className="text-[13px] leading-relaxed text-brand-navy-700">{question}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {selectedQuestions.length > 0 && (
+                <div className="mt-4 rounded-xl bg-white p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-700">
+                    My conversation list
+                  </p>
+                  <ol className="mt-3 space-y-2">
+                    {selectedQuestions.map((question, index) => (
+                      <li key={question} className="flex items-start gap-2 text-[12px] leading-relaxed text-brand-muted-700">
+                        <span className="font-semibold text-violet-700">{index + 1}.</span>
+                        {question}
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="mt-3 text-[11px] leading-relaxed text-brand-muted-500">
+                    This list stays on this page during your visit. It is not automatically sent to the BCBA.
+                  </p>
+                </div>
+              )}
+            </section>
+          )}
+        </AccordionStep>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="rounded-2xl border border-surface-border bg-white px-5 py-4">
+          <div className="flex items-start gap-3">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+            <div>
+              <p className="text-sm font-semibold text-brand-navy-700">Important boundary</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">
+                Common Ground supports the parent. It does not diagnose behavior, create a behavior plan,
+                replace mental-health treatment, or provide emergency care. Child-specific concerns should
+                be brought to the BCBA or appropriate clinical professional.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-rose-200 bg-rose-50/70 px-5 py-4">
+          <div className="flex items-start gap-3">
+            <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0 text-rose-700" />
+            <div>
+              <p className="text-sm font-semibold text-rose-900">Need immediate help?</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-rose-800">
+                Common Ground is not an emergency service. Use the urgent support options provided by the
+                site when anyone may be in immediate danger.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
 
-function PopulatedPlan({ plan }: { plan: SavedCarePlan }) {
-  const [checkInState, setCheckInState] = useState<WeeklyCheckInState | null>(null);
-  const [emailOpen, setEmailOpen] = useState(false);
-  const [completedKeys, setCompletedKeys] = useState<string[]>([]);
-  const [legacyHrefs, setLegacyHrefs] = useState<string[]>([]);
-
-  const allBucketSteps = useMemo(() => getCarePlanBucketSteps(plan), [plan]);
-  const legacyArcPosition = checkInState
-    ? computeWeekNumber(checkInState.planStartedAt)
-    : 1;
-
-  const weekView = useMemo(
-    () =>
-      getCarePlanWeekView(
-        plan,
-        legacyArcPosition,
-        completedKeys,
-        legacyHrefs,
-        loadPreviousWeeklyProgress()?.lastSupportNudgeThread ?? null,
-      ),
-    [plan, legacyArcPosition, completedKeys, legacyHrefs],
-  );
-
-  useEffect(() => {
-    if (weekView.supportNudgeThread) {
-      recordSupportNudgeThread(weekView.supportNudgeThread);
-    }
-  }, [weekView.supportNudgeThread]);
-
-  const topSteps = weekView.activeSteps;
-  const focusIntro = useMemo(
-    () => (weekView.weekTwoUnlocked ? getWeekTwoGuideIntro(plan.answers) : null),
-    [plan.answers, weekView.weekTwoUnlocked],
-  );
-
-  const previousProgress = useMemo(
-    () => loadPreviousWeeklyProgress(),
-    [completedKeys],
-  );
-  const recentlyCompleted = useMemo(
-    () => completedStepTitles(allBucketSteps, previousProgress),
-    [allBucketSteps, previousProgress],
-  );
-
-  const refreshProgress = () => {
-    const raw = loadWeeklyProgress();
-    setCompletedKeys(resolvedCompletionKeys(allBucketSteps, raw));
-    setLegacyHrefs(raw.completedStepHrefs ?? []);
-  };
-
-  useEffect(() => {
-    setCheckInState(ensurePlanStarted(plan.createdAt));
-    refreshProgress();
-    const onUpdate = () => refreshProgress();
-    window.addEventListener(WEEKLY_PROGRESS_EVENT, onUpdate);
-    return () => window.removeEventListener(WEEKLY_PROGRESS_EVENT, onUpdate);
-  }, [plan.createdAt, allBucketSteps]);
-
-  const handleToggleStep = (stepKey: string, currentlyDone: boolean) => {
-    if (currentlyDone) {
-      unmarkStepDone(stepKey);
-    } else {
-      markStepDone(stepKey);
-    }
-    refreshProgress();
-  };
-
-  const handlePrint = () => {
-    if (typeof window !== 'undefined') window.print();
-  };
-
-  const completionUniverse = useMemo(
-    () => [...allBucketSteps, ...topSteps],
-    [allBucketSteps, topSteps],
-  );
-  const isStepDone = (step: CarePlanStep) =>
-    isStepComplete(step, completedKeys, legacyHrefs, completionUniverse);
-  const doneCount = topSteps.filter(isStepDone).length;
-  const progressPercent = topSteps.length
-    ? Math.round((doneCount / topSteps.length) * 100)
-    : 0;
-  const stageMeta = resolveStageMeta(weekView.arcPhase, doneCount, topSteps.length);
-
-  const resources = plan.resources;
-  const nextActions = resources.slice(0, 3);
-  const toolItems = resources.slice(3, 6).length
-    ? resources.slice(3, 6)
-    : resources.slice(0, 3);
-  const recommended = resources.slice(0, 3);
-  const concerns = (plan.answers.hardest ?? []) as Hardest[];
-
-  const latestCheckIn =
-    checkInState && checkInState.history.length
-      ? checkInState.history[checkInState.history.length - 1]
-      : null;
-
-  const updated = new Date(plan.updatedAt);
-  const updatedDisplay = updated.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+function AccordionStep({
+  number,
+  title,
+  subtitle,
+  description,
+  accent,
+  open,
+  onToggle,
+  children,
+}: {
+  number: StepNumber;
+  title: string;
+  subtitle: string;
+  description: string;
+  accent: 'teal' | 'blue' | 'violet';
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  const styles = {
+    teal: {
+      border: 'border-teal-200',
+      background: open ? 'bg-teal-50/40' : 'bg-white',
+      number: 'bg-teal-700 text-white',
+      eyebrow: 'text-teal-700',
+    },
+    blue: {
+      border: 'border-blue-200',
+      background: open ? 'bg-blue-50/35' : 'bg-white',
+      number: 'bg-blue-700 text-white',
+      eyebrow: 'text-blue-700',
+    },
+    violet: {
+      border: 'border-violet-200',
+      background: open ? 'bg-violet-50/35' : 'bg-white',
+      number: 'bg-violet-700 text-white',
+      eyebrow: 'text-violet-700',
+    },
+  }[accent];
 
   return (
-    <Shell>
-      <section
-        aria-label={`Current stage: ${stageMeta.label}`}
-        className="rounded-3xl border border-surface-border bg-gradient-to-br from-white via-white to-brand-plum-50/35 p-5 shadow-soft sm:p-6"
+    <section className={cn('overflow-hidden rounded-3xl border shadow-soft transition', styles.border, styles.background)}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className="flex w-full items-center gap-4 px-5 py-5 text-left sm:px-6"
       >
-        <div className="grid gap-5 sm:grid-cols-[minmax(0,1fr)_minmax(220px,0.55fr)] sm:items-start">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-muted-500">
-              Your current stage
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-2.5">
-              <span
-                className={`inline-flex rounded-full border px-3 py-1 text-[12px] font-semibold ${stageMeta.badgeClass}`}
-              >
-                {stageMeta.label}
-              </span>
-              <span className="text-[13px] font-medium text-brand-muted-600">
-                Based on your latest check-in
-              </span>
-            </div>
-            <h2 className="mt-3 text-xl font-bold leading-tight text-brand-navy-700 sm:text-2xl">
-              {weekView.arcTheme}
-            </h2>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-brand-muted-700">
-              {stageMeta.description}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-surface-border bg-white/85 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-                  Action progress
-                </p>
-                <p className="mt-1 text-[14px] font-semibold text-brand-navy-700">
-                  {doneCount} of {topSteps.length} complete
-                </p>
-              </div>
-              <span className="text-lg font-bold tabular-nums text-primary">
-                {progressPercent}%
-              </span>
-            </div>
-            <div
-              role="progressbar"
-              aria-label={`${doneCount} of ${topSteps.length} current actions complete`}
-              aria-valuemin={0}
-              aria-valuemax={Math.max(topSteps.length, 1)}
-              aria-valuenow={doneCount}
-              className="mt-3 h-2 overflow-hidden rounded-full bg-stone-200/80"
-            >
-              <div
-                className="h-full rounded-full bg-primary transition-[width] duration-300"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <Link
-              href={CHECK_IN_HREF}
-              className="mt-3 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-primary hover:text-primary/80"
-            >
-              Tell us what changed <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-start gap-2 rounded-2xl bg-surface-muted/45 px-3.5 py-3 text-[12px] leading-relaxed text-brand-muted-600">
-          <RefreshCw className="mt-0.5 h-4 w-4 shrink-0 text-brand-plum-600" />
-          <p>
-            Check in whenever your situation, completed actions, or biggest concern changes.
-            That gives Common Ground the information it needs to recalculate what comes next.
-          </p>
-        </div>
-      </section>
-
-      <nav aria-label="Breadcrumb" className="mt-6 text-[12px] text-brand-muted-500">
-        <ol className="flex items-center gap-1.5">
-          <li>
-            <Link href="/support" className="hover:text-brand-navy-700">
-              Home
-            </Link>
-          </li>
-          <li aria-hidden>
-            <ChevronRight className="h-3 w-3" />
-          </li>
-          <li className="font-medium text-brand-muted-700">My Family Care Plan</li>
-        </ol>
-      </nav>
-
-      <header className="mt-3">
-        <h1 className="text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">
-          <span className="inline-block border-b-[3px] border-brand-plum-300 pb-0.5">
-            Your plan
+        <span className={cn('inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold', styles.number)}>
+          {number}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className={cn('block text-[10px] font-bold uppercase tracking-[0.16em]', styles.eyebrow)}>
+            {subtitle}
           </span>
-          , simplified
-        </h1>
-        <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-brand-muted-700">
-          A focused plan built from what you told us. Complete what is useful, return when
-          something changes, and let the next check-in keep the plan accurate.
-        </p>
-        <p className="mt-1.5 text-[12px] text-brand-muted-500">
-          Last updated {updatedDisplay} · Saved privately on this device
-        </p>
-      </header>
-
-      {concerns.length > 0 && (
-        <section
-          aria-label="What shaped this plan"
-          className="mt-5 rounded-2xl bg-brand-plum-50 px-4 py-3 sm:px-5"
-        >
-          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-                What shaped this plan
-              </p>
-              <ul className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                {concerns.map((concern) => {
-                  const Icon = HARDEST_ICONS[concern];
-                  return (
-                    <li
-                      key={concern}
-                      className="inline-flex items-center gap-1.5 text-[13px] font-medium text-brand-navy-700"
-                    >
-                      {Icon && <Icon className="h-3.5 w-3.5 text-brand-plum-600" />}
-                      {HARDEST_LABEL_BY_VALUE[concern] ?? concern}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-            <Link
-              href={INTAKE_HREF}
-              className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-800"
-            >
-              Edit my concerns <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </section>
-      )}
-
-      {recentlyCompleted.length > 0 && (
-        <section
-          aria-label="Recently completed actions"
-          className="mt-5 rounded-2xl border border-surface-border bg-surface-muted/40 px-4 py-3 sm:px-5"
-        >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-            Recently completed
-          </p>
-          <ul className="mt-2 flex flex-wrap gap-2">
-            {recentlyCompleted.map((title) => (
-              <li
-                key={title}
-                className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[12px] font-medium text-emerald-800"
-              >
-                <Check className="h-3 w-3" aria-hidden /> {title}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section
-        aria-label="Current focus"
-        className="mt-5 overflow-hidden rounded-3xl border border-emerald-200 bg-gradient-to-br from-emerald-50/75 via-white to-white shadow-soft"
-      >
-        <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_245px]">
-          <div className="p-5 sm:p-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.17em] text-emerald-700">
-                Current focus
-              </p>
-              <span className="h-1 w-1 rounded-full bg-emerald-300" aria-hidden />
-              <p className="text-[11px] font-semibold text-emerald-700">{stageMeta.label}</p>
-            </div>
-            <h2 className="mt-2 text-xl font-bold leading-tight text-brand-navy-700">
-              {weekView.arcTheme}
-            </h2>
-            <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-brand-muted-700">
-              {focusIntro
-                ? stageLanguage(focusIntro.body)
-                : 'These actions were selected from your most recent answers. Start with the smallest useful step, then update the plan when your circumstances change.'}
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <Link
-                href={CHECK_IN_HREF}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
-              >
-                Update my next step <ArrowRight className="h-4 w-4" />
-              </Link>
-              <AdmissionsHandoff compact />
-            </div>
-          </div>
-
-          <div className="border-t border-emerald-100 bg-white/70 p-5 lg:border-l lg:border-t-0">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-              <Route className="h-4.5 w-4.5" />
-            </div>
-            <h3 className="mt-3 text-[14px] font-semibold text-brand-navy-700">
-              How your plan moves
-            </h3>
-            <p className="mt-1.5 text-[12px] leading-relaxed text-brand-muted-600">
-              Complete actions at your pace. When something changes, check in again so the
-              system can validate your situation and update the focus.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-        <div>
-          <section aria-label="Your next steps">
-            <SectionHeader
-              icon={Target}
-              title="Your next steps"
-              subtitle="The smallest useful actions for your current focus. You do not have to complete everything at once."
-              right={
-                <div className="flex items-center gap-2">
-                  {doneCount >= topSteps.length && topSteps.length > 0 ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  ) : (
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[12px] font-bold text-white">
-                      {Math.min(doneCount + 1, Math.max(topSteps.length, 1))}
-                    </span>
-                  )}
-                  <span className="text-[12px] font-semibold text-brand-muted-600">
-                    {doneCount} of {topSteps.length} complete
-                  </span>
-                </div>
-              }
-            />
-
-            <ol className="mt-1 divide-y divide-surface-border">
-              {topSteps.map((step, index) => {
-                const isDone = isStepDone(step);
-                const stepKey = getStepCompletionKey(step);
-                const bucket = step.bucket;
-                const isExternal = step.href.startsWith('http') || step.href.startsWith('tel:');
-                const showAdmissions =
-                  step.id !== undefined && ADMISSIONS_STEP_IDS.has(step.id);
-                const ctaVerb =
-                  step.id === 'parentTherapist'
-                    ? 'Find a therapist'
-                    : bucket
-                      ? BUCKET_CTA[bucket]
-                      : 'Open guide';
-
-                return (
-                  <li
-                    key={stepKey}
-                    className={
-                      'flex gap-3 rounded-xl py-4 transition ' +
-                      (isDone ? '-mx-3 bg-emerald-50/50 px-3 opacity-90' : '')
-                    }
-                  >
-                    <span
-                      className={
-                        'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold ' +
-                        (isDone
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-primary/10 text-primary')
-                      }
-                    >
-                      {isDone ? <Check className="h-3.5 w-3.5" /> : index + 1}
-                    </span>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-                        <h3
-                          className={
-                            'text-[15px] font-semibold text-brand-navy-700 ' +
-                            (isDone ? 'line-through decoration-brand-muted-300' : '')
-                          }
-                        >
-                          {step.title}
-                        </h3>
-                        <StepLink
-                          href={step.href}
-                          className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary hover:text-primary/80"
-                        >
-                          {ctaVerb} <ArrowRight className="h-3.5 w-3.5" />
-                          {isExternal && (
-                            <span className="sr-only"> (opens in new tab)</span>
-                          )}
-                        </StepLink>
-                      </div>
-
-                      <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
-                        {stageLanguage(step.because ?? step.why)}
-                      </p>
-
-                      {step.evidence && <EvidenceStrip evidence={step.evidence} />}
-
-                      {showAdmissions && step.id !== 'admissionsConsult' && (
-                        <div className="mt-2">
-                          <AdmissionsHandoff compact />
-                        </div>
-                      )}
-
-                      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                        {bucket && (
-                          <span
-                            className={
-                              'inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ' +
-                              BUCKET_PILL[bucket]
-                            }
-                          >
-                            {stageLanguage(BUCKET_LABELS[bucket])}
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => handleToggleStep(stepKey, isDone)}
-                          aria-pressed={isDone}
-                          className={
-                            'inline-flex items-center gap-1.5 text-[12px] font-semibold transition ' +
-                            (isDone
-                              ? 'text-emerald-700 hover:text-emerald-800'
-                              : 'text-brand-muted-500 hover:text-brand-navy-700')
-                          }
-                        >
-                          {isDone ? (
-                            <>
-                              <Check className="h-3.5 w-3.5" /> Done
-                            </>
-                          ) : (
-                            <>
-                              <Circle className="h-3.5 w-3.5" /> Mark done
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-          </section>
-
-          {!weekView.weekTwoUnlocked && weekView.nextWeekSteps.length > 0 && (
-            <aside
-              aria-label="Later in this support arc"
-              className="mt-6 rounded-2xl border border-dashed border-sky-200 bg-sky-50/40 p-5"
-            >
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-700">
-                Later in this arc
-              </p>
-              <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
-                These are useful, but they are not the priority yet. Your next check-in can
-                move them into focus when the information supports it.
-              </p>
-              <ul className="mt-3 space-y-2">
-                {weekView.nextWeekSteps.map((step) => (
-                  <li
-                    key={getStepCompletionKey(step)}
-                    className="flex items-start gap-2 rounded-xl border border-sky-100 bg-white/80 px-3 py-2.5"
-                  >
-                    <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[10px] font-bold text-sky-700">
-                      →
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[13px] font-semibold text-brand-navy-700">
-                        {step.title}
-                      </span>
-                      <span className="mt-0.5 block text-[12px] text-brand-muted-500">
-                        {stageLanguage(step.because ?? step.why)}
-                      </span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </aside>
-          )}
-        </div>
-
-        <CarePlanSupportPanel answers={plan.answers} className="lg:sticky lg:top-24" />
-      </div>
-
-      <div className="mt-6 print:hidden">
-        <AdmissionsHandoff />
-      </div>
-
-      {resources.length > 0 && (
-        <section aria-label="Next actions and tools" className="mt-9 grid gap-5 lg:grid-cols-2">
-          <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
-            <SectionHeader
-              icon={Flag}
-              title="Do this next"
-              subtitle="Useful actions that support the focus above."
-            />
-            <ul className="mt-1 divide-y divide-surface-border">
-              {nextActions.map((resource) => (
-                <li key={resource.href}>
-                  <Link
-                    href={resource.href}
-                    className="flex items-center justify-between gap-3 py-3 text-[14px] font-medium text-brand-navy-700 hover:text-primary"
-                  >
-                    <span className="min-w-0 truncate">{resource.label}</span>
-                    <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
-                      Open <ArrowRight className="h-3.5 w-3.5" />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-2xl border border-surface-border bg-white p-5 shadow-soft">
-            <SectionHeader
-              icon={Wrench}
-              title="Helpful tools"
-              subtitle="Calculators, templates, and checklists."
-            />
-            <ul className="mt-1 divide-y divide-surface-border">
-              {toolItems.map((resource) => (
-                <li key={resource.href}>
-                  <Link
-                    href={resource.href}
-                    className="flex items-center justify-between gap-3 py-3 text-[14px] font-medium text-brand-navy-700 hover:text-primary"
-                  >
-                    <span className="min-w-0 truncate">{resource.label}</span>
-                    <span className="inline-flex shrink-0 items-center gap-1 text-[13px] font-semibold text-primary">
-                      Use tool <ArrowRight className="h-3.5 w-3.5" />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/support/resources"
-              className="mt-2 inline-flex items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-800"
-            >
-              See all tools <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-        </section>
-      )}
-
-      {recommended.length > 0 && (
-        <section aria-label="Recommended resources" className="mt-9">
-          <SectionHeader
-            icon={BookOpen}
-            title="Recommended resources"
-            subtitle="Curated reads and videos connected to your current focus."
-            right={
-              <Link
-                href="/support/resources"
-                className="inline-flex items-center gap-1 text-[13px] font-semibold text-brand-plum-700 hover:text-brand-plum-800"
-              >
-                See all resources <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            }
-          />
-          <ul className="mt-1 divide-y divide-surface-border">
-            {recommended.map((resource, index) => (
-              <li key={resource.href}>
-                <Link
-                  href={resource.href}
-                  className="flex items-center justify-between gap-3 py-3 hover:text-primary"
-                >
-                  <span className="min-w-0 truncate text-[14px] font-medium text-brand-navy-700">
-                    {resource.label}
-                  </span>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-warm-100 px-2.5 py-0.5 text-[11px] font-semibold text-brand-muted-700">
-                    {index === 1 ? 'Video (3 min)' : 'Article'}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      <section
-        aria-label="Plan actions"
-        className="mt-9 flex flex-wrap items-center justify-center gap-x-2 gap-y-2 rounded-2xl bg-brand-plum-50 px-4 py-3 text-[13px] font-semibold text-brand-plum-700 print:hidden sm:gap-x-4"
-      >
-        <button
-          type="button"
-          onClick={handlePrint}
-          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
-        >
-          <Printer className="h-4 w-4" /> Print my plan
-        </button>
-        <span aria-hidden className="text-brand-plum-200">
-          |
+          <span className="mt-1 block text-xl font-semibold text-brand-navy-700">{title}</span>
+          <span className="mt-1 block text-[13px] leading-relaxed text-brand-muted-500">{description}</span>
         </span>
-        <button
-          type="button"
-          onClick={() => setEmailOpen(true)}
-          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
-        >
-          <Mail className="h-4 w-4" /> Email my plan
-        </button>
-        <span aria-hidden className="text-brand-plum-200">
-          |
-        </span>
-        <Link
-          href={CHECK_IN_HREF}
-          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
-        >
-          <RefreshCw className="h-4 w-4" /> Check in &amp; update
-        </Link>
-        <span aria-hidden className="text-brand-plum-200">
-          |
-        </span>
-        <Link
-          href={INTAKE_HREF}
-          className="inline-flex items-center gap-1.5 hover:text-brand-plum-800"
-        >
-          <Pencil className="h-4 w-4" /> Edit concerns
-        </Link>
-      </section>
-
-      <p className="mt-6 text-[11.5px] leading-relaxed text-brand-muted-500">
-        Saved privately on this device. Clearing your browser data removes it. Common
-        Ground is parent support — it does not diagnose, treat, or replace clinical care.
-      </p>
-
-      <EmailPlanDialog
-        open={emailOpen}
-        onClose={() => setEmailOpen(false)}
-        plan={plan}
-        latestCheckIn={latestCheckIn}
-      />
-    </Shell>
+        {open ? (
+          <ChevronUp className={cn('h-5 w-5 shrink-0', styles.eyebrow)} />
+        ) : (
+          <ChevronDown className="h-5 w-5 shrink-0 text-brand-muted-400" />
+        )}
+      </button>
+      {open && <div className="border-t border-current/10 px-5 pb-5 pt-5 sm:px-6 sm:pb-6">{children}</div>}
+    </section>
   );
 }
