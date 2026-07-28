@@ -5,13 +5,12 @@ import Link from 'next/link';
 import {
   ArrowRight,
   BookOpen,
-  Bookmark,
-  Brain,
   Check,
   ChevronDown,
   ChevronUp,
   CircleHelp,
-  Clock,
+  ExternalLink,
+  FileText,
   Heart,
   LifeBuoy,
   Link2,
@@ -52,52 +51,59 @@ type Concern = {
   updatedAt: string;
 };
 
-type SupportAction = {
+type GuidedTool = {
   id: string;
   title: string;
-  description: string;
-  detail: string;
+  summary: string;
+  steps: string[];
+  noteLabel: string;
+  notePlaceholder: string;
   icon: LucideIcon;
+  resource?: {
+    label: string;
+    href: string;
+  };
 };
 
 type UnderstandingPrompt = {
   id: string;
   title: string;
   description: string;
+  placeholder: string;
 };
 
-type SupportDestination = {
+type ConnectionOption = {
   id: string;
   title: string;
   description: string;
-  href: string;
   icon: LucideIcon;
+  kind: 'guide' | 'resource';
+  href?: string;
+  resourceLabel?: string;
+  opener?: string;
+  questions?: string[];
+  noteLabel?: string;
+  notePlaceholder?: string;
 };
 
-type ConcernProgress = {
+type ConcernWorkspace = {
   activeStep: GuideStep;
-  savedActionIds: string[];
-  understandingIds: string[];
-  destinationIds: string[];
-  helpful: boolean;
-  needsClarity: boolean;
-  lastTouched: string | null;
+  toolNotes: Record<string, string>;
+  understandingNotes: Record<string, string>;
+  connectionNotes: Record<string, string>;
   updatedAt: string;
 };
 
-type ProgressByConcern = Record<string, ConcernProgress>;
+type WorkspaceByConcern = Record<string, ConcernWorkspace>;
 
 const STACK_KEY = 'cg.parentSupport.concerns.v1';
-const PROGRESS_KEY = 'cg.parentSupport.progress.v1';
+const WORKSPACE_KEY = 'cg.parentSupport.workspace.v2';
 
-const EMPTY_PROGRESS: ConcernProgress = {
+const EMPTY_WORKSPACE: ConcernWorkspace = {
   activeStep: 'stabilize',
-  savedActionIds: [],
-  understandingIds: [],
-  destinationIds: [],
-  helpful: false,
-  needsClarity: false,
-  lastTouched: null,
+  toolNotes: {},
+  understandingNotes: {},
+  connectionNotes: {},
   updatedAt: '',
 };
 
@@ -162,8 +168,8 @@ function inferCategory(text: string): ConcernCategory {
 
 function normalizeStack(value: unknown): Concern[] {
   if (!Array.isArray(value)) return [];
-  const allowedStatuses: ConcernStatus[] = ['focus', 'connected', 'later'];
-  const allowedCategories: ConcernCategory[] = [
+  const statuses: ConcernStatus[] = ['focus', 'connected', 'later'];
+  const categories: ConcernCategory[] = [
     'relationship',
     'behavior',
     'burnout',
@@ -180,12 +186,11 @@ function normalizeStack(value: unknown): Concern[] {
       const title = typeof item.title === 'string' ? item.title.trim().slice(0, 240) : '';
       if (!title) return null;
       const status =
-        typeof item.status === 'string' && allowedStatuses.includes(item.status as ConcernStatus)
+        typeof item.status === 'string' && statuses.includes(item.status as ConcernStatus)
           ? (item.status as ConcernStatus)
           : 'later';
       const category =
-        typeof item.category === 'string' &&
-        allowedCategories.includes(item.category as ConcernCategory)
+        typeof item.category === 'string' && categories.includes(item.category as ConcernCategory)
           ? (item.category as ConcernCategory)
           : inferCategory(title);
       const now = new Date().toISOString();
@@ -248,56 +253,64 @@ function readStoredStack() {
   }
 }
 
-function readStoredProgress(): ProgressByConcern {
+function readStoredWorkspaces(): WorkspaceByConcern {
   if (typeof window === 'undefined') return {};
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(PROGRESS_KEY) ?? '{}');
-    return parsed && typeof parsed === 'object' ? (parsed as ProgressByConcern) : {};
+    const parsed = JSON.parse(window.localStorage.getItem(WORKSPACE_KEY) ?? '{}');
+    return parsed && typeof parsed === 'object' ? (parsed as WorkspaceByConcern) : {};
   } catch {
     return {};
   }
 }
 
-function uniqueById<T extends { id: string }>(values: T[]) {
-  return values.filter((value, index) => values.findIndex((item) => item.id === value.id) === index);
-}
-
-function getSupportModel(current: Concern, connected: Concern[]) {
-  const connectedCategories = new Set(connected.map((concern) => concern.category));
-  let actions: SupportAction[];
+function getSupportModel(current: Concern) {
+  let tools: GuidedTool[];
   let prompts: UnderstandingPrompt[];
-  let destinations: SupportDestination[];
+  let connections: ConnectionOption[];
 
   switch (current.category) {
     case 'relationship':
-      actions = [
+      tools = [
         {
-          id: 'relationship-reduce-pressure',
-          title: 'Reduce immediate pressure',
-          description: 'Choose one part of the issue instead of solving the whole relationship today.',
-          detail: 'Write one sentence naming the specific moment, responsibility, or need that feels hardest right now.',
+          id: 'relationship-pressure-point',
+          title: 'Narrow the pressure point',
+          summary: 'Choose one part of the strain instead of trying to solve the whole relationship today.',
+          steps: [
+            'Name the specific moment, responsibility, or need that feels hardest.',
+            'Choose the one part that would make this week feel more manageable.',
+            'Leave the rest in your Concern Stack for another time.',
+          ],
+          noteLabel: 'The one part I want to address first',
+          notePlaceholder: 'For example: I need us to agree on who handles the evening routine.',
           icon: Target,
         },
         {
           id: 'relationship-calm-conversation',
           title: 'Prepare for a calmer conversation',
-          description: 'Choose a time when both people are regulated and able to listen.',
-          detail: 'Begin with what you are experiencing and what support would help, rather than trying to prove who is right.',
+          summary: 'Plan what you want to communicate before the conversation begins.',
+          steps: [
+            'Choose a time when both people are able to listen.',
+            'Describe your experience without trying to prove who is right.',
+            'Ask for one specific change, clarification, or kind of support.',
+          ],
+          noteLabel: 'A sentence I could use to begin',
+          notePlaceholder: 'I have been feeling overwhelmed by ____. Could we talk about one change that would help?',
           icon: MessageCircle,
+          resource: { label: 'Open Marriage & Relationships support', href: '/support/couples' },
         },
         {
-          id: 'relationship-protect-capacity',
-          title: 'Care for your own capacity',
-          description: 'Name what is draining you before deciding what conversation comes next.',
-          detail: 'Consider whether you first need rest, practical relief, emotional support, or clearer information from the care team.',
+          id: 'relationship-capacity',
+          title: 'Name what you need before the conversation',
+          summary: 'Sometimes rest, relief, or clearer information needs to come before problem-solving.',
+          steps: [
+            'Ask whether you need emotional support, practical relief, or clinical clarification.',
+            'Choose the smallest form of support that would help today.',
+            'Write the request plainly so another person can respond to it.',
+          ],
+          noteLabel: 'The support I need most right now',
+          notePlaceholder: 'For example: I need thirty quiet minutes before we discuss the evening routine.',
           icon: Heart,
-        },
-        {
-          id: 'relationship-shared-load',
-          title: 'Clarify the shared load',
-          description: 'Identify where responsibilities or expectations may feel uneven.',
-          detail: 'Focus on one routine, task, or decision that could be made clearer this week.',
-          icon: Users,
+          resource: { label: 'Open caregiver support', href: '/support/caregiver' },
         },
       ];
       prompts = [
@@ -305,366 +318,757 @@ function getSupportModel(current: Concern, connected: Concern[]) {
           id: 'relationship-strain',
           title: 'What feels strained?',
           description: 'Communication, emotional connection, responsibilities, intimacy, finances, or decisions about care.',
+          placeholder: 'The part that feels most strained is…',
         },
         {
-          id: 'relationship-timing',
-          title: 'When is it hardest?',
-          description: 'Notice whether tension rises around transitions, difficult behavior, appointments, or exhaustion.',
+          id: 'relationship-pattern',
+          title: 'When does the strain show up most?',
+          description: 'Consider routines, difficult moments, appointments, exhaustion, or disagreements about care.',
+          placeholder: 'I notice it most when…',
         },
         {
           id: 'relationship-need',
-          title: 'What do you need most?',
-          description: 'Understanding, practical change, shared responsibility, reassurance, or outside support.',
-        },
-        {
-          id: 'relationship-care-link',
-          title: 'How is caregiving involved?',
-          description: 'Consider whether unclear plans or unequal care responsibilities are adding pressure.',
+          title: 'What would meaningful support look like?',
+          description: 'Understanding, a practical change, shared responsibility, reassurance, or outside support.',
+          placeholder: 'What would help me feel supported is…',
         },
       ];
-      destinations = [
+      connections = [
         {
-          id: 'talk-partner',
-          title: 'Prepare a conversation with my partner',
-          description: 'Use a calmer, one-topic conversation guide.',
-          href: '/support/couples',
+          id: 'relationship-partner-guide',
+          title: 'Prepare the conversation here',
+          description: 'Build a calm opening and choose questions before talking with your partner.',
           icon: Users,
+          kind: 'guide',
+          opener: 'I care about us, and I want to talk about one thing that has been weighing on me. I am not trying to solve everything tonight.',
+          questions: [
+            'What part of our current routine feels hardest for you?',
+            'Where do responsibilities feel unclear or uneven?',
+            'What is one change we could try this week?',
+          ],
+          noteLabel: 'What I want to remember during the conversation',
+          notePlaceholder: 'Write the main point, request, or boundary you want to communicate.',
         },
         {
-          id: 'relationship-bcba',
-          title: 'Prepare questions for my BCBA',
-          description: 'Clarify the home plan when care decisions are creating conflict.',
-          href: '/support/care-plan',
+          id: 'relationship-bcba-guide',
+          title: 'Prepare questions for the BCBA',
+          description: 'Use this only when disagreement or stress is connected to the child’s care plan.',
           icon: ListChecks,
+          kind: 'guide',
+          opener: 'We want to respond consistently at home, but parts of the plan are unclear to us.',
+          questions: [
+            'Could you review the home response with both caregivers?',
+            'Can you demonstrate the first steps and watch us practice?',
+            'Can we have the plan in a short written format?',
+          ],
+          noteLabel: 'The care-plan question I do not want to forget',
+          notePlaceholder: 'Write the exact point you want clarified by the BCBA.',
         },
         {
-          id: 'relationship-caregiver',
-          title: 'Explore caregiver support',
-          description: 'Find support for anxiety, burnout, and personal capacity.',
-          href: '/support/caregiver',
+          id: 'relationship-resource',
+          title: 'Marriage & Relationships',
+          description: 'Open the existing Common Ground relationship-support section.',
           icon: Heart,
+          kind: 'resource',
+          href: '/support/couples',
+          resourceLabel: 'Open support',
         },
         {
-          id: 'relationship-connect',
-          title: 'Connect with support resources',
-          description: 'Find people and services that fit what you need.',
-          href: '/support/connect',
-          icon: Link2,
+          id: 'relationship-mental-health',
+          title: 'Mental Health Toolbox',
+          description: 'Find support when anxiety or emotional strain needs more attention.',
+          icon: CircleHelp,
+          kind: 'resource',
+          href: '/support/mental-health',
+          resourceLabel: 'Open toolbox',
         },
       ];
       break;
+
     case 'behavior':
-      actions = [
+      tools = [
         {
-          id: 'behavior-safety',
-          title: 'Start with immediate safety',
-          description: 'Use the safety guidance already provided by the clinical team.',
-          detail: 'If you cannot maintain safety, contact the appropriate clinical, medical, or emergency support instead of waiting.',
+          id: 'behavior-safety-reminder',
+          title: 'Create a safety-first reminder',
+          summary: 'Keep the first priority visible without creating a new behavior procedure.',
+          steps: [
+            'Use the safety guidance already provided by the clinical team.',
+            'Identify the first one or two steps you have already been taught.',
+            'Contact appropriate support when you cannot safely follow the current plan.',
+          ],
+          noteLabel: 'The approved safety reminder I need visible',
+          notePlaceholder: 'Write only the guidance already provided by your clinical team.',
           icon: ShieldCheck,
         },
         {
-          id: 'behavior-current-plan',
-          title: 'Use the current plan',
-          description: 'Do not invent a new consequence or strategy in the difficult moment.',
-          detail: 'Keep the written guidance accessible and ask the BCBA to clarify the first one or two steps.',
+          id: 'behavior-plan-reminder',
+          title: 'Make the current plan easier to remember',
+          summary: 'Turn existing guidance into a short reminder you can find during a hard moment.',
+          steps: [
+            'Do not invent a new consequence or strategy during the situation.',
+            'Write the first approved action in plain language.',
+            'Mark anything that still needs to be demonstrated or clarified by the BCBA.',
+          ],
+          noteLabel: 'The short reminder I want to keep',
+          notePlaceholder: 'For example: First, check safety. Then follow the written response plan.',
           icon: ListChecks,
+          resource: { label: 'Open At Home Strategies', href: '/support/at-home' },
         },
         {
-          id: 'behavior-short-language',
-          title: 'Lower the response load',
-          description: 'Use brief language and focus on the next safe action.',
-          detail: 'Fewer words can make the response easier for both the parent and child to follow during a stressful moment.',
-          icon: MessageCircle,
-        },
-        {
-          id: 'behavior-recover',
-          title: 'Plan for recovery afterward',
-          description: 'Give yourself a brief pause before trying to solve the whole problem.',
-          detail: 'Once everyone is safe, record what happened and identify what felt unclear or difficult to carry out.',
-          icon: Heart,
+          id: 'behavior-afterward',
+          title: 'Record the moment after everyone is safe',
+          summary: 'Capture useful details without trying to diagnose why the behavior occurred.',
+          steps: [
+            'Write what happened immediately before the concern.',
+            'Describe only what you could see or hear.',
+            'Note what adults tried and what felt difficult to carry out.',
+          ],
+          noteLabel: 'What happened this time',
+          notePlaceholder: 'Before: ____. I saw/heard: ____. We responded by: ____.',
+          icon: FileText,
         },
       ];
       prompts = [
         {
           id: 'behavior-before',
           title: 'What happened immediately before?',
-          description: 'Describe the routine, request, transition, or change without guessing why it happened.',
+          description: 'Describe the routine, request, transition, or change without guessing the function.',
+          placeholder: 'Immediately before, we were…',
         },
         {
           id: 'behavior-visible',
           title: 'What could you see or hear?',
-          description: 'Use specific observable actions rather than broad labels.',
+          description: 'Use observable actions instead of labels such as “being difficult.”',
+          placeholder: 'I saw or heard…',
         },
         {
           id: 'behavior-response',
-          title: 'How did the adults respond?',
-          description: 'Note what was attempted and what felt difficult to use consistently.',
-        },
-        {
-          id: 'behavior-change',
-          title: 'What is changing over time?',
-          description: 'Notice whether the concern is new, increasing, or becoming harder to manage safely.',
+          title: 'What part of the response was hardest to use?',
+          description: 'This can become a request for demonstration, practice, or clearer written steps.',
+          placeholder: 'The part I could not use consistently was…',
         },
       ];
-      destinations = [
+      connections = [
         {
-          id: 'behavior-bcba',
-          title: 'Prepare questions for my BCBA',
-          description: 'Ask for modeling, written steps, and safety clarification.',
-          href: '/support/care-plan',
+          id: 'behavior-bcba-guide',
+          title: 'Prepare questions for the BCBA',
+          description: 'Turn what happened at home into a focused clinical conversation.',
           icon: ListChecks,
+          kind: 'guide',
+          opener: 'I want to make sure I understand how to respond safely and consistently at home.',
+          questions: [
+            'What should I do at the first sign that this is beginning?',
+            'Can you demonstrate the response and watch me practice?',
+            'What information would be most useful for me to record?',
+            'When should I contact you before our next meeting?',
+          ],
+          noteLabel: 'The question I most need answered',
+          notePlaceholder: 'Write the exact part of the response that feels unclear.',
         },
         {
-          id: 'behavior-home',
-          title: 'Open at-home guides',
-          description: 'Review approved practical guidance for home routines.',
-          href: '/support/at-home',
+          id: 'behavior-at-home',
+          title: 'At Home Strategies',
+          description: 'Open practical guidance that already exists inside Common Ground.',
           icon: BookOpen,
+          kind: 'resource',
+          href: '/support/at-home',
+          resourceLabel: 'Open strategies',
         },
         {
           id: 'behavior-caregiver',
-          title: 'Support my own capacity',
-          description: 'Address the emotional and physical cost of repeated difficult moments.',
-          href: '/support/caregiver',
+          title: 'Caregiver support',
+          description: 'Address what repeated difficult moments are costing you.',
           icon: Heart,
+          kind: 'resource',
+          href: '/support/caregiver',
+          resourceLabel: 'Open support',
         },
         {
           id: 'behavior-team',
-          title: 'Connect with my support team',
-          description: 'Reach the appropriate support when the current plan is unclear or unsafe.',
-          href: '/support/connect',
+          title: 'Connect with support',
+          description: 'Find the right human support when the current plan feels unclear or unsafe.',
           icon: Users,
+          kind: 'resource',
+          href: '/support/connect',
+          resourceLabel: 'Find support',
         },
       ];
       break;
+
     case 'burnout':
-      actions = [
+      tools = [
         {
-          id: 'burnout-one-demand',
-          title: 'Remove one nonessential demand',
-          description: 'A lower-capacity day should create a smaller plan, not more pressure.',
-          detail: 'Choose one task that can wait, be simplified, or be shared with someone else.',
+          id: 'burnout-lower-load',
+          title: 'Lower today’s load',
+          summary: 'A lower-capacity day needs a smaller plan, not more expectations.',
+          steps: [
+            'Choose one nonessential task that can wait, be simplified, or be shared.',
+            'Keep the essential responsibility and release the rest for today.',
+            'Name the person who could help if support is available.',
+          ],
+          noteLabel: 'One thing I can release or simplify today',
+          notePlaceholder: 'Today, I am allowing ____ to wait.',
           icon: Target,
         },
         {
           id: 'burnout-specific-help',
-          title: 'Ask for specific help',
-          description: 'Name the kind of relief that would actually change today.',
-          detail: 'Examples include listening, childcare relief, transportation, a meal, paperwork help, or quiet time.',
+          title: 'Ask for one specific kind of help',
+          summary: 'A concrete request is easier for another person to respond to.',
+          steps: [
+            'Choose emotional support, practical relief, information, or professional care.',
+            'Make the request small and specific.',
+            'Send it to one appropriate person instead of carrying it alone.',
+          ],
+          noteLabel: 'The request I could make',
+          notePlaceholder: 'Could you help me with ____ today so I can ____?',
           icon: Users,
         },
         {
-          id: 'burnout-recovery',
-          title: 'Create a recovery window',
-          description: 'Protect a short period that is not used to solve another problem.',
-          detail: 'Choose something realistic enough to happen today, even if it is only a few uninterrupted minutes.',
+          id: 'burnout-recovery-window',
+          title: 'Choose a realistic recovery window',
+          summary: 'Protect a short period that is not used to solve another problem.',
+          steps: [
+            'Choose a length of time that can realistically happen.',
+            'Decide what you will not do during that window.',
+            'Choose one activity that helps your body or mind settle.',
+          ],
+          noteLabel: 'My recovery window',
+          notePlaceholder: 'From ____ to ____, I will pause ____ and do ____ instead.',
           icon: Heart,
-        },
-        {
-          id: 'burnout-one-question',
-          title: 'Carry one question',
-          description: 'Write down the one thing you most need clarified by the team.',
-          detail: 'You do not need to remember every detail or solve every concern before asking for support.',
-          icon: CircleHelp,
+          resource: { label: 'Open caregiver support', href: '/support/caregiver' },
         },
       ];
       prompts = [
         {
           id: 'burnout-drain',
           title: 'What is draining the most energy?',
-          description: 'Emotional strain, sleep, difficult behavior, appointments, work, isolation, or decision fatigue.',
+          description: 'Emotional strain, sleep, difficult behavior, appointments, work, isolation, or decisions.',
+          placeholder: 'The biggest drain on my capacity is…',
         },
         {
           id: 'burnout-functioning',
           title: 'What is becoming harder to do?',
-          description: 'Notice whether overwhelm is affecting sleep, work, relationships, health, or use of the home plan.',
+          description: 'Consider sleep, work, relationships, health, or following the home plan.',
+          placeholder: 'I am noticing that it is harder to…',
         },
         {
           id: 'burnout-relief',
-          title: 'What kind of relief would matter?',
-          description: 'Clarify whether you need emotional support, practical help, clinical clarity, or professional care.',
-        },
-        {
-          id: 'burnout-duration',
-          title: 'How long has this felt unsustainable?',
-          description: 'Persistent or worsening overwhelm may need support beyond a self-guided resource.',
+          title: 'What kind of relief would actually matter?',
+          description: 'Emotional support, practical help, clinical clarity, respite, or professional care.',
+          placeholder: 'The support that would make the biggest difference is…',
         },
       ];
-      destinations = [
+      connections = [
         {
-          id: 'burnout-caregiver',
-          title: 'Explore caregiver support',
-          description: 'Find tools for capacity, identity, and emotional well-being.',
-          href: '/support/caregiver',
+          id: 'burnout-help-guide',
+          title: 'Prepare a request for help',
+          description: 'Turn “I am overwhelmed” into a request another person can understand.',
+          icon: MessageCircle,
+          kind: 'guide',
+          opener: 'I am carrying more than I can sustain right now. I need help with one specific part.',
+          questions: [
+            'Who is most likely to respond safely and practically?',
+            'What exact task, time period, or kind of support am I requesting?',
+            'What will I do if this person is unavailable?',
+          ],
+          noteLabel: 'The message I want to send',
+          notePlaceholder: 'I need help with ____ by ____. Could you ____?',
+        },
+        {
+          id: 'burnout-caregiver-resource',
+          title: 'Caregiver support',
+          description: 'Open Common Ground tools focused on your capacity and well-being.',
           icon: Heart,
+          kind: 'resource',
+          href: '/support/caregiver',
+          resourceLabel: 'Open support',
         },
         {
           id: 'burnout-mental-health',
-          title: 'Open the Mental Health Toolbox',
-          description: 'Review approved support and professional-care options.',
+          title: 'Mental Health Toolbox',
+          description: 'Explore coping tools and routes to professional mental-health support.',
+          icon: CircleHelp,
+          kind: 'resource',
           href: '/support/mental-health',
-          icon: Brain,
+          resourceLabel: 'Open toolbox',
         },
         {
           id: 'burnout-connect',
           title: 'Find human support',
-          description: 'Connect with people, community resources, or practical help.',
-          href: '/support/connect',
+          description: 'Connect with people, services, and practical resources.',
           icon: Users,
-        },
-        {
-          id: 'burnout-bcba',
-          title: 'Make the home plan more realistic',
-          description: 'Prepare questions about implementation barriers and parent training.',
-          href: '/support/care-plan',
-          icon: ListChecks,
+          kind: 'resource',
+          href: '/support/connect',
+          resourceLabel: 'Find support',
         },
       ];
       break;
-    default:
-      actions = [
+
+    case 'aba':
+      tools = [
         {
-          id: 'general-one-part',
-          title: 'Choose one part to carry',
-          description: 'Focus on the part that would make the biggest difference today.',
-          detail: 'The other concerns remain in your stack, so choosing one focus does not mean forgetting the rest.',
-          icon: Target,
-        },
-        {
-          id: 'general-name-need',
-          title: 'Name the support you need',
-          description: 'Decide whether you need information, relief, a conversation, or professional support.',
-          detail: 'A specific support request is easier for another person or team to respond to.',
+          id: 'aba-one-confusion',
+          title: 'Name the one unclear instruction',
+          summary: 'Turn a broad feeling of confusion into one question that can be answered.',
+          steps: [
+            'Choose the routine or recommendation that feels least clear.',
+            'Write what you believe you are supposed to do.',
+            'Mark the exact point where you become unsure.',
+          ],
+          noteLabel: 'The part I need explained',
+          notePlaceholder: 'I understand ____, but I am unsure what to do when ____ happens.',
           icon: CircleHelp,
         },
         {
-          id: 'general-one-question',
-          title: 'Write one important question',
-          description: 'Capture it now so you do not have to hold it in your head.',
-          detail: 'Your saved question can travel with you into the next conversation or resource.',
-          icon: MessageCircle,
+          id: 'aba-teach-back',
+          title: 'Prepare a teach-back request',
+          summary: 'Ask the BCBA to demonstrate the strategy and watch you practice it.',
+          steps: [
+            'Ask for the strategy in simple written steps.',
+            'Ask the BCBA to model the response.',
+            'Practice it and ask for feedback before leaving the meeting.',
+          ],
+          noteLabel: 'What I want demonstrated',
+          notePlaceholder: 'Please show me how to respond when…',
+          icon: ListChecks,
         },
         {
-          id: 'general-protect-capacity',
-          title: 'Protect your capacity',
-          description: 'Make the next action small enough to be realistic today.',
-          detail: 'Support should lower the burden of the concern, not create another assignment.',
-          icon: Heart,
+          id: 'aba-home-barrier',
+          title: 'Describe what makes it harder at home',
+          summary: 'A strategy may be understood but still be difficult to use in real family life.',
+          steps: [
+            'Name the time, setting, or competing responsibility creating the barrier.',
+            'Describe who else needs to understand the plan.',
+            'Ask how the existing recommendation can be practiced in that context.',
+          ],
+          noteLabel: 'The barrier at home',
+          notePlaceholder: 'The plan becomes difficult to use when…',
+          icon: FileText,
+          resource: { label: 'Read What is ABA?', href: '/support/what-is-aba' },
+        },
+      ];
+      prompts = [
+        {
+          id: 'aba-confusing-part',
+          title: 'Which part is confusing?',
+          description: 'A term, the reason for a strategy, the exact steps, or how to use it at home.',
+          placeholder: 'The part I do not understand is…',
+        },
+        {
+          id: 'aba-home-difference',
+          title: 'What is different at home?',
+          description: 'Consider siblings, schedules, fatigue, space, other caregivers, and competing demands.',
+          placeholder: 'At home, the main difference is…',
+        },
+        {
+          id: 'aba-needed-format',
+          title: 'How would you learn it best?',
+          description: 'A demonstration, written steps, practice, video, example, or follow-up check-in.',
+          placeholder: 'It would help me if the BCBA could…',
+        },
+      ];
+      connections = [
+        {
+          id: 'aba-bcba-guide',
+          title: 'Prepare the BCBA conversation',
+          description: 'Create a focused request for explanation, modeling, and practice.',
+          icon: ListChecks,
+          kind: 'guide',
+          opener: 'I want to use the plan correctly at home, but I need one part explained more clearly.',
+          questions: [
+            'Can you explain the purpose in plain language?',
+            'Can you demonstrate it and then watch me practice?',
+            'What should I do when the home situation looks different from the clinic?',
+            'How will we know whether I am using it correctly?',
+          ],
+          noteLabel: 'My most important question for the BCBA',
+          notePlaceholder: 'Write the one answer you need before the meeting ends.',
+        },
+        {
+          id: 'aba-learn',
+          title: 'What is ABA?',
+          description: 'Open the existing plain-language ABA guide.',
+          icon: BookOpen,
+          kind: 'resource',
+          href: '/support/what-is-aba',
+          resourceLabel: 'Open guide',
+        },
+        {
+          id: 'aba-home',
+          title: 'At Home Strategies',
+          description: 'Review practical guidance already available in Common Ground.',
+          icon: BookOpen,
+          kind: 'resource',
+          href: '/support/at-home',
+          resourceLabel: 'Open strategies',
+        },
+        {
+          id: 'aba-connect',
+          title: 'Connect with support',
+          description: 'Find the appropriate person or support route for your question.',
+          icon: Users,
+          kind: 'resource',
+          href: '/support/connect',
+          resourceLabel: 'Find support',
+        },
+      ];
+      break;
+
+    case 'financial':
+      tools = [
+        {
+          id: 'financial-urgent-question',
+          title: 'Identify the urgent financial question',
+          summary: 'Separate the issue that needs an answer now from everything else.',
+          steps: [
+            'Choose whether the concern is a bill, coverage, authorization, cost, or paperwork.',
+            'Write the date, amount, or deadline only if it is safe and appropriate to store here.',
+            'Name the answer you need from billing or insurance.',
+          ],
+          noteLabel: 'The financial question I need answered',
+          notePlaceholder: 'I need to understand why ____ and what I should do next.',
+          icon: CircleHelp,
+          resource: { label: 'Open Paying for Care', href: '/support/financial' },
+        },
+        {
+          id: 'financial-prepare-contact',
+          title: 'Prepare before contacting support',
+          summary: 'Gather only what is needed so the conversation is easier to manage.',
+          steps: [
+            'Write the name of the department you need to contact.',
+            'List the document or information you may need available.',
+            'Choose the one outcome you want from the conversation.',
+          ],
+          noteLabel: 'What I need ready',
+          notePlaceholder: 'Contact: ____. Information needed: ____. Desired answer: ____.',
+          icon: FileText,
+        },
+        {
+          id: 'financial-lower-load',
+          title: 'Keep the task contained',
+          summary: 'Financial uncertainty can expand mentally; give this task a clear boundary.',
+          steps: [
+            'Choose one call, form, or question for this session.',
+            'Set aside the remaining concerns in the stack.',
+            'Record the next contact or follow-up before stopping.',
+          ],
+          noteLabel: 'The one financial task I am handling now',
+          notePlaceholder: 'For this session, I am only going to…',
+          icon: Target,
+        },
+      ];
+      prompts = [
+        {
+          id: 'financial-type',
+          title: 'What kind of issue is this?',
+          description: 'Billing, insurance coverage, authorization, affordability, or paperwork.',
+          placeholder: 'This concern is mainly about…',
+        },
+        {
+          id: 'financial-unknown',
+          title: 'What answer is missing?',
+          description: 'Identify the specific information preventing you from moving forward.',
+          placeholder: 'I cannot move forward until I know…',
+        },
+        {
+          id: 'financial-next-contact',
+          title: 'Who is the next appropriate contact?',
+          description: 'The clinic, billing team, insurer, employer, or another support resource.',
+          placeholder: 'The next person or department I need to contact is…',
+        },
+      ];
+      connections = [
+        {
+          id: 'financial-call-guide',
+          title: 'Prepare the billing or insurance conversation',
+          description: 'Write a clear opening and the questions you need answered.',
+          icon: MessageCircle,
+          kind: 'guide',
+          opener: 'I am calling because I need clarification about one part of the cost or coverage for care.',
+          questions: [
+            'What is the current status of this bill, claim, or authorization?',
+            'What information or action is needed from me?',
+            'Who should I contact if this is not resolved?',
+            'Can you give me a reference number or written summary?',
+          ],
+          noteLabel: 'What I need to leave the conversation knowing',
+          notePlaceholder: 'Before the call ends, I need a clear answer about…',
+        },
+        {
+          id: 'financial-resource',
+          title: 'Paying for Care',
+          description: 'Open the Common Ground financial-support section.',
+          icon: BookOpen,
+          kind: 'resource',
+          href: '/support/financial',
+          resourceLabel: 'Open support',
+        },
+        {
+          id: 'financial-connect',
+          title: 'Find the right contact',
+          description: 'Use Common Ground to identify the appropriate human support.',
+          icon: Users,
+          kind: 'resource',
+          href: '/support/connect',
+          resourceLabel: 'Find support',
+        },
+      ];
+      break;
+
+    default:
+      tools = [
+        {
+          id: 'general-one-part',
+          title: 'Choose one part to carry right now',
+          summary: 'Focusing on one part does not mean the other concerns are forgotten.',
+          steps: [
+            'Name the part creating the most pressure today.',
+            'Choose one action, answer, or conversation that would help.',
+            'Leave the remaining concerns safely in your stack.',
+          ],
+          noteLabel: 'The part I want help with first',
+          notePlaceholder: 'The first thing I want to make more manageable is…',
+          icon: Target,
+        },
+        {
+          id: 'general-name-support',
+          title: 'Name the kind of support you need',
+          summary: 'Choose between information, practical relief, a conversation, or professional support.',
+          steps: [
+            'Ask what would be different if you felt supported.',
+            'Choose the person, resource, or kind of help that fits that need.',
+            'Turn the need into one clear request.',
+          ],
+          noteLabel: 'The support I am looking for',
+          notePlaceholder: 'I need help with ____ so that ____ becomes more manageable.',
+          icon: CircleHelp,
+        },
+        {
+          id: 'general-capture-question',
+          title: 'Capture one question',
+          summary: 'Write it now so you do not have to keep carrying it mentally.',
+          steps: [
+            'Write the question exactly as it appears in your mind.',
+            'Choose who is most qualified to answer it.',
+            'Keep it here until the next conversation.',
+          ],
+          noteLabel: 'The question I do not want to forget',
+          notePlaceholder: 'My question is…',
+          icon: MessageCircle,
         },
       ];
       prompts = [
         {
           id: 'general-hardest',
           title: 'What feels hardest?',
-          description: 'Identify the specific part of the situation that is creating the most pressure.',
+          description: 'Identify the specific part of the situation creating the most pressure.',
+          placeholder: 'The hardest part is…',
         },
         {
           id: 'general-pattern',
           title: 'When does it affect you most?',
           description: 'Notice the times, routines, people, or decisions connected to the concern.',
-        },
-        {
-          id: 'general-tried',
-          title: 'What have you already tried?',
-          description: 'Record what helped, what did not, and what was too difficult to sustain.',
+          placeholder: 'This affects me most when…',
         },
         {
           id: 'general-support',
           title: 'What support would change the situation?',
           description: 'Clarify the next conversation, resource, or person that may be appropriate.',
+          placeholder: 'The support that would make a difference is…',
         },
       ];
-      destinations = [
+      connections = [
+        {
+          id: 'general-conversation-guide',
+          title: 'Prepare the next conversation',
+          description: 'Organize what is happening, what you need, and what you want to ask.',
+          icon: MessageCircle,
+          kind: 'guide',
+          opener: 'I want to explain what has been weighing on me and ask for one kind of support.',
+          questions: [
+            'What is the main point I need this person to understand?',
+            'What specific help or answer am I requesting?',
+            'What will I do if this person is not the right source of support?',
+          ],
+          noteLabel: 'What I want to say or ask',
+          notePlaceholder: 'Write the main point you want to carry into the conversation.',
+        },
         {
           id: 'general-resources',
-          title: 'Explore the resource library',
-          description: 'Find approved support organized around common parent needs.',
-          href: '/support/resources',
+          title: 'Resource Hub',
+          description: 'Explore support that already exists inside Common Ground.',
           icon: BookOpen,
+          kind: 'resource',
+          href: '/support/resources',
+          resourceLabel: 'Open resources',
         },
         {
           id: 'general-caregiver',
-          title: 'Support my well-being',
-          description: 'Choose support that addresses the impact on you.',
-          href: '/support/caregiver',
+          title: 'Caregiver support',
+          description: 'Find support centered on what this is costing you.',
           icon: Heart,
-        },
-        {
-          id: 'general-bcba',
-          title: 'Prepare for my BCBA',
-          description: 'Turn the concern into useful questions when clinical support is relevant.',
-          href: '/support/care-plan',
-          icon: ListChecks,
+          kind: 'resource',
+          href: '/support/caregiver',
+          resourceLabel: 'Open support',
         },
         {
           id: 'general-connect',
-          title: 'Connect to the right support',
-          description: 'Find people, services, and next-step guidance.',
-          href: '/support/connect',
+          title: 'Find human support',
+          description: 'Connect with an appropriate person, service, or community resource.',
           icon: Users,
+          kind: 'resource',
+          href: '/support/connect',
+          resourceLabel: 'Find support',
         },
       ];
   }
 
-  if (connectedCategories.has('burnout') && current.category !== 'burnout') {
-    actions = uniqueById([
-      ...actions.slice(0, 3),
+  if (current.category === 'school') {
+    connections = [
       {
-        id: 'merged-protect-capacity',
-        title: 'Protect your capacity too',
-        description: 'The connected burnout concern deserves support alongside the current focus.',
-        detail: 'Choose a next action that is realistic for your current energy instead of adding another burden.',
-        icon: Heart,
+        id: 'school-conversation-guide',
+        title: 'Prepare the school or care-team conversation',
+        description: 'Organize what you have observed and what answer or support you need.',
+        icon: MessageCircle,
+        kind: 'guide',
+        opener: 'I want to make sure we understand what is happening across settings and what support is appropriate.',
+        questions: [
+          'What are you observing in this setting?',
+          'What information would help us compare home, clinic, and school?',
+          'Who should be involved in the next conversation?',
+        ],
+        noteLabel: 'The school concern I want to explain clearly',
+        notePlaceholder: 'I have noticed ____. I need help understanding ____.',
       },
-    ]).slice(0, 4);
+      {
+        id: 'school-resources',
+        title: 'Resource Hub',
+        description: 'Open existing educational and family resources.',
+        icon: BookOpen,
+        kind: 'resource',
+        href: '/support/resources',
+        resourceLabel: 'Open resources',
+      },
+      {
+        id: 'school-connect',
+        title: 'Find support',
+        description: 'Identify the appropriate person or service for the next question.',
+        icon: Users,
+        kind: 'resource',
+        href: '/support/connect',
+        resourceLabel: 'Find support',
+      },
+    ];
   }
 
-  if (connectedCategories.has('behavior') && current.category === 'relationship') {
-    actions = uniqueById([
-      actions[0],
+  if (current.category === 'siblings') {
+    connections = [
       {
-        id: 'merged-separate-crisis',
-        title: 'Separate the crisis from the disagreement',
-        description: 'Handle immediate safety first, then discuss caregiver differences later.',
-        detail: 'A difficult moment is usually not the best time to settle disagreements about the home response.',
-        icon: ShieldCheck,
+        id: 'siblings-conversation-guide',
+        title: 'Prepare a family conversation',
+        description: 'Choose simple language and identify what the sibling needs to hear or receive.',
+        icon: MessageCircle,
+        kind: 'guide',
+        opener: 'I want to make space for how this has been affecting you too.',
+        questions: [
+          'What has felt hardest or confusing lately?',
+          'What time or attention do you need from me?',
+          'What would help home feel more predictable?',
+        ],
+        noteLabel: 'What I want to remember about the sibling’s needs',
+        notePlaceholder: 'The sibling may need…',
       },
-      ...actions.slice(1),
-    ]).slice(0, 4);
+      {
+        id: 'siblings-resource',
+        title: 'Sibling Support',
+        description: 'Open the existing Common Ground sibling-support section.',
+        icon: Users,
+        kind: 'resource',
+        href: '/support/siblings',
+        resourceLabel: 'Open support',
+      },
+      {
+        id: 'siblings-connect',
+        title: 'Find family support',
+        description: 'Connect with relevant community or practical resources.',
+        icon: Link2,
+        kind: 'resource',
+        href: '/support/connect',
+        resourceLabel: 'Find support',
+      },
+    ];
   }
 
-  return { actions, prompts, destinations };
+  if (current.category === 'isolation') {
+    connections = [
+      {
+        id: 'isolation-reach-out-guide',
+        title: 'Prepare a low-pressure reach-out',
+        description: 'Write a simple message that asks for connection without explaining everything.',
+        icon: MessageCircle,
+        kind: 'guide',
+        opener: 'I have been carrying a lot lately and could use someone to talk with.',
+        questions: [
+          'Who has felt safe or understanding in the past?',
+          'Would I prefer listening, practical help, or shared experience?',
+          'What is the smallest invitation I could make?',
+        ],
+        noteLabel: 'The message I could send',
+        notePlaceholder: 'Would you have time to ____ this week?',
+      },
+      {
+        id: 'isolation-connect',
+        title: 'Parent and community connection',
+        description: 'Use Common Ground to find people and resources that understand.',
+        icon: Users,
+        kind: 'resource',
+        href: '/support/connect',
+        resourceLabel: 'Find connection',
+      },
+      {
+        id: 'isolation-resources',
+        title: 'Resource Hub',
+        description: 'Explore other available caregiver and family supports.',
+        icon: BookOpen,
+        kind: 'resource',
+        href: '/support/resources',
+        resourceLabel: 'Open resources',
+      },
+    ];
+  }
+
+  return { tools, prompts, connections };
 }
 
 function buildInsight(current: Concern, connected: Concern[]) {
   const categories = new Set([current.category, ...connected.map((concern) => concern.category)]);
   if (categories.has('relationship') && categories.has('behavior') && categories.has('burnout')) {
     return {
-      title: 'These concerns may be reinforcing one another.',
-      body: 'Difficult moments at home can drain your capacity, and exhaustion can make communication with your partner harder. We will focus on one pressure point while keeping the others visible.',
+      title: 'These concerns may be influencing one another.',
+      body: 'Difficult moments at home can drain your capacity, and exhaustion can make communication with your partner harder. The guide will focus on one pressure point while keeping the full picture visible.',
     };
   }
   if (categories.has('behavior') && categories.has('burnout')) {
     return {
       title: 'The home concern and caregiver exhaustion appear connected.',
-      body: 'Preparing for difficult moments and protecting your capacity may need to happen together. The guide will keep both needs in view without asking you to solve everything at once.',
+      body: 'Preparing for difficult moments and protecting your capacity may need to happen together. You can work on one without losing the other.',
     };
   }
   if (categories.has('aba') && categories.has('relationship')) {
     return {
       title: 'Unclear care expectations may be adding relationship pressure.',
-      body: 'The guide can help you prepare a partner conversation while also identifying what should be clarified with the BCBA.',
+      body: 'A partner conversation and clearer questions for the BCBA may both be useful, but they do not have to happen at the same time.',
     };
   }
   if (connected.length) {
     return {
       title: 'Your concerns appear connected.',
-      body: `We will focus on “${current.title}” while keeping ${connected.length === 1 ? 'the connected concern' : `${connected.length} connected concerns`} in the background so important context is not lost.`,
+      body: `The guide will focus on “${current.title}” while keeping ${connected.length === 1 ? 'the connected concern' : `${connected.length} connected concerns`} visible so important context is not lost.`,
     };
   }
   return {
-    title: 'One focus can create a clearer next step.',
-    body: 'You can add other concerns at any time. Common Ground will keep them saved and help you decide which one needs attention first.',
+    title: 'One focus can make the next decision clearer.',
+    body: 'You can add other concerns at any time. Choosing one focus does not mean the others are forgotten.',
   };
 }
 
@@ -703,19 +1107,20 @@ export default function SupportHome() {
   const [hydrated, setHydrated] = useState(false);
   const [plan, setPlan] = useState<SavedCarePlan | null>(null);
   const [concerns, setConcerns] = useState<Concern[]>([]);
-  const [progressByConcern, setProgressByConcern] = useState<ProgressByConcern>({});
+  const [workspaces, setWorkspaces] = useState<WorkspaceByConcern>({});
   const [showComposer, setShowComposer] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftConcern, setDraftConcern] = useState('');
   const [draftStatus, setDraftStatus] = useState<ConcernStatus>('connected');
-  const [expandedActionId, setExpandedActionId] = useState<string | null>(null);
+  const [expandedToolId, setExpandedToolId] = useState<string | null>(null);
+  const [expandedConnectionId, setExpandedConnectionId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadedPlan = loadCarePlan();
     const stored = readStoredStack();
     setPlan(loadedPlan);
     setConcerns(stored.length ? stored : deriveConcerns(loadedPlan));
-    setProgressByConcern(readStoredProgress());
+    setWorkspaces(readStoredWorkspaces());
     setHydrated(true);
   }, []);
 
@@ -724,55 +1129,52 @@ export default function SupportHome() {
     try {
       window.localStorage.setItem(STACK_KEY, JSON.stringify(concerns));
     } catch {
-      // The page still works if device storage is unavailable.
+      // The page remains usable if device storage is unavailable.
     }
   }, [concerns, hydrated]);
 
   useEffect(() => {
     if (!hydrated) return;
     try {
-      window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(progressByConcern));
+      window.localStorage.setItem(WORKSPACE_KEY, JSON.stringify(workspaces));
     } catch {
-      // The page still works if device storage is unavailable.
+      // The page remains usable if device storage is unavailable.
     }
-  }, [hydrated, progressByConcern]);
+  }, [hydrated, workspaces]);
 
   const currentConcern = concerns.find((concern) => concern.status === 'focus') ?? null;
   const connectedConcerns = concerns.filter((concern) => concern.status === 'connected');
-  const savedConcerns = concerns.filter((concern) => concern.status === 'later');
-  const currentProgress = currentConcern
-    ? progressByConcern[currentConcern.id] ?? EMPTY_PROGRESS
-    : EMPTY_PROGRESS;
+  const currentWorkspace = currentConcern
+    ? workspaces[currentConcern.id] ?? EMPTY_WORKSPACE
+    : EMPTY_WORKSPACE;
   const model = useMemo(
-    () => (currentConcern ? getSupportModel(currentConcern, connectedConcerns) : null),
-    [connectedConcerns, currentConcern],
+    () => (currentConcern ? getSupportModel(currentConcern) : null),
+    [currentConcern],
   );
   const insight = useMemo(
     () => (currentConcern ? buildInsight(currentConcern, connectedConcerns) : null),
     [connectedConcerns, currentConcern],
   );
 
-  const updateCurrentProgress = useCallback(
-    (updater: (current: ConcernProgress) => ConcernProgress) => {
+  const updateWorkspace = useCallback(
+    (updater: (workspace: ConcernWorkspace) => ConcernWorkspace) => {
       if (!currentConcern) return;
-      setProgressByConcern((current) => {
-        const previous = current[currentConcern.id] ?? EMPTY_PROGRESS;
-        return {
-          ...current,
-          [currentConcern.id]: updater(previous),
-        };
+      setWorkspaces((current) => {
+        const previous = current[currentConcern.id] ?? EMPTY_WORKSPACE;
+        return { ...current, [currentConcern.id]: updater(previous) };
       });
     },
     [currentConcern],
   );
 
   const setActiveStep = (step: GuideStep) => {
-    updateCurrentProgress((current) => ({
-      ...current,
+    updateWorkspace((workspace) => ({
+      ...workspace,
       activeStep: step,
       updatedAt: new Date().toISOString(),
     }));
-    setExpandedActionId(null);
+    setExpandedToolId(null);
+    setExpandedConnectionId(null);
   };
 
   const setFocus = (id: string) => {
@@ -784,21 +1186,8 @@ export default function SupportHome() {
         updatedAt: concern.id === id || concern.status === 'focus' ? now : concern.updatedAt,
       })),
     );
-    setExpandedActionId(null);
-  };
-
-  const setConcernStatus = (id: string, status: ConcernStatus) => {
-    if (status === 'focus') {
-      setFocus(id);
-      return;
-    }
-    setConcerns((current) =>
-      current.map((concern) =>
-        concern.id === id
-          ? { ...concern, status, updatedAt: new Date().toISOString() }
-          : concern,
-      ),
-    );
+    setExpandedToolId(null);
+    setExpandedConnectionId(null);
   };
 
   const openAddConcern = () => {
@@ -819,16 +1208,12 @@ export default function SupportHome() {
     const title = draftConcern.trim();
     if (title.length < 10) return;
     const now = new Date().toISOString();
+
     if (editingId) {
       setConcerns((current) =>
         current.map((concern) =>
           concern.id === editingId
-            ? {
-                ...concern,
-                title: title.slice(0, 240),
-                category: inferCategory(title),
-                updatedAt: now,
-              }
+            ? { ...concern, title: title.slice(0, 240), category: inferCategory(title), updatedAt: now }
             : concern,
         ),
       );
@@ -854,6 +1239,7 @@ export default function SupportHome() {
           : [...current, nextConcern],
       );
     }
+
     setShowComposer(false);
     setDraftConcern('');
     setEditingId(null);
@@ -875,46 +1261,28 @@ export default function SupportHome() {
     setDraftConcern('');
   };
 
-  const toggleSavedAction = (action: SupportAction) => {
-    updateCurrentProgress((current) => {
-      const selected = current.savedActionIds.includes(action.id);
-      return {
-        ...current,
-        savedActionIds: selected
-          ? current.savedActionIds.filter((id) => id !== action.id)
-          : [...current.savedActionIds, action.id],
-        lastTouched: action.title,
-        updatedAt: new Date().toISOString(),
-      };
-    });
+  const updateToolNote = (id: string, value: string) => {
+    updateWorkspace((workspace) => ({
+      ...workspace,
+      toolNotes: { ...workspace.toolNotes, [id]: value.slice(0, 1200) },
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
-  const toggleUnderstanding = (prompt: UnderstandingPrompt) => {
-    updateCurrentProgress((current) => {
-      const selected = current.understandingIds.includes(prompt.id);
-      return {
-        ...current,
-        understandingIds: selected
-          ? current.understandingIds.filter((id) => id !== prompt.id)
-          : [...current.understandingIds, prompt.id],
-        lastTouched: prompt.title,
-        updatedAt: new Date().toISOString(),
-      };
-    });
+  const updateUnderstandingNote = (id: string, value: string) => {
+    updateWorkspace((workspace) => ({
+      ...workspace,
+      understandingNotes: { ...workspace.understandingNotes, [id]: value.slice(0, 1200) },
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
-  const toggleDestination = (destination: SupportDestination) => {
-    updateCurrentProgress((current) => {
-      const selected = current.destinationIds.includes(destination.id);
-      return {
-        ...current,
-        destinationIds: selected
-          ? current.destinationIds.filter((id) => id !== destination.id)
-          : [...current.destinationIds, destination.id],
-        lastTouched: destination.title,
-        updatedAt: new Date().toISOString(),
-      };
-    });
+  const updateConnectionNote = (id: string, value: string) => {
+    updateWorkspace((workspace) => ({
+      ...workspace,
+      connectionNotes: { ...workspace.connectionNotes, [id]: value.slice(0, 1200) },
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
   if (!hydrated) {
@@ -931,15 +1299,19 @@ export default function SupportHome() {
     );
   }
 
-  const stepProgress = [
-    currentProgress.savedActionIds.length > 0,
-    currentProgress.understandingIds.length > 0,
-    currentProgress.destinationIds.length > 0,
-  ];
-  const startedCount = stepProgress.filter(Boolean).length;
-  const selectedDestinations = model?.destinations.filter((destination) =>
-    currentProgress.destinationIds.includes(destination.id),
-  ) ?? [];
+  const savedEntries = model
+    ? [
+        ...model.tools
+          .filter((tool) => Boolean(currentWorkspace.toolNotes[tool.id]?.trim()))
+          .map((tool) => ({ id: `tool-${tool.id}`, label: tool.title, color: 'text-teal-700' })),
+        ...model.prompts
+          .filter((prompt) => Boolean(currentWorkspace.understandingNotes[prompt.id]?.trim()))
+          .map((prompt) => ({ id: `prompt-${prompt.id}`, label: prompt.title, color: 'text-blue-700' })),
+        ...model.connections
+          .filter((option) => Boolean(currentWorkspace.connectionNotes[option.id]?.trim()))
+          .map((option) => ({ id: `connection-${option.id}`, label: option.title, color: 'text-violet-700' })),
+      ]
+    : [];
 
   return (
     <div className="page-shell gap-6 sm:gap-8">
@@ -949,44 +1321,27 @@ export default function SupportHome() {
             Parent support
           </p>
           <h1 className="mt-2 text-balance text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
-            You&rsquo;re not alone. We&rsquo;ll help you take the next right step.
+            You&rsquo;re not alone. We&rsquo;ll help you make the next decision clearer.
           </h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-brand-muted-600">
-            You may have several concerns at once. Common Ground helps you focus on one while
-            keeping the others connected, saved, and supported.
+            Keep every concern in view, work with one focus at a time, and use practical tools
+            without turning support into another assignment.
           </p>
         </div>
         {currentConcern && (
-          <div className="flex flex-wrap items-center gap-3 text-[12px] text-brand-muted-500">
-            <span className="inline-flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              Last updated {new Date(currentConcern.updatedAt).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-              })}
-            </span>
-            <a
-              href="#concern-stack"
-              className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-white px-3 py-2 font-semibold text-primary hover:bg-brand-navy-50"
-            >
-              <RefreshCw className="h-3.5 w-3.5" /> Return to concern stack
-            </a>
-          </div>
+          <a
+            href="#concern-stack"
+            className="inline-flex w-fit items-center gap-2 rounded-xl border border-primary/20 bg-white px-3 py-2 text-[12px] font-semibold text-primary hover:bg-brand-navy-50"
+          >
+            <RefreshCw className="h-3.5 w-3.5" /> Return to concern stack
+          </a>
         )}
       </section>
 
       <section id="concern-stack" className="scroll-mt-24">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold text-brand-navy-700">Your Concern Stack</h2>
-              <span
-                className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-surface-border text-[11px] text-brand-muted-500"
-                title="All concerns stay available. One remains the current focus."
-              >
-                i
-              </span>
-            </div>
+            <h2 className="text-xl font-semibold text-brand-navy-700">Your Concern Stack</h2>
             <p className="mt-1 text-[13px] text-brand-muted-500">
               Nothing is forgotten. Choose what needs your attention first.
             </p>
@@ -1052,10 +1407,10 @@ export default function SupportHome() {
                       ) : concern.status === 'connected' ? (
                         <Link2 className="h-3.5 w-3.5 text-indigo-600" />
                       ) : (
-                        <Bookmark className="h-3.5 w-3.5" />
+                        <BookOpen className="h-3.5 w-3.5" />
                       )}
                       {concern.status === 'focus'
-                        ? 'Working on this now'
+                        ? 'Current focus'
                         : concern.status === 'connected'
                           ? 'Connected to the focus'
                           : 'Kept for later'}
@@ -1081,21 +1436,12 @@ export default function SupportHome() {
               What is weighing on you right now?
             </h2>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-brand-muted-600">
-              Add your first concern in your own words. Common Ground will organize it into a
-              calm, structured support path.
+              Add your first concern in your own words. Common Ground will keep the experience
+              structured and help you find something useful to do with it.
             </p>
             <button type="button" onClick={openAddConcern} className="btn-primary mt-5">
               <Plus className="h-4 w-4" /> Add my first concern
             </button>
-            {!plan && (
-              <p className="mt-4 text-[12px] text-brand-muted-500">
-                You can also{' '}
-                <Link href="/support/intake" className="font-semibold text-primary hover:underline">
-                  build a full Parent Care Guide
-                </Link>
-                .
-              </p>
-            )}
           </section>
         )}
       </section>
@@ -1133,42 +1479,29 @@ export default function SupportHome() {
           />
           {!editingId && currentConcern && (
             <div className="mt-4 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setDraftStatus('connected')}
-                className={cn(
-                  'rounded-full border px-3 py-1.5 text-xs font-semibold',
-                  draftStatus === 'connected'
-                    ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
-                    : 'border-surface-border bg-white text-brand-muted-600',
-                )}
-              >
-                Connect to current focus
-              </button>
-              <button
-                type="button"
-                onClick={() => setDraftStatus('later')}
-                className={cn(
-                  'rounded-full border px-3 py-1.5 text-xs font-semibold',
-                  draftStatus === 'later'
-                    ? 'border-brand-muted-300 bg-brand-muted-100 text-brand-muted-800'
-                    : 'border-surface-border bg-white text-brand-muted-600',
-                )}
-              >
-                Save for later
-              </button>
-              <button
-                type="button"
-                onClick={() => setDraftStatus('focus')}
-                className={cn(
-                  'rounded-full border px-3 py-1.5 text-xs font-semibold',
-                  draftStatus === 'focus'
-                    ? 'border-teal-300 bg-teal-50 text-teal-800'
-                    : 'border-surface-border bg-white text-brand-muted-600',
-                )}
-              >
-                Make this my focus
-              </button>
+              {(['connected', 'later', 'focus'] as ConcernStatus[]).map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => setDraftStatus(status)}
+                  className={cn(
+                    'rounded-full border px-3 py-1.5 text-xs font-semibold',
+                    draftStatus === status
+                      ? status === 'focus'
+                        ? 'border-teal-300 bg-teal-50 text-teal-800'
+                        : status === 'connected'
+                          ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
+                          : 'border-brand-muted-300 bg-brand-muted-100 text-brand-muted-800'
+                      : 'border-surface-border bg-white text-brand-muted-600',
+                  )}
+                >
+                  {status === 'focus'
+                    ? 'Make this my focus'
+                    : status === 'connected'
+                      ? 'Connect to current focus'
+                      : 'Save for later'}
+                </button>
+              ))}
             </div>
           )}
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -1212,196 +1545,81 @@ export default function SupportHome() {
       {currentConcern && model && insight && (
         <>
           <section className="rounded-3xl border border-teal-200 bg-teal-50/55 p-5 sm:p-6">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-center">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-center">
               <div className="flex items-start gap-3">
                 <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm">
                   <Sparkles className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-teal-950">Smart Insight: {insight.title}</p>
+                  <p className="text-sm font-semibold text-teal-950">Connected picture: {insight.title}</p>
                   <p className="mt-1 text-[13px] leading-relaxed text-teal-950/75">{insight.body}</p>
                 </div>
               </div>
               <div className="border-teal-200 text-[12px] leading-relaxed text-teal-950/75 lg:border-l lg:pl-5">
-                We will work on your current focus while the connected concerns remain visible in
-                the background.
+                Nothing here is a score or required sequence. Open the part that would be most useful
+                today.
                 <button
                   type="button"
                   onClick={() => setActiveStep('understand')}
                   className="mt-2 block font-semibold text-teal-800 hover:underline"
                 >
-                  See how they connect
+                  Explore how these concerns connect
                 </button>
               </div>
             </div>
           </section>
 
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
-            <div className="space-y-3">
-              <GuideAccordion
-                activeStep={currentProgress.activeStep}
-                model={model}
-                progress={currentProgress}
-                expandedActionId={expandedActionId}
-                onExpandedActionChange={setExpandedActionId}
-                onStepChange={setActiveStep}
-                onToggleAction={toggleSavedAction}
-                onToggleUnderstanding={toggleUnderstanding}
-                onToggleDestination={toggleDestination}
-                onHelpful={() =>
-                  updateCurrentProgress((current) => ({
-                    ...current,
-                    helpful: !current.helpful,
-                    needsClarity: false,
-                    updatedAt: new Date().toISOString(),
-                  }))
-                }
-                onNeedsClarity={() =>
-                  updateCurrentProgress((current) => ({
-                    ...current,
-                    needsClarity: !current.needsClarity,
-                    helpful: false,
-                    updatedAt: new Date().toISOString(),
-                  }))
-                }
-              />
-
-              <section className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft sm:p-6">
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                      Where this can lead
-                    </p>
-                    <h2 className="mt-1 text-xl font-semibold text-brand-navy-700">
-                      Next support options based on your connected concerns
-                    </h2>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveStep('connect')}
-                    className="text-sm font-semibold text-primary hover:underline"
-                  >
-                    Open Connect
-                  </button>
-                </div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  {model.destinations.map((destination) => {
-                    const Icon = destination.icon;
-                    return (
-                      <Link
-                        key={destination.id}
-                        href={destination.href}
-                        className="group flex items-center gap-3 rounded-2xl border border-surface-border bg-brand-warm-50/60 p-4 transition hover:border-primary/30 hover:bg-white"
-                      >
-                        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-primary shadow-sm">
-                          <Icon className="h-5 w-5" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-semibold text-brand-navy-700">
-                            {destination.title}
-                          </span>
-                          <span className="mt-0.5 block text-[12px] leading-relaxed text-brand-muted-500">
-                            {destination.description}
-                          </span>
-                        </span>
-                        <ArrowRight className="h-4 w-4 text-brand-muted-400 transition group-hover:translate-x-0.5 group-hover:text-primary" />
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            </div>
+            <GuideAccordion
+              activeStep={currentWorkspace.activeStep}
+              model={model}
+              workspace={currentWorkspace}
+              expandedToolId={expandedToolId}
+              expandedConnectionId={expandedConnectionId}
+              onExpandedToolChange={setExpandedToolId}
+              onExpandedConnectionChange={setExpandedConnectionId}
+              onStepChange={setActiveStep}
+              onToolNoteChange={updateToolNote}
+              onUnderstandingNoteChange={updateUnderstandingNote}
+              onConnectionNoteChange={updateConnectionNote}
+            />
 
             <aside className="space-y-4 xl:sticky xl:top-24 xl:self-start">
               <section className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft">
-                <p className="text-sm font-semibold text-brand-navy-700">Your progress</p>
-                <div className="mt-4 flex items-center gap-4">
-                  <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-warm-100">
-                    <div
-                      className="absolute inset-1 rounded-full"
-                      style={{
-                        background: `conic-gradient(#0f766e ${(startedCount / 3) * 360}deg, #e8e6ef 0deg)`,
-                      }}
-                    />
-                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-white text-sm font-semibold text-brand-navy-700">
-                      {startedCount}/3
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-semibold text-brand-navy-700">
-                      {startedCount === 0
-                        ? 'Start with one small action'
-                        : startedCount === 3
-                          ? 'All three areas started'
-                          : `${startedCount} of 3 areas started`}
-                    </p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-500">
-                      Progress reflects support you saved, not homework you must finish.
-                    </p>
-                  </div>
-                </div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-teal-700">
+                  Current focus
+                </p>
+                <p className="mt-2 text-sm font-semibold leading-relaxed text-brand-navy-700">
+                  {currentConcern.title}
+                </p>
+                <a
+                  href="#concern-stack"
+                  className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
+                >
+                  Change focus <ArrowRight className="h-3.5 w-3.5" />
+                </a>
               </section>
 
               <section className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft">
-                <p className="text-sm font-semibold text-brand-navy-700">Resume where you left off</p>
-                <div className="mt-3 rounded-2xl border border-surface-border bg-brand-warm-50 p-4">
-                  <p className="text-[13px] font-semibold text-brand-navy-700">
-                    {currentProgress.lastTouched ?? 'Begin with Stabilize'}
-                  </p>
-                  <p className="mt-1 text-[11px] text-brand-muted-500">
-                    {currentProgress.updatedAt
-                      ? `Updated ${new Date(currentProgress.updatedAt).toLocaleTimeString([], {
-                          hour: 'numeric',
-                          minute: '2-digit',
-                        })}`
-                      : 'Your place will be saved on this device.'}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setActiveStep(currentProgress.activeStep)}
-                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/20 bg-white px-3 py-2 text-xs font-semibold text-primary hover:bg-brand-navy-50"
-                  >
-                    Continue <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </section>
-
-              <section className="rounded-3xl border border-surface-border bg-white p-5 shadow-soft">
-                <p className="text-sm font-semibold text-brand-navy-700">Your support plan</p>
+                <p className="text-sm font-semibold text-brand-navy-700">Your notes stay here</p>
                 <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-500">
-                  Items you chose to keep for this concern.
+                  Anything you write stays with this concern on this device. There is nothing to
+                  complete.
                 </p>
                 <div className="mt-4 space-y-2.5">
-                  {currentProgress.savedActionIds.length || selectedDestinations.length ? (
-                    <>
-                      {model.actions
-                        .filter((action) => currentProgress.savedActionIds.includes(action.id))
-                        .slice(0, 3)
-                        .map((action) => (
-                          <p key={action.id} className="flex items-start gap-2 text-[12px] text-brand-muted-700">
-                            <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal-700" />
-                            {action.title}
-                          </p>
-                        ))}
-                      {selectedDestinations.slice(0, 2).map((destination) => (
-                        <p key={destination.id} className="flex items-start gap-2 text-[12px] text-brand-muted-700">
-                          <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-700" />
-                          {destination.title}
-                        </p>
-                      ))}
-                    </>
+                  {savedEntries.length ? (
+                    savedEntries.slice(0, 6).map((entry) => (
+                      <p key={entry.id} className="flex items-start gap-2 text-[12px] text-brand-muted-700">
+                        <FileText className={cn('mt-0.5 h-3.5 w-3.5 shrink-0', entry.color)} />
+                        {entry.label}
+                      </p>
+                    ))
                   ) : (
                     <p className="rounded-2xl bg-brand-warm-50 px-3 py-3 text-[12px] leading-relaxed text-brand-muted-500">
-                      Save an action or support option when something feels useful.
+                      Open a tool or reflection prompt when you are ready. Notes save automatically.
                     </p>
                   )}
                 </div>
-                <Link
-                  href="/support/care-plan"
-                  className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
-                >
-                  Open my Parent Care Guide <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
               </section>
 
               <section className="rounded-3xl border border-rose-200 bg-rose-50/70 p-5">
@@ -1427,189 +1645,151 @@ export default function SupportHome() {
 function GuideAccordion({
   activeStep,
   model,
-  progress,
-  expandedActionId,
-  onExpandedActionChange,
+  workspace,
+  expandedToolId,
+  expandedConnectionId,
+  onExpandedToolChange,
+  onExpandedConnectionChange,
   onStepChange,
-  onToggleAction,
-  onToggleUnderstanding,
-  onToggleDestination,
-  onHelpful,
-  onNeedsClarity,
+  onToolNoteChange,
+  onUnderstandingNoteChange,
+  onConnectionNoteChange,
 }: {
   activeStep: GuideStep;
   model: ReturnType<typeof getSupportModel>;
-  progress: ConcernProgress;
-  expandedActionId: string | null;
-  onExpandedActionChange: (id: string | null) => void;
+  workspace: ConcernWorkspace;
+  expandedToolId: string | null;
+  expandedConnectionId: string | null;
+  onExpandedToolChange: (id: string | null) => void;
+  onExpandedConnectionChange: (id: string | null) => void;
   onStepChange: (step: GuideStep) => void;
-  onToggleAction: (action: SupportAction) => void;
-  onToggleUnderstanding: (prompt: UnderstandingPrompt) => void;
-  onToggleDestination: (destination: SupportDestination) => void;
-  onHelpful: () => void;
-  onNeedsClarity: () => void;
+  onToolNoteChange: (id: string, value: string) => void;
+  onUnderstandingNoteChange: (id: string, value: string) => void;
+  onConnectionNoteChange: (id: string, value: string) => void;
 }) {
   return (
-    <section className="space-y-3" aria-label="Parent support guide steps">
+    <section className="space-y-3" aria-label="Parent support guide">
       <AccordionStep
         number="1"
         title="Stabilize"
         label="What may help now"
-        description="Reduce immediate pressure and create enough space to choose the next action."
+        description="Use one practical tool to reduce immediate pressure. Nothing here is homework."
         accent="teal"
         open={activeStep === 'stabilize'}
-        status={progress.savedActionIds.length ? 'In progress' : 'Start here'}
         onToggle={() => onStepChange('stabilize')}
       >
-        <div className="grid gap-3 md:grid-cols-2">
-          {model.actions.map((action) => {
-            const Icon = action.icon;
-            const saved = progress.savedActionIds.includes(action.id);
-            const expanded = expandedActionId === action.id;
+        <div className="space-y-3">
+          {model.tools.map((tool) => {
+            const Icon = tool.icon;
+            const open = expandedToolId === tool.id;
             return (
-              <article key={action.id} className="rounded-2xl border border-teal-100 bg-white p-4">
-                <div className="flex items-start gap-3">
+              <article key={tool.id} className="rounded-2xl border border-teal-100 bg-white">
+                <button
+                  type="button"
+                  onClick={() => onExpandedToolChange(open ? null : tool.id)}
+                  className="flex w-full items-start gap-3 p-4 text-left"
+                  aria-expanded={open}
+                >
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-semibold text-brand-navy-700">{action.title}</h3>
-                    <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">
-                      {action.description}
-                    </p>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-brand-navy-700">{tool.title}</span>
+                    <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                      {tool.summary}
+                    </span>
+                  </span>
+                  {open ? (
+                    <ChevronUp className="mt-1 h-4 w-4 shrink-0 text-teal-700" />
+                  ) : (
+                    <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-brand-muted-400" />
+                  )}
+                </button>
+
+                {open && (
+                  <div className="border-t border-teal-100 px-4 pb-4 pt-4">
+                    <ol className="space-y-2.5">
+                      {tool.steps.map((step, index) => (
+                        <li key={step} className="flex items-start gap-3 text-[12.5px] leading-relaxed text-brand-muted-700">
+                          <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-100 text-[10px] font-bold text-teal-800">
+                            {index + 1}
+                          </span>
+                          {step}
+                        </li>
+                      ))}
+                    </ol>
+                    <label className="mt-4 block">
+                      <span className="text-xs font-semibold text-brand-navy-700">{tool.noteLabel}</span>
+                      <textarea
+                        value={workspace.toolNotes[tool.id] ?? ''}
+                        onChange={(event) => onToolNoteChange(tool.id, event.target.value)}
+                        rows={3}
+                        placeholder={tool.notePlaceholder}
+                        className="mt-2 w-full resize-none rounded-xl border border-surface-border bg-brand-warm-50/60 px-3 py-2.5 text-[13px] leading-relaxed text-brand-navy-700 outline-none placeholder:text-brand-muted-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100"
+                      />
+                    </label>
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                      <p className="text-[11px] text-brand-muted-500">Saved privately on this device.</p>
+                      {tool.resource && (
+                        <Link
+                          href={tool.resource.href}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-800 hover:underline"
+                        >
+                          {tool.resource.label} <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      )}
+                    </div>
                   </div>
-                </div>
-                {expanded && (
-                  <p className="mt-3 rounded-xl bg-teal-50 px-3 py-2.5 text-[12px] leading-relaxed text-teal-950">
-                    {action.detail}
-                  </p>
                 )}
-                <div className="mt-4 flex items-center justify-between gap-2">
-                  <button
-                    type="button"
-                    onClick={() => onExpandedActionChange(expanded ? null : action.id)}
-                    className="text-xs font-semibold text-teal-800 hover:underline"
-                  >
-                    {expanded ? 'Show less' : 'Open step'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onToggleAction(action)}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold',
-                      saved
-                        ? 'border-teal-300 bg-teal-50 text-teal-800'
-                        : 'border-surface-border bg-white text-brand-muted-600 hover:border-teal-300',
-                    )}
-                  >
-                    {saved ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                    {saved ? 'Saved' : 'Add to my plan'}
-                  </button>
-                </div>
               </article>
             );
           })}
         </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-teal-100 pt-4">
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onHelpful}
-              className={cn(
-                'rounded-xl border px-3 py-2 text-xs font-semibold',
-                progress.helpful
-                  ? 'border-teal-300 bg-teal-50 text-teal-800'
-                  : 'border-surface-border bg-white text-brand-muted-600',
-              )}
-            >
-              This helps
-            </button>
-            <button
-              type="button"
-              onClick={onNeedsClarity}
-              className={cn(
-                'rounded-xl border px-3 py-2 text-xs font-semibold',
-                progress.needsClarity
-                  ? 'border-amber-300 bg-amber-50 text-amber-900'
-                  : 'border-surface-border bg-white text-brand-muted-600',
-              )}
-            >
-              I need clearer steps
-            </button>
-          </div>
+        <div className="mt-4 flex justify-end border-t border-teal-100 pt-4">
           <button
             type="button"
             onClick={() => onStepChange('understand')}
             className="inline-flex items-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-teal-800"
           >
-            Continue to Understand <ArrowRight className="h-4 w-4" />
+            Explore Understand <ArrowRight className="h-4 w-4" />
           </button>
         </div>
-        {progress.needsClarity && (
-          <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-[12px] leading-relaxed text-amber-950">
-            Keep the guide focused on one action. Save the item that feels closest, then use
-            Connect to request modeling, written steps, or professional support.
-          </div>
-        )}
       </AccordionStep>
 
       <AccordionStep
         number="2"
         title="Understand"
         label="Understand the concern"
-        description="Clarify what feels hardest, what is connected, and what kind of support may help."
+        description="Write only what helps you see the situation more clearly. Leave anything else blank."
         accent="blue"
         open={activeStep === 'understand'}
-        status={progress.understandingIds.length ? 'In progress' : 'Not started'}
         onToggle={() => onStepChange('understand')}
       >
-        <p className="mb-4 text-[13px] leading-relaxed text-brand-muted-600">
-          Choose the prompts that would help you organize the concern. You are not diagnosing the
-          situation; you are identifying what deserves attention.
-        </p>
-        <div className="grid gap-3 md:grid-cols-2">
-          {model.prompts.map((prompt) => {
-            const selected = progress.understandingIds.includes(prompt.id);
-            return (
-              <button
-                key={prompt.id}
-                type="button"
-                onClick={() => onToggleUnderstanding(prompt)}
-                aria-pressed={selected}
-                className={cn(
-                  'flex items-start gap-3 rounded-2xl border p-4 text-left transition',
-                  selected
-                    ? 'border-blue-300 bg-blue-50/70'
-                    : 'border-surface-border bg-white hover:border-blue-200',
-                )}
-              >
-                <span
-                  className={cn(
-                    'mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border',
-                    selected
-                      ? 'border-blue-500 bg-blue-600 text-white'
-                      : 'border-surface-border text-transparent',
-                  )}
-                >
-                  <Check className="h-3.5 w-3.5" />
-                </span>
-                <span>
-                  <span className="block text-sm font-semibold text-brand-navy-700">{prompt.title}</span>
-                  <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
-                    {prompt.description}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
+        <div className="space-y-3">
+          {model.prompts.map((prompt) => (
+            <label key={prompt.id} className="block rounded-2xl border border-blue-100 bg-white p-4">
+              <span className="text-sm font-semibold text-brand-navy-700">{prompt.title}</span>
+              <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                {prompt.description}
+              </span>
+              <textarea
+                value={workspace.understandingNotes[prompt.id] ?? ''}
+                onChange={(event) => onUnderstandingNoteChange(prompt.id, event.target.value)}
+                rows={3}
+                placeholder={prompt.placeholder}
+                className="mt-3 w-full resize-none rounded-xl border border-surface-border bg-blue-50/35 px-3 py-2.5 text-[13px] leading-relaxed text-brand-navy-700 outline-none placeholder:text-brand-muted-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              />
+            </label>
+          ))}
         </div>
-        <div className="mt-4 flex justify-end border-t border-blue-100 pt-4">
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-blue-100 pt-4">
+          <p className="text-[11px] text-brand-muted-500">Notes save automatically. Skip any question that adds pressure.</p>
           <button
             type="button"
             onClick={() => onStepChange('connect')}
             className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-800"
           >
-            Continue to Connect <ArrowRight className="h-4 w-4" />
+            Explore Connect <ArrowRight className="h-4 w-4" />
           </button>
         </div>
       </AccordionStep>
@@ -1618,72 +1798,106 @@ function GuideAccordion({
         number="3"
         title="Connect"
         label="Choose the right support"
-        description="Move toward the right person, resource, or conversation for this concern."
+        description="Use an inline conversation guide or open a resource that already exists in Common Ground."
         accent="violet"
         open={activeStep === 'connect'}
-        status={progress.destinationIds.length ? 'Support selected' : 'Not started'}
         onToggle={() => onStepChange('connect')}
       >
-        <div className="grid gap-3 md:grid-cols-2">
-          {model.destinations.map((destination) => {
-            const Icon = destination.icon;
-            const selected = progress.destinationIds.includes(destination.id);
-            return (
-              <article
-                key={destination.id}
-                className={cn(
-                  'rounded-2xl border p-4 transition',
-                  selected
-                    ? 'border-violet-300 bg-violet-50/70'
-                    : 'border-surface-border bg-white',
-                )}
-              >
-                <div className="flex items-start gap-3">
+        <div className="space-y-3">
+          {model.connections.map((option) => {
+            const Icon = option.icon;
+            const open = expandedConnectionId === option.id;
+
+            if (option.kind === 'resource' && option.href) {
+              return (
+                <Link
+                  key={option.id}
+                  href={option.href}
+                  className="group flex items-center gap-3 rounded-2xl border border-violet-100 bg-white p-4 transition hover:border-violet-300"
+                >
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <div>
-                    <h3 className="text-sm font-semibold text-brand-navy-700">{destination.title}</h3>
-                    <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">
-                      {destination.description}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => onToggleDestination(destination)}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold',
-                      selected
-                        ? 'border-violet-300 bg-violet-50 text-violet-800'
-                        : 'border-surface-border bg-white text-brand-muted-600',
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-brand-navy-700">{option.title}</span>
+                    <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                      {option.description}
+                    </span>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-800">
+                    {option.resourceLabel ?? 'Open'} <ExternalLink className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
+              );
+            }
+
+            return (
+              <article key={option.id} className="rounded-2xl border border-violet-100 bg-white">
+                <button
+                  type="button"
+                  onClick={() => onExpandedConnectionChange(open ? null : option.id)}
+                  className="flex w-full items-start gap-3 p-4 text-left"
+                  aria-expanded={open}
+                >
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold text-brand-navy-700">{option.title}</span>
+                    <span className="mt-1 block text-[12px] leading-relaxed text-brand-muted-600">
+                      {option.description}
+                    </span>
+                  </span>
+                  {open ? (
+                    <ChevronUp className="mt-1 h-4 w-4 text-violet-700" />
+                  ) : (
+                    <ChevronDown className="mt-1 h-4 w-4 text-brand-muted-400" />
+                  )}
+                </button>
+
+                {open && (
+                  <div className="border-t border-violet-100 px-4 pb-4 pt-4">
+                    {option.opener && (
+                      <div className="rounded-xl bg-violet-50/70 px-3 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-violet-700">
+                          Possible opening
+                        </p>
+                        <p className="mt-1.5 text-[12.5px] leading-relaxed text-violet-950">
+                          “{option.opener}”
+                        </p>
+                      </div>
                     )}
-                  >
-                    {selected ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                    {selected ? 'Added to plan' : 'Add to plan'}
-                  </button>
-                  <Link
-                    href={destination.href}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-violet-800 hover:underline"
-                  >
-                    Open <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
+                    {option.questions?.length ? (
+                      <div className="mt-4">
+                        <p className="text-xs font-semibold text-brand-navy-700">Questions you may want to use</p>
+                        <ul className="mt-2 space-y-2">
+                          {option.questions.map((question) => (
+                            <li key={question} className="flex items-start gap-2 text-[12.5px] leading-relaxed text-brand-muted-700">
+                              <MessageCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-600" />
+                              {question}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {option.noteLabel && (
+                      <label className="mt-4 block">
+                        <span className="text-xs font-semibold text-brand-navy-700">{option.noteLabel}</span>
+                        <textarea
+                          value={workspace.connectionNotes[option.id] ?? ''}
+                          onChange={(event) => onConnectionNoteChange(option.id, event.target.value)}
+                          rows={3}
+                          placeholder={option.notePlaceholder}
+                          className="mt-2 w-full resize-none rounded-xl border border-surface-border bg-violet-50/35 px-3 py-2.5 text-[13px] leading-relaxed text-brand-navy-700 outline-none placeholder:text-brand-muted-400 focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+                        />
+                      </label>
+                    )}
+                    <p className="mt-3 text-[11px] text-brand-muted-500">Saved privately on this device.</p>
+                  </div>
+                )}
               </article>
             );
           })}
-        </div>
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-violet-100 pt-4">
-          <a href="#concern-stack" className="text-xs font-semibold text-brand-muted-600 hover:underline">
-            Return to concern stack
-          </a>
-          <Link
-            href="/support/care-plan"
-            className="inline-flex items-center gap-2 rounded-xl bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-800"
-          >
-            Open my Parent Care Guide <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </AccordionStep>
     </section>
@@ -1697,7 +1911,6 @@ function AccordionStep({
   description,
   accent,
   open,
-  status,
   onToggle,
   children,
 }: {
@@ -1707,65 +1920,54 @@ function AccordionStep({
   description: string;
   accent: 'teal' | 'blue' | 'violet';
   open: boolean;
-  status: string;
   onToggle: () => void;
   children: React.ReactNode;
 }) {
-  const theme = {
+  const styles = {
     teal: {
       border: 'border-teal-200',
       header: 'bg-teal-50/65',
-      number: 'bg-teal-700 text-white',
-      badge: 'border-teal-200 bg-white text-teal-800',
+      circle: 'bg-teal-700 text-white',
+      label: 'text-teal-800',
     },
     blue: {
       border: 'border-blue-200',
-      header: 'bg-blue-50/60',
-      number: 'bg-blue-700 text-white',
-      badge: 'border-blue-200 bg-white text-blue-800',
+      header: 'bg-blue-50/55',
+      circle: 'bg-blue-700 text-white',
+      label: 'text-blue-800',
     },
     violet: {
       border: 'border-violet-200',
-      header: 'bg-violet-50/60',
-      number: 'bg-violet-700 text-white',
-      badge: 'border-violet-200 bg-white text-violet-800',
+      header: 'bg-violet-50/55',
+      circle: 'bg-violet-700 text-white',
+      label: 'text-violet-800',
     },
   }[accent];
 
   return (
-    <article className={cn('overflow-hidden rounded-3xl border bg-white shadow-soft', theme.border)}>
+    <article className={cn('overflow-hidden rounded-3xl border bg-white shadow-soft', styles.border)}>
       <button
         type="button"
         onClick={onToggle}
+        className={cn('flex w-full items-start gap-3 px-5 py-4 text-left sm:px-6', styles.header)}
         aria-expanded={open}
-        className={cn(
-          'flex w-full items-center gap-3 px-4 py-4 text-left sm:px-5',
-          open ? theme.header : 'bg-white',
-        )}
       >
-        <span
-          className={cn(
-            'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold',
-            theme.number,
-          )}
-        >
+        <span className={cn('inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold', styles.circle)}>
           {number}
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-center gap-2">
             <span className="text-lg font-semibold text-brand-navy-700">{title}</span>
-            <span className={cn('rounded-full border px-2.5 py-1 text-[10px] font-semibold', theme.badge)}>
-              {status}
-            </span>
+            <span className={cn('text-[11px] font-semibold', styles.label)}>{label}</span>
           </span>
-          <span className="mt-0.5 block text-[12px] leading-relaxed text-brand-muted-500">
-            <span className="font-semibold text-brand-muted-700">{label}.</span> {description}
+          <span className="mt-1 block text-[12.5px] leading-relaxed text-brand-muted-600">
+            {description}
           </span>
         </span>
         {open ? (
-          <ChevronUp className="h-5 w-5 shrink-0 text-brand-muted-500" />
+          <ChevronUp className="mt-1 h-4 w-4 shrink-0 text-brand-muted-500" />
         ) : (
-          <ChevronDown className="h-5 w-5 shrink-0 text-brand-muted-500" />
+          <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-brand-muted-500" />
         )}
       </button>
       {open && <div className="border-t border-inherit p-4 sm:p-5">{children}</div>}
