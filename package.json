@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/care-plan-copy-checklist.mjs && node scripts/care-plan-safety-audit.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
