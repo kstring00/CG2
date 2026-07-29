@@ -14,7 +14,7 @@ const CHOICES = [
 
 export default function IntakePage() {
   return (
-    <main className="page-shell mx-auto w-full max-w-3xl">
+    <main className="care-plan-flow page-shell mx-auto w-full max-w-3xl">
       {process.env.NODE_ENV !== 'production' && (
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
           {CARE_PLAN_UI.developmentDraft.text}
