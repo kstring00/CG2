@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/care-plan-copy-checklist.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "care-plan:copy-checklist": "node scripts/care-plan-copy-checklist.mjs"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
