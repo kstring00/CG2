@@ -18,5 +18,5 @@ export default function LegacyStoredDataCleanup() {
     }
   }, []);
 
-  return null;
+  return <span className="care-plan-flow hidden" aria-hidden="true" />;
 }
