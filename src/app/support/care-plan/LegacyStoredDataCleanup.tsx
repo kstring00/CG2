@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import FlowChromeIsolation from './FlowChromeIsolation';
 
 const LEGACY_KEYS = [
   'cg.carePlanDraft.v1',
@@ -18,5 +19,5 @@ export default function LegacyStoredDataCleanup() {
     }
   }, []);
 
-  return <span className="care-plan-flow hidden" aria-hidden="true" />;
+  return <FlowChromeIsolation />;
 }
