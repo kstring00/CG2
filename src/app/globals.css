@@ -32,6 +32,7 @@
     --brand-purple: #32175a;
     --brand-muted: #6e727a;
     --brand-warm: #c5c2cf;
+    --brand-teal: #0F6E56;
     --font-display: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --radius: 0.75rem;
@@ -236,6 +237,10 @@
  * and forces a calm, single-column layout.
  * ------------------------------------------------------------------------- */
 @media print {
+  @page {
+    margin: 0.45in;
+  }
+
   /* Hide app shell scaffolding */
   aside,
   nav,
@@ -257,6 +262,40 @@
     margin: 0 !important;
     padding: 0 !important;
     max-width: 100% !important;
+  }
+
+  .care-plan-print-sheet {
+    width: 100% !important;
+    max-width: 7.2in !important;
+    margin: 0 auto !important;
+  }
+
+  .care-plan-print-sheet > * + * {
+    margin-top: 0.16in !important;
+  }
+
+  .care-plan-print-sheet h1 {
+    font-size: 20pt !important;
+    line-height: 1.1 !important;
+  }
+
+  .care-plan-print-sheet h2 {
+    font-size: 13pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .care-plan-print-sheet p,
+  .care-plan-print-sheet li {
+    font-size: 9.5pt !important;
+    line-height: 1.35 !important;
+  }
+
+  .care-plan-print-sheet section,
+  .care-plan-print-sheet [data-print-card] {
+    padding: 0.12in !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    box-shadow: none !important;
   }
 
   /* Avoid awkward breaks inside cards */
