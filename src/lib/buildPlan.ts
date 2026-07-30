@@ -8,17 +8,15 @@ import {
   type BranchId,
   type CopyEntry,
   type PlanRowDefinition,
-  type RowCategory,
   type RowId,
   type StandardBranchId,
   type StandardRowId,
   type TeamMode,
 } from '@/content/carePlan';
 import {
-  CARE_PLAN_SIX_BEAT_DRAFTS,
-  CRISIS_SIX_BEAT_DRAFT,
-  type DraftResponseGuide,
-} from '@/content/carePlanSixBeatDraft';
+  PARENT_FIRST_ROWS,
+  type ParentFirstPlanContent,
+} from '@/content/carePlanParentFirst';
 
 export type TeamContact = {
   label: CopyEntry;
@@ -31,14 +29,13 @@ export type StandardPlanPage = {
   team: TeamMode;
   branch: StandardBranchId;
   row: StandardRowId;
-  category: RowCategory;
   acknowledgment: CopyEntry;
   truth: CopyEntry;
   body: CopyEntry[];
   action: ActionDefinition;
   sessionHeading: CopyEntry;
   questions: CopyEntry[];
-  responseGuide: DraftResponseGuide;
+  parentFirst?: ParentFirstPlanContent;
   crossLink: {
     label: CopyEntry;
     detail: CopyEntry;
@@ -70,7 +67,6 @@ export type CrisisPlanPage = {
   documentationExample: CopyEntry;
   questionsHeading: CopyEntry;
   questions: readonly CopyEntry[];
-  responseGuide: DraftResponseGuide;
   phoneHeading: CopyEntry;
   immediateDangerHeading: CopyEntry;
   immediateDangerBody: CopyEntry;
@@ -119,13 +115,12 @@ export function buildPlan(
       row: 'crisis',
       acknowledgment: CRISIS_PAGE.acknowledgment,
       truth: CRISIS_PAGE.truth,
-      body: [...CRISIS_SIX_BEAT_DRAFT.explanation],
+      body: [...CRISIS_PAGE.body],
       documentationHeading: CRISIS_PAGE.documentationHeading,
       documentationItems: CRISIS_PAGE.documentationItems,
       documentationExample: CRISIS_PAGE.documentationExample,
       questionsHeading: CRISIS_PAGE.questionsHeading,
       questions: CRISIS_PAGE.questions,
-      responseGuide: CRISIS_SIX_BEAT_DRAFT.responseGuide,
       phoneHeading: CRISIS_PAGE.phoneHeading,
       immediateDangerHeading: CRISIS_PAGE.immediateDangerHeading,
       immediateDangerBody: CRISIS_PAGE.immediateDangerBody,
@@ -138,13 +133,11 @@ export function buildPlan(
   if (!definition || definition.branch !== branch) {
     throw new Error(`Invalid Care Plan selection: ${branch}/${row}`);
   }
-  // Branch 4 swaps its rows in team=no mode, so a row that belongs to the branch
-  // may still not belong to this team's version of it.
+
   if (!isRowInBranch(resolvedTeam, branch, definition.id)) {
     throw new Error(`Invalid Care Plan selection for team=${resolvedTeam}: ${branch}/${row}`);
   }
 
-  const sixBeat = CARE_PLAN_SIX_BEAT_DRAFTS[definition.id];
   const providerEvaluationNote =
     resolvedTeam === 'no' && branch === 'working'
       ? TEAM_COPY.no.providerEvaluationNote
@@ -155,14 +148,13 @@ export function buildPlan(
     team: resolvedTeam,
     branch: definition.branch,
     row: definition.id,
-    category: sixBeat.category,
     acknowledgment: definition.acknowledgment,
     truth: definition.truth,
-    body: [...sixBeat.explanation],
-    action: sixBeat.actionOverride ?? definition.action,
+    body: [...definition.body],
+    action: definition.action,
     sessionHeading: TEAM_COPY[resolvedTeam].sessionHeading,
     questions: [...definition.questions],
-    responseGuide: sixBeat.responseGuide,
+    parentFirst: PARENT_FIRST_ROWS[definition.id],
     crossLink: {
       label: definition.crossLink.label,
       detail: definition.crossLink.detail,
@@ -196,7 +188,6 @@ export function isStandardRowId(value: string | undefined): value is StandardRow
   return Boolean(value && value in PLAN_ROWS);
 }
 
-/** Whether a row is reachable in this team mode's version of the branch. */
 export function isRowInBranch(
   team: TeamMode,
   branch: StandardBranchId,
