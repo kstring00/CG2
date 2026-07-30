@@ -170,7 +170,7 @@ export function buildPlan(
     safetyLink: definition.safetyLink
       ? {
           copy: definition.safetyLink,
-          href: `/support/care-plan/crisis?team=${resolvedTeam}`,
+          href: '/support/care-plan/crisis',
         }
       : undefined,
     quietSupport: definition.quietSupport,
