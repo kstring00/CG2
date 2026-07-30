@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/materialize-worksheet-assets.mjs && node scripts/materialize-caregiver-load-map.mjs && node scripts/materialize-care-clarity-review.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/materialize-worksheet-assets.mjs && node scripts/materialize-caregiver-load-map.mjs && node scripts/materialize-care-clarity-review.mjs && node scripts/care-plan-copy-checklist.mjs --summary && npm run care-plan:uniqueness && npm run care-plan:audit",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "care-plan:copy-checklist": "node scripts/care-plan-copy-checklist.mjs",
+    "care-plan:uniqueness": "node scripts/care-plan-content-uniqueness.mjs",
+    "care-plan:audit": "node scripts/care-plan-safety-audit.mjs",
+    "care-plan:worksheets": "node scripts/materialize-worksheet-assets.mjs && node scripts/materialize-caregiver-load-map.mjs && node scripts/materialize-care-clarity-review.mjs"
   },
   "dependencies": {
     "chart.js": "^4.5.1",

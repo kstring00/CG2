@@ -92,6 +92,7 @@ const config: Config = {
             800: '#34363b',
             900: '#212226',
           },
+          teal: '#0F6E56',
         },
         primary: {
           DEFAULT: '#1a2e52',
