@@ -17,6 +17,7 @@ import {
   PARENT_FIRST_ROWS,
   type ParentFirstPlanContent,
 } from '@/content/carePlanParentFirst';
+import { PARENT_FIRST_TEAM_NO_QUESTIONS } from '@/content/carePlanParentFirstTeamNo';
 
 export type TeamContact = {
   label: CopyEntry;
@@ -75,6 +76,10 @@ export type CrisisPlanPage = {
 };
 
 export type PlanPage = StandardPlanPage | CrisisPlanPage;
+
+const teamNoQuestionBank = PARENT_FIRST_TEAM_NO_QUESTIONS as Partial<
+  Record<StandardRowId, readonly CopyEntry[]>
+>;
 
 function phoneHref(team: TeamMode, phoneNumber: string): string | null {
   if (team === 'yes') return null;
@@ -142,6 +147,10 @@ export function buildPlan(
     resolvedTeam === 'no' && branch === 'working'
       ? TEAM_COPY.no.providerEvaluationNote
       : undefined;
+  const questions =
+    resolvedTeam === 'no' && teamNoQuestionBank[definition.id]
+      ? [...teamNoQuestionBank[definition.id]!]
+      : [...definition.questions];
 
   return {
     kind: 'standard',
@@ -153,7 +162,7 @@ export function buildPlan(
     body: [...definition.body],
     action: definition.action,
     sessionHeading: TEAM_COPY[resolvedTeam].sessionHeading,
-    questions: [...definition.questions],
+    questions,
     parentFirst: PARENT_FIRST_ROWS[definition.id],
     crossLink: {
       label: definition.crossLink.label,
