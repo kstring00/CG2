@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Phone } from 'lucide-react';
 import { CARE_PLAN_UI, type TeamMode } from '@/content/carePlan';
-import { SIX_BEAT_UI } from '@/content/carePlanSixBeatDraft';
 import { buildPlan } from '@/lib/buildPlan';
 import LegacyStoredDataCleanup from '../LegacyStoredDataCleanup';
 import PrintButton from '../PrintButton';
@@ -40,17 +39,12 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
           {plan.truth.text}
         </h1>
-        <div className="mt-6 border-t border-surface-border pt-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
-            {SIX_BEAT_UI.explanationHeading.text}
-          </p>
-          <div className="mt-3 space-y-2">
-            {plan.body.map((entry) => (
-              <p key={entry.id} className="text-[15px] leading-relaxed text-brand-muted-600">
-                {entry.text}
-              </p>
-            ))}
-          </div>
+        <div className="mt-4 space-y-2">
+          {plan.body.map((entry) => (
+            <p key={entry.id} className="text-[15px] leading-relaxed text-brand-muted-600">
+              {entry.text}
+            </p>
+          ))}
         </div>
       </section>
 
@@ -83,38 +77,6 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
             </li>
           ))}
         </ol>
-      </section>
-
-      <section className="rounded-xl border border-surface-border bg-white p-5 sm:p-6" data-print-card>
-        <h2 className="text-xl font-semibold leading-snug text-brand-navy-700">
-          {SIX_BEAT_UI.responseGuideHeading.text}
-        </h2>
-        <dl className="mt-5 space-y-5">
-          <div>
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
-              {SIX_BEAT_UI.substantiveLabel.text}
-            </dt>
-            <dd className="mt-2 text-[15px] leading-relaxed text-brand-muted-600">
-              {plan.responseGuide.substantive.text}
-            </dd>
-          </div>
-          <div className="border-t border-surface-border pt-5">
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
-              {SIX_BEAT_UI.incompleteLabel.text}
-            </dt>
-            <dd className="mt-2 text-[15px] leading-relaxed text-brand-muted-600">
-              {plan.responseGuide.incomplete.text}
-            </dd>
-          </div>
-          <div className="border-t border-surface-border pt-5">
-            <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
-              {SIX_BEAT_UI.followUpLabel.text}
-            </dt>
-            <dd className="mt-2 border-l-2 border-brand-navy-200 pl-4 text-[15px] font-medium leading-relaxed text-brand-navy-700">
-              {plan.responseGuide.followUp.text}
-            </dd>
-          </div>
-        </dl>
       </section>
 
       <section className="border-y border-brand-red-200 py-6" data-print-card>
