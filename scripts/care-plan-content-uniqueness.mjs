@@ -4,6 +4,10 @@ const parentFirstSource = readFileSync(
   new URL('../src/content/carePlanParentFirst.ts', import.meta.url),
   'utf8',
 );
+const teamNoSource = readFileSync(
+  new URL('../src/content/carePlanParentFirstTeamNo.ts', import.meta.url),
+  'utf8',
+);
 const canonicalSource = readFileSync(
   new URL('../src/content/carePlan.ts', import.meta.url),
   'utf8',
@@ -72,11 +76,14 @@ const parentFirstEntries = extractDrafts(parentFirstSource).filter((entry) =>
   ),
 );
 
-const questionEntries = extractDrafts(canonicalSource).filter((entry) =>
+const teamYesQuestions = extractDrafts(canonicalSource).filter((entry) =>
   behaviorRows.some((row) => entry.id.startsWith(`row.${row}.question-`)),
 );
+const teamNoQuestions = extractDrafts(teamNoSource).filter((entry) =>
+  entry.id.startsWith('parent-first.team-no.'),
+);
 
-const entries = [...parentFirstEntries, ...questionEntries];
+const entries = [...parentFirstEntries, ...teamYesQuestions, ...teamNoQuestions];
 const byNormalizedText = new Map();
 
 for (const entry of entries) {
@@ -91,7 +98,7 @@ if (duplicates.length) {
   const report = duplicates
     .map(([text, ids]) => `DUPLICATE: ${JSON.stringify(text)} -> ${ids.join(', ')}`)
     .join('\n');
-  throw new Error(`Parent-first copy must be unique across rows.\n${report}`);
+  throw new Error(`Parent-first copy must be unique across rows and team modes.\n${report}`);
 }
 
 for (const row of behaviorRows) {
@@ -100,11 +107,12 @@ for (const row of behaviorRows) {
       entry.id.startsWith(`parent-first.${row}.reflect.`) ||
       entry.id.startsWith(`parent-first.${row}.stabilize.`) ||
       entry.id.startsWith(`parent-first.${row}.path.`) ||
-      entry.id.startsWith(`row.${row}.question-`),
+      entry.id.startsWith(`row.${row}.question-`) ||
+      entry.id.startsWith(`parent-first.team-no.${row}.question-`),
   );
   if (!rowEntries.length) throw new Error(`No uniqueness-audited content found for ${row}`);
 }
 
 console.log(
-  `PARENT_FIRST_UNIQUENESS_OK rows=${behaviorRows.length} strings=${entries.length} duplicates=0`,
+  `PARENT_FIRST_UNIQUENESS_OK rows=${behaviorRows.length} strings=${entries.length} duplicates=0 team_modes=2`,
 );
