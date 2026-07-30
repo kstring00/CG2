@@ -1,14 +1,25 @@
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../src/content/carePlan.ts', import.meta.url), 'utf8');
+const files = [
+  {
+    name: 'src/content/carePlan.ts',
+    source: readFileSync(new URL('../src/content/carePlan.ts', import.meta.url), 'utf8'),
+    callNames: ['draft'],
+  },
+  {
+    name: 'src/content/carePlanSixBeatDraft.ts',
+    source: readFileSync(new URL('../src/content/carePlanSixBeatDraft.ts', import.meta.url), 'utf8'),
+    callNames: ['d'],
+  },
+];
 
-function skipSpace(index) {
+function skipSpace(source, index) {
   while (/\s/.test(source[index] ?? '')) index += 1;
   return index;
 }
 
-function readLiteral(index) {
-  index = skipSpace(index);
+function readLiteral(source, index) {
+  index = skipSpace(source, index);
   const quote = source[index];
   if (quote !== "'" && quote !== '"') {
     throw new Error(`Expected string literal at source offset ${index}`);
@@ -33,15 +44,21 @@ function readLiteral(index) {
 }
 
 const entries = [];
-let cursor = 0;
-while ((cursor = source.indexOf('draft(', cursor)) !== -1) {
-  let index = cursor + 'draft('.length;
-  const id = readLiteral(index);
-  index = skipSpace(id.next);
-  if (source[index] !== ',') throw new Error(`Expected comma after ${id.value}`);
-  const text = readLiteral(index + 1);
-  entries.push({ id: id.value, text: text.value });
-  cursor = text.next;
+
+for (const file of files) {
+  for (const callName of file.callNames) {
+    let cursor = 0;
+    const needle = `${callName}(`;
+    while ((cursor = file.source.indexOf(needle, cursor)) !== -1) {
+      let index = cursor + needle.length;
+      const id = readLiteral(file.source, index);
+      index = skipSpace(file.source, id.next);
+      if (file.source[index] !== ',') throw new Error(`Expected comma after ${id.value}`);
+      const text = readLiteral(file.source, index + 1);
+      entries.push({ id: id.value, text: text.value, file: file.name });
+      cursor = text.next;
+    }
+  }
 }
 
 const duplicateIds = entries
@@ -53,7 +70,7 @@ if (duplicateIds.length) {
 
 console.log('CARE_PLAN_COPY_CHECKLIST_BEGIN');
 entries.forEach((entry, index) => {
-  console.log(`${index + 1}. ${entry.id} — ${entry.text.replace(/\s+/g, ' ').trim()}`);
+  console.log(`${index + 1}. ${entry.id} — ${entry.text.replace(/\s+/g, ' ').trim()} [${entry.file}]`);
 });
 console.log(`CARE_PLAN_COPY_CHECKLIST_COUNT=${entries.length}`);
 console.log('CARE_PLAN_COPY_CHECKLIST_END');
