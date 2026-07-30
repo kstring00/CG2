@@ -79,126 +79,32 @@ const pathSteps = [
   'Get connected with support',
 ] as const;
 
-const strategyRows = [
+const strategies = [
   ['Visual morning routines', 'Routines'],
   ['First-then language', 'Communication'],
   ['5-minute sensory resets', 'Sensory breaks'],
 ] as const;
 
-const toolboxRows = [
-  { href: '/support/hard-days', label: 'Grounding tools', icon: Wind, tone: 'mint' },
-  { href: '/calm', label: 'Overwhelm reset', icon: Heart, tone: 'coral' },
-  { href: '/support/caregiver', label: 'Caregiver reflection', icon: BookOpen, tone: 'violet' },
-  { href: 'tel:988', label: 'Crisis support', icon: Phone, tone: 'aqua' },
-  { href: '/support/check-in', label: 'Burnout check', icon: Compass, tone: 'sage' },
+const toolbox = [
+  ['/support/hard-days', Wind, 'Grounding tools', 'mint'],
+  ['/calm', Heart, 'Overwhelm reset', 'coral'],
+  ['/support/caregiver', BookOpen, 'Caregiver reflection', 'violet'],
+  ['tel:988', Phone, 'Crisis support', 'aqua'],
+  ['/support/check-in', Compass, 'Burnout check', 'sage'],
 ] as const;
 
 const providers = [
-  {
-    category: 'Sensory-friendly dentists',
-    name: 'Caldwell & Steinbring Dentistry for Children',
-    location: 'Sugar Land',
-  },
-  {
-    category: 'Speech & OT clinics',
-    name: 'Speech & Motion Therapy',
-    location: 'Southwest Houston area',
-  },
-  {
-    category: 'Respite care',
-    name: 'Easter Seals Greater Houston - Respite Services',
-    location: 'Greater Houston area',
-  },
-  {
-    category: 'Parent support groups',
-    name: 'Autism Society of Texas - Connection Groups',
-    location: 'Statewide',
-  },
+  ['Sensory-friendly dentists', 'Caldwell & Steinbring Dentistry for Children', 'Sugar Land'],
+  ['Speech & OT clinics', 'Speech & Motion Therapy', 'Southwest Houston area'],
+  ['Respite care', 'Easter Seals Greater Houston - Respite Services', 'Greater Houston area'],
+  ['Parent support groups', 'Autism Society of Texas - Connection Groups', 'Statewide'],
 ] as const;
 
-function NeedTile({
-  href,
-  icon: Icon,
-  label,
-  description,
-  tone,
-}: (typeof needTiles)[number]) {
+function ToneIcon({ tone, icon: Icon }: { tone: string; icon: typeof Compass }) {
   return (
-    <BorderGlow
-      className={styles.glowTile}
-      edgeSensitivity={24}
-      glowColor="174 64 47"
-      backgroundColor="#ffffff"
-      borderRadius={22}
-      glowRadius={24}
-      glowIntensity={0.5}
-      coneSpread={22}
-      colors={['#0f9f91', '#8b5cf6', '#fb7185']}
-      fillOpacity={0.14}
-    >
-      <Link href={href} className={styles.needTile} aria-label={`${label}: ${description}`}>
-        <span className={`${styles.needIcon} ${styles[tone]}`}>
-          <Icon aria-hidden />
-        </span>
-        <span className={styles.needCopy}>
-          <strong>{label}</strong>
-          <small>{description}</small>
-        </span>
-        <ArrowRight className={styles.tileArrow} aria-hidden />
-      </Link>
-    </BorderGlow>
-  );
-}
-
-function FeatureCard({
-  tone,
-  eyebrow,
-  title,
-  description,
-  cta,
-  href,
-  children,
-}: {
-  tone: 'teal' | 'purple' | 'blue';
-  eyebrow: string;
-  title: string;
-  description: string;
-  cta: string;
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <article className={`${styles.featureCard} ${styles[`feature_${tone}`]}`}>
-      <div className={styles.featureTopline} />
-      <p className={styles.featureEyebrow}>{eyebrow}</p>
-      <h3>{title}</h3>
-      <p className={styles.featureDescription}>{description}</p>
-      <div className={styles.featureBody}>{children}</div>
-      <Link href={href} className={styles.featureButton}>
-        {cta} <ArrowRight aria-hidden />
-      </Link>
-    </article>
-  );
-}
-
-function MapPreview() {
-  return (
-    <Link href="/support/find" className={styles.mapCard} aria-label="Explore the local support directory">
-      <svg viewBox="0 0 500 340" aria-hidden>
-        <rect width="500" height="340" fill="#fbfaf5" />
-        <path d="M-20 202 C 70 150, 145 240, 250 190 S 430 116, 520 160" fill="none" stroke="#c5dfeb" strokeWidth="13" strokeLinecap="round" opacity=".9" />
-        <path d="M55 -15 C 150 90, 260 165, 306 365" fill="none" stroke="#18345e" strokeWidth="4" opacity=".11" />
-        <path d="M-20 282 C 130 245, 325 270, 520 208" fill="none" stroke="#18345e" strokeWidth="4" opacity=".1" />
-        <path d="M382 -15 C 332 92, 360 218, 300 365" fill="none" stroke="#18345e" strokeWidth="4" opacity=".1" />
-        <ellipse cx="278" cy="135" rx="118" ry="91" fill="none" stroke="#18345e" strokeWidth="3" strokeDasharray="9 9" opacity=".19" />
-        <circle cx="278" cy="135" r="48" fill="#f5b942" opacity=".15" />
-      </svg>
-      <span className={`${styles.pin} ${styles.pinKaty}`}><MapPin />Katy</span>
-      <span className={`${styles.pin} ${styles.pinHouston}`}><MapPin />Houston</span>
-      <span className={`${styles.pin} ${styles.pinSugarLand}`}><MapPin />Sugar Land</span>
-      <span className={`${styles.pin} ${styles.pinPearland}`}><MapPin />Pearland</span>
-      <span className={styles.mapAction}>Explore the directory <ArrowRight /></span>
-    </Link>
+    <span className={`${styles.needIcon} ${styles[tone]}`}>
+      <Icon aria-hidden />
+    </span>
   );
 }
 
@@ -249,19 +155,15 @@ export default function DesignPreviewPage() {
               Real autism support for real <em>Texas</em> families
             </h1>
             <p className={styles.heroLead}>
-              A free support hub that helps you find local providers, parent tools, and clear next
-              steps for your family—whether you are newly diagnosed, already receiving services, or
-              just exploring options.
+              A free support hub that helps you find local providers, parent tools, and clear next steps for your family—whether you are newly diagnosed, already receiving services, or just exploring options.
             </p>
             <p className={styles.heroBody}>
-              Common Ground meets you where you are with practical resources, trusted guidance, and
-              support built for the whole family, so you can spend less energy searching and more
-              energy being present.
+              Common Ground meets you where you are with practical resources, trusted guidance, and support built for the whole family, so you can spend less energy searching and more energy being present.
             </p>
             <div className={styles.checks}>
-              {credibilityChecks.map((check) => (
-                <span key={check}>
-                  <CheckCircle2 aria-hidden /> {check}
+              {credibilityChecks.map((item) => (
+                <span key={item}>
+                  <CheckCircle2 aria-hidden /> {item}
                 </span>
               ))}
             </div>
@@ -283,11 +185,38 @@ export default function DesignPreviewPage() {
         <div className={styles.sectionInner}>
           <header className={styles.centerHeading}>
             <h2 id="needs-heading">What do you need today?</h2>
-            <span className={styles.headingMark} aria-hidden><i /><Heart /><i /></span>
+            <span className={styles.headingMark} aria-hidden>
+              <i />
+              <Heart />
+              <i />
+            </span>
             <p>Start wherever you are. Every path below is free and built for parents.</p>
           </header>
           <div className={styles.needGrid}>
-            {needTiles.map((tile) => <NeedTile key={tile.label} {...tile} />)}
+            {needTiles.map(({ href, icon: Icon, label, description, tone }) => (
+              <BorderGlow
+                key={label}
+                className={styles.glowTile}
+                edgeSensitivity={24}
+                glowColor="174 64 47"
+                backgroundColor="#ffffff"
+                borderRadius={22}
+                glowRadius={24}
+                glowIntensity={0.5}
+                coneSpread={22}
+                colors={['#0f9f91', '#8b5cf6', '#fb7185']}
+                fillOpacity={0.14}
+              >
+                <Link href={href} className={styles.needTile} aria-label={`${label}: ${description}`}>
+                  <ToneIcon tone={tone} icon={Icon} />
+                  <span className={styles.needCopy}>
+                    <strong>{label}</strong>
+                    <small>{description}</small>
+                  </span>
+                  <ArrowRight className={styles.tileArrow} aria-hidden />
+                </Link>
+              </BorderGlow>
+            ))}
           </div>
         </div>
       </section>
@@ -296,64 +225,90 @@ export default function DesignPreviewPage() {
         <div className={styles.featureGlowOne} aria-hidden />
         <div className={styles.featureGlowTwo} aria-hidden />
         <div className={`${styles.sectionInner} ${styles.featureGrid}`}>
-          <FeatureCard
-            tone="teal"
-            eyebrow="A guided path"
-            title="Find My Next Step"
-            description="A guided roadmap that meets you exactly where you are."
-            cta="Start My Next Step"
-            href="/support/intake"
-          >
-            <div className={styles.chips}>
-              <span>Newly diagnosed</span><span>In services</span><span>Exploring options</span>
+          <article className={`${styles.featureCard} ${styles.feature_teal}`}>
+            <div className={styles.featureTopline} />
+            <p className={styles.featureEyebrow}>A guided path</p>
+            <h3>Find My Next Step</h3>
+            <p className={styles.featureDescription}>A guided roadmap that meets you exactly where you are.</p>
+            <div className={styles.featureBody}>
+              <div className={styles.chips}>
+                <span>Newly diagnosed</span>
+                <span>In services</span>
+                <span>Exploring options</span>
+              </div>
+              <ol className={styles.pathList}>
+                {pathSteps.map((step, index) => (
+                  <li key={step}>
+                    <b>{index + 1}</b>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+              <div className={styles.progressBox}>
+                <span>Your pathway</span>
+                <small>Step 1 of 4</small>
+                <i><b /></i>
+              </div>
             </div>
-            <ol className={styles.pathList}>
-              {pathSteps.map((step, index) => (
-                <li key={step}><b>{index + 1}</b><span>{step}</span></li>
-              ))}
-            </ol>
-            <div className={styles.progressBox}>
-              <span>Your pathway</span><small>Step 1 of 4</small><i><b /></i>
-            </div>
-          </FeatureCard>
+            <Link href="/support/intake" className={styles.featureButton}>
+              Start My Next Step <ArrowRight aria-hidden />
+            </Link>
+          </article>
 
-          <FeatureCard
-            tone="purple"
-            eyebrow="Practical parent tools"
-            title="At Home Strategies"
-            description="A calm parent toolbox of practical, real-life tools."
-            cta="Browse Strategies"
-            href="/support/at-home"
-          >
-            <div className={`${styles.chips} ${styles.purpleChips}`}>
-              <span>Routines</span><span>Communication</span><span>Transitions</span><span>Sensory breaks</span>
+          <article className={`${styles.featureCard} ${styles.feature_purple}`}>
+            <div className={styles.featureTopline} />
+            <p className={styles.featureEyebrow}>Practical parent tools</p>
+            <h3>At Home Strategies</h3>
+            <p className={styles.featureDescription}>A calm parent toolbox of practical, real-life tools.</p>
+            <div className={styles.featureBody}>
+              <div className={`${styles.chips} ${styles.purpleChips}`}>
+                <span>Routines</span><span>Communication</span><span>Transitions</span><span>Sensory breaks</span>
+              </div>
+              <ul className={styles.strategyList}>
+                {strategies.map(([label, tag]) => (
+                  <li key={label}>
+                    <span className={styles.strategyIcon}><Home /></span>
+                    <strong>{label}</strong>
+                    <small>{tag}</small>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className={styles.strategyList}>
-              {strategyRows.map(([title, tag]) => (
-                <li key={title}>
-                  <span className={styles.strategyIcon}><Home /></span>
-                  <strong>{title}</strong>
-                  <small>{tag}</small>
-                </li>
-              ))}
-            </ul>
-          </FeatureCard>
+            <Link href="/support/at-home" className={styles.featureButton}>
+              Browse Strategies <ArrowRight aria-hidden />
+            </Link>
+          </article>
 
-          <FeatureCard
-            tone="blue"
-            eyebrow="Care for the caregiver"
-            title="Mental Health Toolbox"
-            description="Calm, practical support for you—the caregiver."
-            cta="Open Toolbox"
-            href="/support/caregiver"
-          >
-            <ul className={styles.toolboxList}>
-              {toolboxRows.map(({ href, label, icon: Icon, tone }) => {
-                const content = <><span className={`${styles.toolboxIcon} ${styles[tone]}`}><Icon /></span><strong>{label}</strong><ArrowRight /></>;
-                return <li key={label}>{href.startsWith('tel:') ? <a href={href}>{content}</a> : <Link href={href}>{content}</Link>}</li>;
-              })}
-            </ul>
-          </FeatureCard>
+          <article className={`${styles.featureCard} ${styles.feature_blue}`}>
+            <div className={styles.featureTopline} />
+            <p className={styles.featureEyebrow}>Care for the caregiver</p>
+            <h3>Mental Health Toolbox</h3>
+            <p className={styles.featureDescription}>Calm, practical support for you—the caregiver.</p>
+            <div className={styles.featureBody}>
+              <ul className={styles.toolboxList}>
+                {toolbox.map(([href, Icon, label, tone]) => (
+                  <li key={label}>
+                    {href.startsWith('tel:') ? (
+                      <a href={href}>
+                        <span className={`${styles.toolboxIcon} ${styles[tone]}`}><Icon /></span>
+                        <strong>{label}</strong>
+                        <ArrowRight />
+                      </a>
+                    ) : (
+                      <Link href={href}>
+                        <span className={`${styles.toolboxIcon} ${styles[tone]}`}><Icon /></span>
+                        <strong>{label}</strong>
+                        <ArrowRight />
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Link href="/support/caregiver" className={styles.featureButton}>
+              Open Toolbox <ArrowRight aria-hidden />
+            </Link>
+          </article>
         </div>
       </section>
 
@@ -366,13 +321,33 @@ export default function DesignPreviewPage() {
             <p>Browse local providers and support resources in the greater Houston area.</p>
             <Link href="/support/find">See all local providers <ArrowRight /></Link>
           </div>
-          <MapPreview />
+
+          <Link href="/support/find" className={styles.mapCard} aria-label="Explore the local support directory">
+            <svg viewBox="0 0 500 340" aria-hidden>
+              <rect width="500" height="340" fill="#fbfaf5" />
+              <path d="M-20 202 C 70 150, 145 240, 250 190 S 430 116, 520 160" fill="none" stroke="#c5dfeb" strokeWidth="13" strokeLinecap="round" opacity=".9" />
+              <path d="M55 -15 C 150 90, 260 165, 306 365" fill="none" stroke="#18345e" strokeWidth="4" opacity=".11" />
+              <path d="M-20 282 C 130 245, 325 270, 520 208" fill="none" stroke="#18345e" strokeWidth="4" opacity=".1" />
+              <path d="M382 -15 C 332 92, 360 218, 300 365" fill="none" stroke="#18345e" strokeWidth="4" opacity=".1" />
+              <ellipse cx="278" cy="135" rx="118" ry="91" fill="none" stroke="#18345e" strokeWidth="3" strokeDasharray="9 9" opacity=".19" />
+              <circle cx="278" cy="135" r="48" fill="#f5b942" opacity=".15" />
+            </svg>
+            <span className={`${styles.pin} ${styles.pinKaty}`}><MapPin />Katy</span>
+            <span className={`${styles.pin} ${styles.pinHouston}`}><MapPin />Houston</span>
+            <span className={`${styles.pin} ${styles.pinSugarLand}`}><MapPin />Sugar Land</span>
+            <span className={`${styles.pin} ${styles.pinPearland}`}><MapPin />Pearland</span>
+            <span className={styles.mapAction}>Explore the directory <ArrowRight /></span>
+          </Link>
+
           <div className={styles.providerList}>
-            {providers.map((provider) => (
-              <article key={provider.name} className={styles.providerCard}>
-                <p>{provider.category}</p>
-                <h3>{provider.name}</h3>
-                <div><span><MapPin />{provider.location}</span><Link href="/support/find">Website <ExternalLink /></Link></div>
+            {providers.map(([category, name, location]) => (
+              <article key={name} className={styles.providerCard}>
+                <p>{category}</p>
+                <h3>{name}</h3>
+                <div>
+                  <span><MapPin />{location}</span>
+                  <Link href="/support/find">Website <ExternalLink /></Link>
+                </div>
               </article>
             ))}
           </div>
