@@ -31,7 +31,7 @@ export type StandardPlanPage = {
   action: ActionDefinition;
   sessionHeading: CopyEntry;
   questions: CopyEntry[];
-  crossLink?: {
+  crossLink: {
     label: CopyEntry;
     detail: CopyEntry;
     href: string;
@@ -150,17 +150,15 @@ export function buildPlan(
     action: definition.action,
     sessionHeading: TEAM_COPY[resolvedTeam].sessionHeading,
     questions: [...definition.questions],
-    crossLink: definition.crossLink
-      ? {
-          label: definition.crossLink.label,
-          detail: definition.crossLink.detail,
-          href: standardHref(
-            resolvedTeam,
-            definition.crossLink.branch,
-            definition.crossLink.row,
-          ),
-        }
-      : undefined,
+    crossLink: {
+      label: definition.crossLink.label,
+      detail: definition.crossLink.detail,
+      href: standardHref(
+        resolvedTeam,
+        definition.crossLink.branch,
+        definition.crossLink.row,
+      ),
+    },
     startOverHref,
     teamContact: contact,
     providerEvaluationNote,

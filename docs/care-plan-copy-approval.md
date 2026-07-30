@@ -289,57 +289,65 @@ All entries are currently `approval: "draft"` in `src/content/carePlan.ts`.
 285. `row.deciding.question-2` — How would goals for my child be chosen, and what's my role in choosing them?
 286. `row.deciding.question-3` — How do you measure whether it's working, and how often would I see that data?
 287. `row.deciding.question-4` — What happens if it isn't helping — how does the plan change?
-288. `row.first-months.choice` — What should the first months actually look like?
-289. `row.first-months.acknowledgment` — You said you want honest expectations before you commit.
-290. `row.first-months.truth` — Honest timelines beat big promises — ask for the boring version.
-291. `row.first-months.body-1` — The first weeks are usually assessment and relationship-building, not visible change. A provider who says otherwise is selling.
-292. `row.first-months.body-2` — What you're entitled to is a clear picture: who comes to your home, how often, what they'll do, and when you'll first sit down over data.
-293. `row.first-months.action-heading` — Sketch your family's real week.
-294. `row.first-months.action-body-1` — Write the hours that could actually hold sessions — "weekdays 3:30–6, not Wednesdays" — and who's home during them.
-295. `row.first-months.action-body-2` — Bring it to every provider call. Their answer to "can you staff this?" tells you more than their brochure.
-296. `row.first-months.question-1` — Walk me through a typical first month, week by week.
-297. `row.first-months.question-2` — What changes should we realistically see by month three — and what shouldn't we expect yet?
-298. `row.first-months.question-3` — How often do we meet with the BCBA, not just the therapist?
-299. `row.judging-provider.choice` — How do I judge whether a provider is good?
-300. `row.judging-provider.acknowledgment` — You said you want to tell a good provider from a mediocre one.
-301. `row.judging-provider.truth` — A good provider welcomes every one of these questions. Hesitation is an answer too.
-302. `row.judging-provider.body-1` — You are interviewing them. Families forget this because they're exhausted and waitlists feel like leverage.
-303. `row.judging-provider.body-2` — The questions below are the ones providers hope you won't ask. Ask all of them and write the answers down.
-304. `row.judging-provider.action-heading` — Take notes during every provider call.
-305. `row.judging-provider.action-body-1` — Same three lines each time: what I asked · what they said · how it felt to ask. "Asked about observing sessions — said anytime — felt easy" versus "asked — got a policy speech — felt defensive."
-306. `row.judging-provider.action-body-2` — After three calls, the notes decide for you.
-307. `row.judging-provider.question-1` — Can parents observe sessions?
-308. `row.judging-provider.question-2` — Who supervises the therapists, and how many hours a week is the BCBA actually involved with my child?
-309. `row.judging-provider.question-3` — How do you train and involve parents — is that scheduled or optional?
-310. `row.judging-provider.question-4` — What's your staff turnover like, and what happens when my child's therapist leaves?
-311. `row.what-is-aba.choice` — I don't understand what ABA even does.
-312. `row.what-is-aba.acknowledgment` — You said you need ABA explained before anything else makes sense.
-313. `row.what-is-aba.truth` — If a provider can't explain it plainly, keep looking.
-314. `row.what-is-aba.body-1` — In plain terms: ABA looks closely at what's happening around a behavior — what comes before it, what follows it — and uses that to teach skills and reduce what's getting in the child's way.
-315. `row.what-is-aba.body-2` — Everything is measured. That's the part that protects you: you never have to take "it's going well" on faith — you can ask to see it.
-316. `row.what-is-aba.action-heading` — Bring one real moment to the conversation.
-317. `row.what-is-aba.action-body-1` — Pick one recent hard moment — the restaurant, the morning, the bite — and describe it to the provider.
-318. `row.what-is-aba.action-body-2` — Then ask: "walk me through how your team would approach exactly that." Their answer, in plain language or jargon, is your evaluation.
-319. `row.what-is-aba.question-1` — Explain in plain terms what you'd likely work on first with my child, and why.
-320. `row.what-is-aba.question-2` — What is the family's role — what will we be asked to do?
-321. `row.what-is-aba.question-3` — What does ABA help with, and what does it not help with?
-322. `crisis.acknowledgment` — You said someone in the house is getting hurt.
-323. `crisis.truth` — When someone in the house is getting hurt, this has gone past coping — and families do reach this point.
-324. `crisis.body-1` — This page gives no behavior advice — in a safety situation, guessing is dangerous and you deserve better than guesses. Its job is to get the full truth of what's happening in front of the people responsible for clinical care, fast.
-325. `crisis.body-2` — Families in this situation are not out of options. Ask your team directly which of these apply to you: a revised plan that targets these incidents, hands-on caregiver training, a written safety plan for the moments themselves, or increased support hours. If you don't have a team yet, this is the first thing to tell admissions.
-326. `crisis.documentation-heading` — Document this after each incident, once everyone is safe
-327. `crisis.documentation-1` — The date and time.
-328. `crisis.documentation-2` — What happened.
-329. `crisis.documentation-3` — What happened immediately before it.
-330. `crisis.documentation-4` — How long it lasted.
-331. `crisis.documentation-5` — Who was hurt.
-332. `crisis.documentation-6` — Photos of injuries, when appropriate and safe.
-333. `crisis.documentation-example` — Like this: "Tue 5:15p — asked to turn off tablet — 20 min — bit grandma's forearm, bruised — ended when she left the room." One entry per incident. This log is what turns "it's bad" into a plan revision, more hours, or hands-on training.
-334. `crisis.questions-heading` — Raise these questions now
-335. `crisis.question-1` — We need to talk about safety this week — can we meet sooner than our next session?
-336. `crisis.question-2` — What can be escalated in the plan right now?
-337. `crisis.question-3` — Who do we call between sessions when there's an incident?
-338. `crisis.phone-heading` — Call the appropriate team now
-339. `crisis.immediate-danger-heading` — Immediate danger
-340. `crisis.immediate-danger-body` — If anyone is in immediate danger, call 911. If you're having thoughts of harming yourself, call or text 988.
-341. `crisis.back-label` — Return to the Care Plan
+288. `row.deciding.cross-link-label` — What should the first months actually look like?
+289. `row.deciding.cross-link-detail` — Open the page on honest timelines and expectations.
+290. `row.first-months.choice` — What should the first months actually look like?
+291. `row.first-months.acknowledgment` — You said you want honest expectations before you commit.
+292. `row.first-months.truth` — Honest timelines beat big promises — ask for the boring version.
+293. `row.first-months.body-1` — The first weeks are usually assessment and relationship-building, not visible change. A provider who says otherwise is selling.
+294. `row.first-months.body-2` — What you're entitled to is a clear picture: who comes to your home, how often, what they'll do, and when you'll first sit down over data.
+295. `row.first-months.action-heading` — Sketch your family's real week.
+296. `row.first-months.action-body-1` — Write the hours that could actually hold sessions — "weekdays 3:30–6, not Wednesdays" — and who's home during them.
+297. `row.first-months.action-body-2` — Bring it to every provider call. Their answer to "can you staff this?" tells you more than their brochure.
+298. `row.first-months.question-1` — Walk me through a typical first month, week by week.
+299. `row.first-months.question-2` — What changes should we realistically see by month three — and what shouldn't we expect yet?
+300. `row.first-months.question-3` — How often do we meet with the BCBA, not just the therapist?
+301. `row.first-months.cross-link-label` — How do I judge whether a provider is good?
+302. `row.first-months.cross-link-detail` — Open the provider-interview questions.
+303. `row.judging-provider.choice` — How do I judge whether a provider is good?
+304. `row.judging-provider.acknowledgment` — You said you want to tell a good provider from a mediocre one.
+305. `row.judging-provider.truth` — A good provider welcomes every one of these questions. Hesitation is an answer too.
+306. `row.judging-provider.body-1` — You are interviewing them. Families forget this because they're exhausted and waitlists feel like leverage.
+307. `row.judging-provider.body-2` — The questions below are the ones providers hope you won't ask. Ask all of them and write the answers down.
+308. `row.judging-provider.action-heading` — Take notes during every provider call.
+309. `row.judging-provider.action-body-1` — Same three lines each time: what I asked · what they said · how it felt to ask. "Asked about observing sessions — said anytime — felt easy" versus "asked — got a policy speech — felt defensive."
+310. `row.judging-provider.action-body-2` — After three calls, the notes decide for you.
+311. `row.judging-provider.question-1` — Can parents observe sessions?
+312. `row.judging-provider.question-2` — Who supervises the therapists, and how many hours a week is the BCBA actually involved with my child?
+313. `row.judging-provider.question-3` — How do you train and involve parents — is that scheduled or optional?
+314. `row.judging-provider.question-4` — What's your staff turnover like, and what happens when my child's therapist leaves?
+315. `row.judging-provider.cross-link-label` — I don't understand what ABA even does.
+316. `row.judging-provider.cross-link-detail` — Open the plain-language explanation page.
+317. `row.what-is-aba.choice` — I don't understand what ABA even does.
+318. `row.what-is-aba.acknowledgment` — You said you need ABA explained before anything else makes sense.
+319. `row.what-is-aba.truth` — If a provider can't explain it plainly, keep looking.
+320. `row.what-is-aba.body-1` — In plain terms: ABA looks closely at what's happening around a behavior — what comes before it, what follows it — and uses that to teach skills and reduce what's getting in the child's way.
+321. `row.what-is-aba.body-2` — Everything is measured. That's the part that protects you: you never have to take "it's going well" on faith — you can ask to see it.
+322. `row.what-is-aba.action-heading` — Bring one real moment to the conversation.
+323. `row.what-is-aba.action-body-1` — Pick one recent hard moment — the restaurant, the morning, the bite — and describe it to the provider.
+324. `row.what-is-aba.action-body-2` — Then ask: "walk me through how your team would approach exactly that." Their answer, in plain language or jargon, is your evaluation.
+325. `row.what-is-aba.question-1` — Explain in plain terms what you'd likely work on first with my child, and why.
+326. `row.what-is-aba.question-2` — What is the family's role — what will we be asked to do?
+327. `row.what-is-aba.question-3` — What does ABA help with, and what does it not help with?
+328. `row.what-is-aba.cross-link-label` — How do I know if ABA would actually help my child?
+329. `row.what-is-aba.cross-link-detail` — Open the page for making this decision with real information.
+330. `crisis.acknowledgment` — You said someone in the house is getting hurt.
+331. `crisis.truth` — When someone in the house is getting hurt, this has gone past coping — and families do reach this point.
+332. `crisis.body-1` — This page gives no behavior advice — in a safety situation, guessing is dangerous and you deserve better than guesses. Its job is to get the full truth of what's happening in front of the people responsible for clinical care, fast.
+333. `crisis.body-2` — Families in this situation are not out of options. Ask your team directly which of these apply to you: a revised plan that targets these incidents, hands-on caregiver training, a written safety plan for the moments themselves, or increased support hours. If you don't have a team yet, this is the first thing to tell admissions.
+334. `crisis.documentation-heading` — Document this after each incident, once everyone is safe
+335. `crisis.documentation-1` — The date and time.
+336. `crisis.documentation-2` — What happened.
+337. `crisis.documentation-3` — What happened immediately before it.
+338. `crisis.documentation-4` — How long it lasted.
+339. `crisis.documentation-5` — Who was hurt.
+340. `crisis.documentation-6` — Photos of injuries, when appropriate and safe.
+341. `crisis.documentation-example` — Like this: "Tue 5:15p — asked to turn off tablet — 20 min — bit grandma's forearm, bruised — ended when she left the room." One entry per incident. This log is what turns "it's bad" into a plan revision, more hours, or hands-on training.
+342. `crisis.questions-heading` — Raise these questions now
+343. `crisis.question-1` — We need to talk about safety this week — can we meet sooner than our next session?
+344. `crisis.question-2` — What can be escalated in the plan right now?
+345. `crisis.question-3` — Who do we call between sessions when there's an incident?
+346. `crisis.phone-heading` — Call the appropriate team now
+347. `crisis.immediate-danger-heading` — Immediate danger
+348. `crisis.immediate-danger-body` — If anyone is in immediate danger, call 911. If you're having thoughts of harming yourself, call or text 988.
+349. `crisis.back-label` — Return to the Care Plan

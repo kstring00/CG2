@@ -320,23 +320,21 @@ function PlanView({ plan }: { plan: StandardPlanPage }) {
       <TeamContact team={plan.team} />
 
       <section className="print:hidden overflow-hidden rounded-xl border border-surface-border bg-white">
-        {plan.crossLink && (
-          <Link
-            href={plan.crossLink.href}
-            className="flex items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
-          >
-            <span>
-              <span className="block text-sm font-medium text-brand-navy-700">{plan.crossLink.label.text}</span>
-              <span className="mt-1 block text-xs leading-relaxed text-brand-muted-500">
-                {plan.crossLink.detail.text}
-              </span>
+        <Link
+          href={plan.crossLink.href}
+          className="flex items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
+        >
+          <span>
+            <span className="block text-sm font-medium text-brand-navy-700">{plan.crossLink.label.text}</span>
+            <span className="mt-1 block text-xs leading-relaxed text-brand-muted-500">
+              {plan.crossLink.detail.text}
             </span>
-            <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
-          </Link>
-        )}
+          </span>
+          <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
+        </Link>
         <Link
           href={plan.startOverHref}
-          className="flex items-center justify-between gap-4 border-t border-surface-border px-5 py-4 text-left transition first:border-t-0 hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
+          className="flex items-center justify-between gap-4 border-t border-surface-border px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
         >
           <span>
             <span className="block text-sm font-medium text-brand-navy-700">{CARE_PLAN_UI.startOver.text}</span>

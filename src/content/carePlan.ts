@@ -59,8 +59,7 @@ export type PlanRowDefinition = {
   body: CopyEntry[];
   action: ActionDefinition;
   questions: CopyEntry[];
-  // Optional: the team=no Branch 4 rows have no approved cross-link copy yet.
-  crossLink?: CrossLinkDefinition;
+  crossLink: CrossLinkDefinition;
   safetyLink?: CopyEntry;
   quietSupport?: CopyEntry;
   domesticViolence?: CopyEntry;
@@ -1345,6 +1344,18 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
         "What happens if it isn't helping — how does the plan change?",
       ),
     ],
+    crossLink: {
+      label: draft(
+        'row.deciding.cross-link-label',
+        'What should the first months actually look like?',
+      ),
+      detail: draft(
+        'row.deciding.cross-link-detail',
+        'Open the page on honest timelines and expectations.',
+      ),
+      branch: 'working',
+      row: 'first-months',
+    },
   },
   'first-months': {
     id: 'first-months',
@@ -1395,6 +1406,18 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
         'How often do we meet with the BCBA, not just the therapist?',
       ),
     ],
+    crossLink: {
+      label: draft(
+        'row.first-months.cross-link-label',
+        'How do I judge whether a provider is good?',
+      ),
+      detail: draft(
+        'row.first-months.cross-link-detail',
+        'Open the provider-interview questions.',
+      ),
+      branch: 'working',
+      row: 'judging-provider',
+    },
   },
   'judging-provider': {
     id: 'judging-provider',
@@ -1449,6 +1472,18 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
         "What's your staff turnover like, and what happens when my child's therapist leaves?",
       ),
     ],
+    crossLink: {
+      label: draft(
+        'row.judging-provider.cross-link-label',
+        "I don't understand what ABA even does.",
+      ),
+      detail: draft(
+        'row.judging-provider.cross-link-detail',
+        'Open the plain-language explanation page.',
+      ),
+      branch: 'working',
+      row: 'what-is-aba',
+    },
   },
   'what-is-aba': {
     id: 'what-is-aba',
@@ -1502,6 +1537,18 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
         'What does ABA help with, and what does it not help with?',
       ),
     ],
+    crossLink: {
+      label: draft(
+        'row.what-is-aba.cross-link-label',
+        'How do I know if ABA would actually help my child?',
+      ),
+      detail: draft(
+        'row.what-is-aba.cross-link-detail',
+        'Open the page for making this decision with real information.',
+      ),
+      branch: 'working',
+      row: 'deciding',
+    },
   },
 };
 
