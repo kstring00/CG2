@@ -7,9 +7,9 @@ const files = [
     callNames: ['draft'],
   },
   {
-    name: 'src/content/carePlanSixBeatDraft.ts',
-    source: readFileSync(new URL('../src/content/carePlanSixBeatDraft.ts', import.meta.url), 'utf8'),
-    callNames: ['d'],
+    name: 'src/content/carePlanParentFirst.ts',
+    source: readFileSync(new URL('../src/content/carePlanParentFirst.ts', import.meta.url), 'utf8'),
+    callNames: ['draft'],
   },
 ];
 
@@ -31,7 +31,6 @@ function readLiteral(source, index) {
     const char = source[cursor];
     if (!escaped && char === quote) {
       const raw = source.slice(index, cursor + 1);
-      // Source is trusted and literals contain only authored copy.
       const value = Function(`"use strict"; return (${raw});`)();
       return { value, next: cursor + 1 };
     }
@@ -68,9 +67,18 @@ if (duplicateIds.length) {
   throw new Error(`Duplicate copy IDs: ${[...new Set(duplicateIds)].join(', ')}`);
 }
 
-console.log('CARE_PLAN_COPY_CHECKLIST_BEGIN');
-entries.forEach((entry, index) => {
-  console.log(`${index + 1}. ${entry.id} — ${entry.text.replace(/\s+/g, ' ').trim()} [${entry.file}]`);
-});
+const summaryOnly = process.argv.includes('--summary');
+
+if (!summaryOnly) {
+  console.log('CARE_PLAN_COPY_CHECKLIST_BEGIN');
+  entries.forEach((entry, index) => {
+    console.log(`${index + 1}. ${entry.id} — ${entry.text.replace(/\s+/g, ' ').trim()} [${entry.file}]`);
+  });
+  console.log('CARE_PLAN_COPY_CHECKLIST_END');
+}
+
+const canonicalCount = entries.filter((entry) => entry.file.endsWith('carePlan.ts')).length;
+const parentFirstCount = entries.filter((entry) => entry.file.endsWith('carePlanParentFirst.ts')).length;
 console.log(`CARE_PLAN_COPY_CHECKLIST_COUNT=${entries.length}`);
-console.log('CARE_PLAN_COPY_CHECKLIST_END');
+console.log(`CARE_PLAN_CANONICAL_COPY_COUNT=${canonicalCount}`);
+console.log(`CARE_PLAN_PARENT_FIRST_DRAFT_COUNT=${parentFirstCount}`);
