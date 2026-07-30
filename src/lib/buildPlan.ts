@@ -20,6 +20,7 @@ import {
 import { PARENT_FIRST_EMPTY_ROWS } from '@/content/carePlanParentFirstEmpty';
 import { PARENT_FIRST_EVALUATION_ROWS } from '@/content/carePlanParentFirstEvaluation';
 import { PARENT_FIRST_LOAD_ROWS } from '@/content/carePlanParentFirstLoad';
+import { PARENT_FIRST_QUESTION_OVERRIDES } from '@/content/carePlanParentFirstQuestions';
 import { PARENT_FIRST_TEAM_NO_QUESTIONS } from '@/content/carePlanParentFirstTeamNo';
 import { PARENT_FIRST_WORKING_ROWS } from '@/content/carePlanParentFirstWorking';
 
@@ -167,7 +168,9 @@ export function buildPlan(
   const questions =
     resolvedTeam === 'no' && teamNoQuestionBank[definition.id]
       ? [...teamNoQuestionBank[definition.id]!]
-      : [...definition.questions];
+      : PARENT_FIRST_QUESTION_OVERRIDES[definition.id]
+        ? [...PARENT_FIRST_QUESTION_OVERRIDES[definition.id]!]
+        : [...definition.questions];
 
   return {
     kind: 'standard',
