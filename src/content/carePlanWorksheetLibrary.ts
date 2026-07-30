@@ -76,12 +76,22 @@ export const ONE_SENTENCE_ADVOCACY_WORKSHEET: WorksheetOverride = {
   rows: new Set<StandardRowId>(['marriage-strain']),
 };
 
+export const FAMILY_FRIENDS_SUPPORT_WORKSHEET: WorksheetOverride = {
+  href: '/worksheets/relatives-onepager.pdf',
+  label: draft(
+    'worksheet-library.family-friends-support-one-pager.label',
+    'Download the Family & Friends Support One-Pager',
+  ),
+  rows: new Set<StandardRowId>(['judged']),
+};
+
 const WORKSHEET_OVERRIDES: WorksheetOverride[] = [
   CARE_CLARITY_WORKSHEET,
   PARENT_SUPPORT_WORKSHEET,
   HOME_SITUATION_WORKSHEET,
   PROVIDER_INTERVIEW_WORKSHEET,
   ONE_SENTENCE_ADVOCACY_WORKSHEET,
+  FAMILY_FRIENDS_SUPPORT_WORKSHEET,
 ];
 
 export function resolveWorksheetOverride(row: StandardRowId): WorksheetOverride | undefined {
