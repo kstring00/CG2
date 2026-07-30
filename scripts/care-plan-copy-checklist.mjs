@@ -11,6 +11,11 @@ const files = [
     source: readFileSync(new URL('../src/content/carePlanParentFirst.ts', import.meta.url), 'utf8'),
     callNames: ['draft'],
   },
+  {
+    name: 'src/content/carePlanParentFirstTeamNo.ts',
+    source: readFileSync(new URL('../src/content/carePlanParentFirstTeamNo.ts', import.meta.url), 'utf8'),
+    callNames: ['draft'],
+  },
 ];
 
 function skipSpace(source, index) {
@@ -79,6 +84,8 @@ if (!summaryOnly) {
 
 const canonicalCount = entries.filter((entry) => entry.file.endsWith('carePlan.ts')).length;
 const parentFirstCount = entries.filter((entry) => entry.file.endsWith('carePlanParentFirst.ts')).length;
+const teamNoCount = entries.filter((entry) => entry.file.endsWith('carePlanParentFirstTeamNo.ts')).length;
 console.log(`CARE_PLAN_COPY_CHECKLIST_COUNT=${entries.length}`);
 console.log(`CARE_PLAN_CANONICAL_COPY_COUNT=${canonicalCount}`);
 console.log(`CARE_PLAN_PARENT_FIRST_DRAFT_COUNT=${parentFirstCount}`);
+console.log(`CARE_PLAN_TEAM_NO_BEHAVIOR_QUESTION_COUNT=${teamNoCount}`);
