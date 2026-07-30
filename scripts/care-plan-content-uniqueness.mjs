@@ -1,8 +1,15 @@
 import { readFileSync } from 'node:fs';
 
-const parentFirstSource = readFileSync(
-  new URL('../src/content/carePlanParentFirst.ts', import.meta.url),
-  'utf8',
+const parentFirstFiles = [
+  'carePlanParentFirst.ts',
+  'carePlanParentFirstLoad.ts',
+  'carePlanParentFirstEmpty.ts',
+  'carePlanParentFirstWorking.ts',
+  'carePlanParentFirstEvaluation.ts',
+];
+
+const parentFirstSources = parentFirstFiles.map((file) =>
+  readFileSync(new URL(`../src/content/${file}`, import.meta.url), 'utf8'),
 );
 const teamNoSource = readFileSync(
   new URL('../src/content/carePlanParentFirstTeamNo.ts', import.meta.url),
@@ -13,12 +20,28 @@ const canonicalSource = readFileSync(
   'utf8',
 );
 
-const behaviorRows = [
+const rows = [
   'big-moments',
   'outings',
   'daily-routines',
   'communication-wall',
   'why-behavior',
+  'alone',
+  'marriage-strain',
+  'partner-load',
+  'judged',
+  'cannot-keep-doing',
+  'nothing-left',
+  'grieving',
+  'disappeared',
+  'thinking-stopping',
+  'no-progress',
+  'sessions-concern',
+  'unclear-care',
+  'deciding',
+  'first-months',
+  'judging-provider',
+  'what-is-aba',
 ];
 
 function skipSpace(source, index) {
@@ -67,17 +90,19 @@ function extractDrafts(source) {
   return entries;
 }
 
-const parentFirstEntries = extractDrafts(parentFirstSource).filter((entry) =>
-  behaviorRows.some(
-    (row) =>
-      entry.id.startsWith(`parent-first.${row}.reflect.`) ||
-      entry.id.startsWith(`parent-first.${row}.stabilize.`) ||
-      entry.id.startsWith(`parent-first.${row}.path.`),
-  ),
-);
+const parentFirstEntries = parentFirstSources
+  .flatMap(extractDrafts)
+  .filter((entry) =>
+    rows.some(
+      (row) =>
+        entry.id.startsWith(`parent-first.${row}.reflect.`) ||
+        entry.id.startsWith(`parent-first.${row}.stabilize.`) ||
+        entry.id.startsWith(`parent-first.${row}.path.`),
+    ),
+  );
 
 const teamYesQuestions = extractDrafts(canonicalSource).filter((entry) =>
-  behaviorRows.some((row) => entry.id.startsWith(`row.${row}.question-`)),
+  rows.some((row) => entry.id.startsWith(`row.${row}.question-`)),
 );
 const teamNoQuestions = extractDrafts(teamNoSource).filter((entry) =>
   entry.id.startsWith('parent-first.team-no.'),
@@ -101,7 +126,7 @@ if (duplicates.length) {
   throw new Error(`Parent-first copy must be unique across rows and team modes.\n${report}`);
 }
 
-for (const row of behaviorRows) {
+for (const row of rows) {
   const rowEntries = entries.filter(
     (entry) =>
       entry.id.startsWith(`parent-first.${row}.reflect.`) ||
@@ -114,5 +139,5 @@ for (const row of behaviorRows) {
 }
 
 console.log(
-  `PARENT_FIRST_UNIQUENESS_OK rows=${behaviorRows.length} strings=${entries.length} duplicates=0 team_modes=2`,
+  `PARENT_FIRST_UNIQUENESS_OK rows=${rows.length} strings=${entries.length} duplicates=0 team_modes=2`,
 );
