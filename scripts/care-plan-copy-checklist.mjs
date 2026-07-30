@@ -7,6 +7,7 @@ const files = [
   'src/content/carePlanParentFirstEmpty.ts',
   'src/content/carePlanParentFirstWorking.ts',
   'src/content/carePlanParentFirstEvaluation.ts',
+  'src/content/carePlanParentFirstQuestions.ts',
   'src/content/carePlanParentFirstTeamNo.ts',
 ].map((name) => ({
   name,
