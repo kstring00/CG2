@@ -1,22 +1,18 @@
 import { readFileSync } from 'node:fs';
 
 const files = [
-  {
-    name: 'src/content/carePlan.ts',
-    source: readFileSync(new URL('../src/content/carePlan.ts', import.meta.url), 'utf8'),
-    callNames: ['draft'],
-  },
-  {
-    name: 'src/content/carePlanParentFirst.ts',
-    source: readFileSync(new URL('../src/content/carePlanParentFirst.ts', import.meta.url), 'utf8'),
-    callNames: ['draft'],
-  },
-  {
-    name: 'src/content/carePlanParentFirstTeamNo.ts',
-    source: readFileSync(new URL('../src/content/carePlanParentFirstTeamNo.ts', import.meta.url), 'utf8'),
-    callNames: ['draft'],
-  },
-];
+  'src/content/carePlan.ts',
+  'src/content/carePlanParentFirst.ts',
+  'src/content/carePlanParentFirstLoad.ts',
+  'src/content/carePlanParentFirstEmpty.ts',
+  'src/content/carePlanParentFirstWorking.ts',
+  'src/content/carePlanParentFirstEvaluation.ts',
+  'src/content/carePlanParentFirstTeamNo.ts',
+].map((name) => ({
+  name,
+  source: readFileSync(new URL(`../${name}`, import.meta.url), 'utf8'),
+  callNames: ['draft'],
+}));
 
 function skipSpace(source, index) {
   while (/\s/.test(source[index] ?? '')) index += 1;
@@ -83,7 +79,9 @@ if (!summaryOnly) {
 }
 
 const canonicalCount = entries.filter((entry) => entry.file.endsWith('carePlan.ts')).length;
-const parentFirstCount = entries.filter((entry) => entry.file.endsWith('carePlanParentFirst.ts')).length;
+const parentFirstCount = entries.filter(
+  (entry) => entry.file.includes('carePlanParentFirst') && !entry.file.endsWith('TeamNo.ts'),
+).length;
 const teamNoCount = entries.filter((entry) => entry.file.endsWith('carePlanParentFirstTeamNo.ts')).length;
 console.log(`CARE_PLAN_COPY_CHECKLIST_COUNT=${entries.length}`);
 console.log(`CARE_PLAN_CANONICAL_COPY_COUNT=${canonicalCount}`);
