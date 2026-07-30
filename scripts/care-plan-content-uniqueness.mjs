@@ -11,6 +11,10 @@ const parentFirstFiles = [
 const parentFirstSources = parentFirstFiles.map((file) =>
   readFileSync(new URL(`../src/content/${file}`, import.meta.url), 'utf8'),
 );
+const questionOverrideSource = readFileSync(
+  new URL('../src/content/carePlanParentFirstQuestions.ts', import.meta.url),
+  'utf8',
+);
 const teamNoSource = readFileSync(
   new URL('../src/content/carePlanParentFirstTeamNo.ts', import.meta.url),
   'utf8',
@@ -41,6 +45,25 @@ const rows = [
   'deciding',
   'first-months',
   'judging-provider',
+  'what-is-aba',
+];
+
+const overrideRows = [
+  'outings',
+  'daily-routines',
+  'communication-wall',
+  'why-behavior',
+  'marriage-strain',
+  'judged',
+  'cannot-keep-doing',
+  'nothing-left',
+  'grieving',
+  'disappeared',
+  'thinking-stopping',
+  'no-progress',
+  'sessions-concern',
+  'unclear-care',
+  'first-months',
   'what-is-aba',
 ];
 
@@ -101,14 +124,25 @@ const parentFirstEntries = parentFirstSources
     ),
   );
 
-const teamYesQuestions = extractDrafts(canonicalSource).filter((entry) =>
-  rows.some((row) => entry.id.startsWith(`row.${row}.question-`)),
+const overrideQuestions = extractDrafts(questionOverrideSource).filter((entry) =>
+  entry.id.startsWith('parent-first.questions.'),
+);
+const canonicalQuestions = extractDrafts(canonicalSource).filter((entry) =>
+  rows.some(
+    (row) =>
+      !overrideRows.includes(row) && entry.id.startsWith(`row.${row}.question-`),
+  ),
 );
 const teamNoQuestions = extractDrafts(teamNoSource).filter((entry) =>
   entry.id.startsWith('parent-first.team-no.'),
 );
 
-const entries = [...parentFirstEntries, ...teamYesQuestions, ...teamNoQuestions];
+const entries = [
+  ...parentFirstEntries,
+  ...overrideQuestions,
+  ...canonicalQuestions,
+  ...teamNoQuestions,
+];
 const byNormalizedText = new Map();
 
 for (const entry of entries) {
@@ -132,6 +166,7 @@ for (const row of rows) {
       entry.id.startsWith(`parent-first.${row}.reflect.`) ||
       entry.id.startsWith(`parent-first.${row}.stabilize.`) ||
       entry.id.startsWith(`parent-first.${row}.path.`) ||
+      entry.id.startsWith(`parent-first.questions.${row}.question-`) ||
       entry.id.startsWith(`row.${row}.question-`) ||
       entry.id.startsWith(`parent-first.team-no.${row}.question-`),
   );
