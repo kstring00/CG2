@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/care-plan-copy-checklist.mjs --summary && npm run care-plan:uniqueness && npm run care-plan:audit",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "care-plan:copy-checklist": "node scripts/care-plan-copy-checklist.mjs",
+    "care-plan:uniqueness": "node scripts/care-plan-content-uniqueness.mjs",
     "care-plan:audit": "node scripts/care-plan-safety-audit.mjs"
   },
   "dependencies": {
