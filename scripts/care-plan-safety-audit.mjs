@@ -6,6 +6,7 @@ const roots = [
   'src/app/support/care-plan',
   'src/lib/buildPlan.ts',
   'src/content/carePlanParentFirst.ts',
+  'src/content/carePlanParentFirstTeamNo.ts',
 ];
 
 function filesUnder(path) {
