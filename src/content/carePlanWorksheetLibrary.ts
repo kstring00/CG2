@@ -53,10 +53,25 @@ export const HOME_SITUATION_WORKSHEET: WorksheetOverride = {
   ]),
 };
 
+export const PROVIDER_INTERVIEW_WORKSHEET: WorksheetOverride = {
+  href: '/worksheets/provider-interview.pdf',
+  label: draft(
+    'worksheet-library.provider-interview-guide.label',
+    'Download the Provider Interview Guide',
+  ),
+  rows: new Set<StandardRowId>([
+    'deciding',
+    'first-months',
+    'judging-provider',
+    'what-is-aba',
+  ]),
+};
+
 const WORKSHEET_OVERRIDES: WorksheetOverride[] = [
   CARE_CLARITY_WORKSHEET,
   PARENT_SUPPORT_WORKSHEET,
   HOME_SITUATION_WORKSHEET,
+  PROVIDER_INTERVIEW_WORKSHEET,
 ];
 
 export function resolveWorksheetOverride(row: StandardRowId): WorksheetOverride | undefined {
