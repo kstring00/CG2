@@ -49,6 +49,11 @@ function contactHref(team: TeamMode): string | null {
   return digits ? `tel:+${digits}` : null;
 }
 
+function withTeam(href: string, team: TeamMode): string {
+  if (href !== '/support/care-plan/crisis') return href;
+  return `/support/care-plan/crisis?team=${team}`;
+}
+
 function DraftMark() {
   if (process.env.NODE_ENV === 'production') return null;
   return (
@@ -84,7 +89,9 @@ function TeamContact({ team }: { team: TeamMode }) {
           {copy.phoneNumber.text}
         </a>
       ) : (
-        <p className="mt-1 text-lg font-semibold text-brand-navy-700">{copy.phoneNumber.text}</p>
+        <p className="mt-1 text-lg font-semibold text-brand-navy-700">
+          {copy.phoneNumber.text}
+        </p>
       )}
     </section>
   );
@@ -110,12 +117,17 @@ function ChoiceRow({ href, copy }: { href: string; copy: CopyEntry }) {
 function SelectionContext({ branch }: { branch: BranchDefinition }) {
   return (
     <div className="flex items-start gap-3 border-b border-surface-border pb-5">
-      <span aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 rounded-full bg-brand-navy-700" />
+      <span
+        aria-hidden="true"
+        className="mt-1 h-4 w-4 shrink-0 rounded-full bg-brand-navy-700"
+      />
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
           {CARE_PLAN_UI.selectedContextLabel.text}
         </p>
-        <p className="mt-1 text-sm font-medium text-brand-navy-700">{branch.entryChoice.text}</p>
+        <p className="mt-1 text-sm font-medium text-brand-navy-700">
+          {branch.entryChoice.text}
+        </p>
       </div>
     </div>
   );
@@ -220,7 +232,9 @@ function PlanLinks({ plan }: { plan: StandardPlanPage }) {
         className="flex items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
       >
         <span>
-          <span className="block text-sm font-medium text-brand-navy-700">{plan.crossLink.label.text}</span>
+          <span className="block text-sm font-medium text-brand-navy-700">
+            {plan.crossLink.label.text}
+          </span>
           <span className="mt-1 block text-xs leading-relaxed text-brand-muted-500">
             {plan.crossLink.detail.text}
           </span>
@@ -232,7 +246,9 @@ function PlanLinks({ plan }: { plan: StandardPlanPage }) {
         className="flex items-center justify-between gap-4 border-t border-surface-border px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
       >
         <span>
-          <span className="block text-sm font-medium text-brand-navy-700">{CARE_PLAN_UI.startOver.text}</span>
+          <span className="block text-sm font-medium text-brand-navy-700">
+            {CARE_PLAN_UI.startOver.text}
+          </span>
           <span className="mt-1 block text-xs leading-relaxed text-brand-muted-500">
             {CARE_PLAN_UI.startOverDetail.text}
           </span>
@@ -247,10 +263,12 @@ function PathForwardSection({
   heading,
   entries,
   links,
+  team,
 }: {
   heading: CopyEntry;
   entries: CopyEntry[];
   links?: ParentFirstPlanContent['pathForward']['siteLinks'];
+  team: TeamMode;
 }) {
   return (
     <details className="group border-t border-surface-border first:border-t-0">
@@ -270,7 +288,7 @@ function PathForwardSection({
             {links.map((link) => (
               <Link
                 key={link.label.id}
-                href={link.href}
+                href={withTeam(link.href, team)}
                 className="flex items-center justify-between gap-4 border-t border-surface-border px-4 py-4 first:border-t-0 hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500"
               >
                 <span>
@@ -281,7 +299,10 @@ function PathForwardSection({
                     {link.detail.text}
                   </span>
                 </span>
-                <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
+                <ArrowRight
+                  className="h-4 w-4 shrink-0 text-brand-muted-400"
+                  aria-hidden="true"
+                />
               </Link>
             ))}
           </div>
@@ -291,11 +312,13 @@ function PathForwardSection({
   );
 }
 
-function ParentFirstPlanView({ plan }: { plan: StandardPlanPage & { parentFirst: ParentFirstPlanContent } }) {
+function ParentFirstPlanView({
+  plan,
+}: {
+  plan: StandardPlanPage & { parentFirst: ParentFirstPlanContent };
+}) {
   const content = plan.parentFirst;
-  const safetyHref = plan.safetyLink
-    ? `${plan.safetyLink.href}${plan.safetyLink.href.includes('?') ? '&' : '?'}team=${plan.team}`
-    : null;
+  const safetyHref = plan.safetyLink ? withTeam(plan.safetyLink.href, plan.team) : null;
 
   return (
     <main className="care-plan-print-sheet page-shell mx-auto w-full max-w-5xl">
@@ -311,13 +334,24 @@ function ParentFirstPlanView({ plan }: { plan: StandardPlanPage & { parentFirst:
         </h1>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {content.reflect.items.map((item) => (
-            <div key={item.title.id} className="border-t border-brand-warm-200 pt-4 md:border-l md:border-t-0 md:pl-4 md:pt-0">
-              <h2 className="text-sm font-semibold text-brand-navy-700">{item.title.text}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">{item.detail.text}</p>
+            <div
+              key={item.title.id}
+              className="border-t border-brand-warm-200 pt-4 md:border-l md:border-t-0 md:pl-4 md:pt-0"
+            >
+              <h2 className="text-sm font-semibold text-brand-navy-700">
+                {item.title.text}
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-brand-muted-600">
+                {item.detail.text}
+              </p>
             </div>
           ))}
         </div>
       </section>
+
+      <p className="border-b border-surface-border pb-5 text-2xl font-semibold leading-snug text-brand-navy-700 sm:text-3xl">
+        {plan.truth.text}
+      </p>
 
       {plan.safetyLink && safetyHref && (
         <Link
@@ -333,7 +367,9 @@ function ParentFirstPlanView({ plan }: { plan: StandardPlanPage & { parentFirst:
         <h2 className="text-xl font-semibold text-brand-navy-700">
           {PARENT_FIRST_UI.stabilizeHeading.text}
         </h2>
-        <p className="mt-1 text-sm text-brand-muted-500">{PARENT_FIRST_UI.stabilizeHelper.text}</p>
+        <p className="mt-1 text-sm text-brand-muted-500">
+          {PARENT_FIRST_UI.stabilizeHelper.text}
+        </p>
         <div className="mt-4">
           <StabilizeSelector row={plan.row} options={content.stabilize.options} />
         </div>
@@ -347,19 +383,23 @@ function ParentFirstPlanView({ plan }: { plan: StandardPlanPage & { parentFirst:
           <PathForwardSection
             heading={PARENT_FIRST_UI.whatToBringUpHeading}
             entries={content.pathForward.whatToBringUp}
+            team={plan.team}
           />
           <PathForwardSection
             heading={PARENT_FIRST_UI.whatHelpToAskForHeading}
             entries={content.pathForward.whatHelpToAskFor}
+            team={plan.team}
           />
           <PathForwardSection
             heading={PARENT_FIRST_UI.whatChangesHeading}
             entries={content.pathForward.whatChangesAndHowFast}
+            team={plan.team}
           />
           <PathForwardSection
             heading={PARENT_FIRST_UI.whereNextHeading}
             entries={content.pathForward.whereToGoNext}
             links={content.pathForward.siteLinks}
+            team={plan.team}
           />
         </div>
       </section>
@@ -384,7 +424,9 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
       <DraftMark />
 
       <section>
-        <p className="text-sm font-medium text-brand-muted-500">{plan.acknowledgment.text}</p>
+        <p className="text-sm font-medium text-brand-muted-500">
+          {plan.acknowledgment.text}
+        </p>
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
           {plan.truth.text}
         </h1>
@@ -415,7 +457,7 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
 
       {plan.safetyLink && (
         <Link
-          href={`${plan.safetyLink.href}?team=${plan.team}`}
+          href={withTeam(plan.safetyLink.href, plan.team)}
           className="print:hidden flex items-center justify-between gap-4 border-y border-brand-red-200 py-4 text-sm font-semibold text-brand-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
         >
           <span>{plan.safetyLink.copy.text}</span>
@@ -425,7 +467,9 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
 
       {plan.education && (
         <section className="rounded-xl border border-surface-border bg-white p-5 sm:p-6">
-          <h2 className="text-lg font-semibold text-brand-navy-700">{plan.education.heading.text}</h2>
+          <h2 className="text-lg font-semibold text-brand-navy-700">
+            {plan.education.heading.text}
+          </h2>
           <div className="mt-3">
             <CopyBlock entries={plan.education.body} />
           </div>
@@ -443,7 +487,10 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
         </section>
       )}
 
-      <section className="rounded-xl border border-surface-border bg-white p-5 sm:p-6" data-print-card>
+      <section
+        className="rounded-xl border border-surface-border bg-white p-5 sm:p-6"
+        data-print-card
+      >
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
           {CARE_PLAN_UI.planActionLabel.text}
         </p>
@@ -458,7 +505,10 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
         </div>
       </section>
 
-      <section className="rounded-xl border border-surface-border bg-white p-5 sm:p-6" data-print-card>
+      <section
+        className="rounded-xl border border-surface-border bg-white p-5 sm:p-6"
+        data-print-card
+      >
         <h2 className="text-xl font-semibold leading-snug text-brand-navy-700">
           {plan.sessionHeading.text}
         </h2>
@@ -472,7 +522,10 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
         )}
         <ol className="mt-5 space-y-4">
           {plan.questions.map((question, index) => (
-            <li key={question.id} className="flex items-start gap-3 text-[15px] leading-relaxed text-brand-navy-700">
+            <li
+              key={question.id}
+              className="flex items-start gap-3 text-[15px] leading-relaxed text-brand-navy-700"
+            >
               <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-brand-muted-300 text-xs font-semibold text-brand-muted-600">
                 {index + 1}
               </span>
@@ -505,7 +558,9 @@ export default async function CarePlanPage({ searchParams }: { searchParams: Sea
   if (!isStandardBranchId(branchValue)) redirect(`/support/care-plan?team=${team}`);
 
   const branch: StandardBranchId = branchValue;
-  if (!rowValue) return <RefineView team={team} branch={resolveBranch(team, branch)} />;
+  if (!rowValue) {
+    return <RefineView team={team} branch={resolveBranch(team, branch)} />;
+  }
   if (!isStandardRowId(rowValue)) redirect(branchHref(team, branch));
 
   const row: StandardRowId = rowValue;
@@ -513,7 +568,9 @@ export default async function CarePlanPage({ searchParams }: { searchParams: Sea
   if (!isRowInBranch(team, branch, row)) redirect(branchHref(team, branch));
 
   const plan = buildPlan(team, branch, row);
-  if (plan.kind !== 'standard') redirect(`/support/care-plan/crisis?team=${team}`);
+  if (plan.kind !== 'standard') {
+    redirect(`/support/care-plan/crisis?team=${team}`);
+  }
 
   if (plan.parentFirst) {
     return <ParentFirstPlanView plan={{ ...plan, parentFirst: plan.parentFirst }} />;
