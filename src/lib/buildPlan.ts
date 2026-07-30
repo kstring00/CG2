@@ -94,8 +94,7 @@ const parentFirstRows: Record<StandardRowId, ParentFirstPlanContent> = {
   ...PARENT_FIRST_EVALUATION_ROWS,
 } as Record<StandardRowId, ParentFirstPlanContent>;
 
-function phoneHref(team: TeamMode, phoneNumber: string): string | null {
-  if (team === 'yes') return null;
+function phoneHref(phoneNumber: string): string | null {
   const digits = phoneNumber.replace(/\D/g, '');
   return digits ? `tel:+${digits}` : null;
 }
@@ -105,7 +104,7 @@ function teamContact(team: TeamMode): TeamContact {
   return {
     label: copy.contactLabel,
     phoneNumber: copy.phoneNumber,
-    href: phoneHref(team, copy.phoneNumber.text),
+    href: phoneHref(copy.phoneNumber.text),
   };
 }
 
@@ -115,7 +114,6 @@ function standardHref(team: TeamMode, branch: StandardBranchId, row?: StandardRo
   return `/support/care-plan?${params.toString()}`;
 }
 
-// V2 SEAM: future AI insertion point. In v2 this becomes a server-side call that selects/adapts within the approved content bank (BAA + compliance review required first). Nothing upstream or downstream changes.
 export function buildPlan(
   team: TeamMode,
   branch: BranchId,

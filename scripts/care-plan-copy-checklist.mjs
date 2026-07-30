@@ -86,5 +86,5 @@ const parentFirstCount = entries.filter(
 const teamNoCount = entries.filter((entry) => entry.file.endsWith('carePlanParentFirstTeamNo.ts')).length;
 console.log(`CARE_PLAN_COPY_CHECKLIST_COUNT=${entries.length}`);
 console.log(`CARE_PLAN_CANONICAL_COPY_COUNT=${canonicalCount}`);
-console.log(`CARE_PLAN_PARENT_FIRST_DRAFT_COUNT=${parentFirstCount}`);
+console.log(`CARE_PLAN_PARENT_FIRST_COPY_COUNT=${parentFirstCount}`);
 console.log(`CARE_PLAN_TEAM_NO_BEHAVIOR_QUESTION_COUNT=${teamNoCount}`);
