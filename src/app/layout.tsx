@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import '@/content/carePlanReleaseOverrides';
 import './globals.css';
 import SiteFooter from '@/components/SiteFooter';
 
