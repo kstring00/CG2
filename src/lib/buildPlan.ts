@@ -17,7 +17,11 @@ import {
   PARENT_FIRST_ROWS,
   type ParentFirstPlanContent,
 } from '@/content/carePlanParentFirst';
+import { PARENT_FIRST_EMPTY_ROWS } from '@/content/carePlanParentFirstEmpty';
+import { PARENT_FIRST_EVALUATION_ROWS } from '@/content/carePlanParentFirstEvaluation';
+import { PARENT_FIRST_LOAD_ROWS } from '@/content/carePlanParentFirstLoad';
 import { PARENT_FIRST_TEAM_NO_QUESTIONS } from '@/content/carePlanParentFirstTeamNo';
+import { PARENT_FIRST_WORKING_ROWS } from '@/content/carePlanParentFirstWorking';
 
 export type TeamContact = {
   label: CopyEntry;
@@ -36,7 +40,7 @@ export type StandardPlanPage = {
   action: ActionDefinition;
   sessionHeading: CopyEntry;
   questions: CopyEntry[];
-  parentFirst?: ParentFirstPlanContent;
+  parentFirst: ParentFirstPlanContent;
   crossLink: {
     label: CopyEntry;
     detail: CopyEntry;
@@ -80,6 +84,14 @@ export type PlanPage = StandardPlanPage | CrisisPlanPage;
 const teamNoQuestionBank = PARENT_FIRST_TEAM_NO_QUESTIONS as Partial<
   Record<StandardRowId, readonly CopyEntry[]>
 >;
+
+const parentFirstRows: Record<StandardRowId, ParentFirstPlanContent> = {
+  ...PARENT_FIRST_ROWS,
+  ...PARENT_FIRST_LOAD_ROWS,
+  ...PARENT_FIRST_EMPTY_ROWS,
+  ...PARENT_FIRST_WORKING_ROWS,
+  ...PARENT_FIRST_EVALUATION_ROWS,
+} as Record<StandardRowId, ParentFirstPlanContent>;
 
 function phoneHref(team: TeamMode, phoneNumber: string): string | null {
   if (team === 'yes') return null;
@@ -143,6 +155,11 @@ export function buildPlan(
     throw new Error(`Invalid Care Plan selection for team=${resolvedTeam}: ${branch}/${row}`);
   }
 
+  const parentFirst = parentFirstRows[definition.id];
+  if (!parentFirst) {
+    throw new Error(`Missing parent-first Care Plan content for row=${definition.id}`);
+  }
+
   const providerEvaluationNote =
     resolvedTeam === 'no' && branch === 'working'
       ? TEAM_COPY.no.providerEvaluationNote
@@ -163,7 +180,7 @@ export function buildPlan(
     action: definition.action,
     sessionHeading: TEAM_COPY[resolvedTeam].sessionHeading,
     questions,
-    parentFirst: PARENT_FIRST_ROWS[definition.id],
+    parentFirst,
     crossLink: {
       label: definition.crossLink.label,
       detail: definition.crossLink.detail,
