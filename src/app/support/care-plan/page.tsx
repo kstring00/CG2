@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import {
-  BRANCHES,
   CARE_PLAN_UI,
   PLAN_ROWS,
   TEAM_COPY,
+  resolveBranch,
+  resolveBranchList,
   type BranchDefinition,
   type CopyEntry,
   type StandardBranchId,
@@ -15,6 +16,7 @@ import {
 import {
   branchHref,
   buildPlan,
+  isRowInBranch,
   isStandardBranchId,
   isStandardRowId,
   rowHref,
@@ -114,7 +116,7 @@ function SelectionContext({ branch }: { branch: BranchDefinition }) {
 }
 
 function EntryView({ team }: { team: TeamMode }) {
-  const branches = Object.values(BRANCHES);
+  const branches = resolveBranchList(team);
 
   return (
     <main className="page-shell mx-auto w-full max-w-3xl">
@@ -318,21 +320,23 @@ function PlanView({ plan }: { plan: StandardPlanPage }) {
       <TeamContact team={plan.team} />
 
       <section className="print:hidden overflow-hidden rounded-xl border border-surface-border bg-white">
-        <Link
-          href={plan.crossLink.href}
-          className="flex items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
-        >
-          <span>
-            <span className="block text-sm font-medium text-brand-navy-700">{plan.crossLink.label.text}</span>
-            <span className="mt-1 block text-xs leading-relaxed text-brand-muted-500">
-              {plan.crossLink.detail.text}
+        {plan.crossLink && (
+          <Link
+            href={plan.crossLink.href}
+            className="flex items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
+          >
+            <span>
+              <span className="block text-sm font-medium text-brand-navy-700">{plan.crossLink.label.text}</span>
+              <span className="mt-1 block text-xs leading-relaxed text-brand-muted-500">
+                {plan.crossLink.detail.text}
+              </span>
             </span>
-          </span>
-          <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
-        </Link>
+            <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
+          </Link>
+        )}
         <Link
           href={plan.startOverHref}
-          className="flex items-center justify-between gap-4 border-t border-surface-border px-5 py-4 text-left transition hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
+          className="flex items-center justify-between gap-4 border-t border-surface-border px-5 py-4 text-left transition first:border-t-0 hover:bg-brand-warm-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy-500 sm:px-6"
         >
           <span>
             <span className="block text-sm font-medium text-brand-navy-700">{CARE_PLAN_UI.startOver.text}</span>
@@ -359,11 +363,13 @@ export default async function CarePlanPage({ searchParams }: { searchParams: Sea
   if (!isStandardBranchId(branchValue)) redirect(`/support/care-plan?team=${team}`);
 
   const branch: StandardBranchId = branchValue;
-  if (!rowValue) return <RefineView team={team} branch={BRANCHES[branch]} />;
+  if (!rowValue) return <RefineView team={team} branch={resolveBranch(team, branch)} />;
   if (!isStandardRowId(rowValue)) redirect(branchHref(team, branch));
 
   const row: StandardRowId = rowValue;
   if (PLAN_ROWS[row].branch !== branch) redirect(branchHref(team, branch));
+  // Branch 4 rows differ by team mode; a row from the other mode is not reachable here.
+  if (!isRowInBranch(team, branch, row)) redirect(branchHref(team, branch));
 
   const plan = buildPlan(team, branch, row);
   if (plan.kind !== 'standard') redirect(`/support/care-plan/crisis?team=${team}`);

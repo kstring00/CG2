@@ -60,6 +60,9 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
             </li>
           ))}
         </ul>
+        <p className="mt-4 border-l-2 border-brand-navy-200 pl-4 text-sm leading-relaxed text-brand-muted-600">
+          {plan.documentationExample.text}
+        </p>
       </section>
 
       <section className="rounded-xl border border-surface-border bg-white p-5 sm:p-6" data-print-card>

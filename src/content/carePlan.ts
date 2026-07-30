@@ -28,6 +28,11 @@ export type RowId =
   | 'no-progress'
   | 'sessions-concern'
   | 'unclear-care'
+  // Branch 4 in team=no mode — evaluation rows, not doubt rows.
+  | 'deciding'
+  | 'first-months'
+  | 'judging-provider'
+  | 'what-is-aba'
   | 'crisis';
 
 export type StandardBranchId = Exclude<BranchId, 'crisis'>;
@@ -54,7 +59,8 @@ export type PlanRowDefinition = {
   body: CopyEntry[];
   action: ActionDefinition;
   questions: CopyEntry[];
-  crossLink: CrossLinkDefinition;
+  // Optional: the team=no Branch 4 rows have no approved cross-link copy yet.
+  crossLink?: CrossLinkDefinition;
   safetyLink?: CopyEntry;
   quietSupport?: CopyEntry;
   domesticViolence?: CopyEntry;
@@ -176,7 +182,7 @@ export const BRANCHES: Record<StandardBranchId, BranchDefinition> = {
     ),
     refineHelper: draft(
       'branch.behaviors.refine-helper',
-      'Choose the closest description. Anything about your child goes to the care team.',
+      "Choose the closest description. Anything about your child belongs with your care team.",
     ),
     rows: [
       'big-moments',
@@ -221,6 +227,38 @@ export const BRANCHES: Record<StandardBranchId, BranchDefinition> = {
   },
 };
 
+/**
+ * Branch 4 overrides for team=no. A family without services cannot doubt services
+ * they don't have, so the branch becomes an evaluation branch: same four pages,
+ * same anatomy, different rows. These replace their team=yes counterparts whenever
+ * team=no — they are never additive.
+ */
+export const TEAM_NO_BRANCHES: Partial<Record<StandardBranchId, BranchDefinition>> = {
+  working: {
+    id: 'working',
+    entryChoice: draft(
+      'branch.working.teamNo.entry-choice',
+      "I don't know if this is right for us.",
+    ),
+    refineQuestion: draft('branch.working.teamNo.refine-question', 'What do you need to know?'),
+    refineHelper: draft(
+      'branch.working.teamNo.refine-helper',
+      'Choose the question closest to yours. A good provider welcomes every one of these.',
+    ),
+    rows: ['deciding', 'first-months', 'judging-provider', 'what-is-aba'],
+  },
+};
+
+/** The branch definition for a given team mode — team=no overrides win. */
+export function resolveBranch(team: TeamMode, branch: StandardBranchId): BranchDefinition {
+  return (team === 'no' ? TEAM_NO_BRANCHES[branch] : undefined) ?? BRANCHES[branch];
+}
+
+/** Entry-screen branches in order, with team=no overrides applied. */
+export function resolveBranchList(team: TeamMode): BranchDefinition[] {
+  return (Object.keys(BRANCHES) as StandardBranchId[]).map((id) => resolveBranch(team, id));
+}
+
 export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
   'big-moments': {
     id: 'big-moments',
@@ -240,23 +278,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.big-moments.body-1',
-        'You should not have to improvise your way through repeated incidents.',
+        "You should not have to improvise your way through the same incident again and again.",
       ),
       draft(
         'row.big-moments.body-2',
-        'The most useful next move is to bring clear incident information and direct safety questions to the care team.',
+        "What changes it isn't more effort from you — it's better information reaching your team faster. That's what this page sets up.",
       ),
     ],
     action: {
-      heading: draft('row.big-moments.action-heading', 'Document the incident after everyone is safe.'),
+      heading: draft('row.big-moments.action-heading', "Document the incident once everyone is safe."),
       body: [
         draft(
           'row.big-moments.action-body-1',
-          'Record the date, what happened immediately before it, how long it lasted, who was hurt, and how it ended.',
+          "Five lines, right after: when it happened · what was happening in the two minutes before · how long it lasted · who was hurt and how · what finally ended it. Like this: \"Tue 5:15p — asked to turn off tablet — 20 min — bit grandma's forearm, bruised — stopped when she left the room.\"",
         ),
         draft(
           'row.big-moments.action-body-2',
-          'This is information for the care team, not a score and not a request for you to determine why it happened.',
+          "Four or five of these logs is exactly the raw material a BCBA uses to change a plan. You're not explaining yourself — you're handing them evidence.",
         ),
       ],
     },
@@ -311,23 +349,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.outings.body-1',
-        'Losing access to ordinary family life is important information for the care team.',
+        "A family that stops leaving the house has lost something real, and it happens so gradually nobody names it.",
       ),
       draft(
         'row.outings.body-2',
-        'You can bring concrete examples without trying to create a child-specific strategy yourself.',
+        "You don't need a strategy for outings — you need your team to know outings have become the cost. That's a program conversation.",
       ),
     ],
     action: {
-      heading: draft('row.outings.action-heading', 'Document what happens on one outing.'),
+      heading: draft('row.outings.action-heading', "Log one outing — even a failed one."),
       body: [
         draft(
           'row.outings.action-body-1',
-          'After the outing, note the setting, what part became difficult, how long the outing lasted, and why the family had to change or end the plan.',
+          "Four lines after you're home: where you went · how long it held · the exact moment it turned · what you had to do. \"Sat 10am grocery store — fine for 10 min — checkout line — left the cart, carried him out.\"",
         ),
         draft(
           'row.outings.action-body-2',
-          'Bring that description to the care team so community access can be discussed directly.',
+          "Two or three of these makes 'we can't go anywhere' concrete enough to become program goals instead of a sad fact.",
         ),
       ],
     },
@@ -364,23 +402,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.daily-routines.body-1',
-        'A routine does not need to look dramatic to have a serious effect on the household.',
+        "A routine doesn't need to look dramatic to be the thing draining the whole house. Forty hard minutes every single morning outweighs one bad Saturday.",
       ),
       draft(
         'row.daily-routines.body-2',
-        'Choose the one routine creating the greatest daily cost and bring it to the care team.',
+        "Don't bring all of it — bring the one routine with the highest daily cost. One is actionable; everything is noise.",
       ),
     ],
     action: {
-      heading: draft('row.daily-routines.action-heading', 'Document the one routine that hurts most.'),
+      heading: draft('row.daily-routines.action-heading', "Pick the one routine that hurts most, then log it for three days."),
       body: [
         draft(
           'row.daily-routines.action-body-1',
-          'Note when the routine begins, how long it takes, where the family gets stuck, and what the routine prevents afterward.',
+          "Three lines a day: when it started · how long it took · where exactly it stalled. \"Mon 7:05a — getting dressed — 35 min — stuck at socks, every day it's socks.\"",
         ),
         draft(
           'row.daily-routines.action-body-2',
-          'Keep the description concrete so the team can decide what belongs in the program.',
+          "Three days of that beats a month of \"mornings are just hard.\" It tells your team where the program goal belongs.",
         ),
       ],
     },
@@ -416,23 +454,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.communication-wall.body-1',
-        'You do not need to determine the communication solution on your own.',
+        "When a child can't get their message across and the adults can't read it, both sides end up frustrated by the same wall — it just looks like defiance from one side and confusion from the other.",
       ),
       draft(
         'row.communication-wall.body-2',
-        'Bring examples of where communication fails so the care team can explain the current system and what support is available.',
+        "You don't have to solve the communication system. You have to show your team where it's failing — they own the rest.",
       ),
     ],
     action: {
-      heading: draft('row.communication-wall.action-heading', 'Note when communication breaks down.'),
+      heading: draft('row.communication-wall.action-heading', "Note the breakdowns as they happen."),
       body: [
         draft(
           'row.communication-wall.action-body-1',
-          'After the moment, note what the child appeared to be trying to communicate and what the adults could not understand.',
+          "Three lines each: what he seemed to be trying to get across · what you tried · what happened. \"Wanted something in the kitchen — offered snack, drink, toy — screaming escalated, gave up after 15 min.\"",
         ),
         draft(
           'row.communication-wall.action-body-2',
-          'Do not interpret the cause. Bring the observable example to the care team.',
+          "Don't interpret why. The observable moment is the useful part — bring three of them.",
         ),
       ],
     },
@@ -474,39 +512,43 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.why-behavior.body-1',
-        'Common Ground will not decide why a behavior happens for your child.',
+        "This page will not tell you why your child does what they do — nobody who hasn't assessed your child honestly can.",
       ),
       draft(
         'row.why-behavior.body-2',
-        'The care team should explain its assessment, the evidence behind it, and what that means for your family.',
+        "What you're owed is the plain-language version of what your team's assessment found, the evidence behind it, and what it means for daily life. That's not a bonus — it's part of the service.",
       ),
     ],
     education: {
       heading: draft(
         'row.why-behavior.education-heading',
-        'Plain-language explainer — Clinical Director authorship required',
+        "Why behavior happens — the short version every parent deserves",
       ),
       body: [
         draft(
           'row.why-behavior.education-body-1',
-          'DRAFT PLACEHOLDER: Behavior can communicate a need, difficulty, or response to the environment.',
+          "Behavior is never random, even when it looks like it. Nearly all of it is doing a job for your child: getting something they want, escaping something hard, reaching connection or attention, or meeting a sensory need. A meltdown at homework time and a meltdown at bath time can look identical and be doing completely different jobs — which is why advice from relatives, forums, and strangers so often fails: they're guessing at the job.",
         ),
         draft(
           'row.why-behavior.education-body-2',
-          'Your BCBA should explain what the behavior may mean for your child and what evidence supports that interpretation.',
+          "Finding the actual job is your BCBA's work — it's called an assessment, and it's built from exactly the kind of moments you've been living through. This is why what you observe at home matters so much, and why the right question isn't \"how do I stop it?\" but the one below.",
+        ),
+        draft(
+          'row.why-behavior.education-body-3',
+          "One thing this page will never do is tell you what YOUR child's behavior means. That answer has to come from the people who've assessed your child — anything else is a guess dressed up as help.",
         ),
       ],
     },
     action: {
-      heading: draft('row.why-behavior.action-heading', 'Choose one example to bring to the care team.'),
+      heading: draft('row.why-behavior.action-heading', "Pick one moment that captures the confusion."),
       body: [
         draft(
           'row.why-behavior.action-body-1',
-          'Choose one recent moment that represents the concern clearly.',
+          "One recent, specific moment — not the pattern, one instance. \"Thursday, threw his plate the second dinner started, out of nowhere.\"",
         ),
         draft(
           'row.why-behavior.action-body-2',
-          'Bring what happened, when it happened, and what you want explained. Do not try to diagnose the reason yourself.',
+          "Bring it with one sentence: \"walk me through what you think was happening there, and how you know.\" Don't diagnose it yourself — make them show their work.",
         ),
       ],
     },
@@ -545,23 +587,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.alone.body-1',
-        'Support has to be sized for the number of adults and hours actually available.',
+        "A program built for two adults, run by one, doesn't half-work — it breaks at specific points. Those points are what your team needs to see.",
       ),
       draft(
         'row.alone.body-2',
-        'Bring the points where the day breaks so the team can see what the current expectations cost.',
+        "This isn't about proving you're trying hard enough. It's about sizing the program to the adults who actually exist.",
       ),
     ],
     action: {
-      heading: draft('row.alone.action-heading', 'Note where the day breaks.'),
+      heading: draft('row.alone.action-heading', "Find where the day breaks."),
       body: [
         draft(
           'row.alone.action-body-1',
-          'Identify the hours, routines, or tasks that become impossible when one adult is carrying everything.',
+          "For three days, jot the moment the wheels come off — \"6:40pm, dinner + meltdown + homework, all at once\" is enough. Three timestamps like that show your team more than an hour of explaining.",
         ),
         draft(
           'row.alone.action-body-2',
-          'This is capacity information for the team, not proof that you should be doing more.',
+          "This is capacity data. The conclusion it points to is a smaller, smarter home program — not a tougher parent.",
         ),
       ],
     },
@@ -602,23 +644,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.marriage-strain.body-1',
-        'A relationship can be affected by unequal information, unequal responsibilities, and too little recovery time.',
+        "Unequal information, unequal load, and zero recovery time will strain any two people — this isn't a referendum on your marriage.",
       ),
       draft(
         'row.marriage-strain.body-2',
-        'You can ask for support without assigning blame or minimizing what is happening.',
+        "You can raise it without blaming anyone: the ask is support, not a verdict.",
       ),
     ],
     action: {
-      heading: draft('row.marriage-strain.action-heading', 'Choose one pressure point to name.'),
+      heading: draft('row.marriage-strain.action-heading', "Name one pressure point — just one."),
       body: [
         draft(
           'row.marriage-strain.action-body-1',
-          'Choose the routine, responsibility, or care decision creating the most strain right now.',
+          "The single routine or responsibility generating the most friction right now. \"Tuesday therapy transport.\" \"Who handles the 3am wake-ups.\" Not \"everything.\"",
         ),
         draft(
           'row.marriage-strain.action-body-2',
-          'Bring that one point to the appropriate conversation instead of trying to solve the whole relationship at once.',
+          "One concrete point gives the counselor, the team, or your partner something to actually move. \"Everything\" gives them nowhere to start.",
         ),
       ],
     },
@@ -661,23 +703,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.partner-load.body-1',
-        'Visibility can make the conversation more concrete without turning family life into a competition.',
+        "Most invisible-load fights are two people arguing from two different maps of the same week. Making the load visible replaces the argument with a fact.",
       ),
       draft(
         'row.partner-load.body-2',
-        'The goal is to show capacity and scheduling barriers that the team may be able to address.',
+        "And some of the imbalance isn't character at all — it's that one of you got trained and one didn't. That part your team can fix directly.",
       ),
     ],
     action: {
-      heading: draft('row.partner-load.action-heading', 'Notice who carries what for one week.'),
+      heading: draft('row.partner-load.action-heading', "For one week, note who does what."),
       body: [
         draft(
           'row.partner-load.action-body-1',
-          'Notice appointments, routines, communication, paperwork, and difficult hours.',
+          "Categories: appointments · daily routines · communication with the team · paperwork · the hard hours (mornings, meltdowns, 3am). One line a day: \"Tue — me: morning routine, session handoff, bedtime. Him: pickup.\"",
         ),
         draft(
           'row.partner-load.action-body-2',
-          'Use it as capacity data for the team, not a scorecard between partners.',
+          "Then use it exactly once — as capacity data in a team or counseling conversation. The moment it becomes a scorecard at home, it stops working.",
         ),
       ],
     },
@@ -721,43 +763,43 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.judged.body-1',
-        'Relatives and trusted adults may need plain language, clear expectations, and a concrete way to help.',
+        "Most judging relatives aren't cruel — they're confident about something they've never lived. Confidence plus zero information produces exactly the comments you've been getting.",
       ),
       draft(
         'row.judged.body-2',
-        'The care team can help determine what education is accurate and appropriate to share.',
+        "You have two tools: the letter below, and an invitation. The second one is stronger — a relative who attends one training session usually stops advising and starts helping.",
       ),
     ],
     printableRelativeGuide: {
       heading: draft(
         'row.judged.relative-guide-heading',
-        'Family one-pager — Clinical Director authorship required',
+        "A one-page letter for the people who love this family — print it and hand it over",
       ),
       body: [
         draft(
           'row.judged.relative-guide-body-1',
-          'DRAFT PLACEHOLDER: Behavior is not evidence of bad parenting.',
+          "To someone this family trusts: the behaviors you've seen — the meltdowns, the hitting, the moments in public — are not the result of soft parenting, and they will not be fixed by firmer discipline. They come from a neurological difference in how this child experiences the world. The parents you're watching are following a clinical program built by licensed specialists, and some of what they do — staying calm through an outburst, not giving in to a demand, keeping rigid routines — is that program, not weakness.",
         ),
         draft(
           'row.judged.relative-guide-body-2',
-          'DRAFT PLACEHOLDER: Explain what the family is managing without diagnosing the child or sharing private details.',
+          "What makes it harder: advice (\"he just needs a firm hand\"), comparisons (\"her kids never acted like that\"), and judgment in the hard moments. Every one of those lands on a parent already running on empty — and it teaches them to stop bringing the child around you.",
         ),
         draft(
           'row.judged.relative-guide-body-3',
-          'DRAFT PLACEHOLDER: Offer specific ways relatives can reduce the load and follow the care team’s guidance.',
+          "What actually helps: pick one and offer it plainly. Take a sibling for an afternoon. Learn one routine — bedtime, mealtime — and run it their way, exactly. Come to a caregiver training session and see the work firsthand. Or simply stay in the room during a hard moment without commentary. The family doesn't need you to understand everything. They need you on their side of the table.",
         ),
       ],
     },
     action: {
-      heading: draft('row.judged.action-heading', 'Ask the care team to review the family one-pager.'),
+      heading: draft('row.judged.action-heading', "Ask the care team to review this page before sharing it."),
       body: [
         draft(
           'row.judged.action-body-1',
-          'Use the draft only as a starting point for Clinical Director-approved family education.',
+          "Your team can confirm it's accurate for your situation and may invite your relatives into a real training session — which does more than any letter.",
         ),
         draft(
           'row.judged.action-body-2',
-          'Do not include the child’s name, diagnosis details, or private clinical information.',
+          "Nothing on this page includes your child's name, diagnosis details, or anything private — keep it that way when you share it.",
         ),
       ],
     },
@@ -799,11 +841,11 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.cannot-keep-doing.body-1',
-        'This page cannot measure how serious the moment is, and you should not have to decide alone.',
+        "This page can't measure how serious this moment is — and you shouldn't have to measure it alone.",
       ),
       draft(
         'row.cannot-keep-doing.body-2',
-        'Tell a real person today and use immediate support if the situation becomes unsafe.',
+        "The move that changes tonight is telling one real person. The move that changes this month is the two questions below.",
       ),
     ],
     quietSupport: draft(
@@ -815,11 +857,11 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
       body: [
         draft(
           'row.cannot-keep-doing.action-body-1',
-          'Choose the person before you leave this page: a trusted person, therapist, faith leader, healthcare professional, or crisis counselor.',
+          "Choose the person before you leave this page — an actual name. Your sister. Your friend from church. Your doctor. A crisis counselor at 988 counts.",
         ),
         draft(
           'row.cannot-keep-doing.action-body-2',
-          'Say plainly that you are at your limit and need them to stay connected with you today.',
+          "The sentence can be this simple: \"I'm at my limit and I need you to check on me this week.\" Sending it is the whole task.",
         ),
       ],
     },
@@ -858,11 +900,11 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.nothing-left.body-1',
-        'A plan that assumes energy you do not have is not a workable plan for the family.',
+        "A plan that assumes energy you don't have isn't a plan — it's a schedule for failing. The fix isn't more effort; it's a plan resized to reality.",
       ),
       draft(
         'row.nothing-left.body-2',
-        'Bring the capacity problem into the next conversation so expectations can be reviewed.',
+        "\"I'm at capacity\" is a legitimate clinical input. Say it in exactly those words at the next session.",
       ),
     ],
     quietSupport: draft(
@@ -870,15 +912,15 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
       'If it gets darker than this page can help with, call or text 988 — any hour.',
     ),
     action: {
-      heading: draft('row.nothing-left.action-heading', 'Protect one small window today.'),
+      heading: draft('row.nothing-left.action-heading', "Protect one small window today."),
       body: [
         draft(
           'row.nothing-left.action-body-1',
-          'Choose a brief, real window that is not spent solving a problem, completing a task, or catching up.',
+          "Small and specific beats big and imaginary: the fifteen minutes after drop-off, sitting in the car. The shower with the door locked. Coffee before anyone wakes. Chosen on purpose, spent on nothing.",
         ),
         draft(
           'row.nothing-left.action-body-2',
-          'The window is not a reward. It is evidence of the capacity the current plan must protect.',
+          "This isn't self-care homework. It's you finding out how much slack the week actually has — which is information your team needs when they resize the program.",
         ),
       ],
     },
@@ -915,11 +957,11 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.grieving.body-1',
-        'Love and grief can exist in the same parent without canceling each other out.',
+        "Love and grief can sit in the same parent at the same time without either one being fake. Most parents in your position carry both and tell no one.",
       ),
       draft(
         'row.grieving.body-2',
-        'This deserves support that can hold the parent’s experience without turning it into a judgment about the child.',
+        "This deserves support built for it — not a pep talk, and not a conversation that turns your grief into a judgment about your child.",
       ),
     ],
     quietSupport: draft(
@@ -927,11 +969,11 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
       'If it gets darker than this page can help with, call or text 988 — any hour.',
     ),
     action: {
-      heading: draft('row.grieving.action-heading', 'Choose one person who can hear the grief without correcting it.'),
+      heading: draft('row.grieving.action-heading', "Choose one person who can hear it without correcting it."),
       body: [
         draft(
           'row.grieving.action-body-1',
-          'Choose a trusted person or professional who can listen without telling you what you should feel.',
+          "The test is simple: someone who won't say \"but you're so blessed\" or \"everything happens for a reason.\" If no one in your life passes that test, a therapist or the 988 line does.",
         ),
         draft(
           'row.grieving.action-body-2',
@@ -968,11 +1010,11 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.disappeared.body-1',
-        'Parent support should make room for a whole person, not only a caregiving role.',
+        "A person who has been entirely converted into a caregiver isn't more devoted — they're closer to the edge. The parents who last are the ones who kept one thing.",
       ),
       draft(
         'row.disappeared.body-2',
-        'Choose one recurring part of life that needs to belong to you again and make the support request concrete.',
+        "So this page asks for exactly one thing back. Not balance. Not a new life. One recurring hour.",
       ),
     ],
     quietSupport: draft(
@@ -980,15 +1022,15 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
       'If it gets darker than this page can help with, call or text 988 — any hour.',
     ),
     action: {
-      heading: draft('row.disappeared.action-heading', 'Pick the one recurring hour that will be yours.'),
+      heading: draft('row.disappeared.action-heading', "Pick the one recurring hour that will be yours."),
       body: [
         draft(
           'row.disappeared.action-body-1',
-          'Choose an hour that can recur, not a perfect day that may never arrive.',
+          "Recurring beats perfect: Thursday 7–8pm, the gym you quit. Sunday morning, the long walk. Same slot every week, so it defends itself.",
         ),
         draft(
           'row.disappeared.action-body-2',
-          'Bring the scheduling or respite barrier into the next conversation so the hour can become realistic.',
+          "Then make the barrier concrete at your next session: \"I need Thursday evenings possible — can scheduling or respite get me there?\" That's an answerable request.",
         ),
       ],
     },
@@ -1023,23 +1065,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.thinking-stopping.body-1',
-        'You do not need to defend the question before the team answers it clearly.',
+        "You don't owe anyone a defense of the question. Families are allowed to weigh whether this is working — that's stewardship, not disloyalty.",
       ),
       draft(
         'row.thinking-stopping.body-2',
-        'Ask for an honest review of the data, the options, and what each path would mean for the family.',
+        "What you're owed back is the honest version: the data, the options, and what each path costs and gains. Not reassurance — information.",
       ),
     ],
     action: {
-      heading: draft('row.thinking-stopping.action-heading', 'Bring the decision questions together.'),
+      heading: draft('row.thinking-stopping.action-heading', "Turn the decision into an agenda."),
       body: [
         draft(
           'row.thinking-stopping.action-body-1',
-          'Use the questions below as the agenda for a dedicated progress conversation.',
+          "The three questions below, sent ahead of a dedicated meeting: \"I want to use our next session to talk about whether this is working. Here's what I need to see.\" Sending it ahead means nobody improvises.",
         ),
         draft(
           'row.thinking-stopping.action-body-2',
-          'You can ask for the answers in plain language and request time to consider them.',
+          "Ask for the answers in plain language, and take time afterward. A decision this size is allowed to take two weeks.",
         ),
       ],
     },
@@ -1082,23 +1124,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.no-progress.body-1',
-        'Progress should be explainable in terms the family understands and connected to life outside sessions.',
+        "Progress that only exists in a report isn't progress yet. It should be explainable in your language and visible somewhere in your actual week.",
       ),
       draft(
         'row.no-progress.body-2',
-        'Bring the difference between the reported data and the home experience into the review.',
+        "The gap between their data and your kitchen isn't an accusation — it's the exact thing the meeting is for. Sometimes it's a measurement gap; sometimes it's a generalization problem; either way it's fixable and yours to raise.",
       ),
     ],
     action: {
-      heading: draft('row.no-progress.action-heading', 'Note what home actually looks like.'),
+      heading: draft('row.no-progress.action-heading', "Write down what home actually looks like."),
       body: [
         draft(
           'row.no-progress.action-body-1',
-          'Choose two or three concrete examples of what is unchanged, harder, or not showing up at home.',
+          "Two or three concrete lines: \"still can't get through dinner without leaving the table\" · \"new since March: hitting at grandma's\" · \"mornings genuinely better.\" Unchanged, worse, and better all count.",
         ),
         draft(
           'row.no-progress.action-body-2',
-          'Do not interpret the data yourself. Ask the team to reconcile what they see with what the family sees.',
+          "Don't reconcile it yourself — that's their job. Hand them both pictures and ask them to explain the gap.",
         ),
       ],
     },
@@ -1144,23 +1186,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.sessions-concern.body-1',
-        'A concern deserves a clear route for observation, explanation, and escalation.',
+        "A concern about sessions deserves a route: observe, get it explained, or escalate. You're entitled to all three.",
       ),
       draft(
         'row.sessions-concern.body-2',
-        'Specific moments are easier to review than a general feeling, but you do not need perfect evidence before asking.',
+        "Specific beats general, but don't wait for proof. \"Something felt off Tuesday\" is enough to start the conversation.",
       ),
     ],
     action: {
-      heading: draft('row.sessions-concern.action-heading', 'Note the specific moments that concern you.'),
+      heading: draft('row.sessions-concern.action-heading', "Write down the moments, not the feeling."),
       body: [
         draft(
           'row.sessions-concern.action-body-1',
-          'Record the date, setting, what you observed or were told, and the question it raised for you.',
+          "Four lines per moment: date · what you saw or were told · what a session note said, if anything · the question it left you with. \"March 4 — she was in the car crying after session — note just said 'good session' — what happened?\"",
         ),
         draft(
           'row.sessions-concern.action-body-2',
-          'Keep the note factual and use it to request explanation or escalation.',
+          "Two or three of those, kept factual, and the conversation runs itself.",
         ),
       ],
     },
@@ -1168,7 +1210,7 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
       draft('row.sessions-concern.question-1', 'Can I observe a session?'),
       draft(
         'row.sessions-concern.question-2',
-        'Who do I talk to above the BCBA if I need to?',
+        "Who oversees clinical care at this clinic, and how do I request a conversation with them? (Every clinic has someone above the BCBA — often called a clinical director. You can ask for that conversation by name.)",
       ),
       draft(
         'row.sessions-concern.question-3',
@@ -1203,23 +1245,23 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
     body: [
       draft(
         'row.unclear-care.body-1',
-        'You should be able to understand what each goal is for and how the team will know whether it is helping.',
+        "Every goal in the plan should survive one question: \"what is this for, in plain words?\" If it can't, the goal isn't wrong — the explanation is missing.",
       ),
       draft(
         'row.unclear-care.body-2',
-        'Ask for the next month to be described in concrete, parent-friendly terms.',
+        "You're not asking for a favor. Understanding the program is part of the program — parents who get it run better home programs, and your team knows that.",
       ),
     ],
     action: {
-      heading: draft('row.unclear-care.action-heading', 'Choose the goals you most need explained.'),
+      heading: draft('row.unclear-care.action-heading', "List the goals you can't explain."),
       body: [
         draft(
           'row.unclear-care.action-body-1',
-          'Bring the names of the goals or recommendations you do not understand.',
+          "Open the last report or plan you were given and write down every goal name you couldn't explain to a friend. That list is the meeting.",
         ),
         draft(
           'row.unclear-care.action-body-2',
-          'Ask the team to explain purpose, evidence, expected change, and timeline without jargon.',
+          "For each one, the same four asks: what it's for · what evidence says it matters · what change we should see · by when. No jargon is a fair demand.",
         ),
       ],
     },
@@ -1247,6 +1289,220 @@ export const PLAN_ROWS: Record<StandardRowId, PlanRowDefinition> = {
       row: 'why-behavior',
     },
   },
+  deciding: {
+    id: 'deciding',
+    branch: 'working',
+    choice: draft('row.deciding.choice', 'How do I know if ABA would actually help my child?'),
+    acknowledgment: draft(
+      'row.deciding.acknowledgment',
+      "You said you're deciding whether ABA is the right move for your family.",
+    ),
+    truth: draft(
+      'row.deciding.truth',
+      'This decision deserves real information, not a sales pitch.',
+    ),
+    body: [
+      draft(
+        'row.deciding.body-1',
+        "No one can promise outcomes for a child they haven't assessed — be cautious with anyone who does.",
+      ),
+      draft(
+        'row.deciding.body-2',
+        "What a good provider CAN do is explain exactly how they'd find out what your child needs, and how you'd both know if it's working.",
+      ),
+    ],
+    action: {
+      heading: draft(
+        'row.deciding.action-heading',
+        'Write down the three things you most want to change.',
+      ),
+      body: [
+        draft(
+          'row.deciding.action-body-1',
+          'Not goals in clinical language — your language. "Get through a grocery store." "Sleep past 5am." "Stop the biting."',
+        ),
+        draft(
+          'row.deciding.action-body-2',
+          'Those three sentences are your yardstick for every provider conversation: ask each one how their program would address exactly those.',
+        ),
+      ],
+    },
+    questions: [
+      draft(
+        'row.deciding.question-1',
+        "Based on what I've described, what would you assess first, and how?",
+      ),
+      draft(
+        'row.deciding.question-2',
+        "How would goals for my child be chosen, and what's my role in choosing them?",
+      ),
+      draft(
+        'row.deciding.question-3',
+        "How do you measure whether it's working, and how often would I see that data?",
+      ),
+      draft(
+        'row.deciding.question-4',
+        "What happens if it isn't helping — how does the plan change?",
+      ),
+    ],
+  },
+  'first-months': {
+    id: 'first-months',
+    branch: 'working',
+    choice: draft('row.first-months.choice', 'What should the first months actually look like?'),
+    acknowledgment: draft(
+      'row.first-months.acknowledgment',
+      'You said you want honest expectations before you commit.',
+    ),
+    truth: draft(
+      'row.first-months.truth',
+      'Honest timelines beat big promises — ask for the boring version.',
+    ),
+    body: [
+      draft(
+        'row.first-months.body-1',
+        'The first weeks are usually assessment and relationship-building, not visible change. A provider who says otherwise is selling.',
+      ),
+      draft(
+        'row.first-months.body-2',
+        "What you're entitled to is a clear picture: who comes to your home, how often, what they'll do, and when you'll first sit down over data.",
+      ),
+    ],
+    action: {
+      heading: draft('row.first-months.action-heading', "Sketch your family's real week."),
+      body: [
+        draft(
+          'row.first-months.action-body-1',
+          'Write the hours that could actually hold sessions — "weekdays 3:30–6, not Wednesdays" — and who\'s home during them.',
+        ),
+        draft(
+          'row.first-months.action-body-2',
+          'Bring it to every provider call. Their answer to "can you staff this?" tells you more than their brochure.',
+        ),
+      ],
+    },
+    questions: [
+      draft(
+        'row.first-months.question-1',
+        'Walk me through a typical first month, week by week.',
+      ),
+      draft(
+        'row.first-months.question-2',
+        "What changes should we realistically see by month three — and what shouldn't we expect yet?",
+      ),
+      draft(
+        'row.first-months.question-3',
+        'How often do we meet with the BCBA, not just the therapist?',
+      ),
+    ],
+  },
+  'judging-provider': {
+    id: 'judging-provider',
+    branch: 'working',
+    choice: draft('row.judging-provider.choice', 'How do I judge whether a provider is good?'),
+    acknowledgment: draft(
+      'row.judging-provider.acknowledgment',
+      'You said you want to tell a good provider from a mediocre one.',
+    ),
+    truth: draft(
+      'row.judging-provider.truth',
+      'A good provider welcomes every one of these questions. Hesitation is an answer too.',
+    ),
+    body: [
+      draft(
+        'row.judging-provider.body-1',
+        "You are interviewing them. Families forget this because they're exhausted and waitlists feel like leverage.",
+      ),
+      draft(
+        'row.judging-provider.body-2',
+        "The questions below are the ones providers hope you won't ask. Ask all of them and write the answers down.",
+      ),
+    ],
+    action: {
+      heading: draft(
+        'row.judging-provider.action-heading',
+        'Take notes during every provider call.',
+      ),
+      body: [
+        draft(
+          'row.judging-provider.action-body-1',
+          'Same three lines each time: what I asked · what they said · how it felt to ask. "Asked about observing sessions — said anytime — felt easy" versus "asked — got a policy speech — felt defensive."',
+        ),
+        draft(
+          'row.judging-provider.action-body-2',
+          'After three calls, the notes decide for you.',
+        ),
+      ],
+    },
+    questions: [
+      draft('row.judging-provider.question-1', 'Can parents observe sessions?'),
+      draft(
+        'row.judging-provider.question-2',
+        'Who supervises the therapists, and how many hours a week is the BCBA actually involved with my child?',
+      ),
+      draft(
+        'row.judging-provider.question-3',
+        'How do you train and involve parents — is that scheduled or optional?',
+      ),
+      draft(
+        'row.judging-provider.question-4',
+        "What's your staff turnover like, and what happens when my child's therapist leaves?",
+      ),
+    ],
+  },
+  'what-is-aba': {
+    id: 'what-is-aba',
+    branch: 'working',
+    choice: draft('row.what-is-aba.choice', "I don't understand what ABA even does."),
+    acknowledgment: draft(
+      'row.what-is-aba.acknowledgment',
+      'You said you need ABA explained before anything else makes sense.',
+    ),
+    truth: draft(
+      'row.what-is-aba.truth',
+      "If a provider can't explain it plainly, keep looking.",
+    ),
+    body: [
+      draft(
+        'row.what-is-aba.body-1',
+        "In plain terms: ABA looks closely at what's happening around a behavior — what comes before it, what follows it — and uses that to teach skills and reduce what's getting in the child's way.",
+      ),
+      draft(
+        'row.what-is-aba.body-2',
+        'Everything is measured. That\'s the part that protects you: you never have to take "it\'s going well" on faith — you can ask to see it.',
+      ),
+    ],
+    action: {
+      heading: draft(
+        'row.what-is-aba.action-heading',
+        'Bring one real moment to the conversation.',
+      ),
+      body: [
+        draft(
+          'row.what-is-aba.action-body-1',
+          'Pick one recent hard moment — the restaurant, the morning, the bite — and describe it to the provider.',
+        ),
+        draft(
+          'row.what-is-aba.action-body-2',
+          'Then ask: "walk me through how your team would approach exactly that." Their answer, in plain language or jargon, is your evaluation.',
+        ),
+      ],
+    },
+    questions: [
+      draft(
+        'row.what-is-aba.question-1',
+        "Explain in plain terms what you'd likely work on first with my child, and why.",
+      ),
+      draft(
+        'row.what-is-aba.question-2',
+        'What is the family\'s role — what will we be asked to do?',
+      ),
+      draft(
+        'row.what-is-aba.question-3',
+        'What does ABA help with, and what does it not help with?',
+      ),
+    ],
+  },
 };
 
 export const CRISIS_PAGE = {
@@ -1261,11 +1517,11 @@ export const CRISIS_PAGE = {
   body: [
     draft(
       'crisis.body-1',
-      'This page does not give behavior advice. It helps you bring an urgent safety concern to the people responsible for clinical care.',
+      "This page gives no behavior advice — in a safety situation, guessing is dangerous and you deserve better than guesses. Its job is to get the full truth of what's happening in front of the people responsible for clinical care, fast.",
     ),
     draft(
       'crisis.body-2',
-      'Escalation options may include a revised plan, caregiver training, or more hours. DRAFT PLACEHOLDER: Clinical Director confirmation required before publication.',
+      "Families in this situation are not out of options. Ask your team directly which of these apply to you: a revised plan that targets these incidents, hands-on caregiver training, a written safety plan for the moments themselves, or increased support hours. If you don't have a team yet, this is the first thing to tell admissions.",
     ),
   ],
   documentationHeading: draft(
@@ -1280,6 +1536,10 @@ export const CRISIS_PAGE = {
     draft('crisis.documentation-5', 'Who was hurt.'),
     draft('crisis.documentation-6', 'Photos of injuries, when appropriate and safe.'),
   ],
+  documentationExample: draft(
+    'crisis.documentation-example',
+    'Like this: "Tue 5:15p — asked to turn off tablet — 20 min — bit grandma\'s forearm, bruised — ended when she left the room." One entry per incident. This log is what turns "it\'s bad" into a plan revision, more hours, or hands-on training.',
+  ),
   questionsHeading: draft('crisis.questions-heading', 'Raise these questions now'),
   questions: [
     draft(

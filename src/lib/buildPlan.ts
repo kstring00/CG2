@@ -3,6 +3,7 @@ import {
   CRISIS_PAGE,
   PLAN_ROWS,
   TEAM_COPY,
+  resolveBranch,
   type ActionDefinition,
   type BranchId,
   type CopyEntry,
@@ -30,7 +31,7 @@ export type StandardPlanPage = {
   action: ActionDefinition;
   sessionHeading: CopyEntry;
   questions: CopyEntry[];
-  crossLink: {
+  crossLink?: {
     label: CopyEntry;
     detail: CopyEntry;
     href: string;
@@ -58,6 +59,7 @@ export type CrisisPlanPage = {
   body: CopyEntry[];
   documentationHeading: CopyEntry;
   documentationItems: readonly CopyEntry[];
+  documentationExample: CopyEntry;
   questionsHeading: CopyEntry;
   questions: readonly CopyEntry[];
   phoneHeading: CopyEntry;
@@ -111,6 +113,7 @@ export function buildPlan(
       body: [...CRISIS_PAGE.body],
       documentationHeading: CRISIS_PAGE.documentationHeading,
       documentationItems: CRISIS_PAGE.documentationItems,
+      documentationExample: CRISIS_PAGE.documentationExample,
       questionsHeading: CRISIS_PAGE.questionsHeading,
       questions: CRISIS_PAGE.questions,
       phoneHeading: CRISIS_PAGE.phoneHeading,
@@ -124,6 +127,11 @@ export function buildPlan(
   const definition = PLAN_ROWS[row as StandardRowId];
   if (!definition || definition.branch !== branch) {
     throw new Error(`Invalid Care Plan selection: ${branch}/${row}`);
+  }
+  // Branch 4 swaps its rows in team=no mode, so a row that belongs to the branch
+  // may still not belong to this team's version of it.
+  if (!isRowInBranch(resolvedTeam, branch, definition.id)) {
+    throw new Error(`Invalid Care Plan selection for team=${resolvedTeam}: ${branch}/${row}`);
   }
 
   const providerEvaluationNote =
@@ -142,15 +150,17 @@ export function buildPlan(
     action: definition.action,
     sessionHeading: TEAM_COPY[resolvedTeam].sessionHeading,
     questions: [...definition.questions],
-    crossLink: {
-      label: definition.crossLink.label,
-      detail: definition.crossLink.detail,
-      href: standardHref(
-        resolvedTeam,
-        definition.crossLink.branch,
-        definition.crossLink.row,
-      ),
-    },
+    crossLink: definition.crossLink
+      ? {
+          label: definition.crossLink.label,
+          detail: definition.crossLink.detail,
+          href: standardHref(
+            resolvedTeam,
+            definition.crossLink.branch,
+            definition.crossLink.row,
+          ),
+        }
+      : undefined,
     startOverHref,
     teamContact: contact,
     providerEvaluationNote,
@@ -173,6 +183,15 @@ export function isStandardBranchId(value: string | undefined): value is Standard
 
 export function isStandardRowId(value: string | undefined): value is StandardRowId {
   return Boolean(value && value in PLAN_ROWS);
+}
+
+/** Whether a row is reachable in this team mode's version of the branch. */
+export function isRowInBranch(
+  team: TeamMode,
+  branch: StandardBranchId,
+  row: StandardRowId,
+): boolean {
+  return resolveBranch(team, branch).rows.includes(row);
 }
 
 export function branchHref(team: TeamMode, branch: StandardBranchId): string {
