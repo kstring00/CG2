@@ -40,9 +40,23 @@ export const PARENT_SUPPORT_WORKSHEET: WorksheetOverride = {
   ]),
 };
 
+export const HOME_SITUATION_WORKSHEET: WorksheetOverride = {
+  href: '/worksheets/home-situation-snapshot.pdf',
+  label: draft(
+    'worksheet-library.home-situation-snapshot.label',
+    'Download the Home Situation Snapshot',
+  ),
+  rows: new Set<StandardRowId>([
+    'outings',
+    'daily-routines',
+    'communication-wall',
+  ]),
+};
+
 const WORKSHEET_OVERRIDES: WorksheetOverride[] = [
   CARE_CLARITY_WORKSHEET,
   PARENT_SUPPORT_WORKSHEET,
+  HOME_SITUATION_WORKSHEET,
 ];
 
 export function resolveWorksheetOverride(row: StandardRowId): WorksheetOverride | undefined {
