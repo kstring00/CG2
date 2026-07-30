@@ -8,11 +8,17 @@ import {
   type BranchId,
   type CopyEntry,
   type PlanRowDefinition,
+  type RowCategory,
   type RowId,
   type StandardBranchId,
   type StandardRowId,
   type TeamMode,
 } from '@/content/carePlan';
+import {
+  CARE_PLAN_SIX_BEAT_DRAFTS,
+  CRISIS_SIX_BEAT_DRAFT,
+  type DraftResponseGuide,
+} from '@/content/carePlanSixBeatDraft';
 
 export type TeamContact = {
   label: CopyEntry;
@@ -25,12 +31,14 @@ export type StandardPlanPage = {
   team: TeamMode;
   branch: StandardBranchId;
   row: StandardRowId;
+  category: RowCategory;
   acknowledgment: CopyEntry;
   truth: CopyEntry;
   body: CopyEntry[];
   action: ActionDefinition;
   sessionHeading: CopyEntry;
   questions: CopyEntry[];
+  responseGuide: DraftResponseGuide;
   crossLink: {
     label: CopyEntry;
     detail: CopyEntry;
@@ -62,6 +70,7 @@ export type CrisisPlanPage = {
   documentationExample: CopyEntry;
   questionsHeading: CopyEntry;
   questions: readonly CopyEntry[];
+  responseGuide: DraftResponseGuide;
   phoneHeading: CopyEntry;
   immediateDangerHeading: CopyEntry;
   immediateDangerBody: CopyEntry;
@@ -110,12 +119,13 @@ export function buildPlan(
       row: 'crisis',
       acknowledgment: CRISIS_PAGE.acknowledgment,
       truth: CRISIS_PAGE.truth,
-      body: [...CRISIS_PAGE.body],
+      body: [...CRISIS_SIX_BEAT_DRAFT.explanation],
       documentationHeading: CRISIS_PAGE.documentationHeading,
       documentationItems: CRISIS_PAGE.documentationItems,
       documentationExample: CRISIS_PAGE.documentationExample,
       questionsHeading: CRISIS_PAGE.questionsHeading,
       questions: CRISIS_PAGE.questions,
+      responseGuide: CRISIS_SIX_BEAT_DRAFT.responseGuide,
       phoneHeading: CRISIS_PAGE.phoneHeading,
       immediateDangerHeading: CRISIS_PAGE.immediateDangerHeading,
       immediateDangerBody: CRISIS_PAGE.immediateDangerBody,
@@ -134,6 +144,7 @@ export function buildPlan(
     throw new Error(`Invalid Care Plan selection for team=${resolvedTeam}: ${branch}/${row}`);
   }
 
+  const sixBeat = CARE_PLAN_SIX_BEAT_DRAFTS[definition.id];
   const providerEvaluationNote =
     resolvedTeam === 'no' && branch === 'working'
       ? TEAM_COPY.no.providerEvaluationNote
@@ -144,12 +155,14 @@ export function buildPlan(
     team: resolvedTeam,
     branch: definition.branch,
     row: definition.id,
+    category: sixBeat.category,
     acknowledgment: definition.acknowledgment,
     truth: definition.truth,
-    body: [...definition.body],
-    action: definition.action,
+    body: [...sixBeat.explanation],
+    action: sixBeat.actionOverride ?? definition.action,
     sessionHeading: TEAM_COPY[resolvedTeam].sessionHeading,
     questions: [...definition.questions],
+    responseGuide: sixBeat.responseGuide,
     crossLink: {
       label: definition.crossLink.label,
       detail: definition.crossLink.detail,
