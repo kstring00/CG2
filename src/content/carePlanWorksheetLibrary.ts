@@ -67,11 +67,21 @@ export const PROVIDER_INTERVIEW_WORKSHEET: WorksheetOverride = {
   ]),
 };
 
+export const ONE_SENTENCE_ADVOCACY_WORKSHEET: WorksheetOverride = {
+  href: '/worksheets/one-sentence-advocacy-card.pdf',
+  label: draft(
+    'worksheet-library.one-sentence-advocacy-card.label',
+    'Download the One-Sentence Advocacy Card',
+  ),
+  rows: new Set<StandardRowId>(['marriage-strain']),
+};
+
 const WORKSHEET_OVERRIDES: WorksheetOverride[] = [
   CARE_CLARITY_WORKSHEET,
   PARENT_SUPPORT_WORKSHEET,
   HOME_SITUATION_WORKSHEET,
   PROVIDER_INTERVIEW_WORKSHEET,
+  ONE_SENTENCE_ADVOCACY_WORKSHEET,
 ];
 
 export function resolveWorksheetOverride(row: StandardRowId): WorksheetOverride | undefined {
