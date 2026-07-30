@@ -7,6 +7,7 @@ import {
   worksheetHref,
   type ParentFirstPlanContent,
 } from '@/content/carePlanParentFirst';
+import { resolveWorksheetOverride } from '@/content/carePlanWorksheetLibrary';
 
 function resolveSelected(value: string | null, count: number): number[] {
   if (!value) return [0, 1].filter((index) => index < count);
@@ -34,6 +35,9 @@ export default function QuestionsAndDownloads({
   const router = useRouter();
   const searchParams = useSearchParams();
   const selected = resolveSelected(searchParams.get('q'), questions.length);
+  const worksheetOverride = resolveWorksheetOverride(row);
+  const resolvedWorksheetHref = worksheetOverride?.href ?? worksheetHref(worksheet.id);
+  const resolvedWorksheetLabel = worksheetOverride?.label.text ?? worksheet.label.text;
 
   function toggle(index: number) {
     const next = selected.includes(index)
@@ -123,11 +127,11 @@ export default function QuestionsAndDownloads({
         </h2>
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           <a
-            href={worksheetHref(worksheet.id)}
+            href={resolvedWorksheetHref}
             download
             className="inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-teal px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2"
           >
-            {worksheet.label.text}
+            {resolvedWorksheetLabel}
           </a>
           <button
             type="button"
