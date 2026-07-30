@@ -14,6 +14,10 @@ import {
   type TeamMode,
 } from '@/content/carePlan';
 import {
+  SIX_BEAT_UI,
+  type DraftResponseGuide,
+} from '@/content/carePlanSixBeatDraft';
+import {
   branchHref,
   buildPlan,
   isRowInBranch,
@@ -206,6 +210,42 @@ function CopyBlock({ entries }: { entries: CopyEntry[] }) {
   );
 }
 
+function ResponseGuide({ guide }: { guide: DraftResponseGuide }) {
+  return (
+    <section className="rounded-xl border border-surface-border bg-white p-5 sm:p-6" data-print-card>
+      <h2 className="text-xl font-semibold leading-snug text-brand-navy-700">
+        {SIX_BEAT_UI.responseGuideHeading.text}
+      </h2>
+      <dl className="mt-5 space-y-5">
+        <div>
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {SIX_BEAT_UI.substantiveLabel.text}
+          </dt>
+          <dd className="mt-2 text-[15px] leading-relaxed text-brand-muted-600">
+            {guide.substantive.text}
+          </dd>
+        </div>
+        <div className="border-t border-surface-border pt-5">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {SIX_BEAT_UI.incompleteLabel.text}
+          </dt>
+          <dd className="mt-2 text-[15px] leading-relaxed text-brand-muted-600">
+            {guide.incomplete.text}
+          </dd>
+        </div>
+        <div className="border-t border-surface-border pt-5">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {SIX_BEAT_UI.followUpLabel.text}
+          </dt>
+          <dd className="mt-2 border-l-2 border-brand-navy-200 pl-4 text-[15px] font-medium leading-relaxed text-brand-navy-700">
+            {guide.followUp.text}
+          </dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
 function PlanView({ plan }: { plan: StandardPlanPage }) {
   return (
     <main className="care-plan-print-sheet page-shell mx-auto w-full max-w-3xl">
@@ -217,8 +257,13 @@ function PlanView({ plan }: { plan: StandardPlanPage }) {
         <h1 className="mt-3 text-3xl font-semibold leading-tight text-brand-navy-700 sm:text-4xl">
           {plan.truth.text}
         </h1>
-        <div className="mt-4">
-          <CopyBlock entries={plan.body} />
+        <div className="mt-6 border-t border-surface-border pt-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-500">
+            {SIX_BEAT_UI.explanationHeading.text}
+          </p>
+          <div className="mt-3">
+            <CopyBlock entries={plan.body} />
+          </div>
         </div>
       </section>
 
@@ -310,6 +355,8 @@ function PlanView({ plan }: { plan: StandardPlanPage }) {
           ))}
         </ol>
       </section>
+
+      <ResponseGuide guide={plan.responseGuide} />
 
       {plan.domesticViolence && (
         <p className="border-y border-surface-border py-4 text-sm leading-relaxed text-brand-muted-600">
