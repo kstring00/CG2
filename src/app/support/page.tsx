@@ -98,22 +98,22 @@ function HomeBaseNoPlan() {
 
       <section className="rounded-[1.75rem] border border-primary/15 bg-gradient-to-br from-brand-plum-50/80 via-white to-[#fdf7f2] p-7 shadow-soft sm:p-9">
         <h2 className="max-w-xl text-2xl font-semibold leading-tight text-brand-navy-700 sm:text-3xl">
-          What do I do right now?
+          What would help right now?
         </h2>
         <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-brand-muted-600">
-          A few honest questions, and we&rsquo;ll put together a small starting point for the
-          week ahead. No sign-up, no clinical paperwork — saved privately on this device.
+          Answer two quick questions and we&rsquo;ll show you a focused starting point,
+          practical support, and a private worksheet when one could help.
         </p>
         <Link
           href="/support/intake"
           className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90"
         >
           <Sparkles className="h-4 w-4" />
-          Build my plan
+          Find my next step
           <ArrowRight className="h-4 w-4" />
         </Link>
         <p className="mt-4 text-[13px] text-brand-muted-500">
-          About three minutes. You can change it anytime.
+          Takes about a minute. Nothing you tap is saved or sent anywhere.
         </p>
       </section>
 
@@ -150,7 +150,7 @@ function HomeBaseWithPlan({
     return {
       title: 'You’re caught up for this week',
       href: '/support/care-plan',
-      why: 'Nothing urgent right now. Your full plan is always here when you want it.',
+      why: 'Nothing urgent right now. Your full support guide is always here when you want it.',
     };
   }, [incompleteSteps]);
 
@@ -194,7 +194,7 @@ function HomeBaseWithPlan({
 
       <p className="text-center text-[12px] text-brand-muted-400">
         <Link href="/support/care-plan" className="font-medium hover:text-primary">
-          Open full care plan
+          Open full support guide
         </Link>
       </p>
     </div>
