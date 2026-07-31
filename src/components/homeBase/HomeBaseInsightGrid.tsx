@@ -63,13 +63,13 @@ export default function HomeBaseInsightGrid({
             href="/support/care-plan"
             className="inline-flex items-center gap-1 text-[12px] font-semibold text-primary hover:text-primary/80"
           >
-            See full plan <ArrowRight className="h-3.5 w-3.5" />
+            See full support guide <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         }
       >
         <ul className="space-y-2.5">
           {glanceSteps.length === 0 ? (
-            <li className="text-[13px] text-brand-muted-600">Your plan steps will show here.</li>
+            <li className="text-[13px] text-brand-muted-600">Your support steps will show here.</li>
           ) : (
             glanceSteps.map((step) => {
               const done = isStepComplete(step, completedKeys, legacyHrefs, steps);

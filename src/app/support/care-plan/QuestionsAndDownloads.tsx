@@ -59,7 +59,7 @@ export default function QuestionsAndDownloads({
       '',
       ...(chosen.length
         ? chosen.map((question, index) => `${index + 1}. ${question.text}`)
-        : ['No questions selected. Return to the Care Plan and choose the questions you want to bring.']),
+        : ['No questions selected. Return to the Support Guide and choose the questions you want to bring.']),
       '',
       'Generated on your device. Nothing was sent to Common Ground.',
     ].join('\n');
