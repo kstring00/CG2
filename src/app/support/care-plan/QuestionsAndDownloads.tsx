@@ -1,6 +1,7 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import type { CopyEntry, StandardRowId, TeamMode } from '@/content/carePlan';
 import {
   PARENT_FIRST_UI,
@@ -32,20 +33,34 @@ export default function QuestionsAndDownloads({
   worksheet: ParentFirstPlanContent['worksheet'];
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const selected = resolveSelected(searchParams.get('q'), questions.length);
+  const searchString = searchParams.toString();
+  const [selected, setSelected] = useState(() =>
+    resolveSelected(searchParams.get('q'), questions.length),
+  );
   const worksheetOverride = resolveWorksheetOverride(row);
   const resolvedWorksheetHref = worksheetOverride?.href ?? worksheetHref(worksheet.id);
   const resolvedWorksheetLabel = worksheetOverride?.label.text ?? worksheet.label.text;
+
+  useEffect(() => {
+    setSelected(resolveSelected(searchParams.get('q'), questions.length));
+  }, [questions.length, searchParams, searchString]);
 
   function toggle(index: number) {
     const next = selected.includes(index)
       ? selected.filter((item) => item !== index)
       : [...selected, index].sort((a, b) => a - b);
-    const params = new URLSearchParams(searchParams.toString());
+
+    setSelected(next);
+
+    const params = new URLSearchParams(searchString);
     params.set('q', next.join(','));
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    const query = params.toString();
+    window.history.replaceState(
+      window.history.state,
+      '',
+      query ? `${pathname}?${query}` : pathname,
+    );
   }
 
   function downloadQuestions() {
