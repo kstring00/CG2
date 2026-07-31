@@ -66,6 +66,8 @@ function GuidedSupportTransition({ children }: { children: ReactNode }) {
 
   const routeKey = `${pathname}?${searchParams.toString()}`;
   const guided = isGuidedPath(pathname);
+  const supportPath = pathname.startsWith('/support');
+  const motionKey = guided ? routeKey : pathname;
   const [leavingRouteKey, setLeavingRouteKey] = useState<string | null>(null);
   const [liveMessage, setLiveMessage] = useState('');
 
@@ -73,7 +75,7 @@ function GuidedSupportTransition({ children }: { children: ReactNode }) {
   const selectedAnchorRef = useRef<HTMLAnchorElement | null>(null);
   const dimmedAnchorsRef = useRef<HTMLAnchorElement[]>([]);
   const timersRef = useRef<number[]>([]);
-  const previousRouteKeyRef = useRef(routeKey);
+  const previousMotionKeyRef = useRef(motionKey);
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach((timer) => window.clearTimeout(timer));
@@ -206,7 +208,7 @@ function GuidedSupportTransition({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    const routeChanged = previousRouteKeyRef.current !== routeKey;
+    const routeChanged = previousMotionKeyRef.current !== motionKey;
 
     setLeavingRouteKey(null);
     setLiveMessage('');
@@ -226,39 +228,47 @@ function GuidedSupportTransition({ children }: { children: ReactNode }) {
       timersRef.current.push(focusTimer);
     }
 
-    previousRouteKeyRef.current = routeKey;
+    previousMotionKeyRef.current = motionKey;
 
     return () => {
       clearTimers();
     };
-  }, [clearChoiceState, clearTimers, guided, reduceMotion, routeKey]);
+  }, [clearChoiceState, clearTimers, guided, motionKey, reduceMotion]);
 
   const leaving = leavingRouteKey === routeKey;
 
   const motionState = useMemo(() => {
-    if (!guided || reduceMotion) {
+    if (!supportPath || reduceMotion) {
       return {
         initial: false as const,
-        animate: { opacity: 1, x: 0, filter: 'blur(0px)' },
+        animate: { opacity: 1, x: 0, y: 0, filter: 'blur(0px)' },
         transition: { duration: 0 },
       };
     }
 
+    if (!guided) {
+      return {
+        initial: { opacity: 0, x: 0, y: 12, filter: 'blur(0px)' },
+        animate: { opacity: 1, x: 0, y: 0, filter: 'blur(0px)' },
+        transition: { duration: 0.34, ease: ENTER_EASE },
+      };
+    }
+
     return {
-      initial: { opacity: 0, x: 28, filter: 'blur(2px)' },
+      initial: { opacity: 0, x: 28, y: 0, filter: 'blur(2px)' },
       animate: leaving
-        ? { opacity: 0, x: -26, filter: 'blur(2px)' }
-        : { opacity: 1, x: 0, filter: 'blur(0px)' },
+        ? { opacity: 0, x: -26, y: 0, filter: 'blur(2px)' }
+        : { opacity: 1, x: 0, y: 0, filter: 'blur(0px)' },
       transition: leaving
         ? { duration: 0.28, ease: EXIT_EASE }
         : { duration: 0.42, ease: ENTER_EASE },
     };
-  }, [guided, leaving, reduceMotion]);
+  }, [guided, leaving, reduceMotion, supportPath]);
 
   return (
     <>
       <motion.div
-        key={routeKey}
+        key={motionKey}
         data-guided-flow-shell="true"
         initial={motionState.initial}
         animate={motionState.animate}
@@ -267,7 +277,7 @@ function GuidedSupportTransition({ children }: { children: ReactNode }) {
         onClickCapture={handleClick}
         onPointerOverCapture={handlePointerOver}
         style={{
-          willChange: guided && !reduceMotion ? 'transform, opacity, filter' : undefined,
+          willChange: supportPath && !reduceMotion ? 'transform, opacity, filter' : undefined,
         }}
       >
         {children}
