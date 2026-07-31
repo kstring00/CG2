@@ -55,7 +55,7 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
 
   const planText = plan ? buildPlanText(plan, latestCheckIn ?? null) : '';
   const mailtoHref = plan && email
-    ? `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Your Common Ground plan')}&body=${encodeURIComponent(planText)}`
+    ? `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent('Your Common Ground support guide')}&body=${encodeURIComponent(planText)}`
     : '';
 
   async function handleSend() {
@@ -113,7 +113,7 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'common-ground-plan.txt';
+    a.download = 'common-ground-support-guide.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -137,13 +137,13 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="inline-flex items-center gap-1.5 rounded-full bg-brand-plum-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-plum-700">
-              <Mail className="h-3 w-3" aria-hidden /> Email my plan
+              <Mail className="h-3 w-3" aria-hidden /> Share my guide
             </p>
             <h2 id="email-plan-title" className="mt-2 text-xl font-bold text-stone-900">
-              Send your plan to yourself.
+              Send your support guide to yourself.
             </h2>
             <p className="mt-1 text-[13.5px] leading-relaxed text-stone-600">
-              We’ll email a plain-text copy of your plan and latest check-in. Stored on this device only.
+              We’ll email a plain-text copy of your guide and latest check-in. Stored on this device only.
             </p>
           </div>
           <button
@@ -181,7 +181,7 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Mail className="h-4 w-4" />
-            {send.kind === 'sending' ? 'Sending…' : 'Email me my plan'}
+            {send.kind === 'sending' ? 'Sending…' : 'Email me my guide'}
           </button>
           <button
             type="button"
@@ -220,7 +220,7 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
                     open your mail app
                   </a>
                 )}{' '}
-                with the plan pre-filled.
+                with the guide pre-filled.
               </p>
             </div>
           )}
@@ -232,7 +232,7 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
         </div>
 
         <p className="mt-5 text-[11.5px] leading-relaxed text-stone-500">
-          We only send what’s in your plan summary — no medical or child details beyond what you wrote.
+          We only send what’s in your support guide summary — no medical or child details beyond what you wrote.
           Automated weekly reminder emails would require server-side scheduling and a real account, which this MVP doesn’t include.
         </p>
       </div>
@@ -242,8 +242,8 @@ export default function EmailPlanDialog({ open, onClose, plan, latestCheckIn }: 
 
 function buildPlanText(plan: SavedCarePlan, checkIn: WeeklyCheckInEntry | null): string {
   const lines: string[] = [];
-  lines.push('Common Ground — Your Plan');
-  lines.push(`Saved: ${new Date(plan.updatedAt).toLocaleDateString()}`);
+  lines.push('Common Ground — Your Support Guide');
+  lines.push(`Saved privately: ${new Date(plan.updatedAt).toLocaleDateString()}`);
   lines.push('');
   lines.push('SUMMARY');
   lines.push(plan.summary);
@@ -261,7 +261,7 @@ function buildPlanText(plan: SavedCarePlan, checkIn: WeeklyCheckInEntry | null):
     lines.push('');
   }
   if (plan.weekMessage) {
-    lines.push('FOR YOU, THIS WEEK');
+    lines.push('SUPPORT FOR RIGHT NOW');
     lines.push(plan.weekMessage);
     lines.push('');
   }
