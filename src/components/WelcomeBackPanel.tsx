@@ -25,7 +25,7 @@ export default function WelcomeBackPanel({ weekNumber, state, onEmailPlan }: Pro
 
   return (
     <section
-      aria-label={`Welcome back. You are in week ${weekNumber} of your plan.`}
+      aria-label="Welcome back. Support for right now."
       className="relative overflow-hidden rounded-3xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -34,14 +34,14 @@ export default function WelcomeBackPanel({ weekNumber, state, onEmailPlan }: Pro
             <Sparkles className="h-3 w-3" aria-hidden /> Welcome back
           </p>
           <h2 className="mt-3 text-2xl font-bold leading-tight text-stone-900 sm:text-3xl">
-            You’re in <span className="text-primary">Week {weekNumber}</span> of your plan.
+            Support for right now
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-600 sm:text-[15px]">
             {checkedInThisWeek
               ? `Your week ${weekNumber} check-in is saved${lastCheckInLabel ? ` (${lastCheckInLabel})` : ''}. We’ll see you Monday for the next one.`
               : reminderActive
-              ? 'A new week’s ready. A short check-in helps the plan keep up with what’s actually happening.'
-              : `Next check-in: ${mondayDisplay}. Come back any time — your plan is waiting.`}
+              ? 'A new week’s ready. A short check-in helps your support guide reflect what’s actually happening.'
+              : `Next check-in: ${mondayDisplay}. Come back any time — your support guide is waiting.`}
           </p>
         </div>
         {reminderActive && (
@@ -71,9 +71,9 @@ export default function WelcomeBackPanel({ weekNumber, state, onEmailPlan }: Pro
           className="group flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left transition hover:border-stone-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
         >
           <span>
-            <span className="block text-sm font-semibold text-brand-navy-700">Continue my plan</span>
+            <span className="block text-sm font-semibold text-brand-navy-700">Open my support guide</span>
             <span className="mt-0.5 block text-[12.5px] text-brand-muted-600">
-              Pick up your saved next steps.
+              Return to your saved next steps.
             </span>
           </span>
           <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-500 transition group-hover:translate-x-0.5" aria-hidden />
@@ -97,9 +97,9 @@ export default function WelcomeBackPanel({ weekNumber, state, onEmailPlan }: Pro
             className="group flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left transition hover:border-stone-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
           >
             <span>
-              <span className="block text-sm font-semibold text-brand-navy-700">Email my plan</span>
+              <span className="block text-sm font-semibold text-brand-navy-700">Share my guide</span>
               <span className="mt-0.5 block text-[12.5px] text-brand-muted-600">
-                Send the current plan to your inbox.
+                Send the current guide to your inbox.
               </span>
             </span>
             <Mail className="h-4 w-4 shrink-0 text-brand-muted-500" aria-hidden />
@@ -108,7 +108,7 @@ export default function WelcomeBackPanel({ weekNumber, state, onEmailPlan }: Pro
       </div>
 
       <p className="mt-4 text-[11.5px] leading-relaxed text-brand-muted-500">
-        Your plan is saved on this device — not in an account. Clear your browser data and it’s gone.
+        Your guide is saved privately on this device — not in an account. Clear your browser data and it’s gone.
         Common Ground is parent support, not a medical or emergency service. {' '}
         <Link href="/privacy" className="underline-offset-2 hover:underline">
           Privacy
