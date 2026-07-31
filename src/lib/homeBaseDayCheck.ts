@@ -32,7 +32,7 @@ export const DAY_CHECK_REFLECTIONS = {
 } as const;
 
 export const DAY_CHECK_BAD_DAY_PLAN_PERMISSION =
-  'The plan will be here when you\u2019re ready — today, just breathe.';
+  'Your support guide will be here when you\u2019re ready — today, just breathe.';
 
 export const DAY_CHECK_GOOD_DAY_PLAN_LEAD =
-  'You\u2019ve got some room today — here\u2019s a good one to tackle.';
+  'You\u2019ve got some room today — here\u2019s one useful next step.';
