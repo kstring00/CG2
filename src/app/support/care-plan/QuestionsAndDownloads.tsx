@@ -112,7 +112,7 @@ export default function QuestionsAndDownloads({
             return (
               <label
                 key={question.id}
-                className="flex cursor-pointer items-start gap-3 border-t border-surface-border py-4 first:border-t-0 focus-within:ring-2 focus-within:ring-brand-navy-500 focus-within:ring-offset-2"
+                className="flex cursor-pointer items-start gap-3 border-t border-surface-border py-4 transition-colors first:border-t-0 focus-within:bg-brand-warm-50/70"
               >
                 <input
                   type="checkbox"
