@@ -118,7 +118,7 @@ function ResultPanel({
           {TIER_RESULT_COPY[result.tier]}
         </p>
         <p className={cn('mt-3 text-xs', theme.text, 'opacity-80')}>
-          Your plan will show <span className="font-semibold">{stepLimit}</span>{' '}
+          Your support guide will show <span className="font-semibold">{stepLimit}</span>{' '}
           {stepLimit === 1 ? 'priority step' : 'priority steps'} to match this.
         </p>
       </section>
@@ -182,7 +182,7 @@ function ResultPanel({
           onClick={onContinue}
           className="btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm"
         >
-          <Compass className="h-4 w-4" /> See my plan
+          <Compass className="h-4 w-4" /> See my support guide
         </button>
       </div>
     </div>
