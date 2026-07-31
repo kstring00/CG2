@@ -28,10 +28,10 @@ export default function CarePlanSupportPanel({ answers, className }: Props) {
       ].join(' ')}
     >
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-500">
-        Support alongside your plan
+        More support you can use
       </p>
       <p className="mt-1 text-[13px] leading-relaxed text-brand-muted-600">
-        These threads stay available every week — separate from your arc steps.
+        These resources stay available whenever they are useful.
       </p>
       <ul className="mt-3 space-y-2">
         {threads.map((thread) => {
