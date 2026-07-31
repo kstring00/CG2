@@ -44,7 +44,7 @@ type Props = {
 export default function HomeBaseHero({ step, variant = 'calm' }: Props) {
   const subtitle = step.because ?? step.why;
   const ctaLabel =
-    step.href === '/support/care-plan' ? 'Open my plan' : 'Open guide';
+    step.href === '/support/care-plan' ? 'Open my support guide' : 'Open guide';
 
   const isProminent = variant === 'prominent';
   const isSoftened = variant === 'softened';
@@ -78,7 +78,7 @@ export default function HomeBaseHero({ step, variant = 'calm' }: Props) {
       <div className="relative max-w-2xl">
         {!isSoftened && (
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-plum-700">
-            {isProminent ? DAY_CHECK_GOOD_DAY_PLAN_LEAD : 'Your plan'}
+            {isProminent ? DAY_CHECK_GOOD_DAY_PLAN_LEAD : 'Support for right now'}
           </p>
         )}
         <h2
@@ -117,7 +117,7 @@ export default function HomeBaseHero({ step, variant = 'calm' }: Props) {
             href="/support/care-plan"
             className="inline-flex items-center gap-1.5 rounded-xl border border-brand-plum-200 bg-white/80 px-4 py-2.5 text-sm font-semibold text-brand-plum-800 transition hover:bg-white"
           >
-            View full plan
+            View full support guide
           </Link>
         </div>
 
