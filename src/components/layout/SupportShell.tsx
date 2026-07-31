@@ -45,7 +45,7 @@ const navGroups = [
     label: 'Start Here',
     items: [
       { href: '/support', label: 'Home Base', icon: Home },
-      { href: '/support/care-plan', label: 'My Family Care Plan', icon: CompassIcon },
+      { href: '/support/care-plan', label: 'My Support Guide', icon: CompassIcon },
       { href: '/support/connect', label: 'Parent Connection', icon: Users },
     ],
   },
