@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   BookOpen,
-  Link2,
   Search,
   Menu,
   X,
@@ -37,9 +37,6 @@ import NextStepButton from '@/components/layout/NextStepButton';
  * in Texas. Nothing here should imply clinical, personalized, or enrolled-client
  * content. If a link needs to go there, send users to /client to sign in first.
  */
-// CCO-review label map (round 2): Start Here now surfaces Parent Connection so
-// it's no longer buried; Sibling Support moves to Learn (it's content, not
-// active support). Order within each group reflects parent priority.
 const navGroups = [
   {
     label: 'Start Here',
@@ -75,12 +72,31 @@ const navGroups = [
   },
 ];
 
-export function SupportShell({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isFindPage = pathname?.startsWith('/support/find') ?? false;
+type SidebarInstance = 'desktop' | 'mobile';
 
-  const SidebarContent = () => (
+type SidebarContentProps = {
+  pathname: string;
+  instance: SidebarInstance;
+  reduceMotion: boolean;
+  onNavigate: () => void;
+};
+
+function SidebarContent({
+  pathname,
+  instance,
+  reduceMotion,
+  onNavigate,
+}: SidebarContentProps) {
+  function finishMobileNavigation() {
+    if (instance !== 'mobile') return;
+    if (reduceMotion) {
+      onNavigate();
+      return;
+    }
+    window.setTimeout(onNavigate, 130);
+  }
+
+  return (
     <>
       <div className="border-b border-surface-border px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0">
@@ -96,10 +112,13 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <div className="px-4 pt-4">
-        <NextStepButton onNavigate={() => setSidebarOpen(false)} />
+        <NextStepButton onNavigate={finishMobileNavigation} />
       </div>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Common Ground parent support navigation">
+      <nav
+        className="min-h-0 flex-1 overflow-y-auto px-3 py-4"
+        aria-label="Common Ground parent support navigation"
+      >
         {navGroups.map((group, gi) => (
           <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
             <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
@@ -109,34 +128,80 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
               {group.items.map((item) => {
                 const isCurrent =
                   pathname === item.href ||
-                  (item.href !== '/support' && pathname?.startsWith(item.href + '/'));
+                  (item.href !== '/support' && pathname.startsWith(item.href + '/'));
+
                 return (
-                  <li key={item.href}>
-                    <a
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      aria-current={isCurrent ? 'page' : undefined}
-                      className={cn(
-                        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all',
-                        isCurrent
-                          ? 'bg-surface-subtle text-brand-muted-900'
-                          : 'text-brand-muted-600 hover:bg-surface-subtle hover:text-brand-muted-900',
-                      )}
+                  <li key={item.href} className="relative">
+                    <motion.div
+                      whileTap={reduceMotion ? undefined : { scale: 0.985, x: 1 }}
+                      transition={{ duration: 0.1 }}
                     >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span className="flex-1 text-[13px]">{item.label}</span>
-                    </a>
+                      <Link
+                        href={item.href}
+                        onClick={finishMobileNavigation}
+                        aria-current={isCurrent ? 'page' : undefined}
+                        className={cn(
+                          'group/nav relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-2 text-sm font-medium outline-none transition-colors duration-150',
+                          'focus-visible:ring-2 focus-visible:ring-primary/45 focus-visible:ring-offset-1',
+                          isCurrent
+                            ? 'text-brand-navy-800'
+                            : 'text-brand-muted-600 hover:bg-primary/[0.045] hover:text-brand-navy-800',
+                        )}
+                      >
+                        {isCurrent && (
+                          <motion.span
+                            layoutId={`support-nav-active-${instance}`}
+                            aria-hidden="true"
+                            className="absolute inset-0 rounded-xl border border-primary/10 bg-gradient-to-r from-primary/[0.105] via-brand-plum-50/65 to-primary/[0.045] shadow-[0_8px_22px_rgba(26,46,82,0.07)]"
+                            transition={
+                              reduceMotion
+                                ? { duration: 0 }
+                                : {
+                                    type: 'spring',
+                                    stiffness: 430,
+                                    damping: 38,
+                                    mass: 0.8,
+                                  }
+                            }
+                          />
+                        )}
+
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            'absolute left-1 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary transition-all duration-200',
+                            isCurrent
+                              ? 'scale-y-100 opacity-100'
+                              : 'scale-y-50 opacity-0 group-hover/nav:scale-y-75 group-hover/nav:opacity-45',
+                          )}
+                        />
+
+                        <item.icon
+                          className={cn(
+                            'relative z-10 h-4 w-4 shrink-0 transition-all duration-200 group-hover/nav:translate-x-0.5',
+                            isCurrent
+                              ? 'translate-x-0.5 text-brand-plum-700'
+                              : 'text-brand-muted-500 group-hover/nav:text-primary',
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            'relative z-10 flex-1 text-[13px] transition-all duration-200 group-hover/nav:translate-x-0.5',
+                            isCurrent && 'translate-x-0.5 font-semibold',
+                          )}
+                        >
+                          {item.label}
+                        </span>
+                      </Link>
+                    </motion.div>
                   </li>
                 );
               })}
             </ul>
           </div>
         ))}
-
       </nav>
 
-      {/* Quiet privacy footer — replaces the duplicate client-portal handoff,
-          which now lives in the nav under "For Current Families". */}
       <div className="border-t border-surface-border px-4 py-3">
         <p className="px-1 text-[11px] leading-relaxed text-brand-muted-500">
           Saved privately on this device. Common Ground is parent support, not clinical care.
@@ -144,42 +209,73 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
       </div>
     </>
   );
+}
+
+export function SupportShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const reduceMotion = Boolean(useReducedMotion());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isFindPage = pathname.startsWith('/support/find');
 
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: '#f2f4f8' }}>
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-surface-border bg-white lg:flex">
-        <SidebarContent />
+        <SidebarContent
+          pathname={pathname}
+          instance="desktop"
+          reduceMotion={reduceMotion}
+          onNavigate={() => undefined}
+        />
       </aside>
 
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/35 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 flex min-h-0 w-64 flex-col bg-white transition-transform duration-300 lg:hidden',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            key="support-mobile-backdrop"
+            className="fixed inset-0 z-40 bg-black/35 lg:hidden"
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.22 }}
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
+      </AnimatePresence>
+
+      <motion.aside
+        initial={false}
+        animate={{
+          x: sidebarOpen ? 0 : '-100%',
+          opacity: sidebarOpen ? 1 : reduceMotion ? 1 : 0.96,
+        }}
+        transition={
+          reduceMotion
+            ? { duration: 0 }
+            : { type: 'spring', stiffness: 390, damping: 40, mass: 0.9 }
+        }
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 flex min-h-0 w-64 flex-col bg-white shadow-2xl lg:hidden',
+          !sidebarOpen && 'pointer-events-none',
+        )}
+        aria-hidden={!sidebarOpen}
       >
         <button
           onClick={() => setSidebarOpen(false)}
           aria-label="Close navigation"
-          className="absolute right-4 top-4 rounded-lg p-1 hover:bg-surface-subtle"
+          className="absolute right-4 top-4 rounded-lg p-1 transition hover:bg-surface-subtle active:scale-95"
         >
           <X className="h-5 w-5 text-brand-muted-500" />
         </button>
-        <SidebarContent />
-      </aside>
+        <SidebarContent
+          pathname={pathname}
+          instance="mobile"
+          reduceMotion={reduceMotion}
+          onNavigate={() => setSidebarOpen(false)}
+        />
+      </motion.aside>
 
       <div
         className="flex min-h-screen flex-1 flex-col lg:ml-64"
-        // Single source of truth for the find-page sticky offset. The crisis bar
-        // (the only sticky chrome above the directory toolbar) is pinned to this
-        // exact height on desktop, and the toolbar / rails stick to the same
-        // token — so they stay flush even if the height changes later.
         style={{ ['--find-sticky-top' as string]: '2.75rem' }}
       >
         {isFindPage && (
@@ -212,7 +308,6 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {/* Persistent mode banner — makes the layer unmistakable at all times */}
         <div className="border-b border-primary/15 bg-primary/5">
           <div className={cn('mx-auto flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8', isFindPage ? 'max-w-[1600px]' : 'max-w-6xl')}>
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
@@ -237,7 +332,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
               <button
                 onClick={() => setSidebarOpen(true)}
                 aria-label="Open navigation"
-                className="rounded-xl p-2 hover:bg-surface-subtle lg:hidden"
+                className="rounded-xl p-2 transition hover:bg-surface-subtle active:scale-95 lg:hidden"
               >
                 <Menu className="h-5 w-5 text-brand-muted-600" />
               </button>
@@ -256,7 +351,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         {isFindPage && (
           <button
             onClick={() => setSidebarOpen(true)}
-            className="absolute left-3 top-[88px] z-30 rounded-xl bg-white p-2 shadow-soft hover:bg-surface-subtle lg:hidden"
+            className="absolute left-3 top-[88px] z-30 rounded-xl bg-white p-2 shadow-soft transition hover:bg-surface-subtle active:scale-95 lg:hidden"
             aria-label="Open navigation"
           >
             <Menu className="h-5 w-5 text-brand-muted-600" />
