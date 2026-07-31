@@ -53,6 +53,9 @@ export default function QuestionsAndDownloads({
 
     setSelected(next);
 
+    // Keep question selection immediate and visually stable. Writing directly to
+    // browser history preserves the downloadable selection without triggering
+    // the route-level support-guide transition.
     const params = new URLSearchParams(searchString);
     params.set('q', next.join(','));
     const query = params.toString();
