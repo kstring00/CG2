@@ -8,6 +8,10 @@ type MutableCopy = { text: string };
 (CARE_PLAN_UI.developmentDraft as MutableCopy).text = '';
 (CARE_PLAN_UI.carePlanEyebrow as MutableCopy).text = 'My Family Support Guide';
 (CARE_PLAN_UI.planActionLabel as MutableCopy).text = 'A starting point for right now';
+(CARE_PLAN_UI.backToHardest as MutableCopy).text = 'Choose something different';
+(CARE_PLAN_UI.startOver as MutableCopy).text = 'Choose another concern';
+(CARE_PLAN_UI.startOverDetail as MutableCopy).text =
+  'Return to the first question and choose what fits right now.';
 (TEAM_COPY.yes.contactLabel as MutableCopy).text =
   'Talk to Texas ABA Centers for help reaching the right clinic.';
 (TEAM_COPY.yes.phoneNumber as MutableCopy).text = '(877) 771-5725';
