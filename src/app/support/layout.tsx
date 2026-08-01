@@ -1,3 +1,4 @@
+import HomeBaseActivityTracker from '@/components/homeBase/HomeBaseActivityTracker';
 import { SupportShell } from '@/components/layout/SupportShell';
 
 export default function SupportLayout({
@@ -5,5 +6,10 @@ export default function SupportLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <SupportShell>{children}</SupportShell>;
+  return (
+    <SupportShell>
+      <HomeBaseActivityTracker />
+      {children}
+    </SupportShell>
+  );
 }
