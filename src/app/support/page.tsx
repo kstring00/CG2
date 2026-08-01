@@ -1,5 +1,5 @@
-import HomeBaseContinuityDashboard from '@/components/homeBase/HomeBaseContinuityDashboard';
+import HomeBaseV22 from '@/components/homeBase/HomeBaseV22';
 
 export default function SupportHome() {
-  return <HomeBaseContinuityDashboard />;
+  return <HomeBaseV22 />;
 }
