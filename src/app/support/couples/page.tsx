@@ -10,7 +10,6 @@ import {
   ChevronRight,
   CircleHelp,
   Clock3,
-  DoorOpen,
   HeartHandshake,
   Home,
   LifeBuoy,
@@ -220,22 +219,9 @@ export default function CouplesSupportPage() {
     setSafetyOpen((open) => !open);
   }
 
-  function leavePage() {
-    window.location.replace('https://www.google.com');
-  }
-
   return (
     <div className="relative space-y-9 pb-8 sm:space-y-11">
-      <button
-        type="button"
-        onClick={leavePage}
-        className="fixed right-3 top-3 z-50 inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-[12px] font-semibold text-slate-800 shadow-lg transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:right-5 sm:top-5"
-      >
-        <DoorOpen className="h-4 w-4" aria-hidden />
-        Leave this page
-      </button>
-
-      <nav aria-label="Breadcrumb" className="pr-32 text-[12px] text-brand-muted-500">
+      <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
         <ol className="flex items-center gap-1.5">
           <li><Link href="/support" className="hover:text-brand-navy-700">Home</Link></li>
           <li aria-hidden><ChevronRight className="h-3 w-3" /></li>
