@@ -9,6 +9,7 @@ import {
   type ParentFirstPlanContent,
 } from '@/content/carePlanParentFirst';
 import { resolveWorksheetOverride } from '@/content/carePlanWorksheetLibrary';
+import { recordPrivateTool } from '@/lib/homeBaseActivity';
 
 function resolveSelected(value: string | null, count: number): number[] {
   if (!value) return [0, 1].filter((index) => index < count);
@@ -147,6 +148,13 @@ export default function QuestionsAndDownloads({
           <a
             href={resolvedWorksheetHref}
             download
+            onClick={() =>
+              recordPrivateTool({
+                id: `care-plan-${row}`,
+                label: resolvedWorksheetLabel,
+                href: resolvedWorksheetHref,
+              })
+            }
             className="inline-flex min-h-12 items-center justify-center rounded-lg bg-brand-teal px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2"
           >
             {resolvedWorksheetLabel}
