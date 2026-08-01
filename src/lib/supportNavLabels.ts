@@ -2,4 +2,4 @@
 
 export const AT_HOME_STRATEGIES_LABEL = 'At Home Strategies';
 export const RESOURCE_HUB_LABEL = 'Resource Hub';
-export const MARRIAGE_RELATIONSHIPS_LABEL = 'Marriage & Relationships';
+export const MARRIAGE_RELATIONSHIPS_LABEL = 'Partnership & Co-parenting';
