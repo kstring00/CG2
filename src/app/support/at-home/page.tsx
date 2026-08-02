@@ -1,430 +1,399 @@
 'use client';
 
-/**
- * /support/at-home — At-Home Strategies
- *
- * 10 ABA-grounded tools in a compact 2-column card grid. Parents scan visually,
- * filter by situation, and open one strategy at a time with a smooth inline
- * expansion — same interaction language as the Mental Health Toolbox.
- */
-
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AlertTriangle,
-  ArrowLeftRight,
   ArrowRight,
-  Award,
   BookOpen,
+  Brain,
+  Check,
+  ChevronDown,
   ChevronRight,
-  Footprints,
+  ClipboardList,
+  Eye,
+  Gift,
   Hand,
-  Heart,
-  Home as HomeIcon,
-  LayoutGrid,
-  Lightbulb,
-  ListChecks,
+  HeartHandshake,
+  Info,
+  LockKeyhole,
+  MessageCircle,
+  PackageOpen,
+  RefreshCcw,
   ShieldAlert,
-  Signpost,
-  SlidersHorizontal,
   Sparkles,
-  Timer,
   Users,
+  X,
 } from 'lucide-react';
-import {
-  AT_HOME_STRATEGIES,
-  SITUATION_LABELS,
-  strategiesForSituation,
-  type AtHomeStrategy,
-  type StrategySituation,
-} from '@/lib/atHomeStrategies';
 import { AT_HOME_STRATEGIES_LABEL } from '@/lib/supportNavLabels';
+import {
+  matchAtHomeStrategies,
+  type AfterId,
+  type BeforeId,
+  type BehaviorId,
+  type FunctionId,
+  type MatchInput,
+  type MatchedStrategy,
+} from '@/lib/atHomeMatcher';
 import { cn } from '@/lib/utils';
 
-type FilterValue = StrategySituation | 'all';
-
-const FILTER_ORDER: FilterValue[] = [
-  'all',
-  'transitions',
-  'meltdowns',
-  'refusal',
-  'overwhelm',
-  'routines',
-  'communication',
-  'unsafe-behavior',
+const FUNCTIONS: Array<{
+  id: FunctionId;
+  title: string;
+  short: string;
+  description: string;
+  examples: string;
+  icon: typeof Gift;
+  className: string;
+}> = [
+  {
+    id: 'tangible',
+    title: 'Tangible',
+    short: 'Getting something',
+    description: 'The behavior may help get or regain an item, activity, food, location, or privilege.',
+    examples: 'Watch for: denied, delayed, removed, or unavailable items.',
+    icon: PackageOpen,
+    className: 'border-emerald-200 bg-emerald-50/70 text-emerald-800',
+  },
+  {
+    id: 'escape',
+    title: 'Escape',
+    short: 'Getting out of something',
+    description: 'The behavior may help delay, reduce, avoid, or end something difficult or unwanted.',
+    examples: 'Watch for: demands, transitions, waiting, endings, or discomfort.',
+    icon: ArrowRight,
+    className: 'border-sky-200 bg-sky-50/70 text-sky-800',
+  },
+  {
+    id: 'attention',
+    title: 'Attention',
+    short: 'Getting someone',
+    description: 'The behavior may reliably produce talking, helping, comforting, correcting, or another response.',
+    examples: 'Watch for: another person was busy, unavailable, or elsewhere.',
+    icon: Users,
+    className: 'border-violet-200 bg-violet-50/70 text-violet-800',
+  },
+  {
+    id: 'automatic',
+    title: 'Automatic',
+    short: 'How it feels',
+    description: 'The behavior itself may provide sensory input, stimulation, regulation, relief, or comfort.',
+    examples: 'Watch for: it also happens alone or without an obvious social outcome.',
+    icon: Brain,
+    className: 'border-amber-200 bg-amber-50/70 text-amber-800',
+  },
 ];
 
-const FILTER_LABEL: Record<FilterValue, string> = {
-  all: 'Show all',
-  transitions: SITUATION_LABELS.transitions,
-  meltdowns: SITUATION_LABELS.meltdowns,
-  refusal: SITUATION_LABELS.refusal,
-  overwhelm: SITUATION_LABELS.overwhelm,
-  routines: SITUATION_LABELS.routines,
-  communication: SITUATION_LABELS.communication,
-  'unsafe-behavior': SITUATION_LABELS['unsafe-behavior'],
-};
+const BEFORE_OPTIONS: Array<{ id: BeforeId; label: string }> = [
+  { id: 'demand', label: 'Asked to do something' },
+  { id: 'transition', label: 'Transition or activity ending' },
+  { id: 'denied', label: 'Something was unavailable' },
+  { id: 'attention-away', label: 'Attention moved away' },
+  { id: 'waiting', label: 'Waiting or delay' },
+  { id: 'alone', label: 'They were alone' },
+  { id: 'sensory', label: 'Noise, discomfort, or sensory conditions' },
+  { id: 'unclear', label: 'Nothing obvious changed' },
+];
 
-const STRATEGY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  'first-then': LayoutGrid,
-  'catch-them-being-good': Award,
-  'two-good-choices': Signpost,
-  'smaller-step': Footprints,
-  'visuals-not-words': LayoutGrid,
-  'replacement-behavior': ArrowLeftRight,
-  'practice-when-calm': BookOpen,
-  'timer-transitions': Timer,
-  'ask-for-break': Hand,
-  'reduce-demand': SlidersHorizontal,
-};
+const BEHAVIOR_OPTIONS: Array<{ id: BehaviorId; label: string }> = [
+  { id: 'crying', label: 'Crying or whining' },
+  { id: 'yelling', label: 'Yelling or loud voice' },
+  { id: 'hitting', label: 'Hitting or kicking' },
+  { id: 'throwing', label: 'Throwing or breaking things' },
+  { id: 'leaving', label: 'Leaving or running' },
+  { id: 'dropping', label: 'Dropping to the floor' },
+  { id: 'repeating', label: 'Repeating a request' },
+  { id: 'refusal', label: 'Not beginning or refusing' },
+  { id: 'self-stim', label: 'Repetitive or self-stimulatory behavior' },
+  { id: 'other', label: 'Another observable behavior' },
+];
 
-function strategyNumber(id: string): number {
-  return AT_HOME_STRATEGIES.findIndex((s) => s.id === id) + 1;
-}
+const AFTER_OPTIONS: Array<{ id: AfterId; label: string }> = [
+  { id: 'task-ended', label: 'The task stopped or was delayed' },
+  { id: 'item-given', label: 'They received an item or activity' },
+  { id: 'attention-given', label: 'Someone responded, corrected, or comforted' },
+  { id: 'left-alone', label: 'They were left alone' },
+  { id: 'environment-changed', label: 'The environment changed' },
+  { id: 'task-continued', label: 'The task continued' },
+  { id: 'sensory-result', label: 'The behavior itself appeared to provide sensory input or relief' },
+  { id: 'nothing-changed', label: 'Nothing obvious changed' },
+];
+
+const STATUS_LABEL = {
+  'stronger-clue': 'Stronger clue',
+  possible: 'Possible',
+  unclear: 'Unclear',
+} as const;
 
 export default function AtHomeStrategiesPage() {
-  const [filter, setFilter] = useState<FilterValue>('all');
-  const [expanded, setExpanded] = useState<string | null>(null);
+  const [input, setInput] = useState<MatchInput>({ before: null, behavior: null, after: null });
+  const [showResults, setShowResults] = useState(false);
+  const [activeStrategy, setActiveStrategy] = useState<MatchedStrategy | null>(null);
+  const receiveRef = useRef<HTMLElement>(null);
 
-  const visible = useMemo(() => strategiesForSituation(filter), [filter]);
+  const complete = Boolean(input.before && input.behavior && input.after);
+  const result = useMemo(() => matchAtHomeStrategies(input), [input]);
 
-  useEffect(() => {
-    setExpanded(null);
-  }, [filter]);
+  function update<K extends keyof MatchInput>(key: K, value: MatchInput[K]) {
+    setInput((current) => ({ ...current, [key]: value }));
+    setShowResults(false);
+  }
 
-  const toggleStrategy = (id: string) => {
-    setExpanded((current) => (current === id ? null : id));
-  };
+  function revealResults() {
+    if (!complete) return;
+    setShowResults(true);
+    window.setTimeout(() => receiveRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
+  }
+
+  function clearActivity() {
+    setInput({ before: null, behavior: null, after: null });
+    setShowResults(false);
+    setActiveStrategy(null);
+  }
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-      {/* Breadcrumb */}
+    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
         <ol className="flex items-center gap-1.5">
-          <li>
-            <Link href="/support" className="hover:text-brand-navy-700">
-              Home
-            </Link>
-          </li>
-          <li aria-hidden>
-            <ChevronRight className="h-3 w-3" />
-          </li>
+          <li><Link href="/support" className="hover:text-brand-navy-700">Home</Link></li>
+          <li aria-hidden><ChevronRight className="h-3 w-3" /></li>
           <li className="font-medium text-brand-muted-700">{AT_HOME_STRATEGIES_LABEL}</li>
         </ol>
       </nav>
 
-      {/* Header */}
-      <header className="mt-3">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1 text-[11px] font-semibold text-brand-plum-700">
-              <HomeIcon className="h-3.5 w-3.5" /> {AT_HOME_STRATEGIES_LABEL}
-            </span>
-            <h1 className="mt-3 text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">
-              Ten things to try when the moment is hard.
-            </h1>
-            <p className="mt-2 text-[15px] leading-relaxed text-brand-muted-700">
-              Real ABA strategies, written in parent-friendly language. Each one is something you
-              can try in the next 60 seconds — not after months of training.
-            </p>
-          </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-brand-plum-200 bg-brand-plum-50/60 px-3 py-1.5 text-[11px] font-semibold text-brand-plum-700">
-            <Sparkles className="h-3.5 w-3.5" />
-            10 starter strategies
+      <header className="mt-4 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-2xl">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-brand-plum-200 bg-brand-plum-50 px-3 py-1 text-[11px] font-semibold text-brand-plum-700">
+            <Sparkles className="h-3.5 w-3.5" /> {AT_HOME_STRATEGIES_LABEL}
           </span>
-        </div>
-
-        <div className="mt-5 flex items-start gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/60 px-4 py-3">
-          <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
-          <p className="text-[13px] leading-relaxed text-amber-900">
-            These are starting points, not a treatment plan. If a behavior is unsafe, getting
-            worse, or doesn&rsquo;t respond to anything you try, bring it to your BCBA or care
-            team. Common Ground is parent support — it does not diagnose, treat, or replace
-            clinical care.
+          <h1 className="mt-3 text-3xl font-bold leading-tight text-brand-navy-700 sm:text-4xl">Understand the pattern. Choose a tool that fits.</h1>
+          <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-brand-muted-700">
+            Learn the four possible jobs of behavior, apply that lens to one moment, and receive four parent-friendly tools to explore.
           </p>
+        </div>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 lg:w-64">
+          <div className="flex items-start gap-3">
+            <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
+            <div>
+              <p className="text-sm font-bold text-emerald-900">Private practice mode</p>
+              <p className="mt-1 text-[12px] leading-relaxed text-emerald-800">Your choices stay on this page only. They are not saved to Home Base or a child profile.</p>
+              <button type="button" onClick={clearActivity} className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-800 underline-offset-2 hover:underline">
+                <RefreshCcw className="h-3.5 w-3.5" /> Clear this activity
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Situation filter */}
-      <section aria-label="Filter by situation" className="mt-8">
-        <h2 className="text-base font-bold text-brand-navy-700 sm:text-lg">
-          When are you using this?
-        </h2>
-        <p className="mt-0.5 text-[13px] text-brand-muted-600">
-          Pick the situation. We&rsquo;ll show the strategies that fit.
+      <div className="mt-7 grid gap-3 sm:grid-cols-3">
+        <StepBadge number="1" title="Learn" text="Understand TEAA" />
+        <StepBadge number="2" title="Apply" text="Look at one moment with ABC" />
+        <StepBadge number="3" title="Receive" text="See matched tools and why" />
+      </div>
+
+      <section aria-labelledby="learn-heading" className="mt-5 rounded-[1.5rem] border border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-white p-5 shadow-sm sm:p-6">
+        <SectionHeading number="1" label="Learn" title="The four possible functions of behavior — TEAA" id="learn-heading" />
+        <p className="mt-2 max-w-3xl text-[14px] leading-relaxed text-brand-muted-700">
+          The same behavior can happen for different reasons. TEAA gives you four lenses to consider. It does not give you a diagnosis or a confirmed function.
         </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {FILTER_ORDER.map((value) => {
-            const active = filter === value;
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {FUNCTIONS.map((item) => {
+            const Icon = item.icon;
             return (
-              <button
-                key={value}
-                type="button"
-                onClick={() => setFilter(value)}
-                aria-pressed={active}
-                className={cn(
-                  'rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors duration-200',
-                  active
-                    ? 'border-brand-navy-700 bg-brand-navy-700 text-white shadow-sm'
-                    : 'border-brand-plum-100 bg-brand-plum-50/80 text-brand-muted-700 hover:bg-brand-plum-100',
-                )}
-              >
-                {FILTER_LABEL[value]}
-              </button>
+              <article key={item.id} className={cn('rounded-2xl border p-4', item.className)}>
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/80 shadow-sm"><Icon className="h-5 w-5" /></span>
+                <h3 className="mt-3 text-base font-bold">{item.title}</h3>
+                <p className="text-[12px] font-semibold opacity-80">{item.short}</p>
+                <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-800">{item.description}</p>
+                <p className="mt-3 border-t border-current/15 pt-3 text-[11px] leading-relaxed opacity-80">{item.examples}</p>
+              </article>
             );
           })}
         </div>
-        <p className="mt-2 text-[12px] text-brand-muted-500">
-          Showing{' '}
-          <span className="font-semibold text-brand-muted-700">{visible.length}</span> of{' '}
-          {AT_HOME_STRATEGIES.length}
-        </p>
+        <div className="mt-4 flex items-start gap-2 rounded-xl border border-emerald-200 bg-white/75 px-4 py-3 text-[12px] leading-relaxed text-emerald-900">
+          <Eye className="mt-0.5 h-4 w-4 shrink-0" />
+          <p><strong>Think like a detective, not a judge.</strong> Ask what changed before and after instead of assigning motives to the child.</p>
+        </div>
       </section>
 
-      {/* Strategy card grid */}
-      <section
-        aria-label="Strategy list"
-        className="mt-6 grid items-start gap-4 sm:grid-cols-2"
-      >
-        {visible.map((strategy) => (
-          <StrategyCard
-            key={strategy.id}
-            strategy={strategy}
-            index={strategyNumber(strategy.id)}
-            isExpanded={expanded === strategy.id}
-            onToggle={() => toggleStrategy(strategy.id)}
-          />
-        ))}
-        {visible.length === 0 && (
-          <div className="col-span-full rounded-2xl border border-dashed border-surface-border bg-white p-6 text-center text-sm text-brand-muted-600">
-            No strategies match that situation yet. Try another filter or show all.
+      <section aria-labelledby="apply-heading" className="mt-5 rounded-[1.5rem] border border-sky-200 bg-gradient-to-br from-sky-50/80 to-white p-5 shadow-sm sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <SectionHeading number="2" label="Apply" title="Use ABC to examine one moment" id="apply-heading" />
+            <p className="mt-2 text-[14px] leading-relaxed text-brand-muted-700">Select what was most true. Do not include names or identifying details.</p>
           </div>
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-sky-200 bg-white px-3 py-1 text-[11px] font-semibold text-sky-800"><LockKeyhole className="h-3.5 w-3.5" /> Temporary activity</span>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          <ChoicePanel letter="A" title="Before" question="What happened immediately before?" options={BEFORE_OPTIONS} value={input.before} onSelect={(value) => update('before', value as BeforeId)} tone="sky" />
+          <ChoicePanel letter="B" title="Behavior" question="What could someone see or hear?" options={BEHAVIOR_OPTIONS} value={input.behavior} onSelect={(value) => update('behavior', value as BehaviorId)} tone="violet" />
+          <ChoicePanel letter="C" title="After" question="What happened immediately afterward?" options={AFTER_OPTIONS} value={input.after} onSelect={(value) => update('after', value as AfterId)} tone="emerald" />
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-sky-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2 text-[12px] leading-relaxed text-brand-muted-700">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-sky-700" />
+            <p>ABC organizes an observation. It does not prove why a behavior occurred.</p>
+          </div>
+          <button type="button" onClick={revealResults} disabled={!complete} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-brand-navy-700 px-5 py-2.5 text-[13px] font-semibold text-white transition hover:bg-brand-navy-800 disabled:cursor-not-allowed disabled:opacity-40">
+            See matched tools <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      </section>
+
+      <section ref={receiveRef} aria-labelledby="receive-heading" className={cn('mt-5 rounded-[1.5rem] border border-violet-200 bg-gradient-to-br from-violet-50/80 to-white p-5 shadow-sm transition sm:p-6', !showResults && 'opacity-70')}>
+        <SectionHeading number="3" label="Receive" title="See what may be worth noticing" id="receive-heading" />
+
+        {!showResults ? (
+          <div className="mt-5 rounded-2xl border border-dashed border-violet-200 bg-white/70 p-8 text-center">
+            <Gift className="mx-auto h-8 w-8 text-violet-500" />
+            <p className="mt-3 text-sm font-bold text-brand-navy-700">Complete A, B, and C to unlock this section.</p>
+            <p className="mt-1 text-[12px] text-brand-muted-600">You will receive four approved tools and an explanation of why each appeared.</p>
+          </div>
+        ) : (
+          <>
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/75 p-4">
+              <div className="flex items-start gap-2">
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                <div>
+                  <p className="text-[13px] font-bold text-amber-950">Pattern insight — not a diagnosis</p>
+                  <p className="mt-1 text-[12px] leading-relaxed text-amber-900">{result.summary}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {result.insights.map((insight) => (
+                <article key={insight.id} className="rounded-2xl border border-violet-100 bg-white p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-bold text-brand-navy-700">{insight.label}</h3>
+                    <span className={cn('rounded-full px-2 py-1 text-[10px] font-bold', insight.status === 'stronger-clue' ? 'bg-brand-navy-700 text-white' : insight.status === 'possible' ? 'bg-violet-100 text-violet-800' : 'bg-slate-100 text-slate-600')}>{STATUS_LABEL[insight.status]}</span>
+                  </div>
+                  <p className="mt-2 text-[11px] leading-relaxed text-brand-muted-600">{insight.explanation}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-6 flex items-end justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-bold text-brand-navy-700">Four tools to explore</h3>
+                <p className="mt-1 text-[12px] text-brand-muted-600">Selected from the approved At-Home Strategies library—not generated as a treatment plan.</p>
+              </div>
+            </div>
+
+            <div className="mt-3 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {result.strategies.map((match) => (
+                <button key={match.strategy.id} type="button" onClick={() => setActiveStrategy(match)} className="group rounded-2xl border border-violet-100 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-700"><BookOpen className="h-4 w-4" /></span>
+                  <h4 className="mt-3 text-sm font-bold text-brand-navy-700">{match.strategy.title}</h4>
+                  <p className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-violet-700">Why it appeared</p>
+                  <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">{match.why}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-[12px] font-semibold text-brand-navy-700">See how to use it <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" /></span>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-violet-200 bg-white p-5">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex max-w-xl items-start gap-3">
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700"><HeartHandshake className="h-5 w-5" /></span>
+                  <div>
+                    <h3 className="text-base font-bold text-brand-navy-700">Bring the observation to your BCBA</h3>
+                    <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">Share what happened before, what the behavior looked like, what followed, and which strategies you are considering.</p>
+                  </div>
+                </div>
+                <div className="grid gap-2 text-[12px] text-brand-muted-700 sm:grid-cols-3">
+                  {['What you noticed', 'What you tried', 'What you want to ask'].map((item) => <span key={item} className="inline-flex items-center gap-1.5"><Check className="h-4 w-4 text-emerald-600" />{item}</span>)}
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </section>
 
-      {/* Bottom callout */}
-      <footer className="mt-9 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/50 px-5 py-5 sm:px-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-3">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-plum-100 text-brand-plum-700">
-              <Heart className="h-5 w-5" />
-            </span>
+      <section className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50/70 p-5">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-rose-700" />
             <div>
-              <h2 className="text-lg font-bold text-brand-navy-700">
-                These ten are a starting library.
-              </h2>
-              <p className="mt-1 text-[14px] leading-relaxed text-brand-muted-700">
-                Your BCBA can help you choose which ones fit your child best — and add more that
-                are specific to your family&rsquo;s routines.
-              </p>
+              <h2 className="text-base font-bold text-rose-950">Someone may be unsafe?</h2>
+              <p className="mt-1 text-[12px] leading-relaxed text-rose-900">Focus on immediate safety and the established crisis or safety plan—not testing a new strategy or trying to determine function in the moment.</p>
+              <Link href="/support/crisis" className="mt-3 inline-flex items-center gap-1.5 text-[12px] font-bold text-rose-800 hover:underline">Get crisis support <ArrowRight className="h-3.5 w-3.5" /></Link>
             </div>
           </div>
-          <div className="flex shrink-0 flex-wrap gap-2.5">
-            <Link
-              href="/support/care-plan"
-              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-[13px] font-semibold text-white shadow-soft transition hover:bg-primary/90"
-            >
-              See my care plan <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-            <Link
-              href="/support/connect"
-              className="inline-flex items-center gap-2 rounded-2xl border border-brand-plum-300 bg-white px-4 py-2.5 text-[13px] font-semibold text-brand-plum-700 transition hover:bg-brand-plum-100"
-            >
-              <Users className="h-4 w-4" /> Talk to other parents
-            </Link>
+        </div>
+        <div className="rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 p-5">
+          <div className="flex items-start gap-3">
+            <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-brand-plum-700" />
+            <div>
+              <h2 className="text-base font-bold text-brand-navy-700">Common Ground supports the conversation</h2>
+              <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-700">This activity helps caregivers notice useful details. A BCBA can assess the pattern, consider the full context, and individualize treatment.</p>
+            </div>
           </div>
         </div>
-        <p className="mt-4 text-[11px] text-brand-muted-500">
-          Saved nowhere. Read privately. Common Ground is parent support, not clinical care.
-        </p>
-      </footer>
+      </section>
+
+      {activeStrategy && <StrategyDialog match={activeStrategy} onClose={() => setActiveStrategy(null)} />}
     </main>
   );
 }
 
-/* ── Collapsible reveal (reuses toolbox animation from globals.css) ── */
-
-function CollapsibleReveal({
-  open,
-  children,
-}: {
-  open: boolean;
-  children: React.ReactNode;
-}) {
+function StepBadge({ number, title, text }: { number: string; title: string; text: string }) {
   return (
-    <div className="toolbox-reveal" data-open={open ? 'true' : 'false'}>
-      <div className="toolbox-reveal-inner">
-        <div className="toolbox-reveal-content">{children}</div>
-      </div>
+    <div className="flex items-center gap-3 rounded-2xl border border-surface-border bg-white px-4 py-3 shadow-sm">
+      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-navy-700 text-sm font-bold text-white">{number}</span>
+      <div><p className="text-sm font-bold text-brand-navy-700">{title}</p><p className="text-[11px] text-brand-muted-600">{text}</p></div>
     </div>
   );
 }
 
-/* ── Strategy Card ─────────────────────────────────────────────────── */
-
-function StrategyCard({
-  strategy,
-  index,
-  isExpanded,
-  onToggle,
-}: {
-  strategy: AtHomeStrategy;
-  index: number;
-  isExpanded: boolean;
-  onToggle: () => void;
-}) {
-  const Icon = STRATEGY_ICONS[strategy.id] ?? Lightbulb;
-
+function SectionHeading({ number, label, title, id }: { number: string; label: string; title: string; id: string }) {
   return (
-    <article
-      className={cn(
-        'self-start rounded-2xl border bg-white shadow-soft transition-colors duration-200 ease-out',
-        isExpanded
-          ? 'border-brand-plum-300 bg-brand-plum-50/30 ring-1 ring-brand-plum-200/60'
-          : 'border-surface-border hover:border-brand-plum-100',
-      )}
-    >
-      <div className="flex flex-1 flex-col p-5">
-        <div className="flex items-start gap-3">
-          <span
-            aria-hidden
-            className={cn(
-              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold transition-colors duration-200',
-              isExpanded
-                ? 'bg-brand-plum-200 text-brand-plum-900'
-                : 'bg-brand-plum-100 text-brand-plum-800',
-            )}
-          >
-            {index}
-          </span>
-          <span
-            className={cn(
-              'inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors duration-200',
-              isExpanded
-                ? 'bg-brand-plum-100 text-brand-plum-800'
-                : 'bg-brand-plum-50 text-brand-plum-700',
-            )}
-          >
-            <Icon className="h-6 w-6" aria-hidden />
-          </span>
-        </div>
+    <div className="flex items-center gap-3">
+      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-brand-navy-700 shadow-sm">{number}</span>
+      <div><p className="text-[11px] font-bold uppercase tracking-[0.15em] text-primary">{label}</p><h2 id={id} className="text-lg font-bold text-brand-navy-700 sm:text-xl">{title}</h2></div>
+    </div>
+  );
+}
 
-        <div className="mt-3 min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3
-              className={cn(
-                'text-[15px] font-semibold leading-snug',
-                isExpanded ? 'text-brand-plum-900' : 'text-brand-navy-700',
-              )}
-            >
-              {strategy.title}
-            </h3>
-            <span className="rounded-full border border-surface-border bg-surface-subtle px-2 py-0.5 text-[9.5px] font-semibold uppercase tracking-wide text-brand-muted-600">
-              {strategy.abaConcept}
-            </span>
-          </div>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-brand-muted-600">
-            {strategy.tagline}
-          </p>
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {strategy.bestFor.map((s) => (
-              <span
-                key={s}
-                className="rounded-full bg-brand-plum-50 px-2 py-0.5 text-[10px] font-semibold text-brand-plum-700"
-              >
-                {SITUATION_LABELS[s]}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={isExpanded}
-          aria-controls={`strategy-${strategy.id}-body`}
-          className={cn(
-            'mt-4 inline-flex items-center gap-1 self-start text-[13px] font-semibold transition-colors duration-200',
-            isExpanded
-              ? 'text-brand-plum-800 hover:text-brand-plum-900'
-              : 'text-primary hover:text-primary/80',
-          )}
-        >
-          {isExpanded ? 'Close' : 'Open strategy'}
-          <ArrowRight
-            className={cn(
-              'h-3.5 w-3.5 transition-transform duration-200',
-              isExpanded && 'rotate-90',
-            )}
-          />
-        </button>
+function ChoicePanel({ letter, title, question, options, value, onSelect, tone }: { letter: string; title: string; question: string; options: Array<{ id: string; label: string }>; value: string | null; onSelect: (value: string) => void; tone: 'sky' | 'violet' | 'emerald' }) {
+  const toneClass = tone === 'sky' ? 'bg-sky-100 text-sky-800' : tone === 'violet' ? 'bg-violet-100 text-violet-800' : 'bg-emerald-100 text-emerald-800';
+  return (
+    <fieldset className="rounded-2xl border border-surface-border bg-white p-4">
+      <legend className="sr-only">{title}: {question}</legend>
+      <div className="flex items-start gap-3">
+        <span className={cn('inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold', toneClass)}>{letter}</span>
+        <div><h3 className="text-sm font-bold text-brand-navy-700">{title}</h3><p className="text-[11px] text-brand-muted-600">{question}</p></div>
       </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {options.map((option) => {
+          const active = value === option.id;
+          return <button key={option.id} type="button" onClick={() => onSelect(option.id)} aria-pressed={active} className={cn('rounded-full border px-3 py-2 text-left text-[11px] font-semibold transition', active ? 'border-brand-navy-700 bg-brand-navy-700 text-white shadow-sm' : 'border-surface-border bg-slate-50 text-brand-muted-700 hover:border-brand-plum-200 hover:bg-brand-plum-50')}>{option.label}</button>;
+        })}
+      </div>
+    </fieldset>
+  );
+}
 
-      <CollapsibleReveal open={isExpanded}>
-        <div
-          id={`strategy-${strategy.id}-body`}
-          className="border-t border-brand-plum-100/80 px-5 pb-5 pt-4"
-        >
-          <p className="text-[13.5px] leading-relaxed text-brand-muted-800">
-            {strategy.explanation}
-          </p>
-
-          <section className="mt-4">
-            <h4 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-600">
-              <Lightbulb className="h-3.5 w-3.5 text-brand-plum-600" /> Try saying
-            </h4>
-            <ul className="mt-2 space-y-1.5">
-              {strategy.examples.map((ex) => (
-                <li
-                  key={ex}
-                  className="rounded-xl border border-brand-plum-100 bg-white px-3.5 py-2 text-[13px] text-brand-muted-800"
-                >
-                  {ex}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-4">
-            <h4 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-muted-600">
-              <ListChecks className="h-3.5 w-3.5 text-emerald-600" /> How to try it
-            </h4>
-            <ol className="mt-2 space-y-1.5">
-              {strategy.howTo.map((step, i) => (
-                <li key={step} className="flex gap-2 text-[13px] text-brand-muted-800">
-                  <span
-                    aria-hidden
-                    className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-semibold text-emerald-800"
-                  >
-                    {i + 1}
-                  </span>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          <section className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200/80 bg-amber-50/60 p-3.5">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden />
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-800">
-                Common mistake
-              </p>
-              <p className="mt-1 text-[13px] leading-relaxed text-amber-900">
-                {strategy.commonMistake}
-              </p>
-            </div>
-          </section>
-
-          <button
-            type="button"
-            onClick={onToggle}
-            className="mt-4 text-[12px] font-semibold text-brand-muted-500 transition-colors hover:text-brand-navy-700"
-          >
-            Close
-          </button>
+function StrategyDialog({ match, onClose }: { match: MatchedStrategy; onClose: () => void }) {
+  const { strategy } = match;
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand-navy-950/40 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="strategy-dialog-title" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+      <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-[1.5rem] bg-white p-5 shadow-2xl sm:rounded-[1.5rem] sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <div><p className="text-[11px] font-bold uppercase tracking-[0.14em] text-violet-700">{strategy.abaConcept}</p><h2 id="strategy-dialog-title" className="mt-1 text-2xl font-bold text-brand-navy-700">{strategy.title}</h2><p className="mt-2 text-sm leading-relaxed text-brand-muted-700">{strategy.explanation}</p></div>
+          <button type="button" onClick={onClose} aria-label="Close strategy" className="rounded-full border border-surface-border p-2 text-brand-muted-600 hover:bg-slate-50"><X className="h-4 w-4" /></button>
         </div>
-      </CollapsibleReveal>
-    </article>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-violet-100 bg-violet-50/60 p-4"><h3 className="text-sm font-bold text-brand-navy-700">Why it appeared</h3><p className="mt-2 text-[12px] leading-relaxed text-brand-muted-700">{match.why}</p></div>
+          <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-4"><h3 className="text-sm font-bold text-brand-navy-700">When to use it</h3><p className="mt-2 text-[12px] leading-relaxed text-brand-muted-700">{match.when}</p></div>
+        </div>
+        <div className="mt-5"><h3 className="text-sm font-bold text-brand-navy-700">How to try it</h3><ol className="mt-3 space-y-2">{strategy.howTo.map((step, index) => <li key={step} className="flex gap-3 text-[13px] leading-relaxed text-brand-muted-700"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-plum-50 text-[11px] font-bold text-brand-plum-700">{index + 1}</span>{step}</li>)}</ol></div>
+        <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50/70 p-4"><div className="flex items-start gap-2"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" /><div><h3 className="text-sm font-bold text-amber-950">Common way this can miss</h3><p className="mt-1 text-[12px] leading-relaxed text-amber-900">{strategy.commonMistake}</p></div></div></div>
+        <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4"><h3 className="text-sm font-bold text-emerald-950">Ask your BCBA</h3><p className="mt-1 text-[12px] leading-relaxed text-emerald-900">“{match.askYourBcba}”</p></div>
+        <button type="button" onClick={onClose} className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-brand-navy-700 px-5 text-sm font-semibold text-white hover:bg-brand-navy-800">Done</button>
+      </div>
+    </div>
   );
 }
