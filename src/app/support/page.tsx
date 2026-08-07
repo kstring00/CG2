@@ -1,5 +1,5 @@
-import HomeBaseV22 from '@/components/homeBase/HomeBaseV22';
+import HomeSupportHub from '@/components/home/HomeSupportHub';
 
 export default function SupportHome() {
-  return <HomeBaseV22 />;
+  return <HomeSupportHub />;
 }
