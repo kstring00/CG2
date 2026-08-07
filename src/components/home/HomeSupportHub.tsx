@@ -3,27 +3,24 @@
 import Link from 'next/link';
 import {
   ArrowRight,
-  BatteryLow,
   BookOpen,
   Compass,
   ExternalLink,
-  Flower2,
   Heart,
   Home,
   Laptop,
+  Lock,
   MapPin,
   MessagesSquare,
-  NotebookPen,
-  Phone,
-  Wind,
+  ShieldCheck,
+  Signpost,
+  Toolbox,
+  UsersRound,
   Wrench,
 } from 'lucide-react';
-import { AT_HOME_STRATEGIES_LABEL } from '@/lib/supportNavLabels';
 import { cn } from '@/lib/utils';
 import { sensoryFriendlyPlaces } from '@/lib/data';
 import { verifiedProviders } from '@/lib/providers';
-
-const CREAM = '#f4efe8';
 
 function SectionHeading({
   title,
@@ -77,43 +74,34 @@ function SupportTile({
   );
 }
 
-function FeatureCard({
+function BenefitCard({
+  icon: Icon,
   title,
-  purpose,
-  ctaLabel,
-  ctaHref,
-  children,
+  description,
+  iconClassName,
+  iconWrapClassName,
 }: {
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
-  purpose: string;
-  ctaLabel: string;
-  ctaHref: string;
-  children: React.ReactNode;
+  description: string;
+  iconClassName: string;
+  iconWrapClassName: string;
 }) {
   return (
-    <article className="flex h-full flex-col rounded-3xl border border-stone-200/80 bg-white p-6 shadow-soft transition duration-200 hover:shadow-card-hover sm:p-7">
-      <h3 className="text-xl font-bold text-primary">{title}</h3>
-      <p className="mt-1.5 text-[13.5px] leading-relaxed text-stone-500">{purpose}</p>
-      <div className="mt-5 flex-1">{children}</div>
-      <Link
-        href={ctaHref}
-        className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+    <article className="flex items-start gap-5 rounded-3xl border border-white/80 bg-white/95 p-6 shadow-soft backdrop-blur-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover sm:p-7">
+      <span
+        className={cn(
+          'inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border',
+          iconWrapClassName,
+        )}
       >
-        {ctaLabel} <ArrowRight className="h-4 w-4" aria-hidden />
-      </Link>
+        <Icon className={cn('h-7 w-7', iconClassName)} aria-hidden />
+      </span>
+      <div className="pt-1">
+        <h3 className="text-lg font-bold text-primary">{title}</h3>
+        <p className="mt-2 text-[14px] leading-relaxed text-stone-600">{description}</p>
+      </div>
     </article>
-  );
-}
-
-function ChipRow({ chips }: { chips: string[] }) {
-  return (
-    <div className="flex flex-wrap gap-1.5" aria-hidden>
-      {chips.map((chip) => (
-        <span key={chip} className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-1 text-[11px] font-semibold text-stone-600">
-          {chip}
-        </span>
-      ))}
-    </div>
   );
 }
 
@@ -126,25 +114,35 @@ const NEED_TILES = [
   { href: '/support/resources', icon: Wrench, label: 'I need practical resources', description: 'Guides matched to your needs.' },
 ] as const;
 
-const NEXT_STEPS = [
-  'Understand where you are',
-  'Find local providers',
-  'Build your next step',
-  'Get connected with support',
-] as const;
-
-const AT_HOME_ROWS = [
-  { icon: Home, title: 'Visual morning routines', tag: 'Routines' },
-  { icon: MessagesSquare, title: 'First–then language', tag: 'Communication' },
-  { icon: Wind, title: '5-minute sensory resets', tag: 'Sensory Breaks' },
-] as const;
-
-const TOOLBOX_LINKS = [
-  { href: '/support/hard-days', icon: Wind, label: 'Grounding tools' },
-  { href: '/calm', icon: Flower2, label: 'Overwhelm reset' },
-  { href: '/support/caregiver', icon: NotebookPen, label: 'Caregiver reflection' },
-  { href: 'tel:988', icon: Phone, label: 'Crisis support' },
-  { href: '/support/check-in', icon: BatteryLow, label: 'Burnout check' },
+const BENEFITS = [
+  {
+    icon: UsersRound,
+    title: 'Built for parents',
+    description: 'Parent-friendly guidance designed for the people carrying care into daily life.',
+    iconClassName: 'text-teal-600',
+    iconWrapClassName: 'border-teal-100 bg-teal-50',
+  },
+  {
+    icon: Signpost,
+    title: 'Clear next steps',
+    description: 'Turn uncertainty into practical direction with support matched to your family’s needs.',
+    iconClassName: 'text-violet-600',
+    iconWrapClassName: 'border-violet-100 bg-violet-50',
+  },
+  {
+    icon: Toolbox,
+    title: 'Helpful tools at home',
+    description: 'Explore routines, communication tools, caregiver support, and printable resources when needed.',
+    iconClassName: 'text-amber-600',
+    iconWrapClassName: 'border-amber-100 bg-amber-50',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Confidence for families',
+    description: 'Leave with more clarity, better questions, and a stronger sense of what to do next.',
+    iconClassName: 'text-rose-500',
+    iconWrapClassName: 'border-rose-100 bg-rose-50',
+  },
 ] as const;
 
 function shortLocation(location: string): string {
@@ -258,48 +256,36 @@ export default function HomeSupportHub() {
         </div>
       </section>
 
-      <section aria-label="Main features" className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: CREAM }}>
-        <div className="mx-auto max-w-6xl">
-          <div className="grid gap-6 lg:grid-cols-3">
-            <FeatureCard title="Find My Next Step" purpose="A guided roadmap that meets you exactly where you are." ctaLabel="Start My Next Step" ctaHref="/support/intake">
-              <ChipRow chips={['Newly Diagnosed', 'In Services', 'Exploring Options']} />
-              <ol className="mt-5 space-y-0">
-                {NEXT_STEPS.map((step, index) => (
-                  <li key={step} className="relative flex items-start gap-3 pb-4 last:pb-0">
-                    {index < NEXT_STEPS.length - 1 && <span className="absolute left-[13px] top-7 h-[calc(100%-1.5rem)] w-px bg-stone-200" aria-hidden />}
-                    <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-amber-300 bg-amber-50 text-[11px] font-bold text-amber-700">{index + 1}</span>
-                    <span className="pt-1 text-[13.5px] font-medium text-stone-700">{step}</span>
-                  </li>
-                ))}
-              </ol>
-              <div className="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2.5">
-                <div className="flex items-center justify-between text-[11px] font-semibold text-stone-500"><span>Your pathway</span><span>Step 1 of 4</span></div>
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-stone-200" role="presentation"><div className="h-full w-1/4 rounded-full bg-amber-500" /></div>
-              </div>
-            </FeatureCard>
+      <section
+        aria-labelledby="common-ground-benefits"
+        className="relative overflow-hidden px-6 py-16 sm:px-8 sm:py-20"
+        style={{
+          background:
+            'radial-gradient(circle at 0% 15%, rgba(153, 246, 228, 0.34), transparent 35%), radial-gradient(circle at 100% 85%, rgba(233, 213, 255, 0.5), transparent 37%), linear-gradient(110deg, #effcf9 0%, #f3f8fb 52%, #f7f2ff 100%)',
+        }}
+      >
+        <div className="mx-auto max-w-5xl">
+          <div className="text-center">
+            <span className="inline-flex rounded-full border border-teal-100 bg-teal-50/90 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-teal-700 shadow-sm">
+              For parents &amp; families
+            </span>
+            <h2 id="common-ground-benefits" className="mt-4 text-3xl font-bold tracking-tight text-primary sm:text-[2.25rem]">
+              Support that reaches beyond the clinic
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed text-stone-600 sm:text-base">
+              Common Ground is built for parents and caregivers—helping families feel informed, supported, and more prepared for everyday life at home.
+            </p>
+          </div>
 
-            <FeatureCard title={AT_HOME_STRATEGIES_LABEL} purpose="A clean parent toolbox of practical, real-life tools." ctaLabel="Browse Strategies" ctaHref="/support/at-home">
-              <ChipRow chips={['Routines', 'Communication', 'Transitions', 'Sensory Breaks', 'Behavior Support']} />
-              <ul className="mt-5 space-y-2.5">
-                {AT_HOME_ROWS.map(({ icon: Icon, title, tag }) => (
-                  <li key={title} className="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/70 px-3.5 py-3">
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-200/70 bg-white text-amber-600"><Icon className="h-3.5 w-3.5" aria-hidden /></span>
-                    <span className="min-w-0 flex-1 text-[13.5px] font-medium text-stone-700">{title}</span>
-                    <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-stone-500 ring-1 ring-stone-200">{tag}</span>
-                  </li>
-                ))}
-              </ul>
-            </FeatureCard>
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {BENEFITS.map((benefit) => (
+              <BenefitCard key={benefit.title} {...benefit} />
+            ))}
+          </div>
 
-            <FeatureCard title="Mental Health Toolbox" purpose="Calm, practical support for you — the caregiver." ctaLabel="Open Toolbox" ctaHref="/support/caregiver">
-              <ul className="space-y-2">
-                {TOOLBOX_LINKS.map(({ href, icon: Icon, label }) => {
-                  const content = <><span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-200/70 bg-amber-50/60 text-amber-600"><Icon className="h-3.5 w-3.5" aria-hidden /></span><span className="min-w-0 flex-1 text-[13.5px] font-medium text-stone-700">{label}</span><ArrowRight className="h-3.5 w-3.5 shrink-0 text-stone-300" aria-hidden /></>;
-                  const className = 'group flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/70 px-3.5 py-2.5 transition hover:border-amber-200 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
-                  return <li key={label}>{href.startsWith('tel:') ? <a href={href} aria-label={`${label} — call or text 988`} className={className}>{content}</a> : <Link href={href} aria-label={label} className={className}>{content}</Link>}</li>;
-                })}
-              </ul>
-            </FeatureCard>
+          <div className="mx-auto mt-8 flex max-w-3xl items-center justify-center gap-2 rounded-full border border-violet-200/70 bg-white/55 px-5 py-3 text-center text-[12.5px] font-medium text-primary/80 shadow-sm backdrop-blur-sm sm:text-sm">
+            <Lock className="h-4 w-4 shrink-0" aria-hidden />
+            <span>Private by design <span className="mx-2 text-primary/35">•</span> Built to support caregivers with practical, easy-to-use guidance</span>
           </div>
         </div>
       </section>
