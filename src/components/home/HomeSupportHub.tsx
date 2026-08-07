@@ -14,7 +14,6 @@ import {
   MessagesSquare,
   ShieldCheck,
   Signpost,
-  Toolbox,
   UsersRound,
   Wrench,
 } from 'lucide-react';
@@ -130,7 +129,7 @@ const BENEFITS = [
     iconWrapClassName: 'border-violet-100 bg-violet-50',
   },
   {
-    icon: Toolbox,
+    icon: Wrench,
     title: 'Helpful tools at home',
     description: 'Explore routines, communication tools, caregiver support, and printable resources when needed.',
     iconClassName: 'text-amber-600',
