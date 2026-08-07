@@ -170,10 +170,10 @@ const PROVIDER_CARDS = buildProviderCards();
 
 function ProviderCard({ category, name, location, href }: ProviderCardData) {
   return (
-    <div className="rounded-2xl border border-stone-200/80 bg-white p-4 shadow-soft transition duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-card">
-      <p className="text-[10.5px] font-bold uppercase tracking-wide text-amber-700">{category}</p>
-      <p className="mt-1 text-[14px] font-semibold leading-snug text-primary">{name}</p>
-      <div className="mt-1.5 flex items-center justify-between gap-2">
+    <div className="rounded-3xl border border-stone-200/80 bg-white p-5 shadow-[0_14px_36px_rgba(25,48,82,0.08)] transition duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:shadow-[0_18px_44px_rgba(25,48,82,0.12)]">
+      <p className="text-[10.5px] font-bold uppercase tracking-[0.08em] text-amber-700">{category}</p>
+      <p className="mt-1.5 text-[15px] font-semibold leading-snug text-primary">{name}</p>
+      <div className="mt-2 flex items-center justify-between gap-3">
         <span className="inline-flex items-center gap-1 text-[12px] text-stone-500">
           <MapPin className="h-3 w-3" aria-hidden /> {location}
         </span>
@@ -187,91 +187,91 @@ function ProviderCard({ category, name, location, href }: ProviderCardData) {
   );
 }
 
-const MAP_PINS: { label: string; top: string; left: string; major?: boolean }[] = [
-  { label: 'Houston', top: '42%', left: '57%', major: true },
-  { label: 'Katy', top: '30%', left: '18%' },
-  { label: 'Sugar Land', top: '66%', left: '31%' },
-  { label: 'Pearland', top: '72%', left: '61%' },
-];
+const TEXAS_LOCATIONS = [
+  { label: 'Plano', top: '20%', left: '72%', tone: 'navy' },
+  { label: 'Cedar Hill', top: '31%', left: '68%', tone: 'violet' },
+  { label: 'Austin', top: '53%', left: '53%', tone: 'teal' },
+  { label: 'Katy', top: '58%', left: '79%', tone: 'amber' },
+  { label: 'Pearland', top: '69%', left: '72%', tone: 'navy' },
+  { label: 'Sugar Land', top: '76%', left: '63%', tone: 'violet' },
+] as const;
 
-function HoustonMap() {
+function TexasMap() {
   return (
     <Link
       href="/support/find"
-      aria-label="Explore the greater Houston local help directory"
-      className="group relative block min-h-[390px] w-full overflow-hidden rounded-[2rem] border border-slate-200/90 bg-[#f8faf9] shadow-[0_24px_70px_rgba(20,42,73,0.13)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_30px_85px_rgba(20,42,73,0.17)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+      aria-label="Explore Texas ABA Centers support locations across Texas"
+      className="group relative block min-h-[470px] w-full overflow-hidden rounded-[2rem] border border-slate-200/90 bg-[#f8faf7] shadow-[0_26px_75px_rgba(20,42,73,0.14)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_34px_90px_rgba(20,42,73,0.18)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
     >
-      <svg viewBox="0 0 620 430" className="absolute inset-0 h-full w-full" aria-hidden focusable="false">
+      <svg viewBox="0 0 760 520" className="absolute inset-0 h-full w-full" aria-hidden focusable="false">
         <defs>
-          <linearGradient id="mapBase" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id="texasMapBase" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#fbfaf5" />
-            <stop offset="100%" stopColor="#f1f6f5" />
+            <stop offset="100%" stopColor="#eef6f2" />
           </linearGradient>
-          <linearGradient id="water" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#d7eef5" />
-            <stop offset="100%" stopColor="#b9dce8" />
+          <linearGradient id="texasWater" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#dff2f7" />
+            <stop offset="100%" stopColor="#b9deea" />
           </linearGradient>
-          <filter id="pinShadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#10284a" floodOpacity="0.25" />
+          <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="18" />
           </filter>
         </defs>
-        <rect width="620" height="430" fill="url(#mapBase)" />
-
-        <path d="M-30 282 C 90 220, 185 340, 300 282 S 500 184, 665 224" fill="none" stroke="url(#water)" strokeWidth="22" strokeLinecap="round" opacity="0.95" />
-        <path d="M-10 292 C 110 238, 192 350, 305 292 S 500 200, 650 238" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" opacity="0.55" />
-
-        <path d="M30 102 C 154 93, 280 100, 590 93" fill="none" stroke="#d9dee3" strokeWidth="7" strokeLinecap="round" />
-        <path d="M35 102 C 160 95, 286 101, 585 95" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-        <path d="M126 -30 C 210 72, 310 170, 430 458" fill="none" stroke="#d9dee3" strokeWidth="7" strokeLinecap="round" />
-        <path d="M128 -25 C 212 75, 310 171, 428 450" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-        <path d="M485 -20 C 424 90, 420 225, 388 455" fill="none" stroke="#d9dee3" strokeWidth="7" strokeLinecap="round" />
-        <path d="M485 -15 C 428 92, 423 228, 391 448" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" />
-        <path d="M-15 365 C 180 330, 385 362, 650 312" fill="none" stroke="#e1e5e8" strokeWidth="6" strokeLinecap="round" />
-        <path d="M-10 365 C 190 333, 392 363, 645 314" fill="none" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
-
-        <ellipse cx="352" cy="185" rx="135" ry="105" fill="none" stroke="#b9c7d2" strokeWidth="4" strokeDasharray="11 10" opacity="0.8" />
-        <ellipse cx="352" cy="185" rx="94" ry="74" fill="none" stroke="#d3dbe2" strokeWidth="3" opacity="0.7" />
-        <circle cx="352" cy="185" r="49" fill="#f9dca3" opacity="0.43" />
-
-        <g fill="#9aa7b2" fontFamily="sans-serif" fontSize="12" fontWeight="600" opacity="0.8">
-          <text x="65" y="88">I-10</text>
-          <text x="214" y="204">US-59</text>
-          <text x="438" y="147">I-45</text>
-          <text x="458" y="336">Beltway 8</text>
-          <text x="272" y="76">Spring Branch</text>
-          <text x="466" y="245">East End</text>
-          <text x="286" y="320">Missouri City</text>
+        <rect width="760" height="520" fill="url(#texasMapBase)" />
+        <circle cx="620" cy="390" r="180" fill="#d8eef5" opacity="0.55" filter="url(#softGlow)" />
+        <path d="M548 518 C 585 453 600 399 592 351 C 640 346 692 366 760 414 L760 520 Z" fill="url(#texasWater)" opacity="0.95" />
+        <path d="M188 68 L522 68 L524 103 L625 120 L642 225 L694 282 L664 359 L617 385 L587 469 L516 484 L482 446 L393 438 L348 375 L273 353 L230 290 L166 263 L132 188 L160 125 Z" fill="#fbfaf3" stroke="#cbd7d2" strokeWidth="4" />
+        <path d="M167 128 C 266 156, 366 153, 533 118" fill="none" stroke="#e7cfab" strokeWidth="2" opacity="0.75" />
+        <path d="M204 220 C 312 194, 430 216, 626 291" fill="none" stroke="#e7cfab" strokeWidth="2" opacity="0.72" />
+        <path d="M308 350 C 392 324, 486 332, 620 385" fill="none" stroke="#e7cfab" strokeWidth="2" opacity="0.7" />
+        <path d="M438 76 C 420 173, 441 276, 500 458" fill="none" stroke="#d9e2de" strokeWidth="5" opacity="0.85" />
+        <path d="M322 142 C 365 235, 418 314, 505 435" fill="none" stroke="#d9e2de" strokeWidth="5" opacity="0.8" />
+        <path d="M545 128 C 519 232, 537 326, 589 429" fill="none" stroke="#d9e2de" strokeWidth="5" opacity="0.8" />
+        <path d="M181 278 C 302 286, 437 281, 638 257" fill="none" stroke="#e4e9e6" strokeWidth="4" />
+        <g fill="#a4b1ad" opacity="0.55">
+          <circle cx="246" cy="118" r="4" /><circle cx="295" cy="163" r="4" /><circle cx="369" cy="128" r="4" />
+          <circle cx="462" cy="164" r="4" /><circle cx="552" cy="185" r="4" /><circle cx="584" cy="247" r="4" />
+          <circle cx="257" cy="305" r="4" /><circle cx="349" cy="291" r="4" /><circle cx="440" cy="367" r="4" />
         </g>
       </svg>
 
-      <div className="absolute left-5 top-5 rounded-2xl border border-white/80 bg-white/90 px-4 py-3 shadow-lg backdrop-blur-md">
-        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-teal-700">Greater Houston</p>
-        <p className="mt-1 text-sm font-semibold text-primary">Local support directory</p>
-        <p className="mt-0.5 text-[11px] text-stone-500">Verified resources across the metro area</p>
+      <div className="absolute left-5 top-5 rounded-2xl border border-white/80 bg-white/92 px-5 py-4 shadow-xl backdrop-blur-md">
+        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-teal-700">Statewide Texas</p>
+        <p className="mt-1 text-base font-semibold text-primary">Local support directory</p>
+        <p className="mt-1 text-[11px] text-stone-500">Verified resources across Texas</p>
       </div>
 
       <div className="absolute right-4 top-4 flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white/95 text-primary shadow-md" aria-hidden>
-        <span className="flex h-9 w-9 items-center justify-center border-b border-stone-200 text-lg font-semibold">+</span>
-        <span className="flex h-9 w-9 items-center justify-center text-lg font-semibold">−</span>
+        <span className="flex h-10 w-10 items-center justify-center border-b border-stone-200 text-lg font-semibold">+</span>
+        <span className="flex h-10 w-10 items-center justify-center text-lg font-semibold">−</span>
       </div>
 
-      {MAP_PINS.map((pin) => (
-        <span key={pin.label} className="absolute flex -translate-x-1/2 -translate-y-full flex-col items-center" style={{ top: pin.top, left: pin.left }} aria-hidden>
-          <span className={cn('inline-flex items-center justify-center rounded-full border-4 border-white shadow-lg', pin.major ? 'h-12 w-12 bg-amber-500 text-white' : 'h-9 w-9 bg-primary text-white')}>
-            <MapPin className={pin.major ? 'h-6 w-6' : 'h-4 w-4'} fill="currentColor" />
+      {TEXAS_LOCATIONS.map((pin) => {
+        const toneClass = pin.tone === 'amber'
+          ? 'bg-amber-500'
+          : pin.tone === 'teal'
+            ? 'bg-teal-600'
+            : pin.tone === 'violet'
+              ? 'bg-violet-500'
+              : 'bg-primary';
+        return (
+          <span key={pin.label} className="absolute flex -translate-x-1/2 -translate-y-full flex-col items-center" style={{ top: pin.top, left: pin.left }} aria-hidden>
+            <span className={cn('inline-flex h-10 w-10 items-center justify-center rounded-full border-4 border-white text-white shadow-lg', toneClass)}>
+              <MapPin className="h-5 w-5" fill="currentColor" />
+            </span>
+            <span className="mt-1 whitespace-nowrap rounded-full border border-stone-200 bg-white/95 px-3 py-1 text-[10px] font-semibold text-primary shadow-md backdrop-blur-sm">
+              {pin.label}
+            </span>
           </span>
-          <span className={cn('mt-1 whitespace-nowrap rounded-full border bg-white/95 px-2.5 py-1 font-semibold text-primary shadow-md backdrop-blur-sm', pin.major ? 'border-amber-200 text-[11px]' : 'border-stone-200 text-[10px]')}>
-            {pin.label}
-          </span>
-        </span>
-      ))}
+        );
+      })}
 
-      <div className="absolute bottom-5 left-5 rounded-xl border border-white/80 bg-white/90 px-3.5 py-2 shadow-md backdrop-blur-md">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-stone-500">Coverage</p>
-        <p className="mt-0.5 text-xs font-semibold text-primary">Houston • Katy • Sugar Land • Pearland</p>
+      <div className="absolute bottom-5 left-5 max-w-[70%] rounded-2xl border border-white/80 bg-white/92 px-4 py-3 shadow-md backdrop-blur-md">
+        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-teal-700">Coverage</p>
+        <p className="mt-1 text-[11px] font-semibold leading-relaxed text-primary">Cedar Hill • Plano • Austin • Katy • Pearland • Sugar Land</p>
       </div>
 
-      <span className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-[12px] font-semibold text-white shadow-lg transition group-hover:bg-primary/90">
+      <span className="absolute bottom-5 right-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-[12px] font-semibold text-white shadow-lg transition group-hover:bg-primary/90">
         Explore the directory <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden />
       </span>
     </Link>
@@ -307,24 +307,24 @@ export default function HomeSupportHub() {
         </div>
       </section>
 
-      <section aria-label="Find Local Help" className="bg-white px-6 py-16 sm:px-8 sm:py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid items-center gap-10 lg:grid-cols-[0.72fr_1.35fr_0.93fr]">
+      <section aria-label="Find Local Help" className="bg-[linear-gradient(180deg,#fff_0%,#fdfcf9_100%)] px-6 py-20 sm:px-8 sm:py-24">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="grid items-center gap-10 xl:grid-cols-[0.72fr_1.45fr_0.95fr]">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-teal-700">Support near home</p>
-              <SectionHeading className="mb-3 mt-4" title="Find Local Help" text="Local support you can trust, right where you are." />
-              <p className="text-sm leading-relaxed text-stone-500">Browse local providers and support resources across the greater Houston area.</p>
-              <div className="mt-5 flex items-center gap-6">
-                <div><p className="text-2xl font-bold text-primary">4</p><p className="text-[11px] text-stone-500">Featured categories</p></div>
-                <div className="h-9 w-px bg-stone-200" aria-hidden />
-                <div><p className="text-2xl font-bold text-primary">1</p><p className="text-[11px] text-stone-500">Simple directory</p></div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-teal-700">Support across Texas</p>
+              <SectionHeading className="mb-3 mt-4" title="Find Local Help" text="Local support you can trust, right where you are in Texas." />
+              <p className="text-sm leading-relaxed text-stone-500">Browse local providers and support resources across the entire state.</p>
+              <div className="mt-6 flex items-center gap-7">
+                <div><p className="text-3xl font-bold text-primary">4</p><p className="text-[11px] text-stone-500">Featured categories</p></div>
+                <div className="h-12 w-px bg-stone-200" aria-hidden />
+                <div><p className="text-3xl font-bold text-primary">6</p><p className="text-[11px] text-stone-500">Texas locations</p></div>
               </div>
-              <Link href="/support/find" className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2">
-                See all local providers <ArrowRight className="h-4 w-4" aria-hidden />
+              <Link href="/support/find" className="mt-7 inline-flex items-center gap-3 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(20,42,73,0.18)] transition hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2">
+                <MapPin className="h-4 w-4" aria-hidden /> See all local providers <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
-            <HoustonMap />
-            <div className="space-y-3">
+            <TexasMap />
+            <div className="space-y-4">
               {PROVIDER_CARDS.map((card) => <ProviderCard key={card.name} {...card} />)}
             </div>
           </div>
