@@ -45,16 +45,10 @@
   }
 
   body {
-    /* Warm light grey — off-white with a hint of blue-grey, much warmer than pure white */
     background-color: #f2f4f8;
     @apply text-brand-muted-800;
   }
 
-  /* Headings inherit color from their parent so dark backgrounds work
-     out of the box (e.g. cards with text-white). Body color is already
-     text-brand-muted-800, so headings on light backgrounds stay dark by
-     inheritance. Explicit text-* classes on individual headings still
-     win. */
   h1, h2, h3, h4 {
     @apply font-display tracking-tight;
   }
@@ -141,7 +135,6 @@
     @apply inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-white px-3 py-1.5 text-xs font-semibold text-brand-muted-600;
   }
 
-  /* Mental Health Toolbox — calm expand/collapse (caregiver page) */
   .toolbox-reveal {
     display: grid;
     grid-template-rows: 0fr;
@@ -208,7 +201,6 @@
     background: linear-gradient(135deg, #e2283a 0%, #8b2442 30%, #703068 62%, #32175a 82%, #1a2e52 100%);
   }
 
-  /* Texas ABA wave divider — matches brand website wave shape */
   .wave-divider-navy {
     background: #1a2e52;
     clip-path: ellipse(100% 60% at 50% 100%);
@@ -231,6 +223,196 @@
   }
 }
 
+/* Support Guide — center-content visual polish only. App shell/nav remain untouched. */
+main.page-shell.max-w-3xl {
+  position: relative;
+  max-width: 56rem;
+}
+
+main.page-shell.max-w-3xl > section:first-of-type {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(112, 48, 104, 0.12);
+  border-radius: 28px;
+  padding: 28px 30px;
+  background:
+    radial-gradient(circle at 88% 24%, rgba(226, 40, 58, 0.10), transparent 28%),
+    radial-gradient(circle at 72% 0%, rgba(112, 48, 104, 0.12), transparent 34%),
+    linear-gradient(135deg, #fff7fa 0%, #f8f5ff 48%, #eef5ff 100%);
+  box-shadow: 0 18px 45px rgba(26, 46, 82, 0.08);
+}
+
+main.page-shell.max-w-3xl > section:first-of-type::after {
+  content: '';
+  position: absolute;
+  right: -55px;
+  bottom: -72px;
+  width: 220px;
+  height: 150px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(50, 23, 90, 0.11), rgba(226, 40, 58, 0.08));
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+main.page-shell.max-w-3xl > section:first-of-type p:first-child {
+  color: #703068;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+main.page-shell.max-w-3xl > section:first-of-type h1 {
+  max-width: 720px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: #14264a;
+}
+
+main.page-shell.max-w-3xl > section:first-of-type h1::after {
+  content: '';
+  display: block;
+  width: 150px;
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(226, 40, 58, 0.42), rgba(112, 48, 104, 0.38), rgba(26, 46, 82, 0.12));
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) {
+  display: grid;
+  gap: 12px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a {
+  position: relative;
+  min-height: 72px;
+  border: 1px solid rgba(26, 46, 82, 0.10) !important;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 22px rgba(26, 46, 82, 0.055);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 13px 30px rgba(26, 46, 82, 0.10);
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a::after {
+  content: '›';
+  margin-left: auto;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 400;
+  color: #66728a;
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a > span:first-child {
+  width: 22px;
+  height: 22px;
+  border-width: 2px;
+  border-color: #a6adbb;
+  box-shadow: 0 0 0 7px rgba(242, 244, 248, 0.9);
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a > span:nth-child(2) {
+  font-size: 16px;
+  font-weight: 650;
+  color: #172b51;
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(1) {
+  border-color: rgba(226, 40, 58, 0.24) !important;
+  background: linear-gradient(90deg, rgba(255, 241, 245, 0.94), rgba(255,255,255,0.98));
+}
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(1)::after { color: #c61e45; }
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(2) {
+  border-color: rgba(62, 136, 232, 0.22) !important;
+  background: linear-gradient(90deg, rgba(239, 247, 255, 0.98), rgba(255,255,255,0.98));
+}
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(2)::after { color: #2f76c8; }
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(3) {
+  border-color: rgba(15, 110, 86, 0.22) !important;
+  background: linear-gradient(90deg, rgba(238, 252, 248, 0.98), rgba(255,255,255,0.98));
+}
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(3)::after { color: #0f6e56; }
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(4) {
+  border-color: rgba(112, 48, 104, 0.24) !important;
+  background: linear-gradient(90deg, rgba(249, 242, 252, 0.98), rgba(255,255,255,0.98));
+}
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(4)::after { color: #703068; }
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(5) {
+  border-color: rgba(210, 150, 18, 0.28) !important;
+  background: linear-gradient(90deg, rgba(255, 249, 228, 0.98), rgba(255,255,255,0.98));
+}
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(5)::after { color: #a96b00; }
+
+main.page-shell.max-w-3xl > section:nth-of-type(3) {
+  position: relative;
+  border: 1px solid rgba(26, 46, 82, 0.10);
+  border-radius: 22px;
+  padding: 20px 24px 20px 74px;
+  background: linear-gradient(90deg, #edf9ff 0%, #f4fbff 44%, #f6f4ff 100%);
+  box-shadow: 0 9px 24px rgba(26, 46, 82, 0.055);
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(3)::before {
+  content: '☎';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 50%;
+  background: white;
+  color: #1a2e52;
+  font-size: 18px;
+  box-shadow: 0 5px 14px rgba(26, 46, 82, 0.10);
+  transform: translateY(-50%);
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(3) > p:first-child {
+  color: #245bb1;
+  font-weight: 800;
+}
+
+main.page-shell.max-w-3xl > section:nth-of-type(3) a,
+main.page-shell.max-w-3xl > section:nth-of-type(3) > p:last-child {
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+main.page-shell.max-w-3xl > footer {
+  border: 1px solid rgba(26, 46, 82, 0.09);
+  border-radius: 18px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #747d8e;
+  box-shadow: 0 6px 18px rgba(26, 46, 82, 0.035);
+}
+
+@media (max-width: 640px) {
+  main.page-shell.max-w-3xl > section:first-of-type {
+    border-radius: 22px;
+    padding: 22px 20px;
+  }
+
+  main.page-shell.max-w-3xl > section:nth-of-type(2) > a {
+    min-height: 66px;
+    border-radius: 16px;
+  }
+
+  main.page-shell.max-w-3xl > section:nth-of-type(3) {
+    padding: 18px 18px 18px 64px;
+  }
+}
+
 /* ---------------------------------------------------------------------------
  * Print styles — keeps the care plan readable when a parent saves it as PDF.
  * Hides chrome that doesn't translate to paper (sidebars, nav, action rows),
@@ -241,7 +423,6 @@
     margin: 0.45in;
   }
 
-  /* Hide app shell scaffolding */
   aside,
   nav,
   header,
@@ -250,14 +431,12 @@
     display: none !important;
   }
 
-  /* Reset page chrome to a printable canvas */
   body,
   html {
     background: white !important;
     color: black !important;
   }
 
-  /* Keep content within the printable area */
   main {
     margin: 0 !important;
     padding: 0 !important;
@@ -298,13 +477,11 @@
     box-shadow: none !important;
   }
 
-  /* Avoid awkward breaks inside cards */
   section,
   article {
     page-break-inside: avoid;
   }
 
-  /* Hide links' URLs since print readers add them noisily */
   a[href]:after {
     content: '';
   }
