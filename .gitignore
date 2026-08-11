@@ -14,6 +14,9 @@
 # production
 /build
 
+# generated worksheet assets (rebuilt by scripts/materialize-*.mjs on prebuild)
+/public/worksheets/
+
 # misc
 .DS_Store
 *.pem
