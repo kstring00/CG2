@@ -15,14 +15,17 @@ export function SliderPanel({ inputs, onChange }: Props) {
         const v = inputs[def.key];
         return (
           <div key={def.key} className={styles.sliderRow}>
-            <span className={styles.sliderLabel}>{def.label}</span>
+            <span id={`slider-label-${def.key}`} className={styles.sliderLabel}>{def.label}</span>
             <span className={styles.sliderValue}>{v}</span>
-            <span className={styles.sliderDescriptor}>{def.lowDesc} ↔ {def.highDesc}</span>
+            <span id={`slider-desc-${def.key}`} className={styles.sliderDescriptor}>{def.lowDesc} ↔ {def.highDesc}</span>
             <input
               type="range"
               min={0}
               max={100}
               value={v}
+              aria-labelledby={`slider-label-${def.key}`}
+              aria-describedby={`slider-desc-${def.key}`}
+              aria-valuetext={`${v} out of 100`}
               className={def.adverse ? 'adverse' : 'positive'}
               onChange={(e) => onChange(def.key, parseInt(e.target.value, 10))}
             />

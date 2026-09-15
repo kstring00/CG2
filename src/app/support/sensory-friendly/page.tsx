@@ -9,6 +9,7 @@ import {
   sensoryVerificationLabels,
   type SensoryPlaceCategory,
 } from '@/lib/data';
+import { SITE } from '@/config/site';
 
 type CityFilter = 'all' | 'Katy' | 'Sugar Land' | 'Pearland' | 'Houston' | 'Multiple';
 
@@ -216,7 +217,7 @@ export default function SensoryFriendlyPage() {
                   )}
                 </div>
 
-                <p className="mt-4 text-[11px] uppercase tracking-wide text-brand-muted-400">
+                <p className="mt-4 text-[11px] uppercase tracking-wide text-brand-muted-600">
                   {verification.label} · Last reviewed {place.lastReviewed}
                 </p>
               </article>
@@ -237,12 +238,12 @@ export default function SensoryFriendlyPage() {
               team will reach out to verify before adding it — your name and info stay private.
             </p>
           </div>
-          <button
-            disabled
-            className="inline-flex cursor-not-allowed items-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary"
+          <a
+            href={`mailto:${SITE.email}?subject=${encodeURIComponent('Sensory-friendly place suggestion')}`}
+            className="btn-secondary whitespace-nowrap px-5 py-2.5"
           >
-            Suggestion form coming soon
-          </button>
+            Suggest a place
+          </a>
         </div>
       </section>
     </div>

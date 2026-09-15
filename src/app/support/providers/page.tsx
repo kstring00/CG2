@@ -201,7 +201,7 @@ function ProviderCard({ provider }: { provider: (typeof providers)[0] }) {
                 </li>
               ))}
               {provider.services.length > 5 && (
-                <li className="text-xs text-brand-muted-400">+{provider.services.length - 5} more — see website</li>
+                <li className="text-xs text-brand-muted-600">+{provider.services.length - 5} more — see website</li>
               )}
             </ul>
           </div>
@@ -339,7 +339,7 @@ export default function ProvidersPage() {
       <section className="rounded-3xl border border-surface-border bg-white p-4 sm:p-5">
         <div className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-600" />
             <input
               type="text"
               placeholder="Search by name, service, or location…"
@@ -368,7 +368,7 @@ export default function ProvidersPage() {
 
         {/* Category filters */}
         <div className="mt-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-muted-400">Filter by type</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-muted-600">Filter by type</p>
           <div className="flex flex-wrap gap-2">
             {allCategories.map((cat) => {
               const isActive = activeCategories.has(cat.key);
@@ -393,7 +393,7 @@ export default function ProvidersPage() {
 
         {/* Recommendation level filters */}
         <div className="mt-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-muted-400">Filter by priority</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-brand-muted-600">Filter by priority</p>
           <div className="flex flex-wrap gap-2">
             {allRecommendations.map((rec) => (
               <button

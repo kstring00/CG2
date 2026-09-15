@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
@@ -31,6 +32,13 @@ import PrintButton from './PrintButton';
 import QuestionsAndDownloads from './QuestionsAndDownloads';
 import StabilizeSelector from './StabilizeSelector';
 
+export const metadata: Metadata = {
+  title: "My family support guide",
+  description:
+    "A personal starting point built from what is hardest right now. Private to you, and yours to change any time.",
+};
+
+
 export const dynamic = 'force-dynamic';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -57,7 +65,7 @@ function withTeam(href: string, team: TeamMode): string {
 function DraftMark() {
   if (process.env.NODE_ENV === 'production') return null;
   return (
-    <p className="print:hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+    <p className="print:hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">
       {CARE_PLAN_UI.developmentDraft.text}
     </p>
   );
@@ -137,7 +145,7 @@ function EntryView({ team }: { team: TeamMode }) {
   const branches = resolveBranchList(team);
 
   return (
-    <main className="page-shell mx-auto w-full max-w-3xl">
+    <div className="page-shell mx-auto w-full max-w-3xl">
       <LegacyStoredDataCleanup />
       <DraftMark />
 
@@ -169,13 +177,13 @@ function EntryView({ team }: { team: TeamMode }) {
 
       <TeamContact team={team} />
       <ExactFooter />
-    </main>
+    </div>
   );
 }
 
 function RefineView({ team, branch }: { team: TeamMode; branch: BranchDefinition }) {
   return (
-    <main className="page-shell mx-auto w-full max-w-3xl">
+    <div className="page-shell mx-auto w-full max-w-3xl">
       <LegacyStoredDataCleanup />
       <DraftMark />
       <SelectionContext branch={branch} />
@@ -208,7 +216,7 @@ function RefineView({ team, branch }: { team: TeamMode; branch: BranchDefinition
 
       <TeamContact team={team} />
       <ExactFooter />
-    </main>
+    </div>
   );
 }
 
@@ -239,7 +247,7 @@ function PlanLinks({ plan }: { plan: StandardPlanPage }) {
             {plan.crossLink.detail.text}
           </span>
         </span>
-        <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
+        <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-600" aria-hidden="true" />
       </Link>
       <Link
         href={plan.startOverHref}
@@ -253,7 +261,7 @@ function PlanLinks({ plan }: { plan: StandardPlanPage }) {
             {CARE_PLAN_UI.startOverDetail.text}
           </span>
         </span>
-        <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400" aria-hidden="true" />
+        <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-600" aria-hidden="true" />
       </Link>
     </section>
   );
@@ -276,7 +284,7 @@ function PathForwardSection({
         <span className="text-[15px] font-semibold text-brand-navy-700">{heading.text}</span>
         <span
           aria-hidden="true"
-          className="text-brand-muted-400 transition-transform group-open:rotate-90"
+          className="text-brand-muted-600 transition-transform group-open:rotate-90"
         >
           →
         </span>
@@ -300,7 +308,7 @@ function PathForwardSection({
                   </span>
                 </span>
                 <ArrowRight
-                  className="h-4 w-4 shrink-0 text-brand-muted-400"
+                  className="h-4 w-4 shrink-0 text-brand-muted-600"
                   aria-hidden="true"
                 />
               </Link>
@@ -321,7 +329,7 @@ function ParentFirstPlanView({
   const safetyHref = plan.safetyLink ? withTeam(plan.safetyLink.href, plan.team) : null;
 
   return (
-    <main className="care-plan-print-sheet page-shell mx-auto w-full max-w-5xl">
+    <div className="care-plan-print-sheet page-shell mx-auto w-full max-w-5xl">
       <LegacyStoredDataCleanup />
       <DraftMark />
 
@@ -356,7 +364,7 @@ function ParentFirstPlanView({
       {plan.safetyLink && safetyHref && (
         <Link
           href={safetyHref}
-          className="print:hidden flex items-center justify-between gap-4 border-y border-brand-red-200 py-4 text-sm font-semibold text-brand-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+          className="print:hidden flex items-center justify-between gap-4 border-y border-rose-200 py-4 text-sm font-semibold text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2"
         >
           <span>{plan.safetyLink.copy.text}</span>
           <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -413,13 +421,13 @@ function ParentFirstPlanView({
 
       <PlanLinks plan={plan} />
       <ExactFooter />
-    </main>
+    </div>
   );
 }
 
 function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
   return (
-    <main className="care-plan-print-sheet page-shell mx-auto w-full max-w-3xl">
+    <div className="care-plan-print-sheet page-shell mx-auto w-full max-w-3xl">
       <LegacyStoredDataCleanup />
       <DraftMark />
 
@@ -439,14 +447,14 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
         <section
           className={
             plan.row === 'cannot-keep-doing'
-              ? 'border-y border-brand-red-200 bg-white py-5'
+              ? 'border-y border-rose-200 bg-white py-5'
               : 'border-y border-surface-border py-4'
           }
         >
           <p
             className={
               plan.row === 'cannot-keep-doing'
-                ? 'text-sm font-semibold leading-relaxed text-brand-red-700'
+                ? 'text-sm font-semibold leading-relaxed text-rose-700'
                 : 'text-sm leading-relaxed text-brand-muted-600'
             }
           >
@@ -458,7 +466,7 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
       {plan.safetyLink && (
         <Link
           href={withTeam(plan.safetyLink.href, plan.team)}
-          className="print:hidden flex items-center justify-between gap-4 border-y border-brand-red-200 py-4 text-sm font-semibold text-brand-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+          className="print:hidden flex items-center justify-between gap-4 border-y border-rose-200 py-4 text-sm font-semibold text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2"
         >
           <span>{plan.safetyLink.copy.text}</span>
           <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
@@ -544,7 +552,7 @@ function LegacyPlanView({ plan }: { plan: StandardPlanPage }) {
       <TeamContact team={plan.team} />
       <PlanLinks plan={plan} />
       <ExactFooter />
-    </main>
+    </div>
   );
 }
 

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
@@ -9,6 +10,14 @@ import {
 import CrisisPill from '@/components/CrisisPill';
 import HomeSupportHub from '@/components/home/HomeSupportHub';
 import styles from './page.module.css';
+import { SITE } from '@/config/site';
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Real autism support for real families \u2014 free, with no sign-up required.",
+};
+
 
 const credibilityChecks = [
   'Ease the mental and emotional load of caregiving',
@@ -18,15 +27,15 @@ const credibilityChecks = [
 
 export default function DesignPreviewPage() {
   return (
-    <main className={styles.page}>
+    <main id="main" className={styles.page}>
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <Link href="/" aria-label="Common Ground home" className={styles.logoLink}>
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
-              width={320}
-              height={48}
+              src={SITE.logoSrc}
+              alt={SITE.orgName}
+              width={623}
+              height={205}
               priority
             />
           </Link>
@@ -41,8 +50,8 @@ export default function DesignPreviewPage() {
 
       <section className={styles.hero}>
         <Image
-          src="/hero-selected.jpg"
-          alt="Father and daughter doing a puzzle with a Texas ABA Centers therapy kit"
+          src="/portal-hero.png"
+          alt="A parent and child doing a puzzle together at the kitchen table"
           fill
           priority
           quality={100}
@@ -54,25 +63,25 @@ export default function DesignPreviewPage() {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <span className={styles.heroPill}>
-              <Heart aria-hidden /> Texas ABA Centers · Common Ground
+              <Heart aria-hidden /> Free · no sign-up · built with BCBAs
             </span>
             <h1>
-              Real autism support for real <em>Texas</em> families
+              Real autism support for <em>real</em> families
             </h1>
             <p className={styles.heroLead}>
-              A free support hub that helps you find local providers, parent tools, and clear next steps for your family—whether you are newly diagnosed, already receiving services, or just exploring options.
+              For parents raising a child on the spectrum — newly diagnosed, waiting on an evaluation, or years into it.
             </p>
             <p className={styles.heroBody}>
-              Common Ground meets you where you are with practical resources, trusted guidance, and support built for the whole family, so you can spend less energy searching and more energy being present.
+              Find local providers, parent tools, and a clear next step. Less time searching, more time present.
             </p>
-            <div className={styles.checks}>
+            <div className={styles.checks} data-reveal data-reveal-delay="1">
               {credibilityChecks.map((item) => (
                 <span key={item}>
                   <CheckCircle2 aria-hidden /> {item}
                 </span>
               ))}
             </div>
-            <div className={styles.heroButtons}>
+            <div className={styles.heroButtons} data-reveal data-reveal-delay="2">
               <Link href="/support/intake" className={styles.primaryCta}>
                 <Sparkles aria-hidden /> Find My Next Step <ArrowRight aria-hidden />
               </Link>
@@ -80,7 +89,7 @@ export default function DesignPreviewPage() {
                 Browse all support
               </Link>
             </div>
-            <p className={styles.heroNote}>No sign-up. Built for Texas ABA Centers families.</p>
+            <p className={styles.heroNote} data-reveal data-reveal-delay="3">Free for every family. No account needed.</p>
           </div>
         </div>
         <div className={styles.heroWave} aria-hidden />

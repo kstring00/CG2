@@ -197,7 +197,7 @@ export default function ClientPortalHome() {
               <div>
                 <p className="text-sm font-semibold text-brand-muted-900">{win.highlight}</p>
                 <p className="mt-0.5 text-sm leading-relaxed text-brand-muted-600">{win.context}</p>
-                <p className="mt-1 text-xs text-brand-muted-400">{win.date}</p>
+                <p className="mt-1 text-xs text-brand-muted-600">{win.date}</p>
               </div>
             </li>
           ))}

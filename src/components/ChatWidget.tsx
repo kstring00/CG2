@@ -101,8 +101,7 @@ export default function ChatWidget() {
           >
             <div className="flex items-center gap-2.5">
               <div
-                className="flex h-8 w-8 items-center justify-center rounded-full text-white text-sm font-bold"
-                style={{ backgroundColor: '#e2283a' }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-sm font-bold text-white"
               >
                 CG
               </div>
@@ -230,8 +229,7 @@ export default function ChatWidget() {
             </svg>
             {hasUnread && (
               <span
-                className="absolute top-1 right-1 h-3 w-3 rounded-full border-2 border-white"
-                style={{ backgroundColor: '#e2283a' }}
+                className="absolute top-1 right-1 h-3 w-3 rounded-full border-2 border-white bg-accent"
               />
             )}
           </>

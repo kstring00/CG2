@@ -28,7 +28,7 @@ export default function HomeBaseQuickLinks({ answers }: Props) {
 
   return (
     <section aria-label="Quick links" className="space-y-3">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">
         Explore on your own
       </p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

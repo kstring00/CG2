@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { SITE, ORG_HEADER } from './site-config.mjs';
 
 const OUTPUT = resolve(process.cwd(), 'public/worksheets/care-clarity-review.pdf');
 const W = 612;
@@ -83,8 +84,8 @@ function labelLines(x, y, lines, { size = 7.6, rgb = muted, bold = false, leadin
 const content = [];
 content.push(circle(40.5, 761.5, 5.5, { fill: teal }));
 content.push(circle(52.5, 766.5, 4.5, { fill: navy }));
-content.push(circle(52.5, 753.5, 3.5, { fill: [0.85, 0.16, 0.13] }));
-content.push(text(62, 761, 10.5, 'TEXAS ABA CENTERS', { bold: true }));
+content.push(circle(52.5, 753.5, 3.5, { fill: [0.439, 0.188, 0.408] }));
+content.push(text(62, 761, 10.5, ORG_HEADER, { bold: true }));
 content.push(text(62, 747, 8.2, 'COMMON GROUND - PARENT SUPPORT', { rgb: muted }));
 content.push(text(494, 761, 8, 'CG-WS-03 v0.1 DRAFT', { rgb: muted }));
 content.push(text(441, 747, 7.5, 'Clinical review required before publication', { rgb: muted }));
@@ -217,7 +218,7 @@ addTextField('followup_date', [456, 13, 578, 28]);
 const pagesObj = addObject('PAGES_PLACEHOLDER');
 const acroFormObj = addObject(`<< /Fields [${fields.map((id) => `${id} 0 R`).join(' ')}] /NeedAppearances true /DA (/F1 8 Tf 0.102 0.153 0.263 rg) /DR << /Font << /F1 ${fontRegular} 0 R /F2 ${fontBold} 0 R >> >> >>`);
 const catalogObj = addObject(`<< /Type /Catalog /Pages ${pagesObj} 0 R /AcroForm ${acroFormObj} 0 R >>`);
-const infoObj = addObject('<< /Title (Common Ground - Care Clarity & Review Sheet) /Author (Texas ABA Centers - Common Ground) /Subject (Private fillable care clarity and review worksheet for parent use) /Creator (Common Ground worksheet materializer) >>');
+const infoObj = addObject(`<< /Title (Common Ground - Care Clarity & Review Sheet) /Author (${SITE.orgName}) /Subject (Private fillable care clarity and review worksheet for parent use) /Creator (Common Ground worksheet materializer) >>`);
 objects[pageObj - 1] = `<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${fontRegular} 0 R /F2 ${fontBold} 0 R >> >> /Contents ${contentObj} 0 R /Annots [${fields.map((id) => `${id} 0 R`).join(' ')}] >>`;
 objects[pagesObj - 1] = `<< /Type /Pages /Kids [${pageObj} 0 R] /Count 1 >>`;
 let pdf = '%PDF-1.4\n%CGWS\n';

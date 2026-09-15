@@ -1,5 +1,10 @@
 # Common Ground — Voice Guide
 
+> Common Ground is white-label. The operator's name changes per deployment;
+> the voice does not. Never write copy that only makes sense for one
+> organization, and never name an organization in copy — pull it from
+> `SITE.orgName` so it stays correct everywhere.
+
 The most distinctive thing about Common Ground is its voice. For our audience —
 parents of children on the spectrum — voice *is* the product. They&rsquo;ve been talked
 at by clinicians, teachers, insurance reps, and well-meaning strangers for years.
@@ -29,8 +34,10 @@ page&rsquo;s rhythm:
    - Yes: "this is hard. you&rsquo;ve been showing up anyway."
 4. **Never call the parent the patient.** They are the person holding
    everything together.
-5. **No clinical claims.** Common Ground does not diagnose, treat, or
-   evaluate. It points. It mirrors. It introduces.
+5. **No clinical claims, and no vendor claims.** Common Ground does not
+   diagnose, treat, or evaluate. It points. It mirrors. It introduces. It also
+   never claims a named provider is faster, cheaper, or better than another —
+   give parents the question to ask, not the answer to trust.
 6. **CTAs are invitations, not commands.**
    - Not: "Submit", "Get started!", "Get my matches"
    - Yes: "build my plan", "start when you&rsquo;re ready", "try a check-in", "join the waitlist"
@@ -55,6 +62,7 @@ page&rsquo;s rhythm:
 
 ## When to break the rules
 
-Headings that are proper nouns (Texas ABA Centers, Common Ground, Still Waters,
-Pathfinders) keep their casing. Crisis messaging uses normal sentence case
-because lowercase reads as low-stakes — and 988 is high-stakes.
+Headings that are proper nouns (Common Ground, Still Waters, Pathfinders, and
+the deploying organization's own name from `SITE.orgName`) keep their casing.
+Crisis messaging uses normal sentence case because lowercase reads as
+low-stakes — and 988 is high-stakes.

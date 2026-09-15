@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -9,6 +10,14 @@ import {
   Users,
 } from 'lucide-react';
 import { ClientDemoBanner } from '@/components/ui/ClientDemoBanner';
+
+export const metadata: Metadata = {
+  title: "Care plan",
+  description:
+    "Your child's BCBA-authored goals, in plain language.",
+  robots: { index: false, follow: false },
+};
+
 
 const goals = [
   {
@@ -58,7 +67,7 @@ export default function CarePlanPage() {
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-600">
               Behavior specialist (BCBA)
             </p>
             <p className="mt-1 text-sm font-semibold text-brand-muted-900">Dr. Rachel Ortiz</p>
@@ -67,7 +76,7 @@ export default function CarePlanPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-600">
               Therapy provider (RBT)
             </p>
             <p className="mt-1 text-sm font-semibold text-brand-muted-900">Jasmine Patel</p>
@@ -76,7 +85,7 @@ export default function CarePlanPage() {
             </p>
           </div>
           <div className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-600">
               Parent coaching
             </p>
             <p className="mt-1 text-sm font-semibold text-brand-muted-900">Dr. Ortiz</p>
@@ -124,7 +133,7 @@ export default function CarePlanPage() {
 
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-surface-border bg-white p-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted-400">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-brand-muted-600">
                     How we know it&apos;s working
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-brand-muted-700">

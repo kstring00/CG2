@@ -13,7 +13,7 @@
  * brand palette. Submitting persists the result via saveBandwidth() and calls
  * onComplete with the BandwidthResult.
  *
- * Visual contract (per CCO direction):
+ * Visual contract (per clinical review):
  *   • Calm, soft, parent-friendly.
  *   • Frames the purpose first ("we ask this so we don't give you a plan
  *     that's too heavy for the day you're actually having").

@@ -17,7 +17,7 @@ import {
   ArrowRight,
   LogOut,
 } from 'lucide-react';
-import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 
@@ -44,7 +44,7 @@ export function ClientShell({
     <>
       <div className="border-b border-accent/20 bg-gradient-to-b from-accent/5 to-transparent px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0 space-y-2">
-          <TexasAbaLogo decorative className="h-8 w-auto" />
+          <BrandLogo decorative className="h-8 w-auto" />
           <span className="block font-display text-sm font-bold leading-tight text-brand-muted-900">
             Common<span className="text-primary"> Ground</span>
           </span>
@@ -58,7 +58,7 @@ export function ClientShell({
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Client portal">
-        <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+        <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">
           Your care
         </p>
         <ul className="m-0 flex list-none flex-col gap-1 p-0">
@@ -88,7 +88,7 @@ export function ClientShell({
 
         {/* Cross-layer links */}
         <div className="mt-6 border-t border-surface-border/60 pt-4">
-          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+          <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">
             Also here for you
           </p>
           <Link
@@ -184,7 +184,7 @@ export function ClientShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main id="main" className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           {children}
         </main>
       </div>

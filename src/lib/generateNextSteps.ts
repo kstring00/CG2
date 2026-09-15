@@ -34,6 +34,7 @@ import {
   pickSupportNudgeThread,
   type SupportThreadId,
 } from './carePlanSupport';
+import { SITE } from '@/config/site';
 
 // ---------------------------------------------------------------------------
 // Labels (single source of truth for human-readable copy)
@@ -76,7 +77,7 @@ type Candidate = {
   title: string;
   why: string;
   href: string;
-  /** Primary CCO-review bucket. Some candidates are valid in multiple buckets;
+  /** Primary clinical-review bucket. Some candidates are valid in multiple buckets;
    *  the secondary list is used as fallback during bucket assignment. */
   bucket: StepBucket;
   altBuckets?: StepBucket[];
@@ -245,7 +246,7 @@ const C: Record<string, Candidate> = {
   compareThree: {
     id: 'compareThree',
     title: 'Compare three local ABA providers',
-    why: 'Use this when you’re choosing a provider. It lets you filter local ABA centers by insurance accepted and waitlist length, so the three you compare are ones that could realistically take your child.',
+    why: 'Use this when you’re choosing a provider. It lets you filter local ABA providers by insurance accepted and waitlist length, so the three you compare are ones that could realistically take your child.',
     href: '/support/find',
     bucket: 'next-week',
     altBuckets: ['save-resource'],
@@ -277,7 +278,7 @@ const C: Record<string, Candidate> = {
   shortlistProviders: {
     id: 'shortlistProviders',
     title: 'Build a shortlist of two providers to call',
-    why: 'Filter local ABA centers by your insurance, pick two that look promising, and call both — comparing answers beats calling every listing in town.',
+    why: 'Filter local ABA providers by your insurance, pick two that look promising, and call both — comparing answers beats calling every listing in town.',
     href: '/support/find',
     bucket: 'do-today',
   },
@@ -307,7 +308,7 @@ const C: Record<string, Candidate> = {
     id: 'admissionsConsult',
     title: ADMISSIONS_CTA_LABEL,
     why: 'One universal door: a free consultation with our admissions team. They walk through coverage and next steps with you — no eligibility decision on this site.',
-    href: 'tel:+18777715725',
+    href: `tel:${SITE.phone}`,
     bucket: 'do-today',
     altBuckets: ['ask-bcba'],
   },
@@ -358,7 +359,7 @@ const C: Record<string, Candidate> = {
   findLocal: {
     id: 'findLocal',
     title: 'Use Find Local Help',
-    why: 'Start here when you don’t know what’s near you. It searches local ABA centers and support services and filters them by your insurance, so you can pick two real, nearby options to look into.',
+    why: 'Start here when you don’t know what’s near you. It searches local ABA providers and support services and filters them by your insurance, so you can pick two real, nearby options to look into.',
     href: '/support/find',
     bucket: 'next-week',
     altBuckets: ['save-resource'],
@@ -834,10 +835,10 @@ function boostArcPool(scores: Map<string, Score>, arcWeek: ArcWeek): void {
 }
 
 // ---------------------------------------------------------------------------
-// 5-bucket plan (CCO review, May 2026)
+// 5-bucket plan (clinical review, May 2026)
 // ---------------------------------------------------------------------------
 
-/** The 5 buckets, in the display order Texas ABA Centers' CCO asked for. */
+/** The 5 buckets, in the display order set during clinical review. */
 export const BUCKET_ORDER: StepBucket[] = [
   'do-today',
   'ask-bcba',
@@ -1458,7 +1459,7 @@ const FALLBACK_STEPS: CarePlanStep[] = [
   {
     id: 'findLocal',
     title: 'Find local help in your area',
-    why: 'Search local ABA centers and support services filtered by your insurance, so you can see what’s actually available near you.',
+    why: 'Search local ABA providers and support services filtered by your insurance, so you can see what’s actually available near you.',
     href: '/support/find',
   },
 ];

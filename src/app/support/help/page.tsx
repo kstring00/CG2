@@ -10,6 +10,7 @@ import {
   type JourneyStageId,
 } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { SITE } from '@/config/site';
 
 const filterOptions = [
   { key: 'all', label: 'All routes' },
@@ -118,14 +119,14 @@ export default function SupportPage() {
             No verified providers are published for this view yet
           </h3>
           <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-brand-muted-500">
-            Placeholder contacts and demo listings have been removed. Use the verified resource directory or contact Texas ABA Centers directly for current navigation support.
+            Placeholder contacts and demo listings have been removed. Use the verified resource directory, or call for current navigation support.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <a href="/support/find" className="btn-primary px-4 py-2.5 text-sm">
               Open verified resource directory
             </a>
-            <a href="tel:8777715725" className="btn-secondary px-4 py-2.5 text-sm">
-              Call Texas ABA Centers: (877) 771-5725
+            <a href={`tel:${SITE.phone}`} className="btn-secondary px-4 py-2.5 text-sm">
+              Call {SITE.orgName}: {SITE.phoneDisplay}
             </a>
           </div>
         </div>

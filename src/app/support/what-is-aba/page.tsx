@@ -288,7 +288,7 @@ function MythsPanel() {
                 </BadgePill>
                 <ChevronDown
                   className={cn(
-                    'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                    'h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
                     isOpen && 'rotate-180',
                   )}
                 />
@@ -394,7 +394,7 @@ function GoingWellPanel() {
           </span>
           <ChevronDown
             className={cn(
-              'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+              'h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
               showWhy && 'rotate-180',
             )}
           />
@@ -495,14 +495,14 @@ function GlossaryPanel() {
         hear most often, and what they actually mean.
       </p>
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-600" />
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filter terms"
           aria-label="Filter glossary terms"
-          className="w-full rounded-xl border border-surface-border bg-white py-2.5 pl-10 pr-4 text-[14px] text-brand-navy-700 shadow-soft outline-none transition placeholder:text-brand-muted-400 focus:border-brand-plum-300 focus:ring-2 focus:ring-brand-plum-100"
+          className="w-full rounded-xl border border-surface-border bg-white py-2.5 pl-10 pr-4 text-[14px] text-brand-navy-700 shadow-soft outline-none transition placeholder:text-brand-muted-600 focus:border-brand-plum-300 focus:ring-2 focus:ring-brand-plum-100"
         />
       </div>
       <GuideCard as="div" className="mt-4 overflow-hidden p-0 sm:p-0">
@@ -523,7 +523,7 @@ function GlossaryPanel() {
                   <span className="text-[14px] font-bold text-primary">{entry.term}</span>
                   <ChevronDown
                     className={cn(
-                      'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                      'h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
                       isOpen && 'rotate-180',
                     )}
                   />

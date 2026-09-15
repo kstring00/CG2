@@ -57,13 +57,13 @@ const communityRules = [
   'Share support and lived experience without telling another parent what treatment to try.',
   'Do not recommend supplements, diets, protocols, medications, therapies, dosing, or “what worked for us” treatments.',
   'Protect children and other members: no full names, schools, clinics, photos, medical records, screenshots, or reposting.',
-  'Criticism of ABA, providers, and Texas ABA Centers is allowed. Civility toward other members is still required.',
+  'Criticism of ABA and of any provider, including ours, is allowed. Civility toward other members is still required.',
   'Peer support is not clinical care, emergency intervention, or a crisis line.',
 ];
 
 export default function ConnectPage() {
   return (
-    <main className="mx-auto max-w-5xl space-y-8 px-4 py-6 sm:px-6 sm:py-8">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-6 sm:px-6 sm:py-8">
       <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
         <ol className="flex items-center gap-1.5">
           <li><Link href="/support" className="hover:text-brand-navy-700">Home</Link></li>
@@ -214,6 +214,6 @@ export default function ConnectPage() {
       <p className="text-[11.5px] leading-relaxed text-brand-muted-500">
         Parent Connection remains a preview. Real accounts, groups, matching, and messaging are not enabled. Governance language and workflows require Clinical Director, legal, and HIPAA compliance review before launch.
       </p>
-    </main>
+    </div>
   );
 }

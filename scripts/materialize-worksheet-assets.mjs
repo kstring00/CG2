@@ -1,5 +1,6 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { SITE, ORG_HEADER } from './site-config.mjs';
 
 const OUTPUT = resolve(process.cwd(), 'public/worksheets/incident-log.pdf');
 
@@ -84,8 +85,8 @@ const content = [];
 
 content.push(rect(35, 756, 11, 11, { fill: teal }));
 content.push(rect(48, 762, 9, 9, { fill: navy }));
-content.push(rect(49, 750, 7, 7, { fill: [0.85, 0.16, 0.13] }));
-content.push(text(62, 761, 10.5, 'TEXAS ABA CENTERS', { bold: true }));
+content.push(rect(49, 750, 7, 7, { fill: [0.439, 0.188, 0.408] }));
+content.push(text(62, 761, 10.5, ORG_HEADER, { bold: true }));
 content.push(text(62, 747, 8.2, 'COMMON GROUND - PARENT SUPPORT', { rgb: muted }));
 content.push(text(500, 761, 8, 'CG-WS-01 v0.2 DRAFT', { rgb: muted }));
 content.push(text(437, 747, 7.5, 'Clinical review required before publication', { rgb: muted }));
@@ -209,7 +210,7 @@ addTextField('next_review_date', [403.333, 84, 578, 104]);
 const pagesObj = addObject('PAGES_PLACEHOLDER');
 const acroFormObj = addObject(`<< /Fields [${fields.map((id) => `${id} 0 R`).join(' ')}] /NeedAppearances true /DA (/F1 9 Tf 0.102 0.153 0.263 rg) /DR << /Font << /F1 ${fontRegular} 0 R /F2 ${fontBold} 0 R >> >> >>`);
 const catalogObj = addObject(`<< /Type /Catalog /Pages ${pagesObj} 0 R /AcroForm ${acroFormObj} 0 R >>`);
-const infoObj = addObject('<< /Title (Incident & Safety Record) /Author (Texas ABA Centers - Common Ground) /Subject (Private parent incident documentation worksheet) /Creator (Common Ground worksheet materializer) >>');
+const infoObj = addObject(`<< /Title (Incident & Safety Record) /Author (${SITE.orgName}) /Subject (Private parent incident documentation worksheet) /Creator (Common Ground worksheet materializer) >>`);
 
 objects[pageObj - 1] = `<< /Type /Page /Parent ${pagesObj} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${fontRegular} 0 R /F2 ${fontBold} 0 R >> >> /Contents ${contentObj} 0 R /Annots [${fields.map((id) => `${id} 0 R`).join(' ')}] >>`;
 objects[pagesObj - 1] = `<< /Type /Pages /Kids [${pageObj} 0 R] /Count 1 >>`;

@@ -401,7 +401,7 @@ export default function CaregiverIdentityPage() {
                         <span className="text-sm font-semibold text-brand-muted-900">{tool.title}</span>
                       </div>
                     </div>
-                    <ArrowRight className={`h-4 w-4 shrink-0 text-brand-muted-400 transition-transform ${openTool === i ? 'rotate-90' : ''}`} />
+                    <ArrowRight className={`h-4 w-4 shrink-0 text-brand-muted-600 transition-transform ${openTool === i ? 'rotate-90' : ''}`} />
                   </button>
                   {openTool === i && (
                     <div className="px-5 pb-5">
@@ -409,7 +409,7 @@ export default function CaregiverIdentityPage() {
                         {tool.prompt}
                       </p>
                       <div className="rounded-xl border border-surface-border bg-white p-3">
-                        <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400 mb-1">Try this</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-600 mb-1">Try this</p>
                         <p className="text-sm leading-relaxed text-brand-muted-700">{tool.practice}</p>
                       </div>
                     </div>
@@ -436,7 +436,7 @@ export default function CaregiverIdentityPage() {
             <div className="space-y-4">
               {partnerScripts.map((item, i) => (
                 <div key={i} className="rounded-2xl border border-surface-border bg-surface-muted p-4">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-400 mb-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-muted-600 mb-2">
                     When: {item.need}
                   </p>
                   <p className="text-sm leading-relaxed text-brand-muted-800 italic">

@@ -221,7 +221,7 @@ export function SupportActionCard({
         <p className="text-[14px] font-semibold text-brand-navy-700">{title}</p>
         <p className="text-[12px] text-brand-muted-600">{detail}</p>
       </div>
-      <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-400 transition group-hover:translate-x-0.5 group-hover:text-primary" />
+      <ArrowRight className="h-4 w-4 shrink-0 text-brand-muted-600 transition group-hover:translate-x-0.5 group-hover:text-primary" />
     </>
   );
 

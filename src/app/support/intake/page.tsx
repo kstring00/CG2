@@ -1,6 +1,14 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CARE_PLAN_UI } from '@/content/carePlan';
 import FlowChromeIsolation from '@/app/support/care-plan/FlowChromeIsolation';
+
+export const metadata: Metadata = {
+  title: "Find my next step",
+  description:
+    "Answer a few questions and get one clear next step, built around where your family actually is.",
+};
+
 
 const CHOICES = [
   {
@@ -15,10 +23,10 @@ const CHOICES = [
 
 export default function IntakePage() {
   return (
-    <main className="page-shell mx-auto w-full max-w-3xl">
+    <div className="page-shell mx-auto w-full max-w-3xl">
       <FlowChromeIsolation />
       {process.env.NODE_ENV !== 'production' && (
-        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">
           {CARE_PLAN_UI.developmentDraft.text}
         </p>
       )}
@@ -57,6 +65,6 @@ export default function IntakePage() {
       <footer className="border-t border-surface-border pt-5 text-xs leading-relaxed text-brand-muted-500">
         {CARE_PLAN_UI.exactFooter.text}
       </footer>
-    </main>
+    </div>
   );
 }

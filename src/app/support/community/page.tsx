@@ -1,7 +1,15 @@
+import type { Metadata } from 'next';
 import { ArrowRight, Calendar, Globe, Heart, MapPin, Shield, Users } from 'lucide-react';
 import { DemoDataNotice } from '@/components/ui/DemoDataNotice';
 import { TrustPanel } from '@/components/ui/TrustPanel';
 import { communityGroups } from '@/lib/data';
+
+export const metadata: Metadata = {
+  title: "Community & groups",
+  description:
+    "Local parent groups, events, and online spaces for families on the autism journey.",
+};
+
 
 const typeConfig: Record<string, { icon: typeof MapPin; color: string; badge: string }> = {
   local: { icon: MapPin, color: 'bg-primary/10 text-primary', badge: 'Local group' },

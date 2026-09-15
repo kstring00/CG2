@@ -176,7 +176,7 @@ export default function ResourcesPage() {
       <section className="mt-6" aria-label="Search resources">
         <div className="relative">
           <Search
-            className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-muted-400"
+            className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-brand-muted-600"
             aria-hidden
           />
           <input
@@ -322,7 +322,7 @@ export default function ResourcesPage() {
                   </div>
                   <ChevronDown
                     className={cn(
-                      'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                      'h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
                       expanded && 'rotate-180',
                     )}
                   />
@@ -607,7 +607,7 @@ function DemoModal({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-full p-1 text-brand-muted-400 hover:bg-surface-subtle"
+          className="absolute right-3 top-3 rounded-full p-1 text-brand-muted-600 hover:bg-surface-subtle"
         >
           <X className="h-4 w-4" />
         </button>

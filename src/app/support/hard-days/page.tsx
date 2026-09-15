@@ -257,7 +257,7 @@ const resources = [
     external: true,
   },
   {
-    name: 'Texas ABA Centers — Care Coordinator',
+    name: 'Your care coordinator',
     detail: 'Your child\'s care coordinator can connect you to local therapist referrals and family support resources.',
     action: '/support/connect',
     actionLabel: 'Talk to your coordinator',
@@ -455,19 +455,19 @@ export default function HardDaysPage() {
                         {feeling.title}
                       </span>
                       {isOpen
-                        ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                        : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                        ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-600" />
+                        : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-600" />}
                     </button>
                     {isOpen && (
                       <div className="px-5 pb-6 space-y-5">
                         <div className="rounded-xl border border-white/60 bg-white/70 p-4">
-                          <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400 mb-2">
+                          <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-600 mb-2">
                             What this actually means
                           </p>
                           <p className="text-sm leading-relaxed text-brand-muted-700">{feeling.meaning}</p>
                         </div>
                         <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400 mb-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-600 mb-3">
                             What to do with it
                           </p>
                           <div className="space-y-3">
@@ -483,7 +483,7 @@ export default function HardDaysPage() {
                           </div>
                         </div>
                         <div className="rounded-xl border border-surface-border bg-white/50 p-4">
-                          <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400 mb-1.5">
+                          <p className="text-[11px] font-semibold uppercase tracking-widest text-brand-muted-600 mb-1.5">
                             What not to do
                           </p>
                           <p className="text-sm leading-relaxed text-brand-muted-600 italic">{feeling.notDoing}</p>
@@ -645,7 +645,7 @@ export default function HardDaysPage() {
               Check anything that feels true. If even one of these resonates, that is enough reason to reach out today.
               You do not have to earn the right to ask for help.
             </p>
-            <p className="text-sm text-brand-muted-400 italic mb-6">
+            <p className="text-sm text-brand-muted-600 italic mb-6">
               This is about right now — today&apos;s bandwidth, not the longer arc.
             </p>
             <ul className="space-y-3 mb-6">
@@ -677,7 +677,7 @@ export default function HardDaysPage() {
               </div>
             )}
             {checkedCount === 0 && (
-              <p className="text-xs text-brand-muted-400 italic text-center">
+              <p className="text-xs text-brand-muted-600 italic text-center">
                 Check anything that is true for you right now.
               </p>
             )}

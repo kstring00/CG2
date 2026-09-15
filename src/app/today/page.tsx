@@ -47,6 +47,7 @@ export default function TodayPreviewPage() {
 
   return (
     <main
+      id="main"
       className="min-h-screen px-6 py-12 sm:px-8 sm:py-16"
       style={{ backgroundColor: '#f4efe8' }}
     >

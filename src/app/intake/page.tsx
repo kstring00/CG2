@@ -22,7 +22,7 @@ export default function IntakePreviewPage() {
   }
 
   return (
-    <main className="min-h-screen px-6 py-12 sm:px-8 sm:py-16" style={{ backgroundColor: '#f4efe8' }}>
+    <main id="main" className="min-h-screen px-6 py-12 sm:px-8 sm:py-16" style={{ backgroundColor: '#f4efe8' }}>
       <div className="mx-auto max-w-2xl">
         <div className="mb-6 flex items-center justify-between">
           <Link

@@ -67,7 +67,7 @@ export type CarePlanAnswers = {
 };
 
 /**
- * 5-bucket framing requested by Texas ABA Centers' clinical director.
+ * 5-bucket framing requested during clinical review.
  * Each saved step belongs in one bucket. The care plan page renders one
  * suggested step per bucket so a parent can scan "what to do today vs. what
  * to bring to the BCBA" in a single glance.
@@ -95,7 +95,7 @@ export type CarePlanStep = {
   because?: string;
   /** Internal score used for ordering. Higher = surfaced first. */
   weight?: number;
-  /** Which CCO-review bucket this step belongs in (added in 2026-05 CCO pass). */
+  /** Which clinical-review bucket this step belongs in (added in the 2026-05 pass). */
   bucket?: StepBucket;
   /** Optional one-line research context for why this step is worth trying. */
   evidence?: StepEvidence;

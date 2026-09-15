@@ -382,7 +382,7 @@ export default function SleepPage() {
                   style={{ width: `${(answers.filter((a) => a !== null).length / sleepCheckQuestions.length) * 100}%` }}
                 />
               </div>
-              <span className="text-[11px] font-semibold text-brand-muted-400">
+              <span className="text-[11px] font-semibold text-brand-muted-600">
                 {answers.filter((a) => a !== null).length}/{sleepCheckQuestions.length}
               </span>
             </div>
@@ -449,8 +449,8 @@ export default function SleepPage() {
                       </div>
                     </div>
                     {openStepIdx === i
-                      ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                      : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                      ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-600" />
+                      : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-600" />}
                   </button>
                   {openStepIdx === i && (
                     <div className="px-5 pb-5">
@@ -519,8 +519,8 @@ export default function SleepPage() {
                   >
                     <span className="text-sm font-semibold text-brand-muted-900 italic">{myth.myth}</span>
                     {openMythIdx === i
-                      ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-400" />
-                      : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-400" />}
+                      ? <ChevronUp className="h-4 w-4 shrink-0 text-brand-muted-600" />
+                      : <ChevronDown className="h-4 w-4 shrink-0 text-brand-muted-600" />}
                   </button>
                   {openMythIdx === i && (
                     <div className="px-5 pb-5">

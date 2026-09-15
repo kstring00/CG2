@@ -26,16 +26,39 @@
 @layer base {
   :root {
     --brand-navy: #1a2e52;
-    --brand-red: #e2283a;
-    --brand-burgundy: #8b2442;
     --brand-plum: #703068;
     --brand-purple: #32175a;
-    --brand-muted: #6e727a;
+    --brand-muted: #5f6570;
     --brand-warm: #c5c2cf;
     --brand-teal: #0F6E56;
-    --font-display: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --brand-accent: #0F6E56;
+    --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+    --font-body: var(--font-inter), "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --radius: 0.75rem;
+
+    /* Type scale — 1.200 minor third, 16px base. Used by the .t-* helpers so
+       headings step predictably instead of being hand-picked per page. */
+    --t-xs:   0.75rem;    /* 12 */
+    --t-sm:   0.875rem;   /* 14 */
+    --t-base: 1rem;       /* 16 */
+    --t-lg:   1.125rem;   /* 18 */
+    --t-xl:   1.375rem;   /* 22 */
+    --t-2xl:  1.625rem;   /* 26 */
+    --t-3xl:  2rem;       /* 32 */
+    --t-4xl:  2.5rem;     /* 40 */
+    --t-5xl:  3.125rem;   /* 50 */
+
+    /* Spacing rhythm — one 4px-based ramp so vertical gaps stay consistent. */
+    --space-2xs: 0.25rem;
+    --space-xs:  0.5rem;
+    --space-sm:  0.75rem;
+    --space-md:  1rem;
+    --space-lg:  1.5rem;
+    --space-xl:  2.25rem;
+    --space-2xl: 3.5rem;
+    --space-3xl: 5rem;
+
+    --ease-out-soft: cubic-bezier(0.33, 1, 0.68, 1);
   }
 
   html {
@@ -55,6 +78,40 @@
 
   p, span, li {
     @apply font-body;
+  }
+
+  /* One consistent focus ring across every interactive element. Keyboard-only
+     (focus-visible) so it never fires on mouse click. */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  [role='button']:focus-visible,
+  [tabindex]:not([tabindex='-1']):focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid theme('colors.primary.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Skip link — visible only when focused. */
+  .skip-link {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 100;
+    transform: translate(-50%, -120%);
+    padding: 0.625rem 1rem;
+    border-radius: 0 0 0.75rem 0.75rem;
+    font-size: var(--t-sm);
+    font-weight: 600;
+    background: theme('colors.primary.DEFAULT');
+    color: #fff;
+    transition: transform 160ms var(--ease-out-soft);
+  }
+  .skip-link:focus-visible {
+    transform: translate(-50%, 0);
   }
 }
 
@@ -94,7 +151,7 @@
   .input-field {
     @apply w-full px-4 py-3 rounded-2xl
       bg-surface-muted border border-surface-border
-      text-brand-muted-800 placeholder:text-brand-muted-400
+      text-brand-muted-800 placeholder:text-brand-muted-600
       focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
       transition-all duration-200;
   }
@@ -170,6 +227,92 @@
   .toolbox-chevron[data-open='true'] {
     transform: rotate(180deg);
   }
+
+  /* ── Type scale helpers ────────────────────────────────────────────────
+     Prefer these over ad-hoc text-[13.5px] so headings step predictably. */
+  .t-display {
+    font-size: clamp(var(--t-3xl), 4.2vw, var(--t-5xl));
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    @apply font-display font-bold;
+  }
+  .t-h1 {
+    font-size: clamp(var(--t-2xl), 3.2vw, var(--t-4xl));
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    @apply font-display font-bold;
+  }
+  .t-h2 {
+    font-size: clamp(var(--t-xl), 2.4vw, var(--t-3xl));
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    @apply font-display font-bold;
+  }
+  .t-h3 {
+    font-size: var(--t-xl);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    @apply font-display font-semibold;
+  }
+  .t-lead {
+    font-size: clamp(var(--t-base), 1.4vw, var(--t-lg));
+    line-height: 1.6;
+    @apply font-body;
+  }
+  .t-body {
+    font-size: var(--t-base);
+    line-height: 1.65;
+    @apply font-body;
+  }
+  .t-meta {
+    font-size: var(--t-sm);
+    line-height: 1.5;
+    @apply font-body text-brand-muted-500;
+  }
+
+  /* Vertical rhythm — one ramp, applied to section stacks. */
+  .rhythm > * + * { margin-top: var(--space-md); }
+  .rhythm-lg > * + * { margin-top: var(--space-lg); }
+  .rhythm-xl > * + * { margin-top: var(--space-xl); }
+  .section-rhythm { padding-block: var(--space-2xl); }
+
+  /* ── Scroll reveal ─────────────────────────────────────────────────────
+     Restrained: 14px rise + fade, 520ms, one shot. Elements start hidden
+     ONLY once JS has marked the document ready, so a no-JS or failed-hydration
+     visitor still sees everything. */
+  [data-reveal] {
+    opacity: 1;
+  }
+  [data-reveal-ready] [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 520ms var(--ease-out-soft),
+      transform 520ms var(--ease-out-soft);
+    will-change: opacity, transform;
+  }
+  [data-reveal-ready] [data-reveal='visible'] {
+    opacity: 1;
+    transform: none;
+  }
+  [data-reveal-delay='1'] { transition-delay: 70ms; }
+  [data-reveal-delay='2'] { transition-delay: 140ms; }
+  [data-reveal-delay='3'] { transition-delay: 210ms; }
+
+  /* Consistent interactive lift for cards and link tiles. */
+  .lift {
+    transition:
+      transform 200ms var(--ease-out-soft),
+      box-shadow 200ms var(--ease-out-soft),
+      border-color 200ms var(--ease-out-soft);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    @apply shadow-card-hover;
+  }
+  .lift:active {
+    transform: translateY(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -181,6 +324,29 @@
 
   .toolbox-reveal[data-open='false'] {
     display: none;
+  }
+
+  /* Reveal animations collapse to "already there" — never hide content. */
+  [data-reveal-ready] [data-reveal],
+  [data-reveal-ready] [data-reveal='visible'] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .lift:hover,
+  .lift:active {
+    transform: none !important;
+  }
+
+  /* Blanket safety net for anything else that animates. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -198,7 +364,7 @@
   }
 
   .gradient-brand-hearts {
-    background: linear-gradient(135deg, #e2283a 0%, #8b2442 30%, #703068 62%, #32175a 82%, #1a2e52 100%);
+    background: linear-gradient(135deg, #0F6E56 0%, #703068 34%, #32175a 66%, #1a2e52 100%);
   }
 
   .wave-divider-navy {
@@ -236,7 +402,7 @@ main.page-shell.max-w-3xl > section:first-of-type {
   border-radius: 28px;
   padding: 28px 30px;
   background:
-    radial-gradient(circle at 88% 24%, rgba(226, 40, 58, 0.10), transparent 28%),
+    radial-gradient(circle at 88% 24%, rgba(112, 48, 104, 0.10), transparent 28%),
     radial-gradient(circle at 72% 0%, rgba(112, 48, 104, 0.12), transparent 34%),
     linear-gradient(135deg, #fff7fa 0%, #f8f5ff 48%, #eef5ff 100%);
   box-shadow: 0 18px 45px rgba(26, 46, 82, 0.08);
@@ -250,7 +416,7 @@ main.page-shell.max-w-3xl > section:first-of-type::after {
   width: 220px;
   height: 150px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(50, 23, 90, 0.11), rgba(226, 40, 58, 0.08));
+  background: linear-gradient(135deg, rgba(50, 23, 90, 0.11), rgba(112, 48, 104, 0.08));
   transform: rotate(-12deg);
   pointer-events: none;
 }
@@ -275,7 +441,7 @@ main.page-shell.max-w-3xl > section:first-of-type h1::after {
   height: 8px;
   margin-top: 10px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(226, 40, 58, 0.42), rgba(112, 48, 104, 0.38), rgba(26, 46, 82, 0.12));
+  background: linear-gradient(90deg, rgba(15, 110, 86, 0.42), rgba(112, 48, 104, 0.38), rgba(26, 46, 82, 0.12));
 }
 
 main.page-shell.max-w-3xl > section:nth-of-type(2) {
@@ -325,10 +491,10 @@ main.page-shell.max-w-3xl > section:nth-of-type(2) > a > span:nth-child(2) {
 }
 
 main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(1) {
-  border-color: rgba(226, 40, 58, 0.24) !important;
-  background: linear-gradient(90deg, rgba(255, 241, 245, 0.94), rgba(255,255,255,0.98));
+  border-color: rgba(225, 29, 72, 0.24) !important;
+  background: linear-gradient(90deg, rgba(255, 241, 242, 0.94), rgba(255,255,255,0.98));
 }
-main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(1)::after { color: #c61e45; }
+main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(1)::after { color: #be123c; }
 main.page-shell.max-w-3xl > section:nth-of-type(2) > a:nth-child(2) {
   border-color: rgba(62, 136, 232, 0.22) !important;
   background: linear-gradient(90deg, rgba(239, 247, 255, 0.98), rgba(255,255,255,0.98));

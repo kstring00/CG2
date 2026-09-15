@@ -6,7 +6,7 @@
  * The site previously had check-in / mental-health / wellness measurement in
  * multiple places (Home Base PulseCard, WellnessMirror tile, the 8-slider
  * dashboard at /support/mental-health, a separate weekly qualitative form at
- * /support/check-in). Per the CCO direction, that scatter does more harm than
+ * /support/check-in). Per clinical review, that scatter does more harm than
  * good: a measurement that doesn't change anything just adds shame.
  *
  * This module replaces all of that with one concept:

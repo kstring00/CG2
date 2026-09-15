@@ -5,7 +5,7 @@
  * Why this exists
  * ---------------
  * The /support/mental-health dashboard is rich but invisible to parents who
- * don't navigate to it. The CCO asked us to surface a parent's score on the
+ * don't navigate to it. Clinical review asked us to surface a parent's score on the
  * main journey so check-ins become a habit, not a hidden page.
  *
  * What this is NOT

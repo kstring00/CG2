@@ -160,7 +160,7 @@ export const TEAM_COPY: Record<
       'team.no.contact-label',
       "Talk to Admissions — they help families who don't have a team yet.",
     ),
-    phoneNumber: draft('team.no.phone-number', '(877) 771-5725'),
+    phoneNumber: draft('team.no.phone-number', '(000) 000-0000'),
     providerEvaluationNote: draft(
       'team.no.provider-evaluation-note',
       'These questions are also how you evaluate a provider — a good one welcomes all of them.',

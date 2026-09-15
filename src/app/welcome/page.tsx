@@ -18,11 +18,12 @@ import {
   Wind,
 } from 'lucide-react';
 import CrisisPill from '@/components/CrisisPill';
+import { SITE } from '@/config/site';
 
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
+    <main id="main" className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
 
       {/* ─────────────────────────────────────────
           NAV
@@ -31,10 +32,10 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
-              width={320}
-              height={48}
+              src={SITE.logoSrc}
+              alt={SITE.orgName}
+              width={623}
+              height={205}
               priority
               className="h-8 w-auto sm:h-9"
               style={{ objectFit: 'contain' }}
@@ -67,8 +68,8 @@ export default function HomePage() {
         {/* Photo — full bleed, framed on therapist face + logo */}
         <div className="absolute inset-0">
           <Image
-            src="/hero-selected.jpg"
-            alt="Father and daughter doing a puzzle with Texas ABA Centers therapy kit"
+            src="/portal-hero.png"
+            alt="A parent and child doing a puzzle together at the kitchen table"
             fill
             priority
             quality={100}
@@ -99,7 +100,7 @@ export default function HomePage() {
             {/* LEFT: Headline + CTAs — sits over the natural open left zone */}
             <div className="w-full max-w-[540px]">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
-                <Heart className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Common Ground
+                <Heart className="h-3 w-3 text-rose-400" /> Free · no sign-up · built with BCBAs
               </span>
               <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
                 You don&apos;t have to figure this out alone.
@@ -114,7 +115,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-                  <span>Clinically reviewed by BCBAs at Texas ABA Centers</span>
+                  <span>Clinically reviewed by BCBAs</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
@@ -144,7 +145,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────
           HOW THIS WORKS — 3-step, right below hero
       ───────────────────────────────────────── */}
-      <section className="border-b border-stone-100 bg-white px-6 py-8 sm:px-8">
+      <section className="border-b border-stone-100 bg-white px-6 py-8 sm:px-8" data-reveal>
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-6 sm:grid-cols-3">
             {[
@@ -161,8 +162,8 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-          <p className="mt-6 border-t border-stone-100 pt-5 text-center text-xs text-stone-400">
-            Built by <span className="font-semibold text-stone-600">Texas ABA Centers</span> to support families — not just clients.
+          <p className="mt-6 border-t border-stone-100 pt-5 text-center text-xs text-stone-600">
+            Built to support families — not just clients.
           </p>
         </div>
       </section>
@@ -175,18 +176,18 @@ export default function HomePage() {
           <span className="flex items-center gap-2 font-bold text-white">
             <Phone className="h-3.5 w-3.5" /> Need help right now?
           </span>
-          <span className="text-rose-100">Call or text <a href="tel:988" className="font-bold text-white underline hover:text-rose-200">988</a></span>
+          <span className="text-rose-50">Call or text <a href="tel:988" className="font-bold text-white underline hover:text-rose-200">988</a></span>
           <span className="hidden text-rose-300 sm:inline">·</span>
-          <span className="text-rose-100">Harris Center <a href="tel:7139707000" className="font-bold text-white underline hover:text-rose-200">(713) 970-7000</a></span>
+          <span className="text-rose-50">Harris Center <a href="tel:7139707000" className="font-bold text-white underline hover:text-rose-200">(713) 970-7000</a></span>
           <span className="hidden text-rose-300 sm:inline">·</span>
-          <span className="text-rose-100">Emergency: call <span className="font-bold text-white">911</span></span>
+          <span className="text-rose-50">Emergency: call <span className="font-bold text-white">911</span></span>
         </div>
       </div>
 
       {/* ─────────────────────────────────────────
           WHAT DO YOU NEED
       ───────────────────────────────────────── */}
-      <section className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: '#f4efe8' }}>
+      <section className="px-6 py-16 sm:px-8 sm:py-20" style={{ backgroundColor: '#f4efe8' }} data-reveal>
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold text-stone-900 sm:text-4xl">
@@ -279,7 +280,7 @@ export default function HomePage() {
 
           {/* Quiet secondary links */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            <p className="w-full text-center text-[11px] font-medium uppercase tracking-widest text-stone-400">Or go straight to what you need</p>
+            <p className="w-full text-center text-[11px] font-medium uppercase tracking-widest text-stone-600">Or go straight to what you need</p>
             <Link href="/support/caregiver" className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-plum-700 underline-offset-2 hover:underline">
               <Heart className="h-3.5 w-3.5" /> I need support too
             </Link>
@@ -296,7 +297,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────
           PARENT SUPPORT — two col
       ───────────────────────────────────────── */}
-      <section className="px-6 py-16 sm:py-20 sm:px-8" style={{ backgroundColor: '#f9f8f6' }}>
+      <section className="px-6 py-16 sm:py-20 sm:px-8" style={{ backgroundColor: '#f9f8f6' }} data-reveal>
         <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
           <div className="grid lg:grid-cols-2">
             {/* Left */}
@@ -334,7 +335,7 @@ export default function HomePage() {
 
             {/* Right — grounding tools */}
             <div className="border-t border-stone-100 bg-stone-50 p-8 lg:border-l lg:border-t-0 sm:p-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-400">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-600">
                 If today is hard — right now
               </p>
               <h3 className="mt-2 text-xl font-bold text-stone-900">One breath. One step.</h3>
@@ -367,7 +368,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────
           YOU ARE NOT ALONE
       ───────────────────────────────────────── */}
-      <section className="px-6 py-12 sm:px-8 sm:py-16" style={{ backgroundColor: '#f9f8f6' }}>
+      <section className="px-6 py-12 sm:px-8 sm:py-16" style={{ backgroundColor: '#f9f8f6' }} data-reveal>
         <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-50/80">
           <div className="grid gap-6 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
             {/* Left */}
@@ -418,7 +419,7 @@ export default function HomePage() {
               <sig.icon className="h-5 w-5 shrink-0 text-primary/70" />
               <div>
                 <p className="text-xs font-semibold text-stone-700">{sig.label}</p>
-                <p className="text-[11px] text-stone-400">{sig.sub}</p>
+                <p className="text-[11px] text-stone-600">{sig.sub}</p>
               </div>
             </div>
           ))}
@@ -428,7 +429,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────
           HONESTY SECTION
       ───────────────────────────────────────── */}
-      <section className="px-6 py-14 sm:py-16 sm:px-8" style={{ backgroundColor: '#f9f8f6' }}>
+      <section className="px-6 py-14 sm:py-16 sm:px-8" style={{ backgroundColor: '#f9f8f6' }} data-reveal>
         <div className="mx-auto max-w-4xl">
           <div className="flex items-start gap-5 rounded-3xl border border-stone-200 bg-white p-7 shadow-sm sm:p-10">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-plum-100">
@@ -442,7 +443,7 @@ export default function HomePage() {
                 You are carrying a lot. Common Ground is here to lighten the load so it feels
                 like a page, not a mountain. Come back anytime. The resources will wait.
               </p>
-              <p className="mt-3 text-xs text-stone-400">— the team at Texas ABA Centers</p>
+              <p className="mt-3 text-xs text-stone-600">— the team at {SITE.orgName}</p>
             </div>
           </div>
         </div>
@@ -451,7 +452,7 @@ export default function HomePage() {
       {/* ─────────────────────────────────────────
           FOOTER CTA — dark navy
       ───────────────────────────────────────── */}
-      <section className="px-6 py-16 sm:py-20 sm:px-8" style={{ backgroundColor: '#1a2e52' }}>
+      <section className="px-6 py-16 sm:py-20 sm:px-8" style={{ backgroundColor: '#1a2e52' }} data-reveal>
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             One step at a time. That is enough.
@@ -468,7 +469,7 @@ export default function HomePage() {
             </Link>
           </div>
           <p className="mt-10 text-xs text-white/35">
-            Powered by <span className="font-semibold text-white/60">Texas ABA Centers</span> · Common Ground is available to every family in Texas.
+            Common Ground is available to every family in Texas.
           </p>
           <p className="mt-2 text-xs text-white/25">
             <Link href="/privacy" className="underline hover:text-white/50 transition">Privacy Policy</Link>

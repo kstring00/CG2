@@ -1,5 +1,14 @@
+import type { Metadata } from 'next';
 import { Clock, Lock, MessageSquare, Send, UserRound } from 'lucide-react';
 import { ClientDemoBanner } from '@/components/ui/ClientDemoBanner';
+
+export const metadata: Metadata = {
+  title: "Secure messages",
+  description:
+    "HIPAA-protected messaging with your BCBA and care team.",
+  robots: { index: false, follow: false },
+};
+
 
 const thread = [
   {
@@ -67,7 +76,7 @@ export default function MessagesPage() {
             >
               <p className="flex items-center gap-2 text-xs font-semibold text-brand-muted-900">
                 <UserRound className="h-3.5 w-3.5" /> {m.from}
-                <span className="font-normal text-brand-muted-400">· {m.at}</span>
+                <span className="font-normal text-brand-muted-600">· {m.at}</span>
               </p>
               <p className="mt-2 text-sm leading-relaxed text-brand-muted-700">
                 {m.body}
@@ -84,7 +93,7 @@ export default function MessagesPage() {
             disabled
             rows={3}
             placeholder="Message send is disabled in the prototype demo."
-            className="mt-2 w-full resize-none rounded-xl border border-surface-border bg-white p-3 text-sm text-brand-muted-700 placeholder:text-brand-muted-400"
+            className="mt-2 w-full resize-none rounded-xl border border-surface-border bg-white p-3 text-sm text-brand-muted-700 placeholder:text-brand-muted-600"
           />
           <button
             disabled

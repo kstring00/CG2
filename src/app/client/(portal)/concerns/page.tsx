@@ -52,7 +52,7 @@ export default function ConcernsPage() {
             Dr. Ortiz or a member of your care team will respond within one business day. You do
             not have to wait for the next session — questions belong here, not in your head.
           </p>
-          <p className="mt-6 text-xs text-brand-muted-400">
+          <p className="mt-6 text-xs text-brand-muted-600">
             If this is urgent or you need someone now, call or text{' '}
             <a href="tel:988" className="font-semibold text-accent hover:underline">988</a>.
           </p>
@@ -114,7 +114,7 @@ export default function ConcernsPage() {
                       : 'border-surface-border bg-surface-muted text-brand-muted-700 hover:border-primary/30 hover:text-brand-muted-900',
                   )}
                 >
-                  <topic.icon className={cn('h-4 w-4 shrink-0', selected.includes(topic.label) ? 'text-primary' : 'text-brand-muted-400')} />
+                  <topic.icon className={cn('h-4 w-4 shrink-0', selected.includes(topic.label) ? 'text-primary' : 'text-brand-muted-600')} />
                   {topic.label}
                 </button>
               </li>
@@ -136,7 +136,7 @@ export default function ConcernsPage() {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="This week has been hard because… / I noticed that… / I don't understand why… / I'm worried about…"
-            className="mt-4 w-full resize-none rounded-2xl border border-surface-border bg-surface-muted p-4 text-sm leading-relaxed text-brand-muted-700 placeholder:text-brand-muted-400 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10"
+            className="mt-4 w-full resize-none rounded-2xl border border-surface-border bg-surface-muted p-4 text-sm leading-relaxed text-brand-muted-700 placeholder:text-brand-muted-600 focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/10"
           />
         </section>
 
@@ -157,7 +157,7 @@ export default function ConcernsPage() {
               </span>
             ))}
           </div>
-          <p className="mt-3 text-xs text-brand-muted-400">
+          <p className="mt-3 text-xs text-brand-muted-600">
             If this is a safety concern or emergency, call or text{' '}
             <a href="tel:988" className="font-semibold text-accent hover:underline">988</a> or go to your nearest ER.
           </p>

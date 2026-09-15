@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { SITE } from '@/config/site';
 
 /**
  * Persistent site footer with a direct admissions handoff.
@@ -21,15 +22,15 @@ export default function SiteFooter() {
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-4 py-4 text-[11px] text-brand-muted-500 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex min-w-0 flex-col gap-1.5">
           <p className="text-brand-muted-500">
-            &copy; {new Date().getFullYear()} Texas ABA Centers &middot; Common Ground
+            &copy; {new Date().getFullYear()} {SITE.orgName}
           </p>
           <p className="text-[12px] text-brand-muted-600">
             Need help choosing your next step?{' '}
             <a
-              href="tel:+18777715725"
+              href={`tel:${SITE.phone}`}
               className="font-semibold text-primary underline-offset-2 transition hover:underline"
             >
-              Talk to Admissions &mdash; (877) 771-5725
+              Talk to Admissions &mdash; {SITE.phoneDisplay}
             </a>
           </p>
         </div>
