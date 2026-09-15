@@ -88,9 +88,9 @@ function SidebarContent({ pathname, instance, reduceMotion, onNavigate }: Sideba
           <Image
             src={SITE.logoSrc}
             alt={SITE.orgName}
-            width={280}
-            height={42}
-            className="h-auto w-full max-w-[200px]"
+            width={623}
+            height={205}
+            className="h-9 w-auto max-w-full"
             style={{ objectFit: 'contain' }}
           />
         </Link>

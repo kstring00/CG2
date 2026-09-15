@@ -34,8 +34,8 @@ export default function DesignPreviewPage() {
             <Image
               src={SITE.logoSrc}
               alt={SITE.orgName}
-              width={320}
-              height={48}
+              width={623}
+              height={205}
               priority
             />
           </Link>

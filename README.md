@@ -40,9 +40,31 @@ affiliated clinic it wants families routed to first; leave it unset and the
 copy falls back to neutral "your clinic" language and directory-wide guidance.
 
 Swapping the logo: replace `public/logos/common-ground-mark.png`, or point
-`NEXT_PUBLIC_SITE_LOGO_SRC` at your own asset. The favicon, Apple touch icon,
-PWA icons, and Open Graph image are generated from that mark — regenerate them
-if you change it.
+`NEXT_PUBLIC_SITE_LOGO_SRC` at your own asset, then run:
+
+```bash
+python3 scripts/generate-brand-icons.py   # needs Pillow
+```
+
+That regenerates the favicon, Apple touch icon, PWA icons and Open Graph card
+from the mark.
+
+Two things to get right in the asset itself, because both have bitten us:
+
+1. **Trim it.** The mark must be cropped to its artwork with only a hair of
+   padding. A logo saved on a large canvas renders tiny, because the CSS sizes
+   the *canvas* and the artwork is only a fraction of it.
+2. **Key out the background.** Ship it with transparency so it sits on the
+   white and cream navs without a visible box.
+
+The `width`/`height` props at each `<Image>` call site must match the asset's
+real pixel dimensions (currently 623×205). They only reserve layout space —
+CSS `h-*` + `w-auto` controls the rendered size — but a wrong aspect there
+causes layout shift.
+
+After replacing the mark, clear `.next/cache/images`. Next caches optimized
+images by source path with a one-year TTL, so a same-named replacement is
+otherwise served stale.
 
 ## The two layers
 

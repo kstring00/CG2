@@ -39,9 +39,9 @@ export default function NotFound() {
         <Image
           src={SITE.logoSrc}
           alt={SITE.orgName}
-          width={200}
-          height={77}
-          className="h-9 w-auto"
+          width={623}
+          height={205}
+          className="h-10 w-auto"
           priority
         />
       </Link>

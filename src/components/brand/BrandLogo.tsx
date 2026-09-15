@@ -2,8 +2,10 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { SITE } from '@/config/site';
 
-const WIDTH = 200;
-const HEIGHT = 77;
+// Intrinsic size of the brand mark. Keep in sync with the asset so Next
+// reserves the right space and the logo is not scaled to the wrong aspect.
+const WIDTH = 623;
+const HEIGHT = 205;
 
 type BrandLogoProps = {
   className?: string;
@@ -24,7 +26,7 @@ export function BrandLogo({
         alt={decorative ? '' : SITE.orgName}
         width={WIDTH}
         height={HEIGHT}
-        sizes="(max-width: 640px) 160px, 220px"
+        sizes="(max-width: 640px) 140px, 190px"
         className={cn(
           'block h-auto w-auto max-w-full object-contain object-left',
           className,

@@ -32,8 +32,8 @@ export default function ClientSignInPage() {
             <Image
               src={SITE.logoSrc}
               alt={SITE.orgName}
-              width={320}
-              height={48}
+              width={623}
+              height={205}
               priority
               className="h-8 w-auto sm:h-9"
               style={{ objectFit: 'contain' }}
