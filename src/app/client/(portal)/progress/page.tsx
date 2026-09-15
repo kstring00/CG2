@@ -1,6 +1,15 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Heart, MessageSquare, Star, TrendingUp } from 'lucide-react';
 import { ClientDemoBanner } from '@/components/ui/ClientDemoBanner';
+
+export const metadata: Metadata = {
+  title: "Progress",
+  description:
+    "Session data in plain language \u2014 what is moving, and what is not.",
+  robots: { index: false, follow: false },
+};
+
 
 const wins = [
   {
@@ -95,7 +104,7 @@ export default function ProgressPage() {
                 </span>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-600">
                       {win.date}
                     </p>
                     {win.isNew && (

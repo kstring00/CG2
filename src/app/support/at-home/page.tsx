@@ -15,6 +15,7 @@ import {
   type MatchInput, type MatchedStrategy, type SettingEventId,
 } from '@/lib/atHomeMatcher';
 import { cn } from '@/lib/utils';
+import { SITE } from '@/config/site';
 
 const FUNCTIONS: Array<{ id: FunctionId; title: string; short: string; description: string; examples: string; icon: typeof Gift; className: string }> = [
   { id: 'tangible', title: 'Tangible', short: 'Getting something', description: 'The behavior may help get or regain an item, activity, food, location, or privilege.', examples: 'Watch for: denied, delayed, removed, or unavailable items.', icon: PackageOpen, className: 'border-emerald-200 bg-emerald-50/70 text-emerald-800' },
@@ -97,7 +98,7 @@ export default function AtHomeStrategiesPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <nav aria-label="Breadcrumb" className="text-[12px] text-brand-muted-500">
         <ol className="flex items-center gap-1.5"><li><Link href="/support" className="hover:text-brand-navy-700">Home</Link></li><li aria-hidden><ChevronRight className="h-3 w-3" /></li><li className="font-medium text-brand-muted-700">{AT_HOME_STRATEGIES_LABEL}</li></ol>
       </nav>
@@ -137,12 +138,12 @@ export default function AtHomeStrategiesPage() {
       <div className="mt-5 rounded-2xl border border-brand-plum-200 bg-brand-plum-50/60 p-5"><div className="flex items-start gap-3"><MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-brand-plum-700" /><div><h2 className="text-base font-bold text-brand-navy-700">Common Ground supports the conversation</h2><p className="mt-1 text-[12px] leading-relaxed text-brand-muted-700">This activity helps caregivers notice useful details. A BCBA can assess the pattern, consider the full context, and individualize treatment.</p></div></div></div>
 
       {activeStrategy && <StrategyDialog match={activeStrategy} onClose={() => setActiveStrategy(null)} />}
-    </main>
+    </div>
   );
 }
 
 function SafetyInterstitial({ input, onSave }: { input: MatchInput; onSave: () => void }) {
-  return <div className="mt-5 rounded-2xl border-2 border-rose-300 bg-rose-50 p-5 sm:p-6"><div className="flex items-start gap-3"><ShieldAlert className="mt-0.5 h-7 w-7 shrink-0 text-rose-700" /><div><h3 className="text-xl font-bold text-rose-950">Focus on immediate safety—not strategy matching.</h3><p className="mt-2 text-sm leading-relaxed text-rose-900">A higher-risk behavior was selected: <strong>{input.behavior ? BEHAVIOR_LABELS[input.behavior] : ''}</strong>. Follow the child’s established safety or crisis plan, reduce immediate hazards when safe to do so, and avoid introducing an unfamiliar intervention during the event.</p></div></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Link href="/support/crisis" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-rose-700 px-4 text-sm font-bold text-white hover:bg-rose-800"><ShieldAlert className="h-4 w-4" /> Open crisis support</Link><a href="tel:+18777715725" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-navy-700 px-4 text-sm font-bold text-white hover:bg-brand-navy-800"><Phone className="h-4 w-4" /> Talk to someone now</a></div><button type="button" onClick={onSave} className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-rose-300 bg-white px-4 text-sm font-semibold text-rose-900 hover:bg-rose-100"><Download className="h-4 w-4" /> Save this observation for your care team</button><p className="mt-3 text-[11px] leading-relaxed text-rose-800">No pattern insight or routine strategy cards are generated for this selection. Deselect it to continue with a non-Tier-1 behavior.</p></div>;
+  return <div className="mt-5 rounded-2xl border-2 border-rose-300 bg-rose-50 p-5 sm:p-6"><div className="flex items-start gap-3"><ShieldAlert className="mt-0.5 h-7 w-7 shrink-0 text-rose-700" /><div><h3 className="text-xl font-bold text-rose-950">Focus on immediate safety—not strategy matching.</h3><p className="mt-2 text-sm leading-relaxed text-rose-900">A higher-risk behavior was selected: <strong>{input.behavior ? BEHAVIOR_LABELS[input.behavior] : ''}</strong>. Follow the child’s established safety or crisis plan, reduce immediate hazards when safe to do so, and avoid introducing an unfamiliar intervention during the event.</p></div></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Link href="/support/crisis" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-rose-700 px-4 text-sm font-bold text-white hover:bg-rose-800"><ShieldAlert className="h-4 w-4" /> Open crisis support</Link><a href={`tel:${SITE.phone}`} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-navy-700 px-4 text-sm font-bold text-white hover:bg-brand-navy-800"><Phone className="h-4 w-4" /> Talk to someone now</a></div><button type="button" onClick={onSave} className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-rose-300 bg-white px-4 text-sm font-semibold text-rose-900 hover:bg-rose-100"><Download className="h-4 w-4" /> Save this observation for your care team</button><p className="mt-3 text-[11px] leading-relaxed text-rose-800">No pattern insight or routine strategy cards are generated for this selection. Deselect it to continue with a non-Tier-1 behavior.</p></div>;
 }
 
 function CurrentFamilyPanel({ onDownload, onPrint }: { onDownload: () => void; onPrint: () => void }) {

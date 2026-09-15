@@ -3,6 +3,8 @@
  * every week; the balance layer nudges parents toward eligible threads.
  */
 
+import { SITE } from '@/config/site';
+
 import type { CarePlanAnswers } from './carePlanStorage';
 
 export type SupportThreadId = 'mental-health' | 'siblings';
@@ -82,8 +84,8 @@ export const ADMISSIONS_STEP_IDS = new Set([
   'findLocal',
 ]);
 
-export const ADMISSIONS_PHONE = '+18777715725';
-export const ADMISSIONS_PHONE_DISPLAY = '(877) 771-5725';
+export const ADMISSIONS_PHONE = SITE.phone;
+export const ADMISSIONS_PHONE_DISPLAY = SITE.phoneDisplay;
 // Single source of truth for the admissions CTA primary line. Both the
 // AdmissionsHandoff button and the in-plan step title consume this so they
 // can never drift apart.

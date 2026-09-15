@@ -42,6 +42,7 @@ import {
   type Resource,
   type Service,
 } from './resources';
+import { SITE, siteHost } from '@/config/site';
 
 type Locale = 'en' | 'es';
 type CategoryKey = 'therapy' | 'medical' | 'respite' | 'community' | 'school' | 'financial';
@@ -323,7 +324,7 @@ function FilterSelect({
       >
         {children}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-600" />
     </label>
   );
 }
@@ -425,12 +426,12 @@ export default function FindLocalHelpPage() {
         (resource) => `<article><h2>${escapeHtml(resource.name)}</h2><p class="meta">${escapeHtml(resource.cities.join(', '))}</p><p>${escapeHtml(resource.blurb)}</p><p class="meta">${escapeHtml(resource.services.join(' · '))} · ${escapeHtml(resource.ageGroups.join(', '))} · ${escapeHtml(resource.insurance)}</p>${resource.phone ? `<p>${escapeHtml(resource.phone)}</p>` : ''}${resource.website ? `<p>${escapeHtml(resource.website)}</p>` : ''}</article>`,
       )
       .join('');
-    popup.document.write(`<!doctype html><html><head><title>Common Ground shortlist</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:32px auto;padding:0 20px;color:#14274a}h1{font-size:24px}h2{font-size:17px;margin:0 0 4px}article{padding:18px 0;border-bottom:1px solid #dfe5ee;page-break-inside:avoid}p{font-size:13px;line-height:1.55;margin:5px 0}.meta{color:#687389;font-size:11px}</style></head><body><h1>${escapeHtml(t.shortlist)}</h1><p class="meta">texasabacenterscg.com/support/find</p>${rows}<script>window.onload=()=>window.print()</script></body></html>`);
+    popup.document.write(`<!doctype html><html><head><title>Common Ground shortlist</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:32px auto;padding:0 20px;color:#14274a}h1{font-size:24px}h2{font-size:17px;margin:0 0 4px}article{padding:18px 0;border-bottom:1px solid #dfe5ee;page-break-inside:avoid}p{font-size:13px;line-height:1.55;margin:5px 0}.meta{color:#687389;font-size:11px}</style></head><body><h1>${escapeHtml(t.shortlist)}</h1><p class="meta">${escapeHtml(siteHost)}/support/find</p>${rows}<script>window.onload=()=>window.print()</script></body></html>`);
     popup.document.close();
   };
 
   return (
-    <main className="min-h-screen bg-[#f5f7fb] px-3 py-4 sm:px-5 lg:px-7 lg:py-7">
+    <div className="min-h-screen bg-[#f5f7fb] px-3 py-4 sm:px-5 lg:px-7 lg:py-7">
       <div className="mx-auto max-w-[1480px]">
         <section className="relative overflow-hidden rounded-[28px] border border-white/80 bg-gradient-to-br from-[#f5fbff] via-white to-[#fff4eb] px-5 py-7 shadow-soft sm:px-8 lg:px-10 lg:py-9">
           <div className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full bg-teal-200/20 blur-3xl" />
@@ -459,7 +460,7 @@ export default function FindLocalHelpPage() {
             <label>
               <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-brand-muted-600">{t.searchLabel}</span>
               <span className="relative block">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-600" />
                 <input
                   value={query}
                   onChange={(event) => {
@@ -467,14 +468,14 @@ export default function FindLocalHelpPage() {
                     setVisibleCount(6);
                   }}
                   placeholder={t.searchPlaceholder}
-                  className="h-12 w-full rounded-xl border border-surface-border bg-white pl-10 pr-3 text-sm text-brand-muted-900 outline-none transition placeholder:text-brand-muted-400 focus:border-primary focus:ring-2 focus:ring-primary/15"
+                  className="h-12 w-full rounded-xl border border-surface-border bg-white pl-10 pr-3 text-sm text-brand-muted-900 outline-none transition placeholder:text-brand-muted-600 focus:border-primary focus:ring-2 focus:ring-primary/15"
                 />
               </span>
             </label>
             <label>
               <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-brand-muted-600">{t.locationLabel}</span>
               <span className="relative block">
-                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+                <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-600" />
                 <select
                   value={city}
                   onChange={(event) => {
@@ -486,7 +487,7 @@ export default function FindLocalHelpPage() {
                   <option value="">{t.allLocations}</option>
                   {CITIES.map((item) => <option key={item} value={item}>{item}</option>)}
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-400" />
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-brand-muted-600" />
               </span>
             </label>
             <button
@@ -732,11 +733,11 @@ export default function FindLocalHelpPage() {
                 <p className="mt-4 text-[13px] leading-6 text-brand-muted-700">{selectedResource.description}</p>
 
                 <dl className="mt-4 grid grid-cols-2 gap-3 rounded-2xl bg-surface-muted/60 p-3 text-[11px]">
-                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-400">{t.services}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.services.join(' · ')}</dd></div>
-                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-400">{t.ages}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.ageGroups.join(', ')}</dd></div>
-                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-400">{t.payment}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.insurance}</dd></div>
-                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-400">{t.format}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.delivery.join(' · ')}</dd></div>
-                  <div className="col-span-2"><dt className="font-bold uppercase tracking-wider text-brand-muted-400">{t.address}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.address ?? selectedResource.cities.join(' · ')}</dd></div>
+                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-600">{t.services}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.services.join(' · ')}</dd></div>
+                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-600">{t.ages}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.ageGroups.join(', ')}</dd></div>
+                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-600">{t.payment}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.insurance}</dd></div>
+                  <div><dt className="font-bold uppercase tracking-wider text-brand-muted-600">{t.format}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.delivery.join(' · ')}</dd></div>
+                  <div className="col-span-2"><dt className="font-bold uppercase tracking-wider text-brand-muted-600">{t.address}</dt><dd className="mt-1 font-semibold text-brand-muted-700">{selectedResource.address ?? selectedResource.cities.join(' · ')}</dd></div>
                 </dl>
 
                 {selectedResource.helpfulToKnow && (
@@ -802,7 +803,7 @@ export default function FindLocalHelpPage() {
                           <strong className="block truncate text-[12px] text-[#17315a] hover:text-primary">{resource.name}</strong>
                           <span className="mt-0.5 block text-[10px] text-brand-muted-500">{resource.cities[0]} · {resource.services.slice(0, 2).join(', ')}</span>
                         </button>
-                        <button type="button" onClick={() => toggleSave(resource.id)} className="rounded-lg p-1.5 text-brand-muted-400 hover:bg-white hover:text-red-600" aria-label={`${t.remove} ${resource.name}`}><X className="h-3.5 w-3.5" /></button>
+                        <button type="button" onClick={() => toggleSave(resource.id)} className="rounded-lg p-1.5 text-brand-muted-600 hover:bg-white hover:text-red-600" aria-label={`${t.remove} ${resource.name}`}><X className="h-3.5 w-3.5" /></button>
                       </li>
                     ))}
                   </ul>
@@ -834,6 +835,6 @@ export default function FindLocalHelpPage() {
           </aside>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

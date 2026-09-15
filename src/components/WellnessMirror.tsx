@@ -59,7 +59,7 @@ export default function WellnessMirror({ className }: { className?: string }) {
           className,
         )}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-400">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-muted-600">
           a quiet mirror
         </p>
         <p className="mt-2 text-[14.5px] leading-relaxed text-brand-muted-700">

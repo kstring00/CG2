@@ -1,6 +1,14 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Compass, GraduationCap, MessageCircleHeart, Stethoscope, Users } from 'lucide-react';
 import PathfinderCard from '@/components/PathfinderCard';
+
+export const metadata: Metadata = {
+  title: "Pathfinders",
+  description:
+    "A real human who has walked this road, to help you sort the next step and advocate when it matters.",
+};
+
 
 const whatTheyDo = [
   {
@@ -27,7 +35,7 @@ const whatTheyDo = [
 
 export default function PathfindersPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
       <Link
         href="/support/caregiver"
         className="inline-flex items-center gap-1 text-sm font-semibold text-brand-muted-600 hover:text-brand-muted-900"
@@ -43,7 +51,7 @@ export default function PathfindersPage() {
           Meet your Pathfinder.
         </h1>
         <p className="mt-4 text-[15.5px] leading-relaxed text-brand-muted-700">
-          A real human who has walked this road. Pathfinders are Texas ABA Centers care navigators &mdash; trained to help you sort the next step, advocate at school meetings, and check in when the weeks get heavy. You don&rsquo;t have to explain everything from scratch.
+          A real human who has walked this road. Pathfinders are care navigators &mdash; trained to help you sort the next step, advocate at school meetings, and check in when the weeks get heavy. You don&rsquo;t have to explain everything from scratch.
         </p>
       </header>
 
@@ -109,6 +117,6 @@ export default function PathfindersPage() {
           </li>
         </ul>
       </section>
-    </main>
+    </div>
   );
 }

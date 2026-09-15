@@ -1,3 +1,4 @@
+import { SITE } from '@/config/site';
 // ============================================================
 // CG2 — Verified Provider & Resource Directory
 // Last full audit: April 2026
@@ -58,7 +59,7 @@ export const categoryMeta: Record<
     label: 'ABA Therapy',
     emoji: '🧠',
     color: 'bg-blue-50 text-blue-700 border-blue-200',
-    description: 'Texas ABA Centers provides ABA therapy for enrolled families. Use the link below to start the intake process.',
+    description: 'One-on-one behavioral therapy, BCBA-supervised treatment plans, and caregiver coaching. Compare a few providers before you commit.',
   },
   'speech-therapy': {
     label: 'Speech Therapy',
@@ -173,7 +174,8 @@ export const startHereRoutes: {
   description: string;
   emoji: string;
   categories: ProviderCategory[];
-  firstCallId: string;
+  /** Null when the deployment has no affiliated first-call provider. */
+  firstCallId: string | null;
 }[] = [
   {
     id: 'just-diagnosed',
@@ -189,7 +191,7 @@ export const startHereRoutes: {
     description: "You're looking for ABA, speech, OT, or feeding therapy.",
     emoji: '🩺',
     categories: ['aba-therapy', 'speech-therapy', 'occupational-therapy', 'feeding-therapy'],
-    firstCallId: 'texas-aba-centers',
+    firstCallId: SITE.firstCallProviderId,
   },
   {
     id: 'overwhelmed',
@@ -219,34 +221,6 @@ export const startHereRoutes: {
 
 export const providers: Provider[] = [
   // ─── ABA THERAPY ──────────────────────────────────────────────────────────────
-
-  {
-    id: 'texas-aba-centers',
-    category: 'aba-therapy',
-    provider_name: 'Texas ABA Centers',
-    location: 'Greater Houston area (multiple locations)',
-    services: [
-      'One-on-one ABA therapy',
-      'BCBA-supervised treatment plans',
-      'Parent training and caregiver coaching',
-      'Behavior intervention planning',
-      'Progress tracking and goal updates',
-      'Insurance authorization support',
-    ],
-    age_range: 'Contact intake team to confirm',
-    insurance_notes: 'Accepts most major insurance plans. Insurance verification handled during intake.',
-    referral_required: false,
-    waitlist_status: 'Contact intake team for current availability',
-    languages_offered: ['English', 'Spanish — contact to verify'],
-    service_type: ['in-person', 'mobile'],
-    sensory_accommodations: 'Therapy environments adapted to each child\'s sensory needs',
-    website: 'https://texasabacenters.com',
-    phone: 'Contact via website',
-    why_it_may_help: 'Texas ABA Centers is the organization behind Common Ground. If your child needs ABA therapy, starting here means your therapy team and your care navigator are already connected — no hand-offs, no gaps.',
-    helpful_to_know: 'As a current or prospective Texas ABA Centers family, you have access to everything in Common Ground as part of your care relationship. Reach out to your care team or use the client portal to get started.',
-    last_verified_date: 'April 2026',
-    recommendation_level: 'great-first-call',
-  },
 
   // ─── SPEECH THERAPY ──────────────────────────────────────────────────────────
 
@@ -596,7 +570,7 @@ export const providers: Provider[] = [
     website: 'https://www.feathouston.org',
     phone: 'See website for current contact',
     why_it_may_help: 'FEAT Houston is a parent-led community organization in the Clear Lake / Bay Area that connects autism families to events, day programs, schools, and recreational resources. A good place to find local families and community programs.',
-    helpful_to_know: 'Based in the Clear Lake / Bay Area — especially relevant for southeast Houston, Webster, League City, and Pearland families. Great for community events and connecting with other parents. For therapy services, contact your Texas ABA Centers care team.',
+    helpful_to_know: 'Based in the Clear Lake / Bay Area — especially relevant for southeast Houston, Webster, League City, and Pearland families. Great for community events and connecting with other parents. For therapy services, contact your care team.',
     last_verified_date: 'April 2026',
     recommendation_level: 'community-resource',
   },
@@ -894,3 +868,23 @@ export const providers: Provider[] = [
 ];
 
 export const verifiedProviders = providers;
+
+// ─── White-label first-call resolution ───────────────────────────────────────
+
+/**
+ * The provider a deployment wants families to call first, if it has one.
+ * Returns null when SITE.firstCallProviderId is unset or does not match an
+ * entry in the directory — callers then fall back to neutral guidance.
+ */
+export function firstCallProvider(): Provider | null {
+  if (!SITE.firstCallProviderId) return null;
+  return providers.find((entry) => entry.id === SITE.firstCallProviderId) ?? null;
+}
+
+/**
+ * How to refer to the first-call provider in parent-facing copy. Falls back to
+ * "your clinic" so sentences read naturally on an unaffiliated deployment.
+ */
+export function firstCallProviderName(): string {
+  return firstCallProvider()?.provider_name ?? 'your clinic';
+}

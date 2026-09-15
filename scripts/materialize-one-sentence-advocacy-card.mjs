@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { gunzipSync } from 'node:zlib';
+import { applyBrand } from './pdf-brand.mjs';
 
 const OUTPUT = resolve(process.cwd(), 'public/worksheets/one-sentence-advocacy-card.pdf');
 const PDF_GZIP_BASE64 = [
@@ -123,5 +124,8 @@ const PDF_GZIP_BASE64 = [
 ].join('');
 
 mkdirSync(dirname(OUTPUT), { recursive: true });
-writeFileSync(OUTPUT, gunzipSync(Buffer.from(PDF_GZIP_BASE64, 'base64')));
+writeFileSync(
+  OUTPUT,
+  Buffer.from(applyBrand(gunzipSync(Buffer.from(PDF_GZIP_BASE64, 'base64')).toString('latin1'), OUTPUT), 'latin1'),
+);
 console.log('Materialized One-Sentence Advocacy Card.');

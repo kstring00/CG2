@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -9,19 +10,28 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
+import { SITE } from '@/config/site';
+
+export const metadata: Metadata = {
+  title: "Client sign-in",
+  description:
+    "Secure sign-in for families already receiving care.",
+  robots: { index: false, follow: false },
+};
+
 
 
 export default function ClientSignInPage() {
   return (
-    <main className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
+    <main id="main" className="min-h-screen" style={{ backgroundColor: '#f4efe8' }}>
 
       {/* ── NAV ─────────────────────────────────────────────────── */}
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-stone-200/80 bg-white/95 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
+              src={SITE.logoSrc}
+              alt={SITE.orgName}
               width={320}
               height={48}
               priority
@@ -74,7 +84,7 @@ export default function ClientSignInPage() {
             <div className="w-full max-w-[520px]">
 
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
-                <Lock className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Client Portal
+                <Lock className="h-3 w-3 text-rose-400" /> {SITE.orgName} · Client Portal
               </span>
 
               <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl">
@@ -138,7 +148,7 @@ export default function ClientSignInPage() {
           </div>
 
           <p className="mt-5 text-sm leading-relaxed text-stone-600">
-            This portal is for families already receiving care with Texas ABA Centers.
+            This portal is for families already receiving care with your provider.
             Everything inside is personal to your child — BCBA-written goals, session notes,
             and parent coaching tied to your actual plan.
           </p>
@@ -163,7 +173,7 @@ export default function ClientSignInPage() {
             <p className="mt-1.5 text-sm leading-relaxed text-amber-900">
               Everything inside the portal is demo data. Nothing here reflects a
               real child, real BCBA notes, or real session records. In production
-              this will connect to the Texas ABA Centers client sign-in. For now,
+              this will connect to your provider’s client sign-in. For now,
               walk through as an example family below.
             </p>
           </div>

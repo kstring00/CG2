@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Texas ABA Centers logo — hearts (red → maroon → plum → purple) + navy wordmark + gray tagline
+        // Common Ground brand scale — navy wordmark, plum/purple mark, teal accent.
         brand: {
           navy: {
             50:  '#eef1f8',
@@ -22,30 +22,6 @@ const config: Config = {
             700: '#111d39',
             800: '#0c152b',
             900: '#070c1a',
-          },
-          red: {
-            50:  '#fef0f1',
-            100: '#fcd4d7',
-            200: '#f9a8af',
-            300: '#f57c87',
-            400: '#f14f5f',
-            500: '#e2283a',
-            600: '#c41f32',
-            700: '#a31929',
-            800: '#821320',
-            900: '#5c0e17',
-          },
-          burgundy: {
-            50:  '#f8eef1',
-            100: '#ecd3da',
-            200: '#d9a8b7',
-            300: '#c67d94',
-            400: '#b35271',
-            500: '#8b2442',
-            600: '#7a1f3a',
-            700: '#641931',
-            800: '#4f1327',
-            900: '#390e1c',
           },
           plum: {
             50:  '#f7f0f6',
@@ -86,13 +62,25 @@ const config: Config = {
             200: '#d7d8db',
             300: '#b3b5ba',
             400: '#8f9299',
-            500: '#6e727a',
+            500: '#5f6570',
             600: '#5a5d64',
             700: '#474950',
             800: '#34363b',
             900: '#212226',
           },
-          teal: '#0F6E56',
+          teal: {
+            DEFAULT: '#0F6E56',
+            50:  '#eaf5f1',
+            100: '#c9e6dd',
+            200: '#95cdbc',
+            300: '#61b49b',
+            400: '#2f9a79',
+            500: '#0F6E56',
+            600: '#0c5f4a',
+            700: '#0a4e3d',
+            800: '#073c2f',
+            900: '#052a21',
+          },
         },
         primary: {
           DEFAULT: '#1a2e52',
@@ -101,9 +89,9 @@ const config: Config = {
           foreground: '#ffffff',
         },
         accent: {
-          DEFAULT: '#e2283a',
-          light: '#f14f5f',
-          dark: '#a31929',
+          DEFAULT: '#0F6E56',
+          light: '#2f9a79',
+          dark: '#0a4e3d',
           foreground: '#ffffff',
         },
         surface: {

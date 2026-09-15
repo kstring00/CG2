@@ -141,7 +141,7 @@ export default function CalmMode() {
           I&apos;m ready to come back
         </button>
 
-        <p className="mt-2 text-[11px] text-brand-muted-400">
+        <p className="mt-2 text-[11px] text-brand-muted-600">
           Or press <kbd className="rounded border border-brand-muted-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-brand-muted-500">Esc</kbd>
         </p>
       </div>

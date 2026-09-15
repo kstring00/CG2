@@ -1,9 +1,18 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, HeartHandshake, Phone, ShieldAlert, TriangleAlert } from 'lucide-react';
+import { SITE } from '@/config/site';
+
+export const metadata: Metadata = {
+  title: "Crisis help",
+  description:
+    "If today is an emergency, start here. Crisis lines, urgent options, and what to do first.",
+};
+
 
 export default function CrisisSupportPage() {
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
       <Link
         href="/support/at-home"
         className="inline-flex items-center gap-2 text-sm font-semibold text-brand-navy-700 hover:underline"
@@ -62,7 +71,7 @@ export default function CrisisSupportPage() {
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <a
-            href="tel:+18777715725"
+            href={`tel:${SITE.phone}`}
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-navy-700 px-4 text-sm font-bold text-white hover:bg-brand-navy-800"
           >
             <Phone className="h-4 w-4" /> Talk to someone now
@@ -79,7 +88,7 @@ export default function CrisisSupportPage() {
       <p className="mt-4 text-center text-[11px] leading-relaxed text-brand-muted-600">
         Common Ground is a caregiver-support tool. It does not replace individualized clinical guidance, an existing behavior or safety plan, or emergency services.
       </p>
-    </main>
+    </div>
   );
 }
 

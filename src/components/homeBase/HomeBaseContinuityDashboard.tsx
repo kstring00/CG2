@@ -47,6 +47,7 @@ import {
   type HomeBaseVisit,
 } from '@/lib/homeBaseActivity';
 import { cn } from '@/lib/utils';
+import { SITE } from '@/config/site';
 
 const SHORTLIST_KEY = 'cg-find-local-shortlist-v2';
 
@@ -228,7 +229,7 @@ function ActivityRow({ item }: { item: HomeBaseVisit | HomeBaseTool }) {
         <span className="block truncate text-[13px] font-semibold text-brand-navy-800">{item.label}</span>
         <span className="mt-0.5 block text-[11px] text-brand-muted-500">{formatRelativeTime(time)}</span>
       </span>
-      <ChevronRight className="h-4 w-4 shrink-0 text-brand-muted-400 transition group-hover:translate-x-0.5 group-hover:text-primary" />
+      <ChevronRight className="h-4 w-4 shrink-0 text-brand-muted-600 transition group-hover:translate-x-0.5 group-hover:text-primary" />
     </Link>
   );
 }
@@ -546,7 +547,7 @@ export default function HomeBaseContinuityDashboard() {
                     <span className="block truncate text-[13px] font-semibold text-brand-navy-800">{resource.name}</span>
                     <span className="mt-0.5 block truncate text-[11px] text-brand-muted-500">{resource.services.slice(0, 2).join(' · ')}{resource.cities[0] ? ` · ${resource.cities[0]}` : ''}</span>
                   </span>
-                  <ChevronRight className="h-4 w-4 text-brand-muted-400 transition group-hover:translate-x-0.5" />
+                  <ChevronRight className="h-4 w-4 text-brand-muted-600 transition group-hover:translate-x-0.5" />
                 </Link>
               ))}
             </div>
@@ -653,9 +654,9 @@ export default function HomeBaseContinuityDashboard() {
             <h2 className="text-lg font-semibold text-brand-navy-800">We&rsquo;re here for you</h2>
             <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">Real people. Real support. Whenever you need it.</p>
           </div>
-          <a href="tel:+18777715725" className="group flex items-center gap-3 p-5 transition hover:bg-white/70">
+          <a href={`tel:${SITE.phone}`} className="group flex items-center gap-3 p-5 transition hover:bg-white/70">
             <Phone className="h-6 w-6 text-primary" />
-            <span><span className="block text-[13px] font-semibold text-brand-navy-800">Admissions support</span><span className="mt-1 block text-[11px] text-brand-muted-500">Questions about ABA or next steps</span><span className="mt-1 block text-[12px] font-bold text-primary">(877) 771-5725</span></span>
+            <span><span className="block text-[13px] font-semibold text-brand-navy-800">Admissions support</span><span className="mt-1 block text-[11px] text-brand-muted-500">Questions about ABA or next steps</span><span className="mt-1 block text-[12px] font-bold text-primary">{SITE.phoneDisplay}</span></span>
           </a>
           <div className="flex items-center gap-3 p-5">
             <Heart className="h-6 w-6 text-primary" />
@@ -730,7 +731,7 @@ export default function HomeBaseContinuityDashboard() {
                       <a key={worksheet.id} href={worksheet.href} download onClick={() => openWorksheet(worksheet.id, worksheet.label, worksheet.href)} className="group flex min-h-20 items-center gap-3 rounded-xl border border-surface-border p-4 transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-sm">
                         <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700"><FileText className="h-5 w-5" /></span>
                         <span className="min-w-0 flex-1 text-[13px] font-semibold leading-snug text-brand-navy-800">{worksheet.label}</span>
-                        <ArrowRight className="h-4 w-4 text-brand-muted-400 transition group-hover:translate-x-0.5" />
+                        <ArrowRight className="h-4 w-4 text-brand-muted-600 transition group-hover:translate-x-0.5" />
                       </a>
                     ))}
                     <p className="sm:col-span-2 text-[11px] leading-relaxed text-brand-muted-500">These files open or download directly to your device. Common Ground cannot see what you type into them.</p>

@@ -7,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function CalmPage() {
-  return <CalmMode />;
+  return (
+    <main id="main">
+      <CalmMode />
+    </main>
+  );
 }

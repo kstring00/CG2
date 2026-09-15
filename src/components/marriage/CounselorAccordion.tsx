@@ -54,7 +54,7 @@ export default function CounselorAccordion({ openId, onToggle }: Props) {
                   </span>
                   <ChevronDown
                     className={cn(
-                      'h-5 w-5 shrink-0 text-brand-muted-400 transition duration-200',
+                      'h-5 w-5 shrink-0 text-brand-muted-600 transition duration-200',
                       open && 'rotate-180',
                     )}
                     aria-hidden

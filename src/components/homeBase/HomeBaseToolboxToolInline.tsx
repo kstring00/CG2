@@ -44,7 +44,7 @@ export default function HomeBaseToolboxToolInline({ tool, className }: Props) {
         </span>
         <ChevronDown
           className={cn(
-            'mt-1 h-4 w-4 shrink-0 text-brand-muted-400 transition',
+            'mt-1 h-4 w-4 shrink-0 text-brand-muted-600 transition',
             open && 'rotate-180',
           )}
           aria-hidden

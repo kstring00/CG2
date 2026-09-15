@@ -1,9 +1,17 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Phone } from 'lucide-react';
 import { CARE_PLAN_UI, type TeamMode } from '@/content/carePlan';
 import { buildPlan } from '@/lib/buildPlan';
 import LegacyStoredDataCleanup from '../LegacyStoredDataCleanup';
 import PrintButton from '../PrintButton';
+
+export const metadata: Metadata = {
+  title: "Crisis support plan",
+  description:
+    "What to do when things escalate \u2014 a printable plan for the moments you cannot think clearly.",
+};
+
 
 export const dynamic = 'force-dynamic';
 
@@ -25,11 +33,11 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
   if (plan.kind !== 'crisis') return null;
 
   return (
-    <main className="care-plan-print-sheet page-shell mx-auto w-full max-w-3xl">
+    <div className="care-plan-print-sheet page-shell mx-auto w-full max-w-3xl">
       <LegacyStoredDataCleanup />
 
       {process.env.NODE_ENV !== 'production' && (
-        <p className="print:hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">
+        <p className="print:hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">
           {CARE_PLAN_UI.developmentDraft.text}
         </p>
       )}
@@ -79,8 +87,8 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
         </ol>
       </section>
 
-      <section className="border-y border-brand-red-200 py-6" data-print-card>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-brand-red-700">
+      <section className="border-y border-rose-200 py-6" data-print-card>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-rose-700">
           {plan.phoneHeading.text}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
@@ -89,24 +97,24 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
         {plan.teamContact.href ? (
           <a
             href={plan.teamContact.href}
-            className="mt-3 inline-flex items-center gap-3 text-2xl font-semibold text-brand-red-700 underline decoration-brand-red-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+            className="mt-3 inline-flex items-center gap-3 text-2xl font-semibold text-rose-700 underline decoration-rose-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-600 focus-visible:ring-offset-2"
           >
             <Phone className="h-5 w-5" aria-hidden="true" />
             {plan.teamContact.phoneNumber.text}
           </a>
         ) : (
-          <p className="mt-3 flex items-center gap-3 text-2xl font-semibold text-brand-red-700">
+          <p className="mt-3 flex items-center gap-3 text-2xl font-semibold text-rose-700">
             <Phone className="h-5 w-5" aria-hidden="true" />
             {plan.teamContact.phoneNumber.text}
           </p>
         )}
       </section>
 
-      <section className="rounded-xl border-2 border-brand-red-300 bg-white p-5 sm:p-6" data-print-card>
-        <h2 className="text-xl font-semibold text-brand-red-800">
+      <section className="rounded-xl border-2 border-rose-300 bg-white p-5 sm:p-6" data-print-card>
+        <h2 className="text-xl font-semibold text-rose-800">
           {plan.immediateDangerHeading.text}
         </h2>
-        <p className="mt-3 text-[15px] font-medium leading-relaxed text-brand-red-800">
+        <p className="mt-3 text-[15px] font-medium leading-relaxed text-rose-800">
           {plan.immediateDangerBody.text}
         </p>
       </section>
@@ -124,6 +132,6 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
       <footer className="border-t border-surface-border pt-5 text-xs leading-relaxed text-brand-muted-500">
         {CARE_PLAN_UI.exactFooter.text}
       </footer>
-    </main>
+    </div>
   );
 }

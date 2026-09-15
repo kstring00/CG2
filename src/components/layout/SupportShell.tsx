@@ -27,10 +27,11 @@ import {
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 import NextStepButton from '@/components/layout/NextStepButton';
+import { SITE } from '@/config/site';
 
 /**
  * SupportShell — the layout for the parent-facing Common Ground experience.
- * The full site is designed for Texas ABA Centers parents and caregivers.
+ * The full site is designed for parents and caregivers.
  */
 const navGroups = [
   {
@@ -85,8 +86,8 @@ function SidebarContent({ pathname, instance, reduceMotion, onNavigate }: Sideba
       <div className="border-b border-surface-border px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0">
           <Image
-            src="/logos/cg2-lockup-final.png"
-            alt="Texas ABA Centers | Common Ground"
+            src={SITE.logoSrc}
+            alt={SITE.orgName}
             width={280}
             height={42}
             className="h-auto w-full max-w-[200px]"
@@ -102,7 +103,7 @@ function SidebarContent({ pathname, instance, reduceMotion, onNavigate }: Sideba
       <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-4" aria-label="Common Ground parent support navigation">
         {navGroups.map((group, gi) => (
           <div key={group.label} className={gi > 0 ? 'mt-5' : ''}>
-            <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-400">{group.label}</p>
+            <p className="px-3 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-muted-600">{group.label}</p>
             <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
               {group.items.map((item) => {
                 const isCurrent = pathname === item.href || (item.href !== '/support' && pathname.startsWith(item.href + '/'));
@@ -197,6 +198,9 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 390, damping: 40, mass: 0.9 }}
         className={cn('fixed inset-y-0 left-0 z-50 flex min-h-0 w-64 flex-col bg-white shadow-2xl lg:hidden', !sidebarOpen && 'pointer-events-none')}
         aria-hidden={!sidebarOpen}
+        // `inert` removes the closed drawer's buttons and links from the tab
+        // order. Without it, aria-hidden content stays keyboard-reachable.
+        inert={!sidebarOpen}
       >
         <button onClick={() => setSidebarOpen(false)} aria-label="Close navigation" className="absolute right-4 top-4 rounded-lg p-1 transition hover:bg-surface-subtle active:scale-95">
           <X className="h-5 w-5 text-brand-muted-500" />
@@ -204,7 +208,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
         <SidebarContent pathname={pathname} instance="mobile" reduceMotion={reduceMotion} onNavigate={() => setSidebarOpen(false)} />
       </motion.aside>
 
-      <div className="flex min-h-screen flex-1 flex-col lg:ml-64" style={{ ['--find-sticky-top' as string]: '2.75rem' }}>
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:ml-64" style={{ ['--find-sticky-top' as string]: '2.75rem' }}>
         {isFindPage && (
           <div className="sticky top-0 z-40 border-b border-surface-border bg-white text-brand-muted-700 shadow-sm lg:flex lg:h-[var(--find-sticky-top)] lg:items-center" role="region" aria-label="Crisis support">
             <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 text-[12px] font-semibold sm:px-6 lg:px-8">
@@ -225,7 +229,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <div className={cn('mx-auto flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8', isFindPage ? 'max-w-[1600px]' : 'max-w-6xl')}>
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
-              Texas ABA Centers · Parent Support
+              {SITE.orgName} · Parent Support
             </p>
             <CrisisPill />
           </div>
@@ -238,8 +242,8 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
                 <Menu className="h-5 w-5 text-brand-muted-600" />
               </button>
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">Common Ground · Parent Support</p>
-                <p className="truncate text-sm text-brand-muted-700">For Texas ABA Centers families</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-600">Common Ground · Parent Support</p>
+                <p className="truncate text-sm text-brand-muted-700">For families</p>
               </div>
             </div>
           </header>
@@ -251,7 +255,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           </button>
         )}
 
-        {isFindPage ? <main className="flex-1">{children}</main> : <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>}
+        {isFindPage ? <main id="main" className="flex-1">{children}</main> : <main id="main" className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>}
       </div>
     </div>
   );

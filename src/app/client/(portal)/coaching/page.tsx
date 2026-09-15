@@ -1,5 +1,14 @@
+import type { Metadata } from 'next';
 import { ArrowRight, CheckCircle2, GraduationCap, Play } from 'lucide-react';
 import { ClientDemoBanner } from '@/components/ui/ClientDemoBanner';
+
+export const metadata: Metadata = {
+  title: "Parent coaching",
+  description:
+    "Short modules tied to your child's current goals.",
+  robots: { index: false, follow: false },
+};
+
 
 const modules = [
   {

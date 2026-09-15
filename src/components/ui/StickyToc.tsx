@@ -47,7 +47,7 @@ export function StickyToc({ items, className, heading = 'On this page' }: Props)
               href={`#${item.id}`}
               className="flex items-baseline gap-2.5 rounded-lg border-l-2 border-transparent px-2 py-1.5 text-[13px] leading-snug text-brand-muted-700 transition-colors hover:border-brand-navy-200 hover:bg-brand-warm-100 hover:text-brand-muted-900"
             >
-              <span className="shrink-0 font-display text-[11px] font-medium tabular-nums text-brand-muted-400">
+              <span className="shrink-0 font-display text-[11px] font-medium tabular-nums text-brand-muted-600">
                 {item.num}
               </span>
               <span>{item.label}</span>

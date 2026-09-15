@@ -7,6 +7,9 @@ import type { Metadata } from 'next';
  * over time. Once that migration is complete, this whole route can be deleted.
  */
 export const metadata: Metadata = {
+  title: 'Welcome',
+  description:
+    'An archived introduction to Common Ground, kept while its content migrates into the current pages.',
   robots: { index: false, follow: false },
 };
 

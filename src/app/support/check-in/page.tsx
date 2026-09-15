@@ -3,7 +3,7 @@
 /**
  * /support/check-in — Quick Bandwidth Check (standalone)
  *
- * This used to be a separate weekly qualitative form. Per CCO direction, the
+ * This used to be a separate weekly qualitative form. Per clinical review, the
  * check-in is now a single, consistent Bandwidth Check across the entire
  * site. This page is the standalone home for it — entered from:
  *
@@ -61,6 +61,14 @@ function CheckInPageInner() {
           <ArrowLeft className="h-4 w-4" /> Back
         </Link>
       </div>
+
+      <header className="page-header">
+        <h1 className="page-title">your check-in</h1>
+        <p className="page-description">
+          A short read on how much you&rsquo;re carrying right now. No score, no streak — just
+          a way to size the week ahead.
+        </p>
+      </header>
 
       {!result ? (
         <BandwidthCheck

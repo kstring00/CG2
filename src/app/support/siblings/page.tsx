@@ -308,7 +308,7 @@ function AgePanel() {
                   <span className="text-[14px] font-semibold text-brand-navy-700">{sec.heading}</span>
                   <ChevronDown
                     className={cn(
-                      'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                      'h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
                       isOpen && 'rotate-180',
                     )}
                   />
@@ -370,7 +370,7 @@ function SignsPanel() {
                 </span>
                 <ChevronDown
                   className={cn(
-                    'mt-0.5 h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+                    'mt-0.5 h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
                     isOpen && 'rotate-180',
                   )}
                 />
@@ -570,7 +570,7 @@ function ResearchNote() {
         </span>
         <ChevronDown
           className={cn(
-            'h-4 w-4 shrink-0 text-brand-muted-400 transition duration-200',
+            'h-4 w-4 shrink-0 text-brand-muted-600 transition duration-200',
             open && 'rotate-180',
           )}
         />
@@ -687,7 +687,7 @@ export default function SiblingsPage() {
           <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-surface-border bg-white shadow-soft">
             <Star className="h-6 w-6 text-amber-400" />
           </div>
-          <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-widest text-brand-muted-400">
+          <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-widest text-brand-muted-600">
             A note for the sibling — written for them, for you to share
           </p>
           <div className="mx-auto max-w-lg space-y-4 text-[14px] leading-relaxed text-brand-muted-800">
