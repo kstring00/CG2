@@ -8,7 +8,9 @@ const H = 792;
 const navy = [0.102, 0.153, 0.263];
 const muted = [0.36, 0.42, 0.53];
 const teal = [0.02, 0.44, 0.35];
-const red = [0.85, 0.16, 0.13];
+// Safety copy (911 / 988) keeps a real red; the brand mark does not.
+const red = [0.78, 0.12, 0.1];
+const plum = [0.439, 0.188, 0.408];
 const border = [0.78, 0.82, 0.88];
 const paleTeal = [0.94, 0.975, 0.965];
 const paleBlue = [0.95, 0.97, 0.99];
@@ -85,7 +87,7 @@ function labelLines(x, y, lines, { size = 7.6, rgb = navy, bold = false, leading
 const content = [];
 content.push(circle(40.5, 761.5, 5.5, { fill: teal }));
 content.push(circle(52.5, 766.5, 4.5, { fill: navy }));
-content.push(circle(52.5, 753.5, 3.5, { fill: red }));
+content.push(circle(52.5, 753.5, 3.5, { fill: plum }));
 content.push(text(62, 761, 10.5, ORG_HEADER, { bold: true }));
 content.push(text(62, 747, 8.2, 'COMMON GROUND - PARENT SUPPORT', { rgb: muted }));
 content.push(text(497, 761, 8, 'CG-WS-05 v1.0', { rgb: muted }));

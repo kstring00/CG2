@@ -85,7 +85,7 @@ const content = [];
 
 content.push(rect(35, 756, 11, 11, { fill: teal }));
 content.push(rect(48, 762, 9, 9, { fill: navy }));
-content.push(rect(49, 750, 7, 7, { fill: [0.85, 0.16, 0.13] }));
+content.push(rect(49, 750, 7, 7, { fill: [0.439, 0.188, 0.408] }));
 content.push(text(62, 761, 10.5, ORG_HEADER, { bold: true }));
 content.push(text(62, 747, 8.2, 'COMMON GROUND - PARENT SUPPORT', { rgb: muted }));
 content.push(text(500, 761, 8, 'CG-WS-01 v0.2 DRAFT', { rgb: muted }));

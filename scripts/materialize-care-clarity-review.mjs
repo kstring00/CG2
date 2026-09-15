@@ -84,7 +84,7 @@ function labelLines(x, y, lines, { size = 7.6, rgb = muted, bold = false, leadin
 const content = [];
 content.push(circle(40.5, 761.5, 5.5, { fill: teal }));
 content.push(circle(52.5, 766.5, 4.5, { fill: navy }));
-content.push(circle(52.5, 753.5, 3.5, { fill: [0.85, 0.16, 0.13] }));
+content.push(circle(52.5, 753.5, 3.5, { fill: [0.439, 0.188, 0.408] }));
 content.push(text(62, 761, 10.5, ORG_HEADER, { bold: true }));
 content.push(text(62, 747, 8.2, 'COMMON GROUND - PARENT SUPPORT', { rgb: muted }));
 content.push(text(494, 761, 8, 'CG-WS-03 v0.1 DRAFT', { rgb: muted }));

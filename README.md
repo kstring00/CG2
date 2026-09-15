@@ -173,11 +173,17 @@ src/
 `public/worksheets/` (gitignored — they are build output). Each carries
 `SITE.orgName` as its header and PDF `/Author`.
 
-Three of the eight ship as pre-built PDF blobs rather than being laid out at
-build time; `scripts/pdf-brand.mjs` patches the org name into those at a fixed
-width so xref byte offsets stay valid. If your org name is longer than
-17 characters the build fails with a clear error rather than emitting a corrupt
-PDF.
+Several of the eight ship as pre-built PDF blobs rather than being laid out at
+build time. Their text lives inside content streams that are ASCII85-encoded
+and then Flate-compressed, so `scripts/pdf-brand.mjs` decodes each stream
+through its declared filter chain, rewrites the brand, re-encodes it, and
+rebuilds the xref table (byte offsets shift, so the table has to be regenerated).
+
+`scripts/verify-worksheet-branding.mjs` runs on every `predev` and `prebuild`
+and fails the build if any worksheet still carries legacy brand text or the
+retired brand red in its header mark. It decodes the filter chains before
+checking — a plain grep over these PDFs reports "clean" on a page that visibly
+reads the old brand name, which is exactly how this shipped broken once.
 
 ## Brand Palette
 
