@@ -62,10 +62,10 @@ export default function CrisisSupportPage() {
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <a
-            href="tel:+18777715725"
+            href="tel:988"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-brand-navy-700 px-4 text-sm font-bold text-white hover:bg-brand-navy-800"
           >
-            <Phone className="h-4 w-4" /> Talk to someone now
+            <Phone className="h-4 w-4" /> Call or text 988
           </a>
           <Link
             href="/support/connect"

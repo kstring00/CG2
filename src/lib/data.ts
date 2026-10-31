@@ -368,7 +368,7 @@ export const supportProviders: SupportProvider[] = [
     website: 'https://example.com',
     acceptsInsurance: true,
     rating: 4.9,
-    verification: 'Demo listing styled as a clinically reviewed referral example',
+    verification: 'Demo listing — illustrative only, not a real referral',
     lastReviewed: 'March 2026',
     journeyStages: ['just-diagnosed'],
     isDemo: true,
@@ -470,7 +470,7 @@ export const guidedSteps: GuidedStep[] = [
       'Parents are almost always the first to notice. You know your child better than any clinician does. Getting an evaluation is not an overreaction — it is the most protective thing you can do right now, before another month passes.',
     whatMattersNow: [
       'Getting a professional evaluation scheduled — not researching first, not waiting for your next pediatrician visit',
-      'Understanding that Texas ABA Centers can provide the diagnosis AND start therapy in the same place — no separate referrals',
+      'Knowing that some providers handle both the evaluation and the therapy, which saves you a separate referral step',
       'Knowing that the average Texas family waits 5+ months for services — starting now is the only way to avoid that',
     ],
     whatCanWait: [
@@ -479,7 +479,7 @@ export const guidedSteps: GuidedStep[] = [
       'Waiting until your next pediatrician appointment if you can call a specialist today',
     ],
     checklist: [
-      'Call Texas ABA Centers for a free consultation — they evaluate and treat, so your child does not get bounced between providers: (877) 771-5725.',
+      'Call a local provider to ask about an evaluation — look for one that evaluates and treats, so your child does not get bounced between places.',
       'Keep a simple log this week: what you notice, when it happens, how your child responds. Bring this to any evaluation.',
       'If your child is under 3, also call Early Childhood Intervention (ECI) — it is free and requires no referral.',
       'Ask your pediatrician for an M-CHAT developmental screening at your next visit — bring specific written examples.',
@@ -487,11 +487,11 @@ export const guidedSteps: GuidedStep[] = [
       'Tell one trusted person what you are doing — you should not carry this alone.',
     ],
     supportEscalation: [
-      'If you are being told to "wait and see" but your gut says otherwise — get a second opinion. You do not need a referral to call Texas ABA Centers directly.',
-      'If cost or insurance feels like a barrier, Texas ABA Centers verifies insurance on your first call and can tell you immediately what is covered.',
+      'If you are being told to "wait and see" but your gut says otherwise — get a second opinion. Most providers let you call directly without a referral.',
+      'If cost or insurance feels like a barrier, ask any provider to verify your insurance on the first call — most will tell you what is covered before you commit.',
       'If this is triggering panic or grief, that is valid — even before a diagnosis. Parent support can start right now.',
     ],
-    supportAction: 'Call (877) 771-5725 for a free consultation — Texas ABA Centers can evaluate your child and start therapy in the same place, with no long waitlist.',
+    supportAction: 'Use the provider directory to find local clinics that evaluate and treat in the same place, then call to ask about current wait times.',
     resources: ['r1', 'r2', 'r8'],
     reviewedBy: 'Parent navigation team',
     lastUpdated: 'April 2026',
@@ -519,7 +519,7 @@ export const guidedSteps: GuidedStep[] = [
     ],
     checklist: [
       'Give yourself today. The urgency is real, but so is your need to process.',
-      'Call Texas ABA Centers — (877) 771-5725 — to start the therapy intake process. Early start = better outcomes.',
+      'Call a local ABA provider to start the therapy intake process. Early start = better outcomes.',
       'Request and read the full evaluation report. Write down every question you still have.',
       'Call your insurance and document what is covered, what requires referrals, and what the process is.',
       'Find one support resource for yourself — you are part of this plan too.',
@@ -530,7 +530,7 @@ export const guidedSteps: GuidedStep[] = [
       'If the diagnosis has surfaced conflict between partners or family members, that is common and worth addressing early.',
       'If you feel completely flooded, put down the research and call someone who can help you triage.',
     ],
-    supportAction: 'Call (877) 771-5725 to start the therapy intake process — and find one support resource for yourself today.',
+    supportAction: 'Call a local ABA provider to start the therapy intake process — and find one support resource for yourself today.',
     resources: ['r1', 'r2', 'r3', 'r8'],
     reviewedBy: 'Clinically informed navigation review',
     lastUpdated: 'April 2026',
@@ -1460,7 +1460,7 @@ export const sensoryVerificationLabels: Record<
   { label: string; color: string }
 > = {
   'staff-vouched': {
-    label: 'Verified by Texas ABA Centers',
+    label: 'Verified by our team',
     color: 'bg-green-50 text-green-700 border-green-200',
   },
   'parent-submitted': {

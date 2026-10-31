@@ -17,7 +17,7 @@ import {
   ArrowRight,
   LogOut,
 } from 'lucide-react';
-import { TexasAbaLogo } from '@/components/brand/TexasAbaLogo';
+import { CommonGroundLogo } from '@/components/brand/CommonGroundLogo';
 import { cn } from '@/lib/utils';
 import CrisisPill from '@/components/CrisisPill';
 
@@ -44,10 +44,7 @@ export function ClientShell({
     <>
       <div className="border-b border-accent/20 bg-gradient-to-b from-accent/5 to-transparent px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0 space-y-2">
-          <TexasAbaLogo decorative className="h-8 w-auto" />
-          <span className="block font-display text-sm font-bold leading-tight text-brand-muted-900">
-            Common<span className="text-primary"> Ground</span>
-          </span>
+          <CommonGroundLogo className="h-9 w-auto" />
         </Link>
         <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-accent">
           <Lock className="h-3 w-3" /> Client portal

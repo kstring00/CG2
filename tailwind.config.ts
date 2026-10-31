@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Texas ABA Centers logo — hearts (red → maroon → plum → purple) + navy wordmark + gray tagline
+        // Brand palette — hearts (red → maroon → plum → purple) + navy wordmark + gray tagline
         brand: {
           navy: {
             50:  '#eef1f8',

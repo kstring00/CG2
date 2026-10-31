@@ -58,7 +58,7 @@ const newlyDiagnosedArc: Arc = {
     },
     {
       week: 4,
-      theme: 'Find providers & connect with admissions',
+      theme: 'Find providers & reach their intake teams',
       phase: 'setup',
       candidateStepIds: ['findLocal', 'shortlistProviders', 'admissionsConsult', 'callOneProvider'],
     },
@@ -185,7 +185,7 @@ const lookingForAbaArc: Arc = {
     },
     {
       week: 5,
-      theme: 'Make contact & connect with admissions',
+      theme: 'Make contact & reach a provider intake team',
       phase: 'setup',
       candidateStepIds: ['callOneProvider', 'admissionsConsult', 'findLocal'],
     },

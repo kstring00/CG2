@@ -306,8 +306,8 @@ const C: Record<string, Candidate> = {
   admissionsConsult: {
     id: 'admissionsConsult',
     title: ADMISSIONS_CTA_LABEL,
-    why: 'One universal door: a free consultation with our admissions team. They walk through coverage and next steps with you — no eligibility decision on this site.',
-    href: 'tel:+18777715725',
+    why: 'One universal door: the provider directory. Compare local ABA clinics, check what each accepts, and call the one that fits — no eligibility decision on this site.',
+    href: '/support/find',
     bucket: 'do-today',
     altBuckets: ['ask-bcba'],
   },
@@ -837,7 +837,7 @@ function boostArcPool(scores: Map<string, Score>, arcWeek: ArcWeek): void {
 // 5-bucket plan (CCO review, May 2026)
 // ---------------------------------------------------------------------------
 
-/** The 5 buckets, in the display order Texas ABA Centers' CCO asked for. */
+/** The 5 buckets, in their established display order. */
 export const BUCKET_ORDER: StepBucket[] = [
   'do-today',
   'ask-bcba',

@@ -1,4 +1,12 @@
 /** @type {import('next').NextConfig} */
+
+// The project published under texasabacenterscg.com before it became a
+// standalone, independent resource. Anything that still resolves to the legacy
+// host is sent to the matching path on the new domain with a permanent (308)
+// redirect so search engines transfer the old URLs rather than index both.
+const LEGACY_HOSTS = ['texasabacenterscg.com', 'www.texasabacenterscg.com'];
+const SITE_ORIGIN = 'https://commongroundautism.org';
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -23,6 +31,19 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
+      // /design-preview is the module the homepage re-exports. Serving it at
+      // its own URL too would publish the same page twice, so it folds into /.
+      {
+        source: '/design-preview',
+        destination: '/',
+        permanent: true,
+      },
+      ...LEGACY_HOSTS.map((host) => ({
+        source: '/:path*',
+        has: [{ type: 'host', value: host }],
+        destination: `${SITE_ORIGIN}/:path*`,
+        permanent: true,
+      })),
     ];
   },
 };

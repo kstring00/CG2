@@ -57,7 +57,7 @@ const communityRules = [
   'Share support and lived experience without telling another parent what treatment to try.',
   'Do not recommend supplements, diets, protocols, medications, therapies, dosing, or “what worked for us” treatments.',
   'Protect children and other members: no full names, schools, clinics, photos, medical records, screenshots, or reposting.',
-  'Criticism of ABA, providers, and Texas ABA Centers is allowed. Civility toward other members is still required.',
+  'Criticism of ABA and of any provider is allowed. Civility toward other members is still required.',
   'Peer support is not clinical care, emergency intervention, or a crisis line.',
 ];
 
@@ -184,7 +184,7 @@ export default function ConnectPage() {
           <div>
             <h2 id="privacy-heading" className="text-[17px] font-semibold text-brand-navy-800">Privacy, stated honestly</h2>
             <p className="mt-2 text-[13px] leading-relaxed text-brand-muted-700">
-              Community posts would stay inside Common Ground and would not be placed in a child’s clinical record or sent to admissions. Moderators would be able to read posts to keep the space safe. This would not carry the same confidentiality protections as therapy. If a child appears to be abused, neglected, or in immediate danger, staff may have a legal duty to act. Final wording, data handling, retention, and deletion rules require legal and HIPAA compliance approval before launch.
+              Community posts would stay inside Common Ground and would not be placed in a child’s clinical record or sent to any provider. Moderators would be able to read posts to keep the space safe. This would not carry the same confidentiality protections as therapy. If a child appears to be abused, neglected, or in immediate danger, staff may have a legal duty to act. Final wording, data handling, retention, and deletion rules require legal and HIPAA compliance approval before launch.
             </p>
           </div>
         </div>

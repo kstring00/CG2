@@ -23,10 +23,10 @@ export default function DesignPreviewPage() {
         <div className={styles.navInner}>
           <Link href="/" aria-label="Common Ground home" className={styles.logoLink}>
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
-              width={320}
-              height={48}
+              src="/logos/common-ground-lockup.png"
+              alt="Common Ground"
+              width={384}
+              height={128}
               priority
             />
           </Link>
@@ -42,7 +42,7 @@ export default function DesignPreviewPage() {
       <section className={styles.hero}>
         <Image
           src="/hero-selected.jpg"
-          alt="Father and daughter doing a puzzle with a Texas ABA Centers therapy kit"
+          alt="A father and daughter working on a puzzle together at a table"
           fill
           priority
           quality={100}
@@ -54,7 +54,7 @@ export default function DesignPreviewPage() {
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
             <span className={styles.heroPill}>
-              <Heart aria-hidden /> Texas ABA Centers · Common Ground
+              <Heart aria-hidden /> Common Ground · Free parent resources
             </span>
             <h1>
               Real autism support for real <em>Texas</em> families
@@ -80,7 +80,7 @@ export default function DesignPreviewPage() {
                 Browse all support
               </Link>
             </div>
-            <p className={styles.heroNote}>No sign-up. Built for Texas ABA Centers families.</p>
+            <p className={styles.heroNote}>No sign-up. Free for every family.</p>
           </div>
         </div>
         <div className={styles.heroWave} aria-hidden />
