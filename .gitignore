@@ -37,3 +37,8 @@ next-env.d.ts
 # supabase
 supabase/.temp/
 .pr-body.md
+
+# generated worksheets
+# Built from scripts/materialize-*.mjs by predev/prebuild on every run, so the
+# scripts are the source of truth and the PDFs are never committed.
+/public/worksheets/

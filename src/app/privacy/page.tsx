@@ -1,16 +1,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { Shield, Bot, Eye, Lock, Mail, FileText, AlertTriangle, Phone } from 'lucide-react';
+import { Shield, Bot, Eye, Lock, Mail, FileText, AlertTriangle } from 'lucide-react';
 import type { Metadata } from 'next';
+import { CONTACT_EMAIL as CONTACT_EMAIL_ADDRESS, INDEPENDENCE_DISCLAIMER, LEGACY_HOST, SITE_URL } from '@/lib/siteMeta';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'How Common Ground by Texas ABA Centers collects, uses, and protects your information.',
+  description: 'How Common Ground, an independent parent resource, collects, uses, and protects your information.',
 };
 
 const EFFECTIVE_DATE = 'April 23, 2026';
-const CONTACT_EMAIL = 'info@texasabacenters.com';
-const CONTACT_PHONE = '(832) 402-4144';
+const CONTACT_EMAIL = CONTACT_EMAIL_ADDRESS;
 
 export default function PrivacyPage() {
   return (
@@ -20,10 +20,10 @@ export default function PrivacyPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
-              width={320}
-              height={48}
+              src="/logos/common-ground-lockup.png"
+              alt="Common Ground"
+              width={384}
+              height={128}
               priority
               className="h-8 w-auto sm:h-9"
               style={{ objectFit: 'contain' }}
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-base leading-relaxed" style={{ color: '#5a5d64' }}>
-            Common Ground is a free parent navigation resource provided by Texas ABA Centers.
+            Common Ground is a free, independently created parent navigation resource.
             This policy explains what information we collect, how we use it, and your rights — in plain English.
           </p>
         </header>
@@ -63,16 +63,19 @@ export default function PrivacyPage() {
           {/* Who we are */}
           <Section icon={<FileText className="h-5 w-5" style={{ color: '#1a2e52' }} />} title="Who We Are">
             <p>
-              Common Ground (<strong>texasabacenterscg.com</strong>) is a parent navigation system operated by
-              Texas ABA Centers. It is designed to help families of children with autism understand ABA therapy,
-              find local resources, and navigate each stage of their journey. The site is free and does not require
-              an account to use.
+              Common Ground (<strong>{SITE_URL.replace('https://', '')}</strong>) is an independently created
+              parent navigation resource. It is designed to help families of children with autism understand ABA
+              therapy, find local resources, and navigate each stage of their journey. The site is free and does not
+              require an account to use.
             </p>
             <p className="mt-3">
-              Texas ABA Centers is headquartered in Houston, Texas. For questions about this policy, contact us at{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: '#1a2e52', fontWeight: 600 }}>{CONTACT_EMAIL}</a>{' '}
-              or{' '}
-              <a href={`tel:${CONTACT_PHONE}`} style={{ color: '#1a2e52', fontWeight: 600 }}>{CONTACT_PHONE}</a>.
+              {INDEPENDENCE_DISCLAIMER} It is not a clinic, does not provide treatment, and does not accept payment
+              from the providers it lists. The site previously published at <strong>{LEGACY_HOST}</strong>; those
+              addresses now redirect here.
+            </p>
+            <p className="mt-3">
+              For questions about this policy, contact us at{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: '#1a2e52', fontWeight: 600 }}>{CONTACT_EMAIL}</a>.
             </p>
           </Section>
 
@@ -196,9 +199,8 @@ export default function PrivacyPage() {
               medical records, clinical diagnoses, or treatment data.
             </p>
             <p className="mt-3">
-              If you are a current Texas ABA Centers client seeking clinical support, please use the secure{' '}
-              <Link href="/client" style={{ color: '#1a2e52', fontWeight: 600 }}>Client Portal</Link> rather
-              than the public chat assistant.
+              If you are seeking clinical support, contact your own provider directly rather than using the
+              public chat assistant.
             </p>
           </Section>
 
@@ -252,14 +254,6 @@ export default function PrivacyPage() {
                 <Mail className="h-4 w-4" />
                 {CONTACT_EMAIL}
               </a>
-              <a
-                href={`tel:${CONTACT_PHONE}`}
-                className="inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold transition hover:opacity-90"
-                style={{ borderColor: '#d4d8e3', color: '#1a2e52', backgroundColor: '#ffffff' }}
-              >
-                <Phone className="h-4 w-4" />
-                {CONTACT_PHONE}
-              </a>
             </div>
           </div>
 
@@ -267,7 +261,7 @@ export default function PrivacyPage() {
           <div className="flex flex-wrap justify-center gap-4 pt-2 text-sm" style={{ color: '#8f9299' }}>
             <Link href="/" className="hover:underline" style={{ color: '#1a2e52' }}>Home</Link>
             <Link href="/support" className="hover:underline" style={{ color: '#1a2e52' }}>Care Navigation</Link>
-            <span>© {new Date().getFullYear()} Texas ABA Centers</span>
+            <span>© {new Date().getFullYear()} Common Ground</span>
           </div>
 
         </div>

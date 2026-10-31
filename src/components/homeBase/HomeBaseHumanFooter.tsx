@@ -11,7 +11,7 @@ export default function HomeBaseHumanFooter() {
         We&rsquo;re here when you&rsquo;re ready
       </h2>
       <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-brand-muted-600">
-        A free consultation with admissions — or crisis support if today feels unsafe.
+        Browse local providers at your own pace — or get crisis support if today feels unsafe.
       </p>
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch">
         <div className="flex flex-1 items-center rounded-2xl border border-surface-border bg-white px-4 py-3 shadow-soft sm:min-w-[280px]">

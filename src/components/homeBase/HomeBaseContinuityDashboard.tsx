@@ -653,10 +653,10 @@ export default function HomeBaseContinuityDashboard() {
             <h2 className="text-lg font-semibold text-brand-navy-800">We&rsquo;re here for you</h2>
             <p className="mt-1 text-[12px] leading-relaxed text-brand-muted-600">Real people. Real support. Whenever you need it.</p>
           </div>
-          <a href="tel:+18777715725" className="group flex items-center gap-3 p-5 transition hover:bg-white/70">
-            <Phone className="h-6 w-6 text-primary" />
-            <span><span className="block text-[13px] font-semibold text-brand-navy-800">Admissions support</span><span className="mt-1 block text-[11px] text-brand-muted-500">Questions about ABA or next steps</span><span className="mt-1 block text-[12px] font-bold text-primary">(877) 771-5725</span></span>
-          </a>
+          <Link href="/support/find" className="group flex items-center gap-3 p-5 transition hover:bg-white/70">
+            <Search className="h-6 w-6 text-primary" />
+            <span><span className="block text-[13px] font-semibold text-brand-navy-800">Find local providers</span><span className="mt-1 block text-[11px] text-brand-muted-500">Questions about ABA or next steps</span><span className="mt-1 block text-[12px] font-bold text-primary">Browse the directory</span></span>
+          </Link>
           <div className="flex items-center gap-3 p-5">
             <Heart className="h-6 w-6 text-primary" />
             <span><span className="block text-[13px] font-semibold text-brand-navy-800">Crisis support</span><span className="mt-1 block text-[11px] text-brand-muted-500">Help is available 24/7</span><span className="mt-1 flex gap-2 text-[12px] font-bold text-rose-600"><a href="tel:988" className="hover:underline">Call 988</a><span>or</span><a href="sms:988" className="hover:underline">text 988</a></span></span>

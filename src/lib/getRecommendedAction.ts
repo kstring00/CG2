@@ -21,9 +21,9 @@ export function getRecommendedAction(
   switch (context.currentSituation) {
     case 'We just got the diagnosis':
       return {
-        type: 'phone',
-        label: 'Call (877) 771-5725 to schedule intake',
-        value: 'tel:+18777715725',
+        type: 'link',
+        label: 'Find local ABA providers and start intake',
+        value: '/support/find',
       };
     case "We're waiting on an evaluation":
       return {

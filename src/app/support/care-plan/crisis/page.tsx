@@ -86,7 +86,7 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
         <p className="mt-2 text-sm leading-relaxed text-brand-muted-600">
           {plan.teamContact.label.text}
         </p>
-        {plan.teamContact.href ? (
+        {plan.teamContact.phoneNumber.text && plan.teamContact.href ? (
           <a
             href={plan.teamContact.href}
             className="mt-3 inline-flex items-center gap-3 text-2xl font-semibold text-brand-red-700 underline decoration-brand-red-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
@@ -95,10 +95,13 @@ export default async function CrisisCarePlanPage({ searchParams }: { searchParam
             {plan.teamContact.phoneNumber.text}
           </a>
         ) : (
-          <p className="mt-3 flex items-center gap-3 text-2xl font-semibold text-brand-red-700">
+          <a
+            href="tel:988"
+            className="mt-3 inline-flex items-center gap-3 text-2xl font-semibold text-brand-red-700 underline decoration-brand-red-200 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-500 focus-visible:ring-offset-2"
+          >
             <Phone className="h-5 w-5" aria-hidden="true" />
-            {plan.teamContact.phoneNumber.text}
-          </p>
+            Call or text 988
+          </a>
         )}
       </section>
 

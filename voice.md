@@ -55,6 +55,6 @@ page&rsquo;s rhythm:
 
 ## When to break the rules
 
-Headings that are proper nouns (Texas ABA Centers, Common Ground, Still Waters,
+Headings that are proper nouns (Common Ground, Still Waters,
 Pathfinders) keep their casing. Crisis messaging uses normal sentence case
 because lowercase reads as low-stakes — and 988 is high-stakes.

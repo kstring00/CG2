@@ -82,9 +82,10 @@ export const ADMISSIONS_STEP_IDS = new Set([
   'findLocal',
 ]);
 
-export const ADMISSIONS_PHONE = '+18777715725';
-export const ADMISSIONS_PHONE_DISPLAY = '(877) 771-5725';
-// Single source of truth for the admissions CTA primary line. Both the
-// AdmissionsHandoff button and the in-plan step title consume this so they
-// can never drift apart.
-export const ADMISSIONS_CTA_LABEL = 'Talk to Admissions — free consultation';
+// Common Ground runs no intake line of its own, so the universal handoff is a
+// route into the provider directory rather than a phone number. Single source
+// of truth for the CTA: both AdmissionsHandoff and the in-plan step title
+// consume these so they can never drift apart.
+export const ADMISSIONS_CTA_LABEL = 'Find and compare local ABA providers';
+export const ADMISSIONS_CTA_DETAIL = 'Free directory — no sign-up';
+export const ADMISSIONS_CTA_HREF = '/support/find';
