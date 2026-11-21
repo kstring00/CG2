@@ -73,19 +73,3 @@ export function getSupportNudgeCandidateId(thread: SupportThreadId): string {
   return NUDGE_CANDIDATE[thread];
 }
 
-/** Step ids where the universal admissions handoff should appear inline. */
-export const ADMISSIONS_STEP_IDS = new Set([
-  'admissionsConsult',
-  'callOneProvider',
-  'shortlistProviders',
-  'compareThree',
-  'findLocal',
-]);
-
-// Common Ground runs no intake line of its own, so the universal handoff is a
-// route into the provider directory rather than a phone number. Single source
-// of truth for the CTA: both AdmissionsHandoff and the in-plan step title
-// consume these so they can never drift apart.
-export const ADMISSIONS_CTA_LABEL = 'Find and compare local ABA providers';
-export const ADMISSIONS_CTA_DETAIL = 'Free directory — no sign-up';
-export const ADMISSIONS_CTA_HREF = '/support/find';

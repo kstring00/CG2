@@ -60,7 +60,7 @@ const newlyDiagnosedArc: Arc = {
       week: 4,
       theme: 'Find providers & reach their intake teams',
       phase: 'setup',
-      candidateStepIds: ['findLocal', 'shortlistProviders', 'admissionsConsult', 'callOneProvider'],
+      candidateStepIds: ['findLocal', 'shortlistProviders', 'callOneProvider'],
     },
     {
       week: 5,
@@ -72,7 +72,7 @@ const newlyDiagnosedArc: Arc = {
       week: 6,
       theme: 'Get ready to start services',
       phase: 'setup',
-      candidateStepIds: ['trackNotes', 'documentHard', 'admissionsConsult', 'todo-intake-readiness'],
+      candidateStepIds: ['trackNotes', 'documentHard', 'todo-intake-readiness'],
     },
     {
       week: 7,
@@ -144,7 +144,7 @@ const waitingDiagnosisArc: Arc = {
       week: 8,
       theme: 'Prepare for results, plan next step',
       phase: 'setup',
-      candidateStepIds: ['whatIsAba', 'shortlistProviders', 'admissionsConsult', 'todo-after-results'],
+      candidateStepIds: ['whatIsAba', 'shortlistProviders', 'todo-after-results'],
     },
   ],
 };
@@ -187,7 +187,7 @@ const lookingForAbaArc: Arc = {
       week: 5,
       theme: 'Make contact & reach a provider intake team',
       phase: 'setup',
-      candidateStepIds: ['callOneProvider', 'admissionsConsult', 'findLocal'],
+      candidateStepIds: ['callOneProvider', 'findLocal'],
     },
     {
       week: 6,
@@ -205,7 +205,7 @@ const lookingForAbaArc: Arc = {
       week: 8,
       theme: 'Get ready to start services',
       phase: 'sustain',
-      candidateStepIds: ['documentHard', 'admissionsConsult', 'todo-start-services'],
+      candidateStepIds: ['documentHard', 'todo-start-services'],
     },
   ],
 };
@@ -253,7 +253,7 @@ const inAbaArc: Arc = {
       week: 7,
       theme: 'Coordinate the whole care team',
       phase: 'sustain',
-      candidateStepIds: ['parentMatch', 'smallGroups', 'admissionsConsult', 'todo-care-team'],
+      candidateStepIds: ['parentMatch', 'smallGroups', 'todo-care-team'],
     },
     {
       week: 8,
