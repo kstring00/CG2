@@ -1,8 +1,9 @@
 # Common Ground — Demo
 
-A parent support platform concept for autism families, by Texas ABA Centers.
-This is a self-contained demo with mock data — no backend, no auth, no
-environment variables required.
+A parent support platform for autism families. Common Ground is an
+independently created resource and is not affiliated with or endorsed by
+Texas ABA Centers. This is a self-contained demo with mock data — no backend,
+no auth, no environment variables required.
 
 > Common Ground is currently optimized for desktop and laptop only. Mobile
 > responsiveness is a planned future pass.
@@ -15,8 +16,8 @@ it:
 
 | Layer | Route | Who it is for | Visual cue |
 |-------|-------|---------------|------------|
-| **Free Parent Support** | `/support/*` | Every family in Texas — Medicaid, waitlist, pre-diagnosis, not-yet-enrolled. No account required. | Green "Free · open to everyone" chip, emerald banner at the top of every page |
-| **Client Portal** | `/client` (gate) → `/client/portal`, `/client/care-plan`, `/client/progress`, `/client/coaching`, `/client/messages` | Families already enrolled with Texas ABA Centers. Content is personalized, HIPAA-scoped, tied to a BCBA-authored care plan. | Accent-red "Client portal · sign-in required" chip, lock iconography, accent banner at the top of every page |
+| **Free Parent Support** | `/support/*` | Every family — Medicaid, waitlist, pre-diagnosis, not-yet-enrolled. No account required. | Green "Free · open to everyone" chip, emerald banner at the top of every page |
+| **Client Portal** | `/client` (gate) → `/client/portal`, `/client/care-plan`, `/client/progress`, `/client/coaching`, `/client/messages` | Concept demo for families already enrolled with an ABA provider. Content is personalized, HIPAA-scoped, tied to a BCBA-authored care plan. | Accent-red "Client portal · sign-in required" chip, lock iconography, accent banner at the top of every page |
 
 ### What lives in each layer
 
@@ -44,7 +45,7 @@ it:
 ## Tech Stack
 
 - **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS (Texas ABA Centers brand palette)
+- **Styling:** Tailwind CSS (Common Ground brand palette)
 - **Icons:** Lucide React
 - **Animations:** Framer Motion
 - **Language:** TypeScript

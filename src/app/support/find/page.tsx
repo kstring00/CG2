@@ -425,7 +425,7 @@ export default function FindLocalHelpPage() {
         (resource) => `<article><h2>${escapeHtml(resource.name)}</h2><p class="meta">${escapeHtml(resource.cities.join(', '))}</p><p>${escapeHtml(resource.blurb)}</p><p class="meta">${escapeHtml(resource.services.join(' · '))} · ${escapeHtml(resource.ageGroups.join(', '))} · ${escapeHtml(resource.insurance)}</p>${resource.phone ? `<p>${escapeHtml(resource.phone)}</p>` : ''}${resource.website ? `<p>${escapeHtml(resource.website)}</p>` : ''}</article>`,
       )
       .join('');
-    popup.document.write(`<!doctype html><html><head><title>Common Ground shortlist</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:32px auto;padding:0 20px;color:#14274a}h1{font-size:24px}h2{font-size:17px;margin:0 0 4px}article{padding:18px 0;border-bottom:1px solid #dfe5ee;page-break-inside:avoid}p{font-size:13px;line-height:1.55;margin:5px 0}.meta{color:#687389;font-size:11px}</style></head><body><h1>${escapeHtml(t.shortlist)}</h1><p class="meta">texasabacenterscg.com/support/find</p>${rows}<script>window.onload=()=>window.print()</script></body></html>`);
+    popup.document.write(`<!doctype html><html><head><title>Common Ground shortlist</title><style>body{font-family:Arial,sans-serif;max-width:720px;margin:32px auto;padding:0 20px;color:#14274a}h1{font-size:24px}h2{font-size:17px;margin:0 0 4px}article{padding:18px 0;border-bottom:1px solid #dfe5ee;page-break-inside:avoid}p{font-size:13px;line-height:1.55;margin:5px 0}.meta{color:#687389;font-size:11px}</style></head><body><h1>${escapeHtml(t.shortlist)}</h1><p class="meta">commongroundautism.org/support/find</p>${rows}<script>window.onload=()=>window.print()</script></body></html>`);
     popup.document.close();
   };
 

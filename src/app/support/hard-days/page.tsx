@@ -257,8 +257,8 @@ const resources = [
     external: true,
   },
   {
-    name: 'Texas ABA Centers — Care Coordinator',
-    detail: 'Your child\'s care coordinator can connect you to local therapist referrals and family support resources.',
+    name: 'Your child\'s care coordinator',
+    detail: 'If your child already has a provider, their care coordinator can connect you to local therapist referrals and family support resources.',
     action: '/support/connect',
     actionLabel: 'Talk to your coordinator',
     icon: Heart,

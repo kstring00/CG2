@@ -81,18 +81,20 @@ function TeamContact({ team }: { team: TeamMode }) {
         {CARE_PLAN_UI.teamContactHeading.text}
       </p>
       <p className="mt-2 text-sm text-brand-muted-600">{copy.contactLabel.text}</p>
-      {href ? (
-        <a
-          href={href}
-          className="mt-1 inline-block text-lg font-semibold text-brand-navy-700 underline decoration-brand-muted-300 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy-500 focus-visible:ring-offset-2"
-        >
-          {copy.phoneNumber.text}
-        </a>
-      ) : (
-        <p className="mt-1 text-lg font-semibold text-brand-navy-700">
-          {copy.phoneNumber.text}
-        </p>
-      )}
+      {copy.phoneNumber.text ? (
+        href ? (
+          <a
+            href={href}
+            className="mt-1 inline-block text-lg font-semibold text-brand-navy-700 underline decoration-brand-muted-300 underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy-500 focus-visible:ring-offset-2"
+          >
+            {copy.phoneNumber.text}
+          </a>
+        ) : (
+          <p className="mt-1 text-lg font-semibold text-brand-navy-700">
+            {copy.phoneNumber.text}
+          </p>
+        )
+      ) : null}
     </section>
   );
 }

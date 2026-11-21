@@ -10,7 +10,7 @@
  * become a meltdown. They need an actual technique they can try in the next
  * 60 seconds.
  *
- * These 10 are Kyle + CCO-approved starting content. A BCBA can add more
+ * These 10 are the starting content set. A BCBA can add more
  * later — the data shape is stable and forward-compatible.
  *
  * Editorial rules (locked):

@@ -118,14 +118,11 @@ export default function SupportPage() {
             No verified providers are published for this view yet
           </h3>
           <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-brand-muted-500">
-            Placeholder contacts and demo listings have been removed. Use the verified resource directory or contact Texas ABA Centers directly for current navigation support.
+            Placeholder contacts and demo listings have been removed. Use the verified resource directory to find current local support.
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-3">
             <a href="/support/find" className="btn-primary px-4 py-2.5 text-sm">
               Open verified resource directory
-            </a>
-            <a href="tel:8777715725" className="btn-secondary px-4 py-2.5 text-sm">
-              Call Texas ABA Centers: (877) 771-5725
             </a>
           </div>
         </div>

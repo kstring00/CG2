@@ -31,10 +31,10 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
-              width={320}
-              height={48}
+              src="/logos/common-ground-lockup.png"
+              alt="Common Ground"
+              width={384}
+              height={128}
               priority
               className="h-8 w-auto sm:h-9"
               style={{ objectFit: 'contain' }}
@@ -68,7 +68,7 @@ export default function HomePage() {
         <div className="absolute inset-0">
           <Image
             src="/hero-selected.jpg"
-            alt="Father and daughter doing a puzzle with Texas ABA Centers therapy kit"
+            alt="A father and daughter working on a puzzle together at a table"
             fill
             priority
             quality={100}
@@ -99,7 +99,7 @@ export default function HomePage() {
             {/* LEFT: Headline + CTAs — sits over the natural open left zone */}
             <div className="w-full max-w-[540px]">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
-                <Heart className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Common Ground
+                <Heart className="h-3 w-3 text-rose-400" /> Common Ground · Free parent resources
               </span>
               <h1 className="mt-5 text-balance text-4xl font-bold leading-[1.07] tracking-tight text-white sm:text-5xl lg:text-[3.5rem]">
                 You don&apos;t have to figure this out alone.
@@ -114,7 +114,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
-                  <span>Clinically reviewed by BCBAs at Texas ABA Centers</span>
+                  <span>Plain-language guides written for parents, not clinicians</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400" />
@@ -162,7 +162,7 @@ export default function HomePage() {
             ))}
           </div>
           <p className="mt-6 border-t border-stone-100 pt-5 text-center text-xs text-stone-400">
-            Built by <span className="font-semibold text-stone-600">Texas ABA Centers</span> to support families — not just clients.
+            An independent resource built to support families — free, with no sign-up.
           </p>
         </div>
       </section>
@@ -409,10 +409,10 @@ export default function HomePage() {
       <div className="border-y border-stone-200 bg-white px-6 py-6 sm:px-8">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-4 sm:grid-cols-4">
           {[
-            { icon: Shield, label: 'Clinically reviewed', sub: 'by BCBAs' },
-            { icon: Users, label: 'Built for families,', sub: 'clients' },
+            { icon: Shield, label: 'Plain language', sub: 'written for parents' },
+            { icon: Users, label: 'Built for families', sub: 'at every stage' },
             { icon: Heart, label: 'Serving every stage', sub: 'of the journey' },
-            { icon: Lock, label: 'Safe & secure', sub: 'HIPAA-protected' },
+            { icon: Lock, label: 'No account needed', sub: 'nothing to sign up for' },
           ].map((sig) => (
             <div key={sig.label} className="flex items-center gap-3">
               <sig.icon className="h-5 w-5 shrink-0 text-primary/70" />
@@ -442,8 +442,7 @@ export default function HomePage() {
                 You are carrying a lot. Common Ground is here to lighten the load so it feels
                 like a page, not a mountain. Come back anytime. The resources will wait.
               </p>
-              <p className="mt-3 text-xs text-stone-400">— the team at Texas ABA Centers</p>
-            </div>
+              </div>
           </div>
         </div>
       </section>
@@ -468,7 +467,7 @@ export default function HomePage() {
             </Link>
           </div>
           <p className="mt-10 text-xs text-white/35">
-            Powered by <span className="font-semibold text-white/60">Texas ABA Centers</span> · Common Ground is available to every family in Texas.
+            Common Ground is a free, independent resource — available to every family.
           </p>
           <p className="mt-2 text-xs text-white/25">
             <Link href="/privacy" className="underline hover:text-white/50 transition">Privacy Policy</Link>

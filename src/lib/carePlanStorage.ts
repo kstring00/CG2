@@ -67,7 +67,7 @@ export type CarePlanAnswers = {
 };
 
 /**
- * 5-bucket framing requested by Texas ABA Centers' clinical director.
+ * 5-bucket framing used across the support guide.
  * Each saved step belongs in one bucket. The care plan page renders one
  * suggested step per bucket so a parent can scan "what to do today vs. what
  * to bring to the BCBA" in a single glance.

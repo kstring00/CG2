@@ -20,10 +20,10 @@ export default function ClientSignInPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8">
           <Link href="/" aria-label="Common Ground home">
             <Image
-              src="/logos/cg2-lockup-final.png"
-              alt="Texas ABA Centers | Common Ground"
-              width={320}
-              height={48}
+              src="/logos/common-ground-lockup.png"
+              alt="Common Ground"
+              width={384}
+              height={128}
               priority
               className="h-8 w-auto sm:h-9"
               style={{ objectFit: 'contain' }}
@@ -74,7 +74,7 @@ export default function ClientSignInPage() {
             <div className="w-full max-w-[520px]">
 
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white/80 backdrop-blur-sm">
-                <Lock className="h-3 w-3 text-rose-400" /> Texas ABA Centers · Client Portal
+                <Lock className="h-3 w-3 text-rose-400" /> Common Ground · Client Portal
               </span>
 
               <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl">
@@ -138,7 +138,7 @@ export default function ClientSignInPage() {
           </div>
 
           <p className="mt-5 text-sm leading-relaxed text-stone-600">
-            This portal is for families already receiving care with Texas ABA Centers.
+            This portal is a concept demo for families already receiving ABA services.
             Everything inside is personal to your child — BCBA-written goals, session notes,
             and parent coaching tied to your actual plan.
           </p>
@@ -162,9 +162,9 @@ export default function ClientSignInPage() {
             </p>
             <p className="mt-1.5 text-sm leading-relaxed text-amber-900">
               Everything inside the portal is demo data. Nothing here reflects a
-              real child, real BCBA notes, or real session records. In production
-              this will connect to the Texas ABA Centers client sign-in. For now,
-              walk through as an example family below.
+              real child, real BCBA notes, or real session records. No provider
+              sign-in is connected to it. For now, walk through as an example
+              family below.
             </p>
           </div>
 

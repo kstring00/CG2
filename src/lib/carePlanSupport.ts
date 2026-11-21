@@ -73,18 +73,3 @@ export function getSupportNudgeCandidateId(thread: SupportThreadId): string {
   return NUDGE_CANDIDATE[thread];
 }
 
-/** Step ids where the universal admissions handoff should appear inline. */
-export const ADMISSIONS_STEP_IDS = new Set([
-  'admissionsConsult',
-  'callOneProvider',
-  'shortlistProviders',
-  'compareThree',
-  'findLocal',
-]);
-
-export const ADMISSIONS_PHONE = '+18777715725';
-export const ADMISSIONS_PHONE_DISPLAY = '(877) 771-5725';
-// Single source of truth for the admissions CTA primary line. Both the
-// AdmissionsHandoff button and the in-plan step title consume this so they
-// can never drift apart.
-export const ADMISSIONS_CTA_LABEL = 'Talk to Admissions — free consultation';

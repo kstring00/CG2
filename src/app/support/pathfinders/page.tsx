@@ -43,7 +43,7 @@ export default function PathfindersPage() {
           Meet your Pathfinder.
         </h1>
         <p className="mt-4 text-[15.5px] leading-relaxed text-brand-muted-700">
-          A real human who has walked this road. Pathfinders are Texas ABA Centers care navigators &mdash; trained to help you sort the next step, advocate at school meetings, and check in when the weeks get heavy. You don&rsquo;t have to explain everything from scratch.
+          A real human who has walked this road. Pathfinders are trained parent navigators &mdash; they help you sort the next step, advocate at school meetings, and check in when the weeks get heavy. You don&rsquo;t have to explain everything from scratch.
         </p>
       </header>
 

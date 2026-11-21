@@ -30,7 +30,7 @@ import NextStepButton from '@/components/layout/NextStepButton';
 
 /**
  * SupportShell — the layout for the parent-facing Common Ground experience.
- * The full site is designed for Texas ABA Centers parents and caregivers.
+ * The full site is an independent parent resource, free and open to anyone.
  */
 const navGroups = [
   {
@@ -85,11 +85,11 @@ function SidebarContent({ pathname, instance, reduceMotion, onNavigate }: Sideba
       <div className="border-b border-surface-border px-6 py-5">
         <Link href="/" aria-label="Common Ground home" className="block min-w-0">
           <Image
-            src="/logos/cg2-lockup-final.png"
-            alt="Texas ABA Centers | Common Ground"
-            width={280}
-            height={42}
-            className="h-auto w-full max-w-[200px]"
+            src="/logos/common-ground-lockup.png"
+            alt="Common Ground"
+            width={384}
+            height={128}
+            className="h-9 w-auto max-w-full"
             style={{ objectFit: 'contain' }}
           />
         </Link>
@@ -225,7 +225,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
           <div className={cn('mx-auto flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8', isFindPage ? 'max-w-[1600px]' : 'max-w-6xl')}>
             <p className="inline-flex items-center gap-2 text-[11px] font-semibold text-primary">
               <CompassIcon className="h-3.5 w-3.5" />
-              Texas ABA Centers · Parent Support
+              Common Ground · Parent Support
             </p>
             <CrisisPill />
           </div>
@@ -239,7 +239,7 @@ export function SupportShell({ children }: { children: React.ReactNode }) {
               </button>
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand-muted-400">Common Ground · Parent Support</p>
-                <p className="truncate text-sm text-brand-muted-700">For Texas ABA Centers families</p>
+                <p className="truncate text-sm text-brand-muted-700">Free for every family</p>
               </div>
             </div>
           </header>

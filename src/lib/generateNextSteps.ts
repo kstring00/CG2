@@ -28,7 +28,6 @@ import { TIER_STEP_LIMIT, type BandwidthTier } from './bandwidth';
 import type { ArcWeek } from './arcs';
 import { getArcWeek, isResolvableCandidateId } from './arcs';
 import {
-  ADMISSIONS_CTA_LABEL,
   getSupportNudgeCandidateId,
   getSupportNudgeCopy,
   pickSupportNudgeThread,
@@ -303,14 +302,6 @@ const C: Record<string, Candidate> = {
     href: '/support/find',
     bucket: 'do-today',
   },
-  admissionsConsult: {
-    id: 'admissionsConsult',
-    title: ADMISSIONS_CTA_LABEL,
-    why: 'One universal door: a free consultation with our admissions team. They walk through coverage and next steps with you — no eligibility decision on this site.',
-    href: 'tel:+18777715725',
-    bucket: 'do-today',
-    altBuckets: ['ask-bcba'],
-  },
   schoolServicesPath: {
     id: 'schoolServicesPath',
     title: 'Explore school-based services (no insurance required)',
@@ -430,7 +421,7 @@ const W = {
 /** Private-insurance-only financial resources — never surfaced unless coverage is private. */
 const PRIVATE_INSURANCE_ONLY = new Set(['verifyCoverage', 'insuranceCall']);
 
-/** Financial-resource ids — coverage may only filter these (never gates arc, support, or admissions). */
+/** Financial-resource ids — coverage may only filter these (never gates arc or support steps). */
 export const FINANCIAL_CANDIDATE_IDS = new Set([
   'verifyCoverage',
   'insuranceCall',
@@ -837,7 +828,7 @@ function boostArcPool(scores: Map<string, Score>, arcWeek: ArcWeek): void {
 // 5-bucket plan (CCO review, May 2026)
 // ---------------------------------------------------------------------------
 
-/** The 5 buckets, in the display order Texas ABA Centers' CCO asked for. */
+/** The 5 buckets, in their established display order. */
 export const BUCKET_ORDER: StepBucket[] = [
   'do-today',
   'ask-bcba',

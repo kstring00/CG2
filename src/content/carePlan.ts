@@ -148,8 +148,11 @@ export const TEAM_COPY: Record<
 > = {
   yes: {
     sessionHeading: draft('team.yes.session-heading', 'Bring this to your BCBA'),
-    contactLabel: draft('team.yes.contact-label', 'Call your clinic'),
-    phoneNumber: draft('team.yes.phone-number', 'CLINIC_PHONE_PLACEHOLDER'),
+    contactLabel: draft(
+      'team.yes.contact-label',
+      "Call your child's clinic and ask for the BCBA on the case.",
+    ),
+    phoneNumber: draft('team.yes.phone-number', ''),
   },
   no: {
     sessionHeading: draft(
@@ -158,9 +161,9 @@ export const TEAM_COPY: Record<
     ),
     contactLabel: draft(
       'team.no.contact-label',
-      "Talk to Admissions — they help families who don't have a team yet.",
+      'No team yet? Use the provider directory to find and compare local clinics.',
     ),
-    phoneNumber: draft('team.no.phone-number', '(877) 771-5725'),
+    phoneNumber: draft('team.no.phone-number', ''),
     providerEvaluationNote: draft(
       'team.no.provider-evaluation-note',
       'These questions are also how you evaluate a provider — a good one welcomes all of them.',
@@ -1568,7 +1571,7 @@ export const CRISIS_PAGE = {
     ),
     draft(
       'crisis.body-2',
-      "Families in this situation are not out of options. Ask your team directly which of these apply to you: a revised plan that targets these incidents, hands-on caregiver training, a written safety plan for the moments themselves, or increased support hours. If you don't have a team yet, this is the first thing to tell admissions.",
+      "Families in this situation are not out of options. Ask your team directly which of these apply to you: a revised plan that targets these incidents, hands-on caregiver training, a written safety plan for the moments themselves, or increased support hours. If you don't have a team yet, this is the first thing to tell a provider's intake team.",
     ),
   ],
   documentationHeading: draft(
